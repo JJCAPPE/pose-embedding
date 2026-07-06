@@ -1,33 +1,32 @@
 \documentclass[11pt]{article}
 
-% Packages
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{amsmath,amssymb,amsthm}
-\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
 \usepackage{booktabs}
-\usepackage{hyperref}
+\usepackage{array}
+\usepackage{tabularx}
 \usepackage{geometry}
+\usepackage{hyperref}
 \usepackage{natbib}
+\usepackage{enumitem}
 \usepackage{xspace}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
 
-% Geometry
 \geometry{left=1in, right=1in, top=1in, bottom=1in}
-
-% Hyperref
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
     filecolor=magenta,
     urlcolor=cyan,
-    citecolor=blue,
+    citecolor=blue
 }
 
-% Title info
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlist[itemize]{leftmargin=*, itemsep=2pt, topsep=2pt}
+\setlist[enumerate]{leftmargin=*, itemsep=2pt, topsep=2pt}
+
 \title{Literature Review: Pose-Based Motion Embeddings and Contextual Metric Learning for Robust Retrieval}
-\author{Student Name -- Research Project with Prof. Brian Kulis}
+\author{Giacomo Cappelletto -- Research Project with Prof. Brian Kulis}
 \date{\today}
 
 \begin{document}
@@ -36,311 +35,196 @@
 
 \begin{abstract}
 \noindent
-This review surveys the literature on pose-based human-motion retrieval, skeleton action recognition, and deep metric learning, with a view toward extending contextual metric learning from image retrieval to temporal pose-sequence retrieval under pose-estimation noise. Existing work provides strong individual components---skeleton action encoders, motion datasets, metric-learning baselines, and the contextual-loss method---but the intersection of contextual metric learning with pose-sequence retrieval and noise-robustness evaluation appears underexplored. We argue that this gap presents a feasible and scientifically worthwhile extension, and we outline a concrete experimental path toward a first result using public datasets and code.
+The literature does not suggest that contextual metric learning has already been applied to noisy pose-sequence retrieval. Instead, it provides strong but mostly separate components: Kulis's contextual similarity objective for image retrieval, public skeleton/motion encoders, one-shot skeleton metric-learning baselines, robust skeleton-recognition work, and motion-language retrieval systems. The most feasible first result is therefore not a new architecture, but a controlled adaptation: use a public NTU skeleton pipeline, expose a normalized sequence embedding, train standard metric-learning baselines and the contextual loss under the same balanced batches, and compare retrieval degradation under synthetic pose corruptions. The recommended first implementation is MotionBERT's NTU120 one-shot embedding path plus the contextual-loss repository; MMAction2/PoseC3D is the stronger second-stage robustness baseline.
 \end{abstract}
 
-\section{Project Motivation and Research Question}
+\section{Project Framing}
 
-Human-motion retrieval from pose sequences is a natural extension of image-retrieval and text-retrieval pipelines: a query motion is encoded into a fixed-length embedding, and relevant reference motions are returned by nearest-neighbor search. The proposed project asks whether \emph{contextual metric learning}---originally developed for image retrieval by Liao, Tsiligkaridis, and Kulis ---can improve the robustness of such embeddings when the input pose data is noisy, incomplete, or corrupted by viewpoint effects and estimation errors \cite{liao2023supervised}.
-
-The core research question is:
-\begin{quote}
-Can contextual metric learning improve the robustness of pose-sequence embeddings for nearest-neighbor retrieval when pose inputs are degraded by joint jitter, missing joints, temporal dropout, or view perturbations?
-\end{quote}
-
-We frame the problem as a metric-learning/retrieval task rather than a classification task: the goal is not simply to predict action labels, but to learn an embedding space in which nearest-neighbor retrieval yields semantically relevant results, and where retrieval quality is preserved under controlled corruption.
-
-The proposed pipeline is:
+Prof. Kulis's research agenda explicitly includes metric learning, content-based search, clustering, online learning, and applications to audio/visual data \citep{kulisProfile}. The proposed project should therefore be framed as a metric-learning and retrieval problem first:
 \begin{equation}
-\text{pose sequence} \rightarrow \text{temporal encoder} \rightarrow \text{fixed-length embedding} \rightarrow \text{NN retrieval} \rightarrow \text{retrieval metrics under clean/noisy conditions}.
+\begin{aligned}
+\text{pose sequence} &\rightarrow \text{sequence encoder}
+\rightarrow \ell_2\text{-normalized embedding} \\
+&\rightarrow \text{nearest-neighbor retrieval}
+\rightarrow \text{ranking metrics under clean/noisy poses}.
+\end{aligned}
 \end{equation}
 
-%================================================================
-\section{Background: Contextual Metric Learning}
-\label{sec:contextual}
+The central question is narrow enough to test:
+\begin{quote}
+Does neighborhood-based contextual similarity preserve pose-sequence retrieval quality better than standard pairwise or contrastive objectives when input skeletons are corrupted?
+\end{quote}
+The relevant corruptions are joint jitter, missing joints, limb dropout, temporal frame dropout, camera/view perturbations, left-right swaps where anatomically meaningful, and 2D-to-3D lifting or detector confidence noise. Classification accuracy alone is not the target. A classifier can remain strong while its penultimate embedding is poorly ranked for retrieval. The correct evaluation unit is a query/gallery retrieval protocol with Recall@K, mAP, mAP@R, and robustness curves.
 
-The methodological anchor for this project is the work of Liaochan, Tsiligkaridis, and Kulis on supervised metric learning via contextual similarity optimization \cite{liao2023supervised}.
+The main literature gap is the intersection of three lines of work: contextual metric learning for retrieval \citep{liao2023supervised}; skeleton/motion encoders for action recognition or representation learning \citep{yan2018stgcn,duan2022posec3d,zhu2023motionbert}; and robustness studies for incomplete or noisy skeletons \citep{song2020ragcn,shi2020prgcn}. I found strong adjacent work, but not a paper in the supplied archive or subsequent source checks that combines contextual loss, temporal pose embeddings, retrieval ranking metrics, and a controlled pose-noise benchmark.
 
-\subsection{Core idea}
+\section{Contextual Metric Learning}
 
-Standard deep metric learning optimizes pairwise or triplet distances: similar examples are pulled together, dissimilar examples are pushed apart. The contextual approach adds a \emph{neighborhood-level} constraint: two samples are considered similar not only when their embeddings are close, but when their top-$k$ nearest-neighbor sets overlap. This contextual-similarity matrix is then matched to the label-similarity matrix.
+\citet{liao2023supervised} propose supervised metric learning for image retrieval via contextual similarity optimization. Standard metric-learning losses operate mainly on pairwise or tuplewise distances; their method additionally asks whether two samples have similar neighborhoods. In the public implementation, embeddings are normalized, a batch-level cosine similarity matrix is formed, top-$k$ neighborhood masks are computed, and a contextual Jaccard-like similarity is matched to the label agreement matrix \citep{contextualRepo}.
 
-The final loss combines three terms:
-\begin{enumerate}
-    \item \textbf{Contextual loss} --- drives neighborhood structure to match label structure.
-    \item \textbf{Contrastive loss} --- preserves standard pairwise distance semantics.
-    \item \textbf{Similarity regularizer} --- encourages efficient use of the embedding space.
-\end{enumerate}
-
-The authors report improved retrieval on image benchmarks and, importantly, robustness to label noise and overfitting.
-
-\subsection{Why it transfers to pose sequences}
-
-The contextual loss is architecture-agnostic: it operates only on embeddings and labels. To adapt it to pose sequences, one replaces the image encoder (e.g., a CNN) with a temporal pose encoder (e.g., a TCN, ST-GCN, or transformer), and keeps the loss computation unchanged. The key implementation requirements that carry over are:
+The important transfer point is that the loss is mostly encoder-agnostic. For pose sequences, the image CNN can be replaced with a TCN, ST-GCN, PoseC3D, MotionBERT, or a simple GRU/Transformer encoder, while preserving the loss-side contract:
 \begin{itemize}
-    \item L2-normalized embeddings ($\ell_2$ norm = 1) so that dot product = cosine similarity.
-    \item A class-balanced batch sampler providing $N$ classes $\times$ $M$ samples per class per batch.
-    \item The top-$k$ parameter is set to $k = M$, i.e., tied to samples per class.
-    \item The contextual similarity is computed entirely within the mini-batch.
+    \item the model returns one fixed-length embedding per sequence;
+    \item embeddings are $\ell_2$ normalized so dot products are cosine similarities;
+    \item each training batch contains multiple examples per class;
+    \item the contextual neighborhood size $k$ is tied to the samples-per-class value $M$;
+    \item contextual loss is compared against contrastive, triplet, SupCon, multi-similarity, and classification-derived embeddings.
 \end{itemize}
 
-Because the loss is agnostic to the upstream encoder, adaptation is primarily an engineering step of swapping encoders and batch samplers, not a theoretical redesign.
+The repository audit surfaced one concrete engineering caveat. The 224-by-224 branch exposes the hybrid loss as \texttt{HybridLoss(..., k=args.IPC, eps=args.eps)}, while the 256-by-256 path hard-codes $k=4$ inside its contextual loss. For this project, the loss should be refactored so $k=M$ is always passed explicitly; otherwise the batch sampler and contextual neighborhood definition can silently diverge.
 
-%================================================================
-\section{What Has Been Done Before: A Literature Taxonomy}
-\label{sec:taxonomy}
+\section{What Has Been Done Before}
 
-We organize prior work into six thematic groups relevant to the project (Table~\ref{tab:taxonomy}).
+Table~\ref{tab:taxonomy} separates adjacent literatures by what they actually solve. This distinction matters because several papers produce useful embeddings, but only a subset evaluate retrieval directly, and fewer still evaluate retrieval under noisy pose inputs.
 
 \begin{table}[htbp]
+\scriptsize
 \centering
-\caption{Literature taxonomy for pose-motion retrieval and contextual metric learning.}
+\caption{Relevant literature clusters and project implications.}
 \label{tab:taxonomy}
-\begin{tabular}{@{}p{3.2cm}p{8.5cm}@{}}
+\begin{tabularx}{\textwidth}{@{}p{2.8cm}Y Y@{}}
 \toprule
-Category & Key Papers / Systems & Relevance to Project \\
+Cluster & Representative work & Implication for this project \\
 \midrule
-General deep metric learning & Musgrave et al. (Reality Check); Khosla et al. (SupCon); Zhai et al. (Classification baseline); Musgrave et al. (PyTorch Metric Learning) & Establish baselines and caution against overclaiming novel metric-learning gains. \\
-Skeleton-based action recognition & Yan et al. (ST-GCN); Lee et al. (MST-GCN); Cheng et al. (ST-TR); Chen et al. (PoseC3D); Ren et al. (survey) & Provide sequence encoders that can be repurposed as embedding extractors. Most optimize classification, not retrieval. \\
-Robust skeleton recognition & Shi et al. (PR-GCN); Song et al. (RA-GCN) & Define noise types (occlusion, jitter) that can be reused for robustness benchmarks. \\
-Motion representation & Mahmood et al. (AMASS); Punnakkal et al. (BABEL); Duan et al. (MotionBERT) & Offer clean motion data and strong pretrained encoders. AMASS+BABEL enables semantic retrieval possibilities. \\
-Skeleton metric learning & Memmesheimer et al. (SL-DML, Skeleton-DML) & Explicitly frame action recognition as nearest-neighbor search. Most directly related baselines. \\
-Datasets & Liu et al. (NTU RGB+D 120); Ingwersen et al. (SportsPose); Zhang et al. (H3WB); Shao et al. (FineGym); Soomro et al. (UCF101) & Provide labeled skeleton/motion data for retrieval benchmarks. \\
+Metric learning and ranking & Contrastive loss \citep{hadsell2006contrastive}, classification baselines \citep{zhai2018classification}, SupCon \citep{khosla2020supcon}, Smooth-AP \citep{brown2020smoothap}, multi-similarity \citep{wang2019multisimilarity}, PML \citep{musgrave2020pytorch}, and the metric-learning reality check \citep{musgrave2020metric}. & These define fair baselines. Contextual loss should not be compared only to cross-entropy; it should be compared to strong retrieval objectives on the same backbone and sampler. \\
+Pose embeddings & Pose Embeddings \citep{mori2015poseembeddings}; VIPE/Pr-VIPE and occlusion-robust Pr-VIPE \citep{sun2019prvipe,liu2020prvipe}. & This line is closest conceptually: pose similarity is learned as an embedding problem. Pr-VIPE explicitly targets cross-view pose retrieval and partial keypoints, but it is not a supervised action-class motion-retrieval benchmark. \\
+Skeleton action recognition & ST-GCN \citep{yan2018stgcn}, MST-GCN \citep{lee2022mstgcn}, PoseC3D \citep{duan2022posec3d}, MotionBERT \citep{zhu2023motionbert}. & These provide encoders. Most optimize top-1 action accuracy, so their features need retrieval evaluation and metric-loss fine-tuning. \\
+Robust skeleton recognition & RA-GCN and PR-GCN \citep{song2020ragcn,shi2020prgcn}. & These papers justify noise types such as incomplete skeletons, occlusion, and jitter, but they do not answer whether contextual ranking improves retrieval robustness. \\
+Skeleton metric learning & SL-DML \citep{memmesheimer2020sldml} and Skeleton-DML \citep{memmesheimer2022skeletondml}. & These are the most direct baselines: they reduce one-shot skeleton action recognition to nearest-neighbor search in embedding space. They should be cited as prior art, not ignored. \\
+Motion-language retrieval & Text-to-Motion Retrieval \citep{petrovich2023textmotion}, cross-dataset text-motion retrieval \citep{bensabath2024crossdataset}, tri-modal retrieval \citep{yin2024trimodal}, multi-modal retrieval \citep{yu2025multimodal}, and MoCHA \citep{warner2026mocha}. & This is where current motion retrieval is moving, but it changes the problem to text/video/audio-motion alignment. It is useful context and a later extension, not the first experiment. \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
-\subsection{General deep metric learning and retrieval}
+The strongest prior-art warning is from \citet{musgrave2020metric}: metric-learning gains can disappear under careful controls. A defensible result should therefore report clean and noisy retrieval for every loss on the same data split, backbone, augmentation policy, batch composition, embedding dimension, and evaluator.
 
-The metric-learning literature offers a spectrum of loss functions and evaluation practices. Musgrave et al.'s ``Metric Learning Reality Check'' argues that many claimed advances are smaller than reported, and that baselines need to be carefully chosen and fairly evaluated \cite{musgrave2020metric}. Supervised contrastive learning \cite{khosla2020supcon} and the classification-baseline paper \cite{zhai2019classification} are now standard reference points. The PyTorch Metric Learning library (PML) provides open-source, tested implementations of these losses and their corresponding evaluation protocols \cite{musgrave2020pytorch}.
+\section{Datasets and Retrieval Targets}
 
-For our project, this literature establishes the baseline losses against which contextual loss must be compared: contrastive, triplet, supervised contrastive, multi-similarity, and proxy-based losses. It also cautions us to use proper retrieval metrics (Recall@K, mAP) and not to rely solely on proxy measures such as proxy-anchor accuracy or embedding-space triplet violations.
-
-\subsection{Skeleton-based action recognition}
-
-Skeleton action recognition is the closest existing literature to the proposed encoder backbone. ST-GCN \cite{yan2018stgcn} established graph-convolutional networks on skeleton sequences, treating joints as graph nodes and bones as edges, then applying spatial and temporal graph convolutions. MST-GCN \cite{lee2022mstgcn} extended this with multi-scale receptive fields. Transformer-based variants such as ST-TR \cite{cheng2020sttr} replaced graph operations with self-attention over joints and time. PoseC3D \cite{chen2021posec3d} took a different direction, abandoning graph sequences in favor of 3D pose heatmap stacks, and explicitly claimed robustness to pose-estimation noise.
-
-A survey by Ren et al. organizes the field into RNN, CNN, GCN, and Transformer families \cite{ren2024skeletonsurvey}. For our purposes, these architectures are relevant as \emph{encoders}: they can be truncated before the final classification layer to produce embeddings, which can then be L2-normalized and fed into metric-learning losses. The main caveat is that these models are typically trained and evaluated for classification accuracy, not retrieval quality, so their embeddings may require finetuning for nearest-neighbor tasks.
-
-\subsection{Robust skeleton recognition}
-
-PR-GCN (Pose Refinement GCN) \cite{shi2020prgcn} and RA-GCN (Robustly Activated GCN) \cite{song2020ragcn} address incomplete or noisy skeletons directly, with RA-GCN showing reduced degradation under synthetic occlusion and jittering. These papers are useful for defining realistic noise protocols (occlusion, joint dropout, limb dropout) and for sanity-checking robustness claims, even though they do not evaluate retrieval metrics.
-
-\subsection{Motion representation and mocap datasets}
-
-AMASS unifies 15 MoCap datasets into a common SMPL-based representation, offering over 40 hours of clean motion \cite{mahmood2019amass}. BABEL adds sequence-level and frame-level action labels to AMASS, yielding a rich semantic basis for retrieval \cite{punnakkal2021babel}. MotionBERT pretrains a dual-stream spatio-temporal transformer on noisy partial 2D observations and exposes an encoder useful for downstream pose-estimation and action-recognition tasks \cite{duan2022motionbert}. These resources are valuable for clean, high-quality motion modeling, but AMASS+BABEL label structures are more complex than the action-class labels of NTU RGB+D 120, making them a plausible second-phase target rather than the first benchmark.
-
-\subsection{Direct metric learning for skeleton/action retrieval}
-
-SL-DML and Skeleton-DML are the most directly related baselines \cite{memmesheimer2020sldml, memmesheimer2021skeletondml}. Both formulate one-shot or few-shot skeleton-based action recognition as deep metric learning and nearest-neighbor search in embedding space. SL-DML uses triplet loss over signal-to-image representations and reports nearest-neighbor gains on NTU RGB+D 120. Skeleton-DML proposes a skeleton representation specifically for deep metric learning, also on NTU. These papers do not introduce a contextual loss, nor do they systematically evaluate robustness to noise, but they establish that sequence-level skeleton embeddings for ranking are viable.
-
-\subsection{Cross-modal motion retrieval}
-
-More recent work has moved toward text-motion and multimodal retrieval. Text-to-Motion Retrieval \cite{petrovich2022textmotion} and multi-modal extensions (tri-modal, four-modal) use contrastive objectives over motion and language encoders. This is useful context for where the broader motion-embedding community is investing effort, but it does not address the specific question of whether contextual similarity improves robustness under pose-estimation noise.
-
-%================================================================
-\section{Dataset Benchmarking Options}
-\label{sec:datasets}
-
-Table~\ref{tab:datasets} summarizes the datasets most relevant to the project.
+The first benchmark should be easy enough that the research contribution is the loss and robustness evaluation, not dataset plumbing. Table~\ref{tab:datasets} ranks the relevant datasets accordingly.
 
 \begin{table}[htbp]
+\small
 \centering
-\caption{Dataset comparison for pose-sequence retrieval benchmarking.}
+\caption{Dataset options for pose-sequence retrieval.}
 \label{tab:datasets}
-\begin{tabular}{@{}p{2.2cm}p{1.5cm}p{2.5cm}p{3.0cm}p{5.0cm}@{}}
+\begin{tabularx}{\textwidth}{@{}p{2.1cm}p{2.2cm}p{2.5cm}Y Y p{1.5cm}@{}}
 \toprule
-Dataset & Modality & Scale & Labels & Strengths & Weaknesses \\
+Dataset & Modality & Scale / labels & Strength & Weakness & First? \\
 \midrule
-NTU RGB+D 120 & RGB+D+Skeleton & 114K videos, 120 classes & Action labels, cross-subject/setup splits & Large scale; standard splits; multi-view; many classes make retrieval well-defined. & Actions are broad daily motions, not fine-grained sports. \\
-AMASS & MoCap/SMPL & >40 hrs, >11K motions & Via BABEL: >28K sequence labels, >250 categories & Clean, physically plausible motion; rich semantic labels. & Labels require AMASS+BABEL linkage; retrieval task less direct. \\
-SportsPose & 3D sports pose & >176K poses, 5 sports & Sport/activity labels & Relevant to dynamic sports movements; strong joint motion. & Smaller activity count; less directly suited to broad class retrieval. \\
-H3WB & Whole-body 3D pose & 133 keypts, 100K images & Pose-estimation annotations & Useful for whole-body/incomplete-keypoint robustness. & Not a motion-retrieval benchmark. \\
-FineGym & Video+annotations & Fine-grained gymnastics action hierarchy & Sub-action labels & Good for fine-grained temporal retrieval. & Video-first; requires pose extraction. \\
-UCF101 & Video & 101 classes, 13K clips & Action labels & Standard action-recognition benchmark. & Not a skeleton/motion dataset natively. \\
+NTU RGB+D 120 \citep{liu2020ntu120} & RGB, depth, IR, 3D skeleton & 114{,}480 samples, 120 classes, standard cross-subject/cross-setup splits & Large class count and multiple examples per class make label-based retrieval well defined; public skeleton pipelines exist. & Broad daily/interpersonal actions, not fine-grained sports technique. & Yes \\
+NTU RGB+D 60 & Same family & 56{,}880 samples, 60 classes & Easier and already supported by MotionBERT and MMAction2 configs. & Smaller label space than NTU120; less aligned with one-shot NTU120 metric-learning papers. & Pilot \\
+SportsPose \citep{ingwersen2023sportspose} & Markerless 3D sports pose & $>$176{,}000 poses, 24 subjects, 5 sports & Dynamic athletic motion and sports relevance; useful for showing domain relevance. & Pose-estimation benchmark with limited action categories; retrieval labels may need construction. & Later \\
+AMASS+BABEL \citep{mahmood2019amass,punnakkal2021babel} & SMPL/SMPL-H mocap with language/action labels & AMASS has 40+ hours and 11k+ motions; BABEL adds 28k+ sequence and 63k+ frame labels & Clean motion and rich semantics; good for general motion retrieval. & Label structure and preprocessing are more complex than NTU; not the fastest first result. & Later \\
+FineGYM \citep{shao2020finegym} & Video with fine-grained gymnastics hierarchy & Fine-grained temporal action annotations & Strong for sports phase retrieval and hierarchical relevance. & Requires pose extraction or use of preprocessed MMAction2 skeleton annotations. & Later \\
+H3WB \citep{zhang2022h3wb} & Whole-body pose estimation & 133 keypoints over Human3.6M-derived images & Useful for whole-body/keypoint robustness. & Not naturally a sequence retrieval benchmark. & No \\
+UCF101 \citep{soomro2012ucf101} & Raw video & 101 action classes & Useful for eventual video-to-pose robustness. & Adds pose-estimation pipeline noise before the retrieval question is settled. & No \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
-Based on the above, our recommendation is to use \textbf{NTU RGB+D 120} as the first benchmark: it provides abundant skeleton sequences, multiple examples per action class, and standard cross-subject/cross-view splits that naturally support retrieval evaluation. SportsPose can be added later for sports-specific relevance; AMASS+BABEL can be added if the project evolves toward general motion representation; UCF101 and FineGym are best treated as later extensions requiring video-to-pose pipelines.
+The recommendation is to use NTU120 if data preparation is already available, or NTU60 as a pilot if MotionBERT/MMAction2 setup time dominates. SportsPose and FineGYM should be treated as validation of relevance after the core methodology works.
 
-%================================================================
-\section{Architecture and Codebase Options}
-\label{sec:architectures}
+\section{Repository Audit}
 
-Table~\ref{tab:architectures} compares the most relevant architectures and codebases.
+The practical build question is where contextual loss can be inserted with minimal new code. The audit covered the contextual-loss implementation, MotionBERT, MMAction2, standalone ST-GCN, Skeleton-DML/SL-DML, POEM/Pr-VIPE, text-to-motion retrieval, and MotionCLIP \citep{contextualRepo,motionbertRepo,mmaction2Repo,stgcnRepo,skeletonDmlRepo,slDmlRepo,poemRepo,textMotionRepo,motionclipRepo}. Tables~\ref{tab:repos-core} and~\ref{tab:repos-adjacent} summarize the repository-level findings.
 
 \begin{table}[htbp]
+\small
 \centering
-\caption{Architecture and codebase comparison.}
-\label{tab:architectures}
-\begin{tabular}{@{}p{2.8cm}p{2.0cm}p{2.2cm}p{3.0cm}p{3.0cm}@{}}
+\caption{Core implementation codebases.}
+\label{tab:repos-core}
+\begin{tabularx}{\textwidth}{@{}p{2.5cm}Y Y@{}}
 \toprule
-Architecture & Input & Original Task & Embedding Access & Ease of Adding Contextual Loss \\
+Codebase & Reusable adaptation point & Recommendation \\
 \midrule
-Simple TCN/GRU/LSTM & Skeleton seq. & Action recognition & Penultimate hidden state & Trivial: any temporal model can be truncated. \\
-ST-GCN & Skeleton graph & Action recognition & Pre-classifier feature & Straightforward; widely used base. \\
-MST-GCN & Skeleton graph & Action recognition & Pre-classifier feature & Similar to ST-GCN; larger receptive field. \\
-Skeleton-DML / SL-DML & Skeleton seq. & One-shot action recog. & Explicitly trained embedding & Very direct; already metric-learning-based. \\
-MotionBERT & 2D/3D skeletons & Motion representation & Encoder output & Direct; pretrained backbone available. \\
-PoseC3D (MMAction2) & Pose heatmaps & Action recognition & Before final classifier & Robustness claims; requires heatmap conversion. \\
-PyTorch Metric Learning & Embeddings & Metric learning library & N/A (loss-only) & Loss functions already implemented. \\
-Kulis contextual-loss repo & Embeddings & Image retrieval & N/A (loss-only) & Must swap encoder; loss code is clean. \\
+Contextual loss repo & Hybrid contextual/contrastive loss, balanced sampler pattern, and cosine retrieval evaluators; replace the image loader with pose sequences and expose $k=M$. & Use as the loss/evaluator reference, not as the model scaffold. \\
+MotionBERT & NTU action configs, pretrained encoder, \texttt{get\_representation}, normalized \texttt{ActionHeadEmbed}, PML sampler, and cosine nearest-neighbor validation. & Best first path: replace SupCon in \texttt{train\_action\_1shot.py} with contextual/hybrid loss and extend validation to Recall@K/mAP under corruption. \\
+MMAction2 / PoseC3D & Maintained skeleton toolbox, preprocessed NTU/FineGYM/UCF annotations, and ST-GCN/PoseC3D configs. & Strong second-stage baseline: add an embedding head plus metric-learning loss/evaluator inside the MMAction2 stack. \\
+Standalone ST-GCN & Simple model with explicit \texttt{extract\_feature}; remove the classifier head, pool sequence features, normalize, and train retrieval losses. & Useful sanity baseline, but the repo itself is historical. \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
-The optimal first path is to start with a simple temporal encoder (TCN, GRU, or LSTM), which can be trained end-to-end with minimal overhead. Once the basic pipeline is stable, one can introduce ST-GCN or MST-GCN for stronger spatial-temporal skeleton modeling, or MotionBERT for a pretrained high-quality motion encoder. Skeleton-DML/SL-DML are especially relevant because they already frame the task as nearest-neighbor retrieval in embedding space, providing a strong existing baseline.
-
-%================================================================
-\section{Losses and Evaluation Metrics}
-\label{sec:losses}
-
-The proposed experiments should compare several training objectives:
-\begin{enumerate}
-    \item Cross-entropy classification baseline (penultimate layer as embedding).
-    \item Contrastive loss.
-    \item Triplet margin loss.
-    \item Supervised contrastive (SupCon) loss.
-    \item Contextual loss (Liao/Kulis).
-    \item Hybrid contextual + contrastive loss.
-\end{enumerate}
-
-Evaluation must use retrieval metrics, not classification accuracy:
-\begin{itemize}
-    \item \textbf{Recall@1, Recall@5, Recall@10} --- core retrieval quality.
-    \item \textbf{mAP} --- mean average precision over ranked results.
-    \item \textbf{Robustness drop} --- clean score minus noisy score.
-    \item Optionally, area under the robustness curve as a scalar summary.
-\end{itemize}
-
-Noise types for the robustness benchmark include: Gaussian joint jitter, random joint dropout, limb dropout, temporal jitter, frame dropout, scaling/rotation perturbations, and left-right swaps.
-
-%================================================================
-\section{Proposed Experimental Design}
-\label{sec:experiments}
-
-A concrete first experiment is outlined in Table~\ref{tab:experiments}.
-
 \begin{table}[htbp]
+\small
 \centering
-\caption{Proposed first-stage experimental matrix.}
-\label{tab:experiments}
-\begin{tabular}{@{}ll@{}}
+\caption{Adjacent repositories and extension paths.}
+\label{tab:repos-adjacent}
+\begin{tabularx}{\textwidth}{@{}p{2.5cm}Y Y@{}}
+\toprule
+Codebase & Reusable adaptation point & Recommendation \\
+\midrule
+Skeleton-DML / SL-DML & Direct one-shot skeleton metric-learning framing and public code. & Closest baseline family; use if MotionBERT setup stalls or as prior-art comparison. \\
+POEM / Pr-VIPE & View-invariant and occlusion-robust pose embedding code for cross-view pose retrieval. & Valuable side experiment for single-frame or short-sequence robustness, not the first class-level motion benchmark. \\
+Text-to-motion retrieval & Modular motion encoders, normalized text/motion embeddings, and Recall@K/NDCG evaluation. & Later extension only because it changes the problem to cross-modal retrieval. \\
+MotionCLIP & AMASS/BABEL parsing and a CLIP-aligned latent motion space. & Useful for semantic motion search, but not core for the first pose-to-pose result. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The most actionable observation is that MotionBERT's one-shot NTU120 path already has three things the contextual loss needs: an embedding head, class-balanced sampling via PyTorch Metric Learning's sampler, and cosine nearest-neighbor validation. A minimal first version can leave MotionBERT's data code intact and swap only the loss and evaluator.
+
+\section{Experimental Design}
+
+The first experiment should isolate the effect of the loss. The proposed matrix is:
+\begin{table}[htbp]
+\small
+\centering
+\caption{First-stage experimental matrix.}
+\label{tab:experiment}
+\begin{tabularx}{\textwidth}{@{}p{3.1cm}Y@{}}
 \toprule
 Component & Setting \\
 \midrule
-Dataset & NTU RGB+D 120 skeletons \\
-Task & Action-class retrieval \\
-Split & Cross-subject and/or cross-setup \\
-Encoder 1 & Simple TCN baseline \\
-Encoder 2 & Adapted Skeleton-DML or ST-GCN/MST-GCN \\
-Losses & CE-baseline, triplet, SupCon, contextual, hybrid \\
-Noise corruptions & Jitter, dropout, limb dropout, temporal, scaling, rotation \\
-Metrics & R@1, R@5, R@10, mAP; robustness drop \\
+Dataset & NTU RGB+D 120 skeletons if available; otherwise NTU60 pilot using MotionBERT/MMAction2 preprocessed skeletons. \\
+Task & Query/gallery action-class retrieval. A retrieved sequence is relevant if it shares the query's action label; exclude the query instance when query and gallery are identical. \\
+Splits & Cross-subject and cross-setup/cross-view where supported; report which split is used for each dataset. \\
+Backbones & MotionBERT embedding path first; then ST-GCN or PoseC3D through MMAction2. Optional simple TCN as a transparent lower-bound baseline. \\
+Losses & Cross-entropy penultimate embedding, triplet, SupCon, multi-similarity, contextual loss, and contextual+contrastive hybrid. \\
+Corruptions & Gaussian joint jitter, random joint dropout, limb dropout, confidence masking, temporal frame dropout, temporal jitter, scale/rotation/view perturbation, and left-right swap as an ablation. \\
+Metrics & Recall@1/5/10, mAP, mAP@R, clean-minus-noisy degradation, and area under the robustness curve across corruption severity. \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
-The key claim to test is: \emph{Does contextual metric learning degrade more gracefully than standard losses as pose noise increases?} This is a stronger claim than simply winning on clean data, because it connects to the project's core motivation: robustness to pose-estimation error.
-
-%================================================================
-\section{How to Build on Existing Code}
-\label{sec:code}
-
-A concrete step-by-step plan to build the project using existing public code:
-
-\begin{enumerate}
-    \item \textbf{Reproduce contextual loss}: Inspect and run the Kulis contextual-loss repository on an image dataset (or at minimum, run the loss implementation to verify behavior).
-    \item \textbf{Reproduce a skeleton baseline}: Reproduce Skeleton-DML/SL-DML or a simple NTU skeleton encoder to verify that retrieval evaluation computes correctly.
-    \item \textbf{Refactor the model}: Change the training loop so it returns (embedding, label) pairs.
-    \item \textbf{Add balanced batch sampler}: Sample $N$ classes $\times$ $M$ examples per class per batch, compatible with contextual loss ($k=M$).
-    \item \textbf{Add losses}: Integrate PML losses and the contextual loss into the same training pipeline.
-    \item \textbf{Add retrieval evaluator}: Use brute-force cosine similarity (or FAISS \citep{douze2025faiss} for scale).
-    \item \textbf{Add noise-corruption module}: Apply synthetic corruptions to the test (and optionally training) skeletons.
-    \item \textbf{Run ablations}: Compare losses under clean and noisy conditions.
-\end{enumerate}
-
-In pseudocode, the training step is:
+The training step is intentionally simple:
 \begin{verbatim}
-  z = normalize(encoder(x))       # L2-normalized embeddings
-  S = z @ z.T                     # pairwise cosine similarities
-  Y = same_label_matrix(y)        # label agreement matrix
-  W = contextual_similarity(S, k=M)
-  L = L_context(W, Y) + lambda * L_contrastive(z, y)
+z = normalize(encoder(x))              # one embedding per motion
+S = z @ z.T                            # cosine similarity matrix
+Y = (labels[:, None] == labels[None])  # label agreement
+C = contextual_similarity(S, k=M)      # M = samples per class
+L = L_context(C, Y) + lambda * L_contrastive(z, labels)
 \end{verbatim}
-This shows that adapting contextual loss to pose sequences requires only swapping the encoder and preserving the batch structure.
 
-%================================================================
-\section{Feasibility and Risk Assessment}
-\label{sec: avenue_feasibility}
+The evaluator should be separate from the training loss. For each trained model, compute embeddings once for clean query/gallery sequences, then recompute query embeddings under each corruption level while keeping the gallery clean. This measures how retrieval degrades when the observed query pose is noisy, which is the use case motivating the project. A second variant can corrupt both query and gallery to simulate fully noisy pose-estimation archives.
 
-We assess feasibility as a tiered set of paths (Table~\ref{tab:feasibility}).
+\section{Feasibility and Risks}
 
 \begin{table}[htbp]
+\small
 \centering
-\caption{Feasibility and risk assessment of experimental paths.}
-\label{tab:feasibility}
-\begin{tabular}{@{}llll@{}}
+\caption{Feasibility tiers.}
+\label{tab:risk}
+\begin{tabularx}{\textwidth}{@{}p{2.4cm}Y Y@{}}
 \toprule
-Path & Components & Risk & Expected Difficulty \\
+Tier & Path & Main risk \\
 \midrule
-Low & NTU RGB+D 120 + simple encoder + contextual loss + synthetic noise & Low & Reproducible within weeks. \\
-Medium & ST-GCN/MST-GCN + full retrieval evaluation & Medium & Requires architecture adaptation. \\
-Higher & SportsPose / FineGym / real video-to-pose pipeline & High & Pose extraction becomes its own project. \\
-Highest & Rowing-specific dataset or cross-dataset transfer & Very high & Domain shift and label alignment. \\
+Low & MotionBERT NTU one-shot embedding path plus contextual loss and synthetic corruption. & Loss/batch-size memory cost; contextual neighborhood quality depends on enough samples per class. \\
+Medium & MMAction2 ST-GCN/PoseC3D with custom embedding head and retrieval evaluator. & Framework integration is heavier, but gives stronger baselines and preprocessed skeleton resources. \\
+Higher & SportsPose or FineGYM retrieval. & Labels and retrieval targets may need task-specific construction; pose extraction/preprocessing can become the project. \\
+Highest & Rowing-specific or cross-dataset transfer. & Data collection, labeling, domain shift, and biomechanical validity dominate the metric-learning question. \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
-The most realistic first deliverable is the low-risk path (NTU + simple encoder + contextual loss + synthetic noise). The higher-risk paths can be pursued as extensions if the core result is reached quickly.
+Compute risk is moderate. Skeleton sequences are much cheaper than raw video, and the first result can be run on a subset while debugging. The contextual objective scales with the batch similarity matrix, so memory pressure comes from balanced batch size. If needed, reduce sequence length, use MotionBERT-Lite, mixed precision, or gradient accumulation; do not reduce samples per class below the point where contextual neighborhoods become meaningless.
 
-Compute requirements are moderate: skeleton data is much lighter than raw video, and a subset of NTU can be used for rapid prototyping. Full-scale NTU training benefits from a single GPU, but the batch sizes and sequence lengths needed for contextual loss are well within standard hardware capabilities. Contextual loss requires sufficiently large balanced batches to compute neighborhood statistics, which can be achieved with class-balanced sampling and, if necessary, gradient accumulation.
+\section{Conclusion}
 
-%================================================================
-\section{Main Literature Gap and Project Contribution}
-\label{sec:gap}
+The concise conclusion for Prof. Kulis is that the proposed project is feasible and nontrivial if it is scoped correctly. Prior work has solved many pieces: contextual similarity for image retrieval, pose and skeleton encoders, one-shot skeleton metric learning, and robust skeleton action recognition. What remains underexplored is the controlled question of whether contextual neighborhoods improve temporal pose retrieval robustness under pose-estimation noise.
 
-The literature gap is the intersection of three largely separate lines of work:
-\begin{enumerate}
-    \item Strong metric-learning methods for image retrieval (including contextual loss).
-    \item Strong skeleton action-recognition encoders (ST-GCN, MST-GCN, MotionBERT, etc.).
-    \item Robustness studies for noisy/incomplete skeletons (RA-GCN, PR-GCN, etc.).
-\end{enumerate}
+The recommended first deliverable is an NTU skeleton retrieval benchmark built from public code. Start with MotionBERT's one-shot embedding pipeline, preserve its normalized embeddings and balanced sampler, add contextual/hybrid loss from the Kulis repository, and evaluate clean/noisy Recall@K and mAP. If this works, the natural second deliverable is MMAction2 PoseC3D or ST-GCN++ under the same evaluator, followed by SportsPose or FineGYM only after the retrieval pipeline is stable.
 
-To our knowledge, there is no prior work that:
-\begin{itemize}
-    \item Applies contextual metric learning to temporal pose-sequence embeddings.
-    \item Evaluates retrieval robustness under a controlled pose-noise protocol for metric learning.
-    \item Benchmarks contextual loss against standard metric-learning baselines (triplet, SupCon, etc.) in the skeleton/pose domain.
-\end{itemize}
-
-The proposed contribution is therefore to:
-\begin{itemize}
-    \item Adapt contextual metric learning to temporal pose embeddings.
-    \item Benchmark against standard metric-learning and skeleton baselines on a public dataset.
-    \item Evaluate not only clean retrieval but robustness curves under synthetic pose corruption.
-    \item Provide a reproducible implementation using public datasets and code.
-\end{itemize}
-
-%================================================================
-\section{Recommended Plan and Conclusion}
-\label{sec:plan}
-
-Based on the preceding review, we recommend the following plan:
-\begin{enumerate}
-    \item Start with NTU RGB+D 120, using cross-subject/cross-setup splits.
-    \item Use a simple TCN or Skeleton-DML/SL-DML as the first baseline encoder.
-    \item Implement triplet and SupCon baselines via PyTorch Metric Learning.
-    \item Integrate the Kulis contextual loss, preserving its batch-construction and hybrid-loss logic.
-    \item Evaluate Recall@K and mAP under clean and noisy skeleton inputs.
-    \item Add SportsPose or real video-derived poses only after the first benchmark pipeline is validated.
-    \item Keep sports/rowing as a later application, not the initial benchmark dependency.
-\end{enumerate}
-
-In sum: prior work provides strong encoders, datasets, and metric-learning baselines. The contextual metric-learning method is publicly available and architecture-agnostic. The gap---contextual loss for pose-sequence retrieval under noise---is well-defined, practically motivated, and achievable within the scope of an undergraduate research project using publicly available code and data.
-
-%================================================================
 \bibliographystyle{apalike}
 \bibliography{references}
 
