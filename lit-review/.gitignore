@@ -7,4 +7,4 @@
 *.log
 *.out
 *.pdf
-*.synctex
+*.synctex.gz

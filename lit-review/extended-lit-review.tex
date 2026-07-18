@@ -1,0 +1,69 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\geometry{left=1in, right=1in, top=0.85in, bottom=0.85in}
+\hypersetup{
+    colorlinks=true,
+    urlcolor=blue,
+    pdftitle={Robust Pose-Sequence Retrieval with Contextual Metric Learning},
+    pdfauthor={Giacomo Cappelletto}
+}
+\setlist[itemize]{leftmargin=*, itemsep=4pt, topsep=4pt}
+\setlength{\emergencystretch}{2em}
+
+\title{Robust Pose-Sequence Retrieval with Contextual Metric Learning\\
+\large Brief Literature Review and Feasibility Note}
+\author{Giacomo Cappelletto\\Prepared for Professor Brian Kulis}
+\date{July 18, 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+I propose to test whether contextual metric learning can make retrieval of human pose sequences more robust to imperfect skeleton inputs. The project combines two established lines of work: contextual objectives improve image retrieval by optimizing neighborhood structure, while pose models already learn useful sequence embeddings and can be trained to tolerate missing or noisy joints. What has not been established is whether contextual optimization helps when the \emph{input poses}, rather than the labels, are corrupted. This is a small, falsifiable project: compare contextual and standard metric-learning losses using the same pretrained motion encoder, dataset, and corruption protocol. Most required components already have public implementations, so the work is primarily careful integration and evaluation rather than new model development.
+\end{abstract}
+
+\section*{Aim}
+
+The research question is:
+\begin{quote}
+Does contextual neighborhood optimization preserve pose-sequence retrieval quality better than standard metric-learning objectives as skeleton observations become noisy or incomplete?
+\end{quote}
+
+The first experiment would use NTU RGB+D 120 action labels to define relevance. A MotionBERT encoder would map each pose sequence to a normalized embedding, and cosine similarity would rank a gallery for each query. The central comparison would hold the encoder, data split, batch composition, and augmentation fixed while comparing supervised contrastive loss with contextual loss and their hybrid. Evaluation would use clean queries and increasingly corrupted queries---joint jitter, missing joints or limbs, dropped frames, and, if available, a change of pose estimator---against a fixed clean gallery. Recall@1/5/10, mean average precision, and clean-to-corrupted degradation would provide a direct answer.
+
+\section*{Justification}
+
+The project is feasible because every major component exists. MotionBERT provides a pretrained temporal pose encoder and public one-shot action-retrieval code. NTU RGB+D 120 provides a large public benchmark with standard cross-subject and cross-setup protocols. Skeleton-DML shows that deep metric learning on skeleton sequences is already viable, while MaskCLR supplies relevant corruption tests and shows that pose representations can be made robust to noise, occlusion, frame masking, and pose-estimator changes. The contextual-loss paper provides both the neighborhood objective and reference code.
+
+The contribution is narrow but clear. Contextual metric learning has shown robustness to label noise in image retrieval, but this does not guarantee robustness to corrupted pose coordinates. Conversely, robust skeleton papers mainly report classification, which does not measure whether the ordering of an embedding space remains useful for retrieval. Holding the encoder and evaluator fixed isolates whether neighborhood-aware optimization adds value beyond ordinary contrastive learning and corruption augmentation.
+
+Implementation can be staged to keep cost and risk low. First, use frozen MotionBERT features to validate the query/gallery split, ranking metrics, and deterministic corruption curves. Second, train only small projection heads with the competing losses. Fine-tune the full encoder only if this comparison is stable. The main technical risk is the contextual loss's cubic scaling with batch size, but the published implementation already runs it through batched matrix operations; profiling a balanced, moderate batch is sufficient before larger experiments.
+
+A positive result would support contextual loss as a useful objective for robust motion retrieval. A null result would still be informative: it would show that robustness comes mainly from the encoder or from exposure to corrupted inputs. Either outcome can be obtained with public data, existing code, and a controlled experiment, making this a practical initial project rather than an open-ended architecture effort.
+
+\section*{Supporting Papers}
+
+\begin{itemize}
+    \item Liao, Tsiligkaridis, and Kulis (ICML 2023), \href{https://arxiv.org/abs/2210.01908}{\emph{Supervised Metric Learning to Rank for Retrieval via Contextual Similarity Optimization}}. The central neighborhood-based objective and its image-retrieval evidence; \href{https://github.com/Chris210634/metric-learning-using-contextual-similarity}{code}.
+
+    \item Zhu et al. (ICCV 2023), \href{https://arxiv.org/abs/2210.06551}{\emph{MotionBERT: A Unified Perspective on Learning Human Motion Representations}}. A strong pretrained temporal encoder and the lowest-risk starting pipeline; \href{https://github.com/Walter0807/MotionBERT}{code}.
+
+    \item Memmesheimer et al. (WACV 2022), \href{https://arxiv.org/abs/2012.13823}{\emph{Skeleton-DML: Deep Metric Learning for Skeleton-Based One-Shot Action Recognition}}. Direct evidence that skeleton sequences support metric learning and nearest-neighbor recognition.
+
+    \item Abdelfattah, Hassan, and Alahi (CVPR 2024), \href{https://openaccess.thecvf.com/content/CVPR2024/html/Abdelfattah_MaskCLR_Attention-Guided_Contrastive_Learning_for_Robust_Action_Representation_Learning_CVPR_2024_paper.html}{\emph{MaskCLR: Attention-Guided Contrastive Learning for Robust Action Representation Learning}}. The closest robustness baseline and a source for pose-corruption protocols.
+
+    \item Liu et al. (TPAMI 2020), \href{https://arxiv.org/abs/1905.04757}{\emph{NTU RGB+D 120: A Large-Scale Benchmark for 3D Human Activity Understanding}}. The proposed first dataset, with standard evaluation protocols and 120 action classes.
+
+    \item Duan et al. (CVPR 2022), \href{https://arxiv.org/abs/2104.13586}{\emph{Revisiting Skeleton-Based Action Recognition}}. Additional evidence that useful and robust action representations can be learned from estimated poses.
+
+    \item Musgrave, Belongie, and Lim (ECCV 2020), \href{https://arxiv.org/abs/2003.08505}{\emph{A Metric Learning Reality Check}}. Motivation for matched architectures, tuning budgets, and evaluation when comparing losses.
+\end{itemize}
+
+\end{document}
