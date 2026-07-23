@@ -1,0 +1,131 @@
+\documentclass[10pt]{article}
+\usepackage[letterpaper,margin=0.55in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs,tabularx,array}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\definecolor{navy}{HTML}{15324A}
+\definecolor{teal}{HTML}{167D7F}
+\definecolor{sky}{HTML}{DCEFF2}
+\definecolor{gold}{HTML}{D99A2B}
+\definecolor{amber}{HTML}{FFF3D6}
+\definecolor{brick}{HTML}{A83F39}
+\definecolor{rose}{HTML}{F7E4E2}
+\definecolor{ink}{HTML}{20262D}
+\definecolor{mist}{HTML}{F4F7F9}
+\definecolor{green}{HTML}{2C7A4B}
+\definecolor{lightgreen}{HTML}{E7F3EB}
+\color{ink}
+\hypersetup{colorlinks=true,linkcolor=navy,urlcolor=brick,pdftitle={Contextual Pose Retrieval - Meeting Brief},pdfauthor={Prepared for Giacomo Cappelletto}}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\textcolor{navy}{Contextual pose retrieval}}\fancyhead[R]{\small\textcolor{navy}{Meeting brief}}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0.3pt}
+\setlength{\parindent}{0pt}\setlength{\parskip}{3pt}
+\newtcolorbox{pitchbox}[1][]{enhanced,colback=sky,colframe=teal,boxrule=.8pt,arc=1.5mm,left=2mm,right=2mm,top=1.5mm,bottom=1.5mm,#1}
+\newtcolorbox{warnbox}[1][]{enhanced,colback=rose,colframe=brick,boxrule=.8pt,arc=1.5mm,left=2mm,right=2mm,top=1.5mm,bottom=1.5mm,#1}
+\newtcolorbox{meetbox}[1][]{enhanced,colback=amber,colframe=gold,boxrule=.8pt,arc=1.5mm,left=2mm,right=2mm,top=1.5mm,bottom=1.5mm,#1}
+\newtcolorbox{implbox}[1][]{enhanced,colback=lightgreen,colframe=green,boxrule=.8pt,arc=1.5mm,left=2mm,right=2mm,top=1.5mm,bottom=1.5mm,#1}
+\tikzset{block/.style={rounded corners=1.5mm,draw=navy,thick,fill=mist,minimum height=8mm,align=center,inner sep=3pt},data/.style={rounded corners=1.5mm,draw=teal,thick,fill=sky,minimum height=8mm,align=center,inner sep=3pt},loss/.style={rounded corners=1.5mm,draw=brick,thick,fill=rose,minimum height=8mm,align=center,inner sep=3pt},arrow/.style={-{Latex[length=2mm]},thick,draw=navy!70}}
+\newcommand{\sg}{\operatorname{sg}}
+\newcommand{\ind}{\mathbb{1}}
+\begin{document}
+
+{\sffamily\bfseries\color{navy}\fontsize{20}{23}\selectfont Robust Pose-Sequence Retrieval with Contextual Metric Learning}\par
+{\large Final-proposal discussion brief}\hfill{\small July 2026}
+\vspace{2mm}\hrule height 1pt\vspace{3mm}
+
+\begin{pitchbox}[title=\textbf{60-second pitch}]
+I propose to transfer contextual metric learning from image retrieval to temporal pose embeddings. A pretrained motion encoder maps each skeleton sequence to a normalized vector, and cosine similarity ranks a clean reference gallery. The experimental question is whether optimizing \emph{neighborhood structure}, rather than only direct pairs, causes retrieval quality to degrade more slowly when query poses contain joint jitter, missing joints or limbs, dropped frames, or pose-estimator shift. I would hold the encoder, split, sampler, augmentations, and evaluator fixed; compare supervised contrastive, contextual, and hybrid objectives; and report Recall@1/5/10, mAP, and clean-to-corrupted degradation.
+\end{pitchbox}
+
+\begin{warnbox}[title=\textbf{Scientific boundary}]
+The foundation paper establishes reduced overfitting and label-noise robustness for \emph{image retrieval}. It does not prove robustness to corrupted pose coordinates. That transfer is the hypothesis to test, not a premise to assume.
+\end{warnbox}
+
+\textbf{Method in one picture}
+\begin{center}
+\begin{tikzpicture}[node distance=5mm,scale=.9,transform shape]
+\node[data,minimum width=22mm] (x) {pose sequence\\$x\in\mathbb R^{T\times J\times C}$};
+\node[block,right=of x,minimum width=21mm] (e) {motion\\encoder};
+\node[data,right=of e,minimum width=18mm] (z) {unit vector\\$z$};
+\node[block,right=of z,minimum width=21mm] (s) {$S=ZZ^\top$\\$D=2-2S$};
+\node[block,right=of s,minimum width=24mm] (n) {contextual\\graph $W$};
+\node[loss,right=of n,minimum width=21mm] (l) {match $W$\\to labels $Y$};
+\draw[arrow](x)--(e);\draw[arrow](e)--(z);\draw[arrow](z)--(s);\draw[arrow](s)--(n);\draw[arrow](n)--(l);
+\end{tikzpicture}
+\end{center}
+
+\textbf{Five equations to narrate}
+\begin{align*}
+D(i,j)&=\lVert z_i-z_j\rVert_2^2=2-2s_{ij}.\\[-2pt]
+N_{ij}&=\theta\!\left(-D(i,j)+\sg(D(i,p_k))+\epsilon\right),
+\quad \frac{\partial\theta}{\partial x}=\alpha.\\[-2pt]
+W_1(i,j)&=\frac{N_{ij}}{2}\left[\frac{M_+(i,j)}{\sg\sum_pN_{ip}}+\frac{M_-(i,j)}{\sg\sum_p(1-N_{ip})}\right].\\[-2pt]
+W_2&=\frac{RW_1}{R\mathbf 1},\qquad W=\tfrac12(W_2+W_2^\top),\quad R=N_{k/2}\odot N_{k/2}^\top.\\[-2pt]
+\mathcal L&=\lambda\,\frac{1}{n^2}\sum_{i\ne j}(y_{ij}-w_{ij})^2+(1-\lambda)\mathcal L_{\rm contrast}+\gamma\mathcal L_{\rm reg}.
+\end{align*}
+
+\begin{meetbox}[title=\textbf{The key theoretical statement}]
+For a balanced batch with exactly $k$ samples per class, $n>2k$, and $\epsilon=0$, zero contextual loss occurs exactly when every positive ranks ahead of every negative within the batch. This is why $k$ is tied to samples per class rather than treated as an unrelated top-$k$ hyperparameter.
+\end{meetbox}
+
+\newpage
+{\sffamily\bfseries\color{navy}\Large Experimental design and discussion answers}\vspace{2mm}\hrule\vspace{3mm}
+
+\textbf{Controlled experiment}\par\vspace{1mm}
+{\small
+\renewcommand{\arraystretch}{1.06}
+\begin{tabularx}{\textwidth}{>{\bfseries\raggedright\arraybackslash}p{0.19\textwidth}Y}
+\toprule
+Component & Decision \\
+\midrule
+Dataset & NTU RGB+D 120; official cross-subject and cross-setup protocols. \\
+Encoder & Pretrained MotionBERT sequence encoder; normalized projection output. \\
+Retrieval & Disjoint query/gallery manifest; noisy queries against a fixed clean gallery. \\
+Losses & Cross-entropy embedding, SupCon, triplet or multi-similarity, contextual, contextual+contrastive, corruption-aware SupCon. \\
+Corruptions & Gaussian joint jitter; random joint/limb masking; frame dropout; 3D yaw rotation; pose-estimator shift when available. \\
+Metrics & Recall@1/5/10, mAP, retention $M(c)/M(0)$, and degradation $\Delta(c)=M(0)-M(c)$. \\
+Fairness & Same backbone, embedding dimension, sampler, split, tuning budget, augmentations, and seeds. \\
+\bottomrule
+\end{tabularx}}
+
+\begin{implbox}[title=\textbf{Lowest-risk implementation sequence}]
+\begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=1pt]
+\item Freeze MotionBERT; validate splits, cosine retrieval, metrics, and deterministic corruptions.
+\item Train only small projection heads with SupCon, contextual, and hybrid losses.
+\item Profile contextual $O(n^3)$ batch operations; use balanced batches such as $16\times4=64$ or $32\times4=128$.
+\item Fine-tune the full encoder only after the loss-side comparison is stable.
+\item Add corruption-aware training and a MaskCLR-style robustness control.
+\end{enumerate}
+\end{implbox}
+
+\textbf{Likely questions and precise answers}\par\vspace{1mm}
+{\small
+\renewcommand{\arraystretch}{1.05}
+\begin{tabularx}{\textwidth}{>{\bfseries\raggedright\arraybackslash}p{0.29\textwidth}Y}
+\toprule
+Question & Answer \\
+\midrule
+Why retrieval rather than classification? & Classification can remain acceptable while the ordering of the embedding space deteriorates. Retrieval measures whether examples remain inspectable and useful for one-shot decisions. \\
+Where is the novelty? & Not sequence retrieval itself. The bounded gap is whether the contextual objective improves \emph{retrieval degradation curves under input corruption} when the temporal encoder and evaluator are fixed. \\
+Why might neighborhoods help? & A direct similarity can be unstable under local pose noise; shared and reciprocal neighborhoods provide a local-consensus signal. This is an inductive-bias hypothesis, not a guarantee. \\
+Why NTU120 first? & It provides scale, many examples per class, standard protocols, and compatibility with existing skeleton and one-shot pipelines. It supports a reproducible first test, not claims about fine-grained technique quality. \\
+What would a null result mean? & Robustness is mainly attributable to the encoder or corruption exposure rather than the contextual objective. That is still an informative controlled result. \\
+What is the main engineering risk? & Cubic batch computation and batch-structure sensitivity. Both are bounded by moderate balanced batches, matrix operations, and staged profiling. \\
+\bottomrule
+\end{tabularx}}
+
+\begin{warnbox}[title=\textbf{Do not claim}]
+Do not claim that action-class retrieval measures movement quality, that label-noise robustness implies pose-noise robustness, or that a new motion architecture is being proposed. The contribution is a fair retrieval-first robustness test of the loss.
+\end{warnbox}
+
+\textbf{Closing sentence.} \emph{The project is deliberately narrow: it asks whether local neighborhood structure is a useful inductive bias when the observations, rather than the labels, become unreliable.}
+
+\vfill{\footnotesize Foundation: Liao, Tsiligkaridis, and Kulis (ICML 2023). Proposed study: MotionBERT + NTU RGB+D 120 with controlled pose corruptions.}
+\end{document}
