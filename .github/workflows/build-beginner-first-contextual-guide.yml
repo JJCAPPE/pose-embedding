@@ -1,0 +1,116 @@
+name: Build beginner-first contextual similarity guide
+
+on:
+  push:
+    branches:
+      - docs/beginner-first-contextual-guide
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out guide branch
+        uses: actions/checkout@v4
+        with:
+          ref: docs/beginner-first-contextual-guide
+          fetch-depth: 0
+
+      - name: Install patch dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y zstd
+
+      - name: Reconstruct beginner-first LaTeX source
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_dir="contextual-similarity-study-pack"
+          original="$source_dir/contextual_similarity_textbook.tex"
+          output="$source_dir/contextual_similarity_textbook_beginner_first.tex"
+
+          echo "3108aac86cddc99f1914a75f2f28da5c10cb42b9b34d27f4918792910704114f  $original" | sha256sum --check -
+          cat .github/beginner-guide-payload/payload.part-*.b64 > /tmp/beginner-first-source-patch.b64
+          base64 --decode /tmp/beginner-first-source-patch.b64 > /tmp/beginner-first-source-patch.zst
+          echo "64aa9902747d3dec1c75394d79f0e7d4025e821381edec4f577db19073185e89  /tmp/beginner-first-source-patch.zst" | sha256sum --check -
+          zstd --decompress --patch-from="$original" /tmp/beginner-first-source-patch.zst -o "$output"
+          echo "c812a01c503ac6f8eed5bcf5ff7eef92ea0481b6402d8ae2878a18c2ceab5d07  $output" | sha256sum --check -
+
+          cat > "$source_dir/README.md" <<'EOF'
+          # Contextual Similarity Study Pack
+
+          Prepared for the final-proposal discussion on robust pose-sequence retrieval with contextual metric learning.
+
+          ## Contents
+
+          - `contextual_similarity_textbook.pdf` — original compiled 45-page mathematical and implementation guide.
+          - `contextual_similarity_textbook_beginner_first.pdf` — expanded 76-page beginner-first edition. It introduces every symbol and prerequisite concept before developing the foundation paper's formal equations, proofs, implementation, and pose-retrieval adaptation.
+          - `contextual_similarity_meeting_brief.pdf` — compiled two-page discussion reference.
+          - `contextual_loss_reference.py` — tested PyTorch reference implementation of the contextual objective.
+          - `contextual_similarity_textbook.tex` — complete LaTeX source for the original textbook.
+          - `contextual_similarity_textbook_beginner_first.tex` — complete LaTeX source for the expanded beginner-first textbook.
+          - `contextual_similarity_meeting_brief.tex` — complete LaTeX source for the meeting brief.
+          - `contextual_similarity_study_pack.zip` — archive containing the original complete pack.
+
+          ## Recommended reading order
+
+          1. Start with `contextual_similarity_textbook_beginner_first.pdf` when notation, vector geometry, indicator functions, gradients, or the contextual-similarity equations are not yet automatic.
+          2. Read the two-page meeting brief immediately before the discussion.
+          3. Review the textbook's executive roadmap, five-equation core, ranking proposition, and worked eight-sample example.
+          4. Use the implementation and experiment chapters when discussing feasibility and experimental controls.
+          5. Keep the discussion script and cheat sheet open during the meeting.
+
+          ## Compile the LaTeX sources
+
+          From this directory:
+
+          ```bash
+          latexmk -pdf contextual_similarity_textbook.tex
+          latexmk -pdf contextual_similarity_textbook_beginner_first.tex
+          latexmk -pdf contextual_similarity_meeting_brief.tex
+          ```
+
+          The sources use standard TeX Live packages, including TikZ, PGFPlots, `tcolorbox`, and `listings`.
+
+          ## Run the implementation smoke test
+
+          ```bash
+          python contextual_loss_reference.py
+          ```
+
+          The script validates batch balance, computes contextual similarity and the full hybrid loss, runs back-propagation, and checks that outputs and gradients are finite. PyTorch is required.
+          EOF
+          sed -i 's/^          //' "$source_dir/README.md"
+
+      - name: Compile beginner-first guide
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: contextual-similarity-study-pack
+          root_file: contextual_similarity_textbook_beginner_first.tex
+
+      - name: Validate and clean generated files
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_dir="contextual-similarity-study-pack"
+          base="$source_dir/contextual_similarity_textbook_beginner_first"
+          test -s "$base.pdf"
+          grep -q "76 pages" "$base.log"
+          rm -f "$base.aux" "$base.fdb_latexmk" "$base.fls" "$base.log" "$base.out" "$base.toc" "$base.lof" "$base.lot"
+          rm -rf .github/beginner-guide-payload
+          rm -f .github/workflows/build-beginner-first-contextual-guide.yml
+
+      - name: Commit generated guide
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Add beginner-first contextual similarity guide"
+          git push origin HEAD:docs/beginner-first-contextual-guide
