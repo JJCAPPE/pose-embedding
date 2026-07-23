@@ -1,0 +1,1979 @@
+\documentclass[11pt,oneside,openany]{book}
+
+% ---------- Encoding and typography ----------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[letterpaper,margin=0.82in,headheight=15pt]{geometry}
+\usepackage{setspace}
+\setstretch{1.06}
+\usepackage{ragged2e}
+
+% ---------- Mathematics ----------
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{dsfont}
+\usepackage{cancel}
+
+% ---------- Tables and figures ----------
+\usepackage{booktabs,array,tabularx,longtable,multirow,makecell}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds,matrix,shapes.geometric,decorations.pathreplacing,patterns,3d}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% ---------- Boxes and code ----------
+\usepackage[most]{tcolorbox}
+\usepackage{listings}
+\usepackage{enumitem}
+
+% ---------- Navigation and section styling ----------
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+\usepackage{bookmark}
+
+% ---------- Color system ----------
+\definecolor{navy}{HTML}{15324A}
+\definecolor{teal}{HTML}{167D7F}
+\definecolor{sky}{HTML}{DCEFF2}
+\definecolor{gold}{HTML}{D99A2B}
+\definecolor{amber}{HTML}{FFF3D6}
+\definecolor{brick}{HTML}{A83F39}
+\definecolor{rose}{HTML}{F7E4E2}
+\definecolor{ink}{HTML}{20262D}
+\definecolor{slate}{HTML}{55616D}
+\definecolor{mist}{HTML}{F4F7F9}
+\definecolor{green}{HTML}{2C7A4B}
+\definecolor{lightgreen}{HTML}{E7F3EB}
+\definecolor{purple}{HTML}{7257A6}
+\definecolor{lightpurple}{HTML}{EEE9F8}
+
+\color{ink}
+
+% ---------- PDF metadata ----------
+\hypersetup{
+  colorlinks=true,
+  linkcolor=navy,
+  citecolor=teal,
+  urlcolor=brick,
+  pdftitle={Contextual Similarity Optimization for Robust Pose-Sequence Retrieval},
+  pdfauthor={Prepared as a study guide for Giacomo Cappelletto},
+  pdfsubject={Mathematics and implementation of contextual metric learning},
+  pdfkeywords={metric learning, contextual similarity, pose retrieval, MotionBERT, nearest neighbors}
+}
+
+% ---------- Headers and chapter styling ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{slate}{Contextual Similarity Optimization}}
+\fancyhead[R]{\small\textcolor{slate}{Chapter \thechapter}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\color{navy}}
+  {\filleft\fontsize{42}{44}\selectfont\thechapter}
+  {0.2ex}
+  {\titlerule[1.2pt]\vspace{1ex}\Huge}
+  [\vspace{0.5ex}\titlerule]
+\titlespacing*{\chapter}{0pt}{-20pt}{24pt}
+\titleformat{\section}{\Large\bfseries\color{navy}}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\large\bfseries\color{teal}}{\thesubsection}{0.7em}{}
+
+% ---------- Theorem styles ----------
+\newtheoremstyle{myplain}{8pt}{8pt}{\itshape}{}{}{.}{0.5em}{}
+\theoremstyle{myplain}
+\newtheorem{proposition}{Proposition}[chapter]
+\newtheorem{lemma}[proposition]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}[proposition]{Definition}
+\newtheorem{example}[proposition]{Example}
+
+% ---------- Custom boxes ----------
+\newtcolorbox{conceptbox}[1][]{
+  enhanced,breakable,colback=sky,colframe=teal,boxrule=0.8pt,
+  arc=2mm,left=2.5mm,right=2.5mm,top=2mm,bottom=2mm,
+  title=Concept,#1,fonttitle=\bfseries\color{navy}}
+\newtcolorbox{paperbox}[1][]{
+  enhanced,breakable,colback=mist,colframe=navy,boxrule=0.8pt,
+  arc=2mm,left=2.5mm,right=2.5mm,top=2mm,bottom=2mm,
+  title=Original paper,#1,fonttitle=\bfseries\color{navy}}
+\newtcolorbox{implementationbox}[1][]{
+  enhanced,breakable,colback=lightgreen,colframe=green,boxrule=0.8pt,
+  arc=2mm,left=2.5mm,right=2.5mm,top=2mm,bottom=2mm,
+  title=Implementation,#1,fonttitle=\bfseries\color{green}}
+\newtcolorbox{warningbox}[1][]{
+  enhanced,breakable,colback=rose,colframe=brick,boxrule=0.8pt,
+  arc=2mm,left=2.5mm,right=2.5mm,top=2mm,bottom=2mm,
+  title=Do not overclaim,#1,fonttitle=\bfseries\color{brick}}
+\newtcolorbox{meetingbox}[1][]{
+  enhanced,breakable,colback=amber,colframe=gold,boxrule=0.9pt,
+  arc=2mm,left=2.5mm,right=2.5mm,top=2mm,bottom=2mm,
+  title=For the discussion,#1,fonttitle=\bfseries\color{navy}}
+\newtcolorbox{derivationbox}[1][]{
+  enhanced,breakable,colback=lightpurple,colframe=purple,boxrule=0.8pt,
+  arc=2mm,left=2.5mm,right=2.5mm,top=2mm,bottom=2mm,
+  title=Derivation,#1,fonttitle=\bfseries\color{purple}}
+
+% ---------- Listings ----------
+\lstdefinestyle{pythonstyle}{
+  language=Python,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{purple}\bfseries,
+  commentstyle=\color{green},
+  stringstyle=\color{brick},
+  numbers=left,
+  numberstyle=\tiny\color{slate},
+  numbersep=7pt,
+  frame=single,
+  rulecolor=\color{slate!50},
+  backgroundcolor=\color{mist},
+  showstringspaces=false,
+  breaklines=true,
+  columns=fullflexible,
+  tabsize=4,
+  xleftmargin=1em,
+  framexleftmargin=0.7em
+}
+\lstset{style=pythonstyle}
+
+% ---------- Mathematical notation ----------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\ind}{\mathds{1}}
+\newcommand{\sg}{\operatorname{sg}}
+\newcommand{\simcos}{\operatorname{cos}}
+\newcommand{\relu}{[\,\cdot\,]_+}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\card}[1]{\left|#1\right|}
+\newcommand{\inner}[2]{\left\langle #1,#2\right\rangle}
+\newcommand{\transpose}{\mathsf{T}}
+\newcommand{\had}{\odot}
+\newcommand{\paperEq}[1]{\tag{P#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\Y}{\mathbf{Y}}
+\newcommand{\Smat}{\mathbf{S}}
+\newcommand{\Dmat}{\mathbf{D}}
+\newcommand{\Nmat}{\mathbf{N}}
+\newcommand{\Wmat}{\mathbf{W}}
+
+% ---------- TikZ styles ----------
+\tikzset{
+  block/.style={rounded corners=2mm,draw=navy,thick,fill=mist,minimum height=9mm,align=center,inner sep=4pt},
+  data/.style={rounded corners=2mm,draw=teal,thick,fill=sky,minimum height=9mm,align=center,inner sep=4pt},
+  loss/.style={rounded corners=2mm,draw=brick,thick,fill=rose,minimum height=9mm,align=center,inner sep=4pt},
+  impl/.style={rounded corners=2mm,draw=green,thick,fill=lightgreen,minimum height=9mm,align=center,inner sep=4pt},
+  arrow/.style={-{Latex[length=2.5mm]},thick,draw=slate},
+  dashedarrow/.style={-{Latex[length=2.5mm]},thick,dashed,draw=slate}
+}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+
+% ================================================================
+% Cover
+% ================================================================
+\begin{titlepage}
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[navy] (current page.north west) rectangle ([yshift=-3.65in]current page.north east);
+  \fill[teal] ([yshift=-3.65in]current page.north west) rectangle ([yshift=-3.83in]current page.north east);
+  \draw[gold,line width=3pt] ([xshift=0.85in,yshift=-0.88in]current page.north west) -- ([xshift=-0.85in,yshift=-0.88in]current page.north east);
+\end{tikzpicture}
+
+\vspace*{0.55in}
+{\color{white}\sffamily\bfseries\fontsize{28}{33}\selectfont
+Contextual Similarity Optimization\\[0.14in]
+for Robust Pose-Sequence Retrieval\par}
+\vspace{0.32in}
+{\color{white}\sffamily\Large
+A mathematical and implementation guide to\\
+Liao, Tsiligkaridis, and Kulis (ICML 2023)\par}
+
+\vspace{1.42in}
+\begin{center}
+\resizebox{0.97\textwidth}{!}{%
+\begin{tikzpicture}[node distance=9mm]
+  \node[data,minimum width=29mm] (x) {pose sequence\\$x\in\R^{T\times J\times C}$};
+  \node[block,right=of x,minimum width=29mm] (enc) {temporal\\encoder};
+  \node[data,right=of enc,minimum width=25mm] (z) {unit embedding\\$z\in\mathbb S^{d-1}$};
+  \node[block,right=of z,minimum width=27mm] (ctx) {contextual\\neighborhoods};
+  \node[loss,right=of ctx,minimum width=27mm] (ret) {robust\\retrieval};
+  \draw[arrow] (x)--(enc);
+  \draw[arrow] (enc)--(z);
+  \draw[arrow] (z)--(ctx);
+  \draw[arrow] (ctx)--(ret);
+\end{tikzpicture}%
+}
+\end{center}
+
+\vfill
+\begin{minipage}{0.9\textwidth}
+\small
+\textbf{Audience.} Assumes basic probability, statistics, and machine learning. It develops the paper's equations from first principles, derives the neighborhood objective, explains the non-standard gradients, and maps the method into a controlled pose-retrieval experiment.
+\end{minipage}
+
+\vspace{0.28in}
+{\large Prepared for today's final-proposal discussion}\par
+{\small July 2026}
+\end{titlepage}
+\hypersetup{pageanchor=true}
+
+\frontmatter
+\chapter*{How to use this guide today}
+\addcontentsline{toc}{chapter}{How to use this guide today}
+
+\begin{meetingbox}[title=The 12-minute route]
+Read these pages in order before the meeting:
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+  \item \textbf{The one-sentence research claim} on this page.
+  \item \textbf{The full method in one picture} in \cref{fig:full-pipeline}.
+  \item \textbf{The five equations you must be able to narrate}: \cref{eq:cosdist,eq:neighborhood,eq:w1,eq:qe,eq:full-objective}.
+  \item \textbf{Why this is a valid ranking objective}: \cref{sec:proposition}.
+  \item \textbf{The implementation plan}: \cref{chap:implementation}.
+  \item \textbf{The discussion script and likely questions}: \cref{chap:meeting}.
+\end{enumerate}
+\end{meetingbox}
+
+\begin{conceptbox}[title=The one-sentence research claim]
+\textbf{Test whether a neighborhood-aware metric-learning objective preserves the ranking quality of pose-sequence embeddings better than standard objectives when query skeletons are jittered, incomplete, temporally damaged, or produced by a shifted pose estimator.}
+\end{conceptbox}
+
+\begin{warningbox}[title=The scientific boundary]
+The contextual paper demonstrates robustness to \emph{label noise and overfitting in image retrieval}. It does \textbf{not} establish robustness to corrupted pose coordinates. The proposed project is compelling precisely because that transfer is an open, falsifiable hypothesis rather than a guaranteed consequence.
+\end{warningbox}
+
+\begin{paperbox}[title=Source-fidelity note]
+Equations marked \textbf{P1--P31} reproduce or algebraically restate the numbered equations in Liao, Tsiligkaridis, and Kulis. Motion-specific equations, implementation recommendations, and robustness metrics are explicitly labeled as adaptations or proposed extensions. One line in the paper's printed Algorithm 1 appears inconsistent with its Eq.~(5): the algorithm line shows an MSE between contextual and cosine similarity, while Eq.~(5), the proof, and the released code optimize contextual similarity against the binary label-similarity matrix. This guide follows Eq.~(5) and the reference implementation.
+\end{paperbox}
+
+\tableofcontents
+\listoffigures
+
+\mainmatter
+
+% ================================================================
+\chapter{Retrieval Geometry from First Principles}
+\label{chap:geometry}
+% ================================================================
+
+\section{Retrieval is a ranking problem}
+
+A retrieval system receives a query $q$ and ranks a gallery $\mathcal G=\{g_1,\dots,g_m\}$. The output is not a single class probability. It is an ordering
+\[
+  g_{\pi(1)},g_{\pi(2)},\dots,g_{\pi(m)}
+\]
+chosen so that relevant items appear before irrelevant items. For class-based motion retrieval, relevance can begin with
+\[
+  \operatorname{rel}(q,g_j)=\ind[y_q=y_j].
+\]
+This is deliberately coarse, but objective and reproducible.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=6mm]
+  \node[data,minimum width=25mm] (q) {query\\``throw''};
+  \node[block,right=12mm of q,minimum width=25mm] (e) {encoder\\$f_\theta$};
+  \node[data,right=12mm of e,minimum width=22mm] (zq) {$z_q$};
+  \node[block,right=12mm of zq,minimum width=26mm] (rank) {cosine ranking};
+  \node[right=9mm of rank,align=left] (list) {
+  \begin{tabular}{c@{\quad}l}
+  1 & throw $\checkmark$\\
+  2 & punch $\times$\\
+  3 & throw $\checkmark$\\
+  4 & kick $\times$\\
+  5 & throw $\checkmark$
+  \end{tabular}};
+  \draw[arrow] (q)--(e);
+  \draw[arrow] (e)--(zq);
+  \draw[arrow] (zq)--(rank);
+  \draw[arrow] (rank)--(list);
+  \node[below=8mm of rank,text=slate,align=center] {gallery embeddings are precomputed};
+\end{tikzpicture}
+\caption{A retrieval system learns an ordering, not merely a class decision.}
+\label{fig:retrieval}
+\end{figure}
+
+\section{Embeddings and normalization}
+
+Let an encoder map an input $x_i$ to an unnormalized vector $h_i=f_\theta(x_i)\in\R^d$. The paper works with unit-normalized features
+\begin{equation}
+  z_i=\frac{h_i}{\norm{h_i}_2},\qquad \norm{z_i}_2=1.
+  \label{eq:normalize}
+\end{equation}
+The unit sphere removes vector magnitude as a degree of freedom. The model can encode similarity only through direction.
+
+The cosine similarity is therefore simply a dot product:
+\begin{equation}
+  s_{ij}=\inner{z_i}{z_j}\in[-1,1].
+  \label{eq:cosine}
+\end{equation}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.15]
+  \draw[slate!60] (0,0) circle (2);
+  \draw[->,slate] (-2.25,0)--(2.35,0) node[right] {$z_1$};
+  \draw[->,slate] (0,-2.25)--(0,2.35);
+  \draw[->,very thick,teal] (0,0)--(1.75,0.97) node[above right] {$z_i$};
+  \draw[->,very thick,gold] (0,0)--(1.13,1.65) node[above] {$z_j$};
+  \draw[->,very thick,brick] (0,0)--(-1.75,0.97) node[above left] {$z_k$};
+  \draw[navy,thick] (0.65,0.36) arc[start angle=29,end angle=56,radius=0.75];
+  \node[navy] at (0.89,0.77) {$\phi$};
+  \node[align=left,anchor=west] at (2.65,1.15) {$s_{ij}=\cos\phi$\\small angle $\Rightarrow$ high similarity};
+  \node[align=left,anchor=west] at (2.65,-0.35) {$s_{ik}<0$\\opposite directions};
+\end{tikzpicture}
+\caption{Unit-normalized embeddings convert cosine similarity into geometry on a sphere.}
+\label{fig:unit-sphere}
+\end{figure}
+
+\section{Why squared Euclidean distance becomes $2-2s_{ij}$}
+
+The paper switches between cosine similarity and squared Euclidean distance. This identity is central:
+\begin{derivationbox}[title=Cosine--distance equivalence]
+Because $\norm{z_i}=\norm{z_j}=1$,
+\begin{align}
+D(i,j)
+  &=\norm{z_i-z_j}_2^2\\
+  &=\inner{z_i-z_j}{z_i-z_j}\\
+  &=\norm{z_i}^2+\norm{z_j}^2-2\inner{z_i}{z_j}\\
+  &=1+1-2s_{ij}.
+\end{align}
+Therefore
+\begin{equation}
+  \boxed{D(i,j)=2-2s_{ij}\in[0,4].}
+  \label{eq:cosdist}
+\end{equation}
+Ranking by decreasing cosine similarity is exactly the same as ranking by increasing squared Euclidean distance.
+\end{derivationbox}
+
+\section{The label-similarity matrix}
+
+For a mini-batch of $n$ labeled examples, define
+\begin{equation}
+  y_{ij}=\ind[y_i=y_j]\in\{0,1\}.
+  \label{eq:labelsim}
+\end{equation}
+The matrix $\Y=[y_{ij}]$ is the target pattern. Under class-balanced ordering, it has block-diagonal structure.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.62]
+  \foreach \r in {0,...,11}{
+    \foreach \c in {0,...,11}{
+      \pgfmathtruncatemacro{\same}{(int(\r/4)==int(\c/4))?1:0}
+      \ifnum\same=1
+        \fill[teal!75] (\c,-\r) rectangle ++(1,-1);
+      \else
+        \fill[mist] (\c,-\r) rectangle ++(1,-1);
+      \fi
+      \draw[white,line width=0.25pt] (\c,-\r) rectangle ++(1,-1);
+    }
+  }
+  \draw[navy,thick] (0,0) rectangle (12,-12);
+  \node[left] at (0,-2) {class A};
+  \node[left] at (0,-6) {class B};
+  \node[left] at (0,-10) {class C};
+  \node[above] at (2,0) {A};
+  \node[above] at (6,0) {B};
+  \node[above] at (10,0) {C};
+  \node[right=8mm,align=left] at (12,-6) {teal: $y_{ij}=1$\\white: $y_{ij}=0$};
+\end{tikzpicture}
+\caption{The binary target similarity matrix for a batch with three classes and four samples per class.}
+\label{fig:label-matrix}
+\end{figure}
+
+\begin{meetingbox}[title=What to say]
+``The network outputs unit vectors. Cosine similarity gives the ranking, and because the vectors are normalized, squared Euclidean distance is just $2-2$ times the cosine similarity. The loss therefore changes one pairwise similarity matrix, but it does so through neighborhood structure rather than only individual pairs.''
+\end{meetingbox}
+
+% ================================================================
+\chapter{Metric-Learning Baselines and Balanced Batches}
+\label{chap:baselines}
+% ================================================================
+
+\section{Why batch composition is part of the method}
+
+The paper uses a $P\times K$ sampler: choose $P$ classes and $K$ samples per class. To match the paper's notation, this guide writes
+\[
+  k=K,\qquad n=Pk.
+\]
+The contextual neighborhood size is \textbf{not a free top-$k$ tuning parameter}: the paper sets it equal to the number of samples from each class in the mini-batch.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.9]
+  \foreach \r/\lab/\col in {0/A/teal,1/B/gold,2/C/brick,3/D/purple}{
+    \node[anchor=east] at (-0.35,-\r) {class \lab};
+    \foreach \c in {0,...,3}{
+      \fill[\col!70] (\c,-\r-0.32) circle (0.22);
+      \node[white,font=\scriptsize\bfseries] at (\c,-\r-0.32) {\the\numexpr\c+1\relax};
+    }
+  }
+  \draw[decorate,decoration={brace,mirror,amplitude=5pt},navy] (-0.3,-4.05)--(3.3,-4.05)
+    node[midway,below=7pt] {$k=4$ samples per class};
+  \draw[decorate,decoration={brace,amplitude=5pt},navy] (3.75,0.15)--(3.75,-3.6)
+    node[midway,right=8pt] {$P=4$ classes};
+  \node[below=18mm] at (1.5,-3.55) {$n=Pk=16$};
+\end{tikzpicture}
+\caption{A balanced batch is a structural assumption, not a minor dataloader choice.}
+\label{fig:balanced-batch}
+\end{figure}
+
+\begin{conceptbox}[title=Why $k$ equals samples per class]
+If ranking is perfect inside a balanced batch, each sample's $k$ nearest items, counting itself, are exactly the $k$ examples with the same label. This identity is what lets zero contextual loss coincide with correct within-batch ranking in the paper's proposition.
+\end{conceptbox}
+
+\section{Pairwise contrastive loss}
+
+The contextual framework retains a standard pairwise term. In similarity form, the paper uses positive and negative margins $\delta_+$ and $\delta_-$:
+\begin{equation*}
+\begin{aligned}
+\mathcal L_{\mathrm{contrast}}
+&=
+\frac{\sum_{i,j:y_{ij}=1}[\delta_+-s_{ij}]_+}
+{\card{\{(i,j):y_{ij}=1,\ \delta_+-s_{ij}>0\}}}\\
+&\quad+
+\frac{\sum_{i,j:y_{ij}=0}[s_{ij}-\delta_-]_+}
+{\card{\{(i,j):y_{ij}=0,\ s_{ij}-\delta_->0\}}}.
+\end{aligned}
+\paperEq{29}
+\label{eq:contrastive}
+\end{equation*}
+Here $[a]_+=\max(a,0)$. A positive pair is penalized if its similarity is below $\delta_+$; a negative pair is penalized if its similarity is above $\delta_-$. Only margin-violating pairs contribute.
+
+\section{Triplet and supervised contrastive baselines}
+
+These are not part of the contextual paper's final formula, but they are critical controls for the proposed motion study.
+
+For an anchor $a$, positive $p$, negative $n$, triplet loss is
+\begin{equation}
+  \mathcal L_{\mathrm{triplet}}=[D(a,p)-D(a,n)+m]_+.
+  \label{eq:triplet}
+\end{equation}
+It asks only for a relative inequality.
+
+For supervised contrastive learning, define $P(i)$ as the set of same-label positives for anchor $i$ and $A(i)$ as all other batch indices. With temperature $\tau$,
+\begin{equation}
+\mathcal L_{\mathrm{supcon}}
+=\sum_i -\frac{1}{\card{P(i)}}\sum_{p\in P(i)}
+\log\frac{\exp(z_i^\transpose z_p/\tau)}
+{\sum_{a\in A(i)}\exp(z_i^\transpose z_a/\tau)}.
+\label{eq:supcon}
+\end{equation}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=4mm]
+  \node[block,minimum width=35mm,minimum height=35mm] (pair) {};
+  \node[above=1mm of pair.north] {pairwise view};
+  \fill[teal] ($(pair.center)+(-0.8,0)$) circle (0.16) node[above=2pt] {$i$};
+  \fill[teal] ($(pair.center)+(0.8,0.65)$) circle (0.16) node[above=2pt] {$p$};
+  \fill[brick] ($(pair.center)+(0.9,-0.75)$) circle (0.16) node[below=2pt] {$n$};
+  \draw[teal,very thick] ($(pair.center)+(-0.65,0.08)$)--($(pair.center)+(0.65,0.55)$);
+  \draw[brick,very thick,dashed] ($(pair.center)+(-0.65,-0.08)$)--($(pair.center)+(0.72,-0.65)$);
+
+  \node[block,right=16mm of pair,minimum width=48mm,minimum height=35mm] (ctx) {};
+  \node[above=1mm of ctx.north] {contextual view};
+  \coordinate (c) at (ctx.center);
+  \fill[teal] ($(c)+(-1.2,0)$) circle (0.15) node[above=2pt] {$i$};
+  \fill[teal] ($(c)+(1.2,0)$) circle (0.15) node[above=2pt] {$j$};
+  \foreach \x/\y in {-1.6/0.7,-0.9/0.85,-0.55/-0.7,0.55/-0.7,0.9/0.85,1.6/0.7}{
+    \fill[gold] ($(c)+(\x,\y)$) circle (0.11);
+  }
+  \draw[teal!70,thick,rounded corners] ($(c)+(-1.85,-1.05)$) rectangle ($(c)+(0.15,1.1)$);
+  \draw[teal!70,thick,rounded corners] ($(c)+(-0.15,-1.05)$) rectangle ($(c)+(1.85,1.1)$);
+  \node[below=2mm of ctx.south,align=center] {compare overlapping neighborhoods,\\not only one edge};
+\end{tikzpicture}
+\caption{Standard losses reason through pairs or triplets; contextual loss also reasons through the local graph around each sample.}
+\label{fig:pair-vs-context}
+\end{figure}
+
+% ================================================================
+\chapter{The Full Contextual-Similarity Pipeline}
+\label{chap:pipeline}
+% ================================================================
+
+\section{One picture before the details}
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[node distance=7mm]
+  \node[data,minimum width=24mm] (z) {normalized\\embeddings $Z$};
+  \node[block,right=of z,minimum width=23mm] (s) {similarity\\$S=ZZ^\transpose$};
+  \node[block,right=of s,minimum width=23mm] (d) {distance\\$D=2-2S$};
+  \node[block,right=of d,minimum width=27mm] (n) {$k+\epsilon$\\neighbor mask $N$};
+  \node[block,right=of n,minimum width=28mm] (m) {shared context\\$M_+,M_-$};
+  \node[block,right=of m,minimum width=25mm] (w1) {gated score\\$W_1$};
+  \node[block,right=of w1,minimum width=30mm] (qe) {reciprocal query\\expansion $W_2$};
+  \node[data,right=of qe,minimum width=25mm] (w) {contextual\\similarity $W$};
+  \node[loss,below=11mm of w,minimum width=26mm] (lc) {$\mathcal L_{\rm context}$\\match $W$ to $Y$};
+  \node[loss,below=11mm of s,minimum width=28mm] (lp) {$\mathcal L_{\rm contrast}$\\pairwise margins};
+  \node[loss,below=11mm of d,minimum width=26mm] (lr) {$\mathcal L_{\rm reg}$\\space usage};
+  \draw[arrow] (z)--(s); \draw[arrow] (s)--(d); \draw[arrow] (d)--(n);
+  \draw[arrow] (n)--(m); \draw[arrow] (m)--(w1); \draw[arrow] (w1)--(qe); \draw[arrow] (qe)--(w);
+  \draw[arrow] (w)--(lc);
+  \draw[arrow] (s)--(lp);
+  \draw[arrow] (s.south east) to[out=-70,in=150] (lr.north west);
+\end{tikzpicture}}
+\caption{The complete training computation. Every contextual quantity is ultimately a function of the cosine-similarity matrix.}
+\label{fig:full-pipeline}
+\end{figure}
+
+\section{Dimensions and tensor meanings}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{>{\bfseries}l l X}
+\toprule
+Symbol & Shape & Meaning \\
+\midrule
+$Z$ & $n\times d$ & one normalized embedding per mini-batch item \\
+$S$ & $n\times n$ & cosine similarity, $S_{ij}=z_i^\transpose z_j$ \\
+$D$ & $n\times n$ & squared Euclidean distance, $D=2\mathbf 1\mathbf 1^\transpose-2S$ entrywise \\
+$Y$ & $n\times n$ & binary label agreement \\
+$N$ & $n\times n$ & differentiable-in-backward binary neighborhood indicator \\
+$M_+,M_-$ & $n\times n$ & shared-neighbor and shared-non-neighbor counts \\
+$W_1,W_2,W$ & $n\times n$ & progressively refined contextual similarities \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{conceptbox}[title=The conceptual compression]
+The entire paper can be remembered as
+\[
+\boxed{\text{embeddings}\to\text{pairwise similarities}\to\text{local graph}\to\text{graph similarity}\to\text{label graph}.}
+\]
+The difficult part is making the discrete local graph trainable.
+\end{conceptbox}
+
+% ================================================================
+\chapter{Step 1: Differentiable Neighborhoods}
+\label{chap:step1}
+% ================================================================
+
+\section{The Heaviside operation and the heuristic gradient}
+
+A top-$k$ neighborhood is discrete. The paper expresses the threshold with a Heaviside function:
+\begin{equation*}
+\text{Forward:}\quad
+\theta(x)=\begin{cases}1,&x\ge 0,\\0,&x<0,\end{cases}
+\qquad
+\text{Backward:}\quad \frac{\partial\theta(x)}{\partial x}=\alpha,
+\paperEq{1}
+\label{eq:heaviside}
+\end{equation*}
+where $\alpha>0$ is a constant. The forward pass is exact and binary; the backward pass deliberately overrides the true derivative, which is zero almost everywhere and undefined at zero.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.46\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,height=5cm,axis lines=middle,xmin=-2.2,xmax=2.2,ymin=-0.15,ymax=1.25,
+  xlabel={$x$},ylabel={$\theta(x)$},xtick={-2,-1,0,1,2},ytick={0,1},grid=both]
+  \addplot[navy,very thick,domain=-2.2:0,samples=2] {0};
+  \addplot[navy,very thick,domain=0:2.2,samples=2] {1};
+  \addplot[only marks,mark=*,navy] coordinates {(0,1)};
+\end{axis}
+\end{tikzpicture}
+\caption{Exact binary forward pass.}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{0.46\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,height=5cm,axis lines=middle,xmin=-2.2,xmax=2.2,ymin=-0.15,ymax=1.25,
+  xlabel={$x$},ylabel={surrogate gradient},xtick={-2,-1,0,1,2},ytick={0,1},grid=both]
+  \addplot[teal,very thick,domain=-2.2:2.2,samples=2] {0.75};
+  \node[teal] at (axis cs:1.45,0.92) {$\alpha$};
+\end{axis}
+\end{tikzpicture}
+\caption{Constant backward signal.}
+\end{subfigure}
+\caption{The method uses an exact discrete neighborhood in the forward pass and a straight-through-style heuristic in the backward pass.}
+\label{fig:heaviside}
+\end{figure}
+
+\section{The $k+\epsilon$ neighborhood}
+
+Let $p(i)$ be the index of the $k$-th closest item to $i$, counting $i$ itself. The paper defines
+\begin{equation*}
+\ind_{N_{k+\epsilon}}(i,j)
+=\theta\!\left(-D(i,j)+\sg(D(i,p(i)))+\epsilon\right).
+\paperEq{2}
+\label{eq:neighborhood}
+\end{equation*}
+Equivalently,
+\[
+  j\in N_{k+\epsilon}(i)
+  \quad\Longleftrightarrow\quad
+  D(i,j)\le D(i,p(i))+\epsilon.
+\]
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1.3cm,y=1cm]
+  \draw[->,slate,thick] (0,0)--(7.2,0) node[right] {distance from anchor $i$};
+  \foreach \x/\lab/\col in {0/i/teal,0.9/a/teal,1.6/b/teal,2.5/p/gold,3.0/c/brick,4.1/d/brick,5.5/e/brick}{
+    \fill[\col] (\x,0) circle (0.12);
+    \node[above=3pt] at (\x,0) {\lab};
+  }
+  \draw[navy,very thick] (2.5,-0.45)--(2.5,0.45);
+  \node[below=7pt,navy] at (2.5,0) {$D(i,p)$};
+  \draw[teal,very thick] (3.2,-0.38)--(3.2,0.38);
+  \node[below=7pt,teal] at (3.2,0) {$D(i,p)+\epsilon$};
+  \draw[decorate,decoration={brace,amplitude=5pt},teal] (0,0.85)--(3.2,0.85)
+     node[midway,above=7pt] {$N_{k+\epsilon}(i)$};
+\end{tikzpicture}
+\caption{$\epsilon$ expands the boundary beyond the current $k$-th neighbor and acts as a ranking margin.}
+\label{fig:epsilon-neighborhood}
+\end{figure}
+
+\section{Why stop the gradient through the boundary?}
+
+The operator $\sg(\cdot)$ treats the $k$-th-neighbor distance as a constant during backpropagation. Otherwise, the optimization could alter the threshold itself instead of moving the candidate pair relative to the threshold. In code, this is the difference between
+\[
+  \code{threshold.detach()}
+\]
+and an ordinary differentiable threshold.
+
+\begin{implementationbox}[title=Paper-to-code translation]
+\begin{lstlisting}
+D = (2.0 - 2.0 * S).clamp_min(0.0)
+# topk on -D returns smallest distances
+neg_dk = (-D).topk(k, dim=1).values[:, -1:]
+N = GreaterThan.apply(-D + eps, neg_dk.detach())
+\end{lstlisting}
+The mask $N$ is binary in the forward pass. Its custom autograd function returns a constant gradient with opposite signs for the two comparison arguments.
+\end{implementationbox}
+
+\section{Why not use a sigmoid?}
+
+A low-temperature sigmoid approximates a step, but its gradient becomes concentrated in a tiny interval around the boundary. A higher-temperature sigmoid spreads gradients but ceases to behave like a binary neighborhood. The paper reports that the exact-forward, constant-backward construction performs better in its ablations.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.78\textwidth,height=6cm,axis lines=middle,xmin=-3,xmax=3,ymin=-0.05,ymax=1.05,
+  xlabel={$x$},ylabel={soft membership},grid=both,legend style={at={(0.5,-0.2)},anchor=north,legend columns=3}]
+  \addplot[navy,very thick,domain=-3:0,samples=2] {0};
+  \addplot[navy,very thick,domain=0:3,samples=2] {1};
+  \addplot[teal,thick,domain=-3:3,samples=100] {1/(1+exp(-x/0.5))};
+  \addplot[gold,thick,domain=-3:3,samples=100] {1/(1+exp(-x/0.15))};
+  \legend{step,step,$\tau=0.5$,$\tau=0.15$}
+\end{axis}
+\end{tikzpicture}
+\caption{A sharper sigmoid is a better forward approximation but has useful gradients over a narrower region.}
+\label{fig:sigmoid}
+\end{figure}
+
+% ================================================================
+\chapter{Step 2: Shared Neighborhood Context}
+\label{chap:step2}
+% ================================================================
+
+\section{Neighbor overlap as a dot product}
+
+Let $N_{ij}=\ind_{N_{k+\epsilon}}(i,j)$. The $i$-th row $N_i$ is a binary signature of the neighborhood around $i$. The number of shared neighbors is
+\begin{equation}
+  M_+(i,j)=\sum_{p=1}^{n}N_{ip}N_{jp}
+  =\inner{N_i}{N_j}.
+  \label{eq:mplus}
+\end{equation}
+In matrix form,
+\begin{equation*}
+  M_+=NN^\transpose.
+\paperEq{22}
+\label{eq:mplus-matrix}
+\end{equation*}
+This is why the method can be implemented compactly with a matrix multiplication.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.75]
+  \node at (-1.1,2.6) {$N_i$};
+  \foreach \c/\v in {0/1,1/1,2/0,3/1,4/0,5/0}{
+    \ifnum\v=1
+      \fill[teal!75] (\c,2) rectangle ++(0.8,0.8);
+    \else
+      \fill[mist] (\c,2) rectangle ++(0.8,0.8);
+    \fi
+    \draw[white] (\c,2) rectangle ++(0.8,0.8);
+    \node at (\c+0.4,2.4) {\v};
+  }
+  \node at (-1.1,1.35) {$N_j$};
+  \foreach \c/\v in {0/1,1/0,2/0,3/1,4/1,5/0}{
+    \ifnum\v=1
+      \fill[gold!75] (\c,0.95) rectangle ++(0.8,0.8);
+    \else
+      \fill[mist] (\c,0.95) rectangle ++(0.8,0.8);
+    \fi
+    \draw[white] (\c,0.95) rectangle ++(0.8,0.8);
+    \node at (\c+0.4,1.35) {\v};
+  }
+  \draw[decorate,decoration={brace,mirror,amplitude=5pt},navy] (0,0.55)--(3.8,0.55)
+    node[midway,below=7pt] {two shared 1s};
+  \node[anchor=west] at (5.2,1.85) {$\inner{N_i}{N_j}=2$};
+\end{tikzpicture}
+\caption{Binary neighborhood overlap is an ordinary dot product.}
+\label{fig:binary-dot}
+\end{figure}
+
+\section{Why count shared non-neighbors?}
+
+Define $\bar N=1-N$. Then
+\begin{equation}
+  M_-(i,j)=\sum_{p=1}^{n}(1-N_{ip})(1-N_{jp})
+  =\inner{\bar N_i}{\bar N_j}.
+  \label{eq:mminus}
+\end{equation}
+Two neighborhood signatures can be similar because they include the same points \emph{and} exclude the same points. The $M_-$ term also prevents gradients from focusing only on entries where both neighborhood indicators are one.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.92]
+  \begin{scope}[xshift=-3.3cm]
+    \draw[teal,very thick,fill=teal!10] (-0.7,0) circle (1.25);
+    \draw[gold,very thick,fill=gold!10] (0.7,0) circle (1.25);
+    \node[teal] at (-1.25,1.35) {$N(i)$};
+    \node[gold] at (1.25,1.35) {$N(j)$};
+    \node at (0,0) {$M_+$};
+    \node[below=16mm,align=center] at (0,-1.25) {agreement on\\who is nearby};
+  \end{scope}
+  \begin{scope}[xshift=3.3cm]
+    \draw[navy,thick,rounded corners] (-2,-1.45) rectangle (2,1.45);
+    \draw[teal,very thick,fill=white] (-0.7,0) circle (0.9);
+    \draw[gold,very thick,fill=white] (0.7,0) circle (0.9);
+    \node at (0,-1.05) {$M_-$ region};
+    \node[below=16mm,align=center] at (0,-1.25) {agreement on\\who is far away};
+  \end{scope}
+\end{tikzpicture}
+\caption{$M_+$ measures shared inclusion; $M_-$ measures shared exclusion.}
+\label{fig:mplus-mminus}
+\end{figure}
+
+\section{The intermediate contextual score $W_1$}
+
+The paper combines the two agreements, normalizes them, and gates the result by whether $j$ is currently a neighbor of $i$:
+\begin{equation*}
+\boxed{
+W_1(i,j)=\frac{N_{ij}}{2}
+\left(
+\frac{M_+(i,j)}{\sg\sum_p N_{ip}}
++
+\frac{M_-(i,j)}{\sg\sum_p(1-N_{ip})}
+\right).}
+\paperEq{3}
+\label{eq:w1}
+\end{equation*}
+
+The three design choices are distinct:
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+  \item \textbf{Gate $N_{ij}$:} contextual similarity is initially nonzero only when $j$ belongs to $i$'s neighborhood.
+  \item \textbf{Average $M_+$ and $M_-$:} reward agreement about both local inclusion and exclusion.
+  \item \textbf{Stop-gradient denominators:} normalize the score without training the model to manipulate neighborhood cardinality.
+\end{enumerate}
+
+\section{Algebra when $\epsilon=0$}
+
+When $\epsilon=0$, every row has exactly $k$ ones, so $\sum_pN_{ip}=k$ and $\sum_p(1-N_{ip})=n-k$. The complement overlap simplifies:
+\begin{align*}
+M_-(i,j)
+&=\sum_p(1-N_{ip})(1-N_{jp})\\
+&=n-2k+\inner{N_i}{N_j}.
+\paperEq{12}
+\label{eq:mminus-simplify}
+\end{align*}
+Substitution gives
+\begin{equation*}
+W_1(i,j)=N_{ij}\left(a\inner{N_i}{N_j}+b\right),
+\paperEq{14}
+\label{eq:w1-simplified}
+\end{equation*}
+where
+\begin{equation}
+  a=\frac{1}{2k}+\frac{1}{2(n-k)},\qquad
+  b=\frac{n-2k}{2(n-k)}.
+  \label{eq:ab}
+\end{equation}
+Under the proposition's condition $n>2k$, both $a$ and $b$ are positive. Thus, if $N_{ij}=1$, then $W_1(i,j)>0$ even before considering how large the overlap is.
+
+\medskip
+\noindent\textbf{\textcolor{purple}{Graph interpretation.}}
+Each row $N_i$ is an adjacency vector in a directed $k$-nearest-neighbor graph. The dot product $\inner{N_i}{N_j}$ counts common outgoing neighbors, so $W_1$ compares the \emph{local graph signatures} of $i$ and $j$, not merely their direct edge weight $s_{ij}$.
+
+
+% ================================================================
+\chapter{Step 3: Reciprocal Query Expansion and Symmetry}
+\label{chap:step3}
+% ================================================================
+
+\section{Reciprocal close neighbors}
+
+The method recomputes a smaller $k/2+\epsilon$ neighborhood and keeps only reciprocal relationships:
+\begin{equation*}
+R_{k/2+\epsilon}(i,j)
+=N_{k/2+\epsilon}(i,j)N_{k/2+\epsilon}(j,i).
+\paperEq{4a}
+\label{eq:reciprocal}
+\end{equation*}
+A one-sided accidental neighbor is rejected. A mutual neighbor is retained.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=18mm]
+  \node[circle,draw=navy,thick,fill=mist,minimum size=8mm] (i) {$i$};
+  \node[circle,draw=navy,thick,fill=mist,minimum size=8mm,right=of i] (j) {$j$};
+  \draw[arrow,brick] (i) to[bend left=18] node[above] {$j\in N(i)$} (j);
+  \node[below=8mm of $(i)!0.5!(j)$,brick] {one-sided: reject};
+
+  \node[circle,draw=navy,thick,fill=mist,minimum size=8mm,right=55mm of j] (p) {$p$};
+  \node[circle,draw=navy,thick,fill=mist,minimum size=8mm,right=of p] (q) {$q$};
+  \draw[arrow,teal] (p) to[bend left=18] (q);
+  \draw[arrow,teal] (q) to[bend left=18] (p);
+  \node[below=8mm of $(p)!0.5!(q)$,teal] {reciprocal: retain};
+\end{tikzpicture}
+\caption{Reciprocity filters asymmetric nearest-neighbor accidents.}
+\label{fig:reciprocity}
+\end{figure}
+
+\section{Query expansion}
+
+The method then averages $W_1$ over the reciprocal neighbors of $i$:
+\begin{equation}
+  W_2(i,j)=
+  \frac{\sum_p R_{k/2+\epsilon}(i,p)W_1(p,j)}
+       {\sum_p R_{k/2+\epsilon}(i,p)}.
+  \label{eq:w2}
+\end{equation}
+Finally it symmetrizes:
+\begin{equation*}
+  \boxed{w_{ij}=\frac12\left(W_2(i,j)+W_2(j,i)\right).}
+\paperEq{4}
+\label{eq:qe}
+\end{equation*}
+
+\begin{center}
+\begin{tikzpicture}[node distance=8mm,scale=0.82,transform shape]
+  \node[circle,draw=navy,thick,fill=sky,minimum size=8mm] (i) {$i$};
+  \node[circle,draw=teal,thick,fill=lightgreen,minimum size=7mm,above right=of i] (p1) {$p_1$};
+  \node[circle,draw=teal,thick,fill=lightgreen,minimum size=7mm,below right=of i] (p2) {$p_2$};
+  \node[circle,draw=brick,thick,fill=rose,minimum size=7mm,right=24mm of i] (j) {$j$};
+  \draw[teal,thick] (i)--(p1); \draw[teal,thick] (i)--(p2);
+  \draw[dashedarrow] (p1)--(j); \draw[dashedarrow] (p2)--(j);
+\end{tikzpicture}
+\end{center}
+\noindent\textbf{\textcolor{teal}{Statistical intuition.}}
+Query expansion resembles local smoothing: a noisy pairwise estimate is replaced by an average across a small trusted neighborhood. Averaging can reduce variance, while reciprocity limits contamination from unreliable neighbors.
+
+
+% ================================================================
+\chapter{The Complete Objective and the Role of Every Term}
+\label{chap:objective}
+% ================================================================
+
+\section{Contextual loss}
+
+The final contextual matrix $W=[w_{ij}]$ is trained to match the label-similarity matrix $Y$:
+\begin{equation*}
+  \boxed{\mathcal L_{\mathrm{context}}
+  =\frac{1}{n^2}\sum_{i\ne j}(y_{ij}-w_{ij})^2.}
+\paperEq{5}
+\label{eq:lcontext}
+\end{equation*}
+The diagonal is excluded because every sample is trivially identical to itself.
+
+The derivative with respect to a contextual score is ordinary MSE:
+\begin{equation}
+  \frac{\partial\mathcal L_{\mathrm{context}}}{\partial w_{ij}}
+  =\frac{2}{n^2}(w_{ij}-y_{ij}).
+  \label{eq:msegrad}
+\end{equation}
+The unusual part is the chain from $w_{ij}$ back through query expansion, neighborhood intersections, and discrete threshold comparisons to the embedding similarities.
+
+\section{Similarity regularizer}
+
+The paper also regulates the mean pairwise cosine similarity:
+\begin{equation*}
+  \mathcal L_{\mathrm{reg}}
+  =\left(\tilde s-\frac{1}{n^2}\sum_{i,j}s_{ij}\right)^2.
+\paperEq{7}
+\label{eq:lreg}
+\end{equation*}
+If all embeddings crowd into a small angular region, their mean similarity becomes too high. This term encourages broader use of the unit sphere.
+
+\section{The full objective}
+
+\begin{equation*}
+  \boxed{
+  \mathcal L_{\mathrm{ours}}
+  =\lambda\mathcal L_{\mathrm{context}}
+  +(1-\lambda)\mathcal L_{\mathrm{contrast}}
+  +\gamma\mathcal L_{\mathrm{reg}}.}
+\paperEq{6}
+\label{eq:full-objective}
+\end{equation*}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=10mm]
+  \node[loss,minimum width=42mm] (ctx) {$\mathcal L_{\rm context}$\\correct local ranking graph};
+  \node[loss,right=of ctx,minimum width=42mm] (con) {$\mathcal L_{\rm contrast}$\\maintain pairwise margins};
+  \node[loss,right=of con,minimum width=42mm] (reg) {$\mathcal L_{\rm reg}$\\avoid angular crowding};
+  \node[block,below=15mm of con,minimum width=42mm] (sum) {weighted sum\\$\mathcal L_{\rm ours}$};
+  \draw[arrow] (ctx)--(sum); \draw[arrow] (con)--(sum); \draw[arrow] (reg)--(sum);
+\end{tikzpicture}
+\caption{The three terms solve different failure modes.}
+\label{fig:loss-roles}
+\end{figure}
+
+\section{The decomposability gap}
+
+A batch can be perfectly ranked even while the entire dataset is not. Once $\mathcal L_{\mathrm{context}}=0$ for an easy batch, that batch provides no further signal. The pairwise contrastive term continues enforcing absolute margins and helps bridge this difference between batch-wise and dataset-wise ranking.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=8mm]
+  \node[block,minimum width=42mm,minimum height=24mm] (batch) {sampled batch\\all positives ahead of negatives\\$\mathcal L_{\rm context}=0$};
+  \node[block,right=25mm of batch,minimum width=42mm,minimum height=24mm] (data) {full dataset\\some unseen hard negatives\\ranking still imperfect};
+  \draw[dashedarrow,brick] (batch)-- node[above,align=center] {decomposability\\gap} (data);
+  \node[loss,below=12mm of $(batch)!0.5!(data)$] (c) {contrastive margins keep acting};
+  \draw[arrow] (c)--(batch); \draw[arrow] (c)--(data);
+\end{tikzpicture}
+\caption{Why the hybrid objective is stronger than contextual loss alone.}
+\label{fig:decomp-gap}
+\end{figure}
+
+\section{Hyperparameter map}
+
+\begin{longtable}{>{\bfseries}p{0.12\textwidth}p{0.22\textwidth}p{0.49\textwidth}}
+\toprule
+Parameter & Mathematical role & Practical interpretation \\
+\midrule
+$k$ & neighbor count & must equal samples per class in the balanced batch under the paper's theory \\
+$\epsilon$ & expands the $k$-th-neighbor threshold & a flexible ranking margin in squared-distance units \\
+$\alpha$ & surrogate derivative of $\theta$ & scales gradients through comparisons; largely redundant with learning rate \\
+$\delta_+$ & positive similarity margin & positives below it are pulled closer \\
+$\delta_-$ & negative similarity margin & negatives above it are pushed apart \\
+$\lambda$ & contextual--contrastive mixture & $1$ means contextual only; $0$ means contrastive only \\
+$\gamma$ & similarity-regularizer weight & controls pressure to use more of the sphere \\
+$\tilde s$ & desired mean cosine similarity & target average angular spread \\
+\bottomrule
+\end{longtable}
+
+% ================================================================
+\chapter{Why Zero Contextual Loss Means Correct Ranking}
+\label{chap:proof}
+% ================================================================
+
+\section{The paper's proposition}
+\label{sec:proposition}
+
+\begin{proposition}[Liao--Tsiligkaridis--Kulis, Proposition 4.1]
+Consider a balanced batch of size $n$ with exactly $k$ samples from each class, $n$ divisible by $k$, $n>2k$, $k\ge2$, and $\epsilon=0$. Then
+\[
+\mathcal L_{\mathrm{context}}=0
+\]
+if and only if every positive sample is ranked ahead of every negative sample for every anchor:
+\[
+  s_{ip}>s_{ij}
+  \quad\text{whenever}\quad y_{ip}=1,\ y_{ij}=0.
+\]
+\end{proposition}
+
+\begin{conceptbox}[title=Plain-language translation]
+Under the balanced-batch assumptions, the contextual loss has the right global minimum: it is zero exactly when every anchor's same-class examples occupy the full top-$k$ neighborhood and every different-class example lies below them.
+\end{conceptbox}
+
+\section{Forward direction: correct ranking implies zero loss}
+
+Assume every sample is correctly ranked.
+
+\begin{enumerate}[leftmargin=*,label=\textbf{Step \arabic*.},itemsep=5pt]
+  \item Each class contributes exactly $k$ examples. Therefore the top-$k$ neighborhood of anchor $i$ is exactly its class:
+  \[
+    N_{ij}=y_{ij}.
+  \]
+  \item If $N_{ij}=1$, then $i$ and $j$ have identical neighborhoods of size $k$, so
+  \[
+    \inner{N_i}{N_j}=k.
+  \]
+  \item Substituting into the simplified $W_1$ formula yields $W_1(i,j)=N_{ij}=y_{ij}$.
+  \item Reciprocal query expansion averages identical rows inside the same class, so it leaves these values unchanged.
+  \item Hence $w_{ij}=y_{ij}$ for all off-diagonal pairs and the MSE is zero.
+\end{enumerate}
+
+\section{Backward direction: zero loss implies correct ranking}
+
+Assume $\mathcal L_{\mathrm{context}}=0$ but ranking is not correct. Because the batch contains exactly $k$ positives for each anchor, including itself, a missing positive from the top-$k$ set forces at least one negative intruder into the top-$k$ set. So there exists a negative pair $(i,j)$ with
+\[
+  y_{ij}=0,\qquad N_{ij}=1.
+\]
+From \cref{eq:w1-simplified}, $a>0$ and $b>0$, hence
+\[
+  W_1(i,j)=a\inner{N_i}{N_j}+b>0.
+\]
+Query expansion is an average of nonnegative quantities with positive weights, so the corresponding contextual value remains positive:
+\[
+  w_{ij}>0.
+\]
+But $y_{ij}=0$, so $(y_{ij}-w_{ij})^2>0$, contradicting zero loss. Therefore ranking must be correct.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.58]
+  \foreach \r in {0,...,11}{
+    \foreach \c in {0,...,11}{
+      \pgfmathtruncatemacro{\same}{(int(\r/4)==int(\c/4))?1:0}
+      \ifnum\same=1\fill[teal!75] (\c,-\r) rectangle ++(1,-1);\else\fill[mist] (\c,-\r) rectangle ++(1,-1);\fi
+      \draw[white,line width=0.25pt] (\c,-\r) rectangle ++(1,-1);
+    }
+  }
+  \draw[navy,thick] (0,0) rectangle (12,-12);
+  \node[above=5mm] at (6,0) {perfect-neighborhood matrix $N=Y$};
+  \draw[brick,very thick] (3,-0.05) rectangle (5,-1.95);
+  \node[right=5mm,brick,align=left] at (12,-1) {a negative intruder creates\\a nonzero off-block entry};
+\end{tikzpicture}
+\caption{At the optimum, the neighbor graph has exactly the same block structure as label agreement.}
+\label{fig:proof-matrix}
+\end{figure}
+
+\section{What the assumptions are doing}
+
+\begin{center}
+\small
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.31\textwidth} X}
+\toprule
+Assumption & Why it matters \\
+\midrule
+balanced $k$ samples per class & makes the desired top-$k$ set exactly equal to the same-label set \\
+$\epsilon=0$ & fixes each neighborhood cardinality at exactly $k$ \\
+$n>2k$ & ensures the constant $b=(n-2k)/(2(n-k))$ is positive in the proof \\
+self included & makes a class of $k$ examples correspond to a neighborhood of size $k$ \\
+outside these assumptions & the loss may remain useful empirically, but the proposition's zero-loss/correct-ranking equivalence is not guaranteed \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ================================================================
+\chapter{Gradient Intuition and Semantic Consistency}
+\label{chap:gradients}
+% ================================================================
+
+\section{Simplified gradient view}
+
+For $\epsilon=0$, the paper writes
+\begin{equation*}
+  W_1(i,j)=N_{ij}\left(a\inner{N_i}{N_j}+b\right).
+\paperEq{8}
+\label{eq:paper8}
+\end{equation*}
+Consider a negative intruder $j\in N(i)$, so $y_{ij}=0$ but $N_{ij}=1$. The MSE wants to reduce $W_1(i,j)$. It can do so in two ways:
+
+\begin{enumerate}[leftmargin=*,itemsep=4pt]
+  \item remove the direct neighborhood edge $i\to j$;
+  \item reduce overlap between the neighborhood signatures $N_i$ and $N_j$.
+\end{enumerate}
+The second route changes distances between $i$ and members of $j$'s neighborhood. That is the key distinction from a purely pairwise loss.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.0]
+  \node[circle,draw=navy,thick,fill=sky,minimum size=9mm] (i) at (-2.2,0) {$i$};
+  \node[circle,draw=brick,thick,fill=rose,minimum size=9mm] (j) at (2.2,0) {$j$};
+  \foreach \x/\y/\name in {1.35/1.1/p1,2.7/1.0/p2,1.25/-1.05/p3,2.8/-1.0/p4}{
+    \node[circle,draw=gold,fill=amber,minimum size=6mm] (\name) at (\x,\y) {};
+    \draw[gold,thick] (j)--(\name);
+  }
+  \draw[brick,very thick] (i)-- node[above] {wrong negative edge} (j);
+  \draw[brick,dashed,thick,-{Latex}] (i) to[bend left=18] (p1);
+  \draw[brick,dashed,thick,-{Latex}] (i) to[bend right=18] (p3);
+  \node[below=16mm,align=center] at (0,0) {contextual gradient separates $i$ from\\the \emph{context} around $j$, not only from $j$};
+\end{tikzpicture}
+\caption{A contextual error propagates through a neighborhood.}
+\label{fig:context-gradient}
+\end{figure}
+
+\section{Why apparently ``wrong'' pairwise gradients can generalize}
+
+The paper observes that a contextual gradient may sometimes pull apart same-label examples or push together different-label examples. Pairwise supervision would call that wrong. Contextual supervision asks a different question: is the binary label relation consistent with the local semantic structure?
+
+The paper's gradient-clamping experiment enforces the pairwise label signs
+\begin{equation*}
+\partial D(i,j)\leftarrow
+\begin{cases}
+\max(\partial D(i,j),0),&y_{ij}=1,\\
+\min(\partial D(i,j),0),&y_{ij}=0,
+\end{cases}
+\paperEq{10}
+\label{eq:clamp}
+\end{equation*}
+and reports higher train retrieval but lower test retrieval. Its interpretation is that some label-inconsistent gradients act as regularization against semantically inconsistent labels.
+
+\begin{warningbox}[title=Critical distinction for the pose proposal]
+This argument concerns noisy or semantically incomplete \emph{labels}. Pose-estimation corruption is noisy \emph{input}. A corrupted skeleton may move an entire local neighborhood coherently or destroy it. Therefore the claim ``context helps corrupted poses'' remains an empirical hypothesis.
+\end{warningbox}
+
+\section{Stepwise gradient interpretation}
+
+The supplementary analysis can be summarized as follows:
+
+\begin{center}
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.17\textwidth}X X}
+\toprule
+Component & Positive pair error & Negative pair error \\
+\midrule
+Step 1: $N_{ij}$ & positive outside top-$k$ is pulled inward & negative inside top-$k$ is pushed outward \\
+Step 2: overlap & align the two local contexts & separate each sample from the other's local context \\
+Step 3: query expansion & smooth toward trusted-neighbor consensus & suppress one-sided accidental relations \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% ================================================================
+\chapter{A Worked Numerical Example}
+\label{chap:worked}
+% ================================================================
+
+\section{Setup}
+
+Use a balanced batch with $n=12$, three classes, and $k=4$ samples per class:
+\[
+A=\{1,2,3,4\},\quad B=\{5,6,7,8\},\quad C=\{9,10,11,12\}.
+\]
+Suppose anchor $1$ has a damaged neighborhood
+\[
+N(1)=\{1,2,3,5\},
+\]
+so positive $4$ is missing and negative $5$ is an intruder. Let
+\[
+N(2)=\{2,1,3,4\},\qquad N(5)=\{5,6,7,1\}.
+\]
+
+\section{A true positive pair: $(1,2)$}
+
+The shared neighbors are
+\[
+N(1)\cap N(2)=\{1,2,3\},\qquad M_+(1,2)=3.
+\]
+The union contains five items, so seven of the twelve items are excluded by both neighborhoods:
+\[
+M_-(1,2)=12-\card{N(1)\cup N(2)}=12-5=7.
+\]
+Because $2\in N(1)$, the gate is one. Therefore
+\begin{align}
+W_1(1,2)
+&=\frac12\left(\frac34+\frac78\right)\\
+&=\frac{13}{16}=0.8125.
+\end{align}
+The target is $y_{12}=1$, so this pair contributes
+\[
+(1-0.8125)^2\approx0.0352
+\]
+before the global $1/n^2$ factor.
+
+\section{A wrong negative pair: $(1,5)$}
+
+Here
+\[
+N(1)\cap N(5)=\{1,5\},\qquad M_+(1,5)=2.
+\]
+The union has six items, so $M_-(1,5)=6$. Since $5\in N(1)$,
+\begin{align}
+W_1(1,5)
+&=\frac12\left(\frac24+\frac68\right)\\
+&=0.625.
+\end{align}
+But $y_{15}=0$, so the contribution is
+\[
+(0-0.625)^2=0.390625.
+\]
+This is a strong signal to remove the intruder and separate the surrounding contexts.
+
+\section{A missing positive pair: $(1,4)$}
+
+Because $4\notin N(1)$, the gate makes
+\[
+W_1(1,4)=0
+\]
+even though $y_{14}=1$. Its squared error is $1$, the largest possible. Step 1 therefore pulls sample $4$ toward the top-$k$ boundary of anchor $1$.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=7mm]
+  \node[circle,draw=navy,thick,fill=sky,minimum size=9mm] (a1) {$1_A$};
+  \node[circle,draw=teal,fill=lightgreen,minimum size=7mm,above right=of a1] (a2) {$2_A$};
+  \node[circle,draw=teal,fill=lightgreen,minimum size=7mm,right=of a1] (a3) {$3_A$};
+  \node[circle,draw=teal,fill=white,minimum size=7mm,below right=of a1] (a4) {$4_A$};
+  \node[circle,draw=brick,fill=rose,minimum size=7mm,above=17mm of a3] (b5) {$5_B$};
+  \draw[teal,thick] (a1)--(a2); \draw[teal,thick] (a1)--(a3);
+  \draw[brick,very thick] (a1)--(b5);
+  \draw[teal,dashed,very thick,-{Latex}] (a1)--(a4);
+  \node[right=10mm of b5,brick] {intruder: push out};
+  \node[right=10mm of a4,teal] {missing positive: pull in};
+\end{tikzpicture}
+\caption{The numerical example as a neighborhood-repair problem.}
+\label{fig:worked-example}
+\end{figure}
+
+\section{What query expansion would do}
+
+Suppose $1$ and $2$ are reciprocal close neighbors. Then $W_2(1,j)$ averages the row of $W_1$ for anchors $1$ and $2$. Since anchor $2$ has the correct neighbor $4$ and excludes intruder $5$, its row supplies a corrective vote: $W_2(1,4)$ rises and $W_2(1,5)$ falls. This is the local-consensus interpretation of query expansion.
+
+% ================================================================
+\chapter{Adapting the Mathematics to Pose Sequences}
+\label{chap:pose}
+% ================================================================
+
+\section{The input tensor}
+
+A pose sequence can be written
+\begin{equation}
+  x\in\R^{T\times J\times C},
+  \label{eq:pose-tensor}
+\end{equation}
+where $T$ is frames, $J$ is joints, and $C\in\{2,3\}$ is coordinate dimension. A sequence encoder produces one vector:
+\begin{equation}
+  h=f_\theta(x,m),\qquad
+  z=\frac{g_\phi(h)}{\norm{g_\phi(h)}_2}.
+  \label{eq:pose-encoder}
+\end{equation}
+Here $m$ can be a validity mask for missing joints or frames, $f_\theta$ is MotionBERT or another temporal encoder, and $g_\phi$ is a small projection head.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.94\textwidth}{!}{%
+\begin{tikzpicture}[node distance=9mm]
+  \node[data,minimum width=30mm] (pose) {pose tensor\\$T\times J\times C$};
+  \node[block,right=of pose,minimum width=31mm] (norm) {root/scale\\normalization};
+  \node[block,right=of norm,minimum width=35mm] (enc) {temporal encoder\\MotionBERT};
+  \node[block,right=of enc,minimum width=30mm] (pool) {masked pooling\\or CLS token};
+  \node[block,right=of pool,minimum width=28mm] (head) {projection head\\$g_\phi$};
+  \node[data,right=of head,minimum width=26mm] (z) {unit motion\\embedding $z$};
+  \draw[arrow] (pose)--(norm); \draw[arrow] (norm)--(enc); \draw[arrow] (enc)--(pool); \draw[arrow] (pool)--(head); \draw[arrow] (head)--(z);
+\end{tikzpicture}}
+\caption{The loss does not care whether $z$ came from an image or a motion encoder. Only the encoder-side computation changes.}
+\label{fig:pose-encoder}
+\end{figure}
+
+\section{Pose normalization}
+
+For joint $j$ at frame $t$, let $r$ be a root joint and $b$ a body-scale statistic such as mean bone length. A simple normalization is
+\begin{equation}
+  \tilde x_{t,j}=\frac{x_{t,j}-x_{t,r}}{b+\eta},
+  \label{eq:pose-normalize}
+\end{equation}
+with small $\eta>0$ for stability. This removes global translation and much of body-size variation. View normalization, if used, should be treated as a separate design choice because it can remove information or create artifacts.
+
+\section{Controlled corruption operators}
+
+The main experiment corrupts the query and leaves the gallery clean. Let corruption severity be $c$.
+
+\subsection{Gaussian joint jitter}
+\begin{equation}
+  \tilde x_{t,j}=x_{t,j}+\sigma(c)\xi_{t,j},
+  \qquad \xi_{t,j}\sim\mathcal N(0,I_C).
+  \label{eq:jitter}
+\end{equation}
+Use scale-normalized coordinates so $\sigma$ has comparable meaning across subjects.
+
+\subsection{Joint or limb dropout}
+Let $m_{t,j}\sim\operatorname{Bernoulli}(1-p(c))$. Then
+\begin{equation}
+  \tilde x_{t,j}=m_{t,j}x_{t,j},
+  \label{eq:jointdrop}
+\end{equation}
+while a companion mask tells the encoder which zeros are missing observations. Limb dropout uses a correlated mask over an anatomically connected subset.
+
+\subsection{Frame dropout}
+With frame mask $u_t\sim\operatorname{Bernoulli}(1-q(c))$,
+\begin{equation}
+  \tilde x_t=u_tx_t,
+  \label{eq:framedrop}
+\end{equation}
+or remove the frame and resample the remaining sequence to length $T$.
+
+\subsection{View rotation in 3D}
+For a yaw angle $\psi(c)$,
+\begin{equation}
+\tilde x_{t,j}=R_y(\psi)x_{t,j},\qquad
+R_y(\psi)=
+\begin{bmatrix}
+\cos\psi&0&\sin\psi\\
+0&1&0\\
+-\sin\psi&0&\cos\psi
+\end{bmatrix}.
+\label{eq:rotation}
+\end{equation}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.88]
+% clean skeleton
+\begin{scope}[xshift=-5.2cm]
+  \node[above] at (0,2.5) {clean};
+  \draw[navy,thick] (0,2)--(0,0.5)--(-0.7,-0.6); \draw[navy,thick] (0,0.5)--(0.7,-0.6);
+  \draw[navy,thick] (0,1.45)--(-0.8,0.9); \draw[navy,thick] (0,1.45)--(0.8,0.9);
+  \fill[teal] (0,2.2) circle (0.2);
+  \foreach \x/\y in {0/2,0/1.45,0/0.5,-0.8/0.9,0.8/0.9,-0.7/-0.6,0.7/-0.6}{\fill[navy] (\x,\y) circle (0.08);}
+\end{scope}
+% jitter
+\begin{scope}[xshift=-1.75cm]
+  \node[above] at (0,2.5) {jitter};
+  \draw[navy,thick] (0.08,1.95)--(-0.06,0.55)--(-0.55,-0.75); \draw[navy,thick] (-0.06,0.55)--(0.84,-0.45);
+  \draw[navy,thick] (0.08,1.4)--(-0.95,0.78); \draw[navy,thick] (0.08,1.4)--(0.68,1.03);
+  \fill[teal] (-0.05,2.2) circle (0.2);
+  \foreach \x/\y in {0.08/1.95,-0.06/1.4,-0.06/0.55,-0.95/0.78,0.68/1.03,-0.55/-0.75,0.84/-0.45}{\fill[navy] (\x,\y) circle (0.08);}
+\end{scope}
+% joint missing
+\begin{scope}[xshift=1.75cm]
+  \node[above] at (0,2.5) {missing limb};
+  \draw[navy,thick] (0,2)--(0,0.5)--(-0.7,-0.6); \draw[navy,thick] (0,0.5)--(0.7,-0.6);
+  \draw[navy,thick] (0,1.45)--(-0.8,0.9);
+  \draw[brick,dashed,thick] (0,1.45)--(0.8,0.9);
+  \fill[teal] (0,2.2) circle (0.2);
+  \draw[brick,thick] (0.68,0.78)--(0.92,1.02); \draw[brick,thick] (0.92,0.78)--(0.68,1.02);
+\end{scope}
+% dropped frames
+\begin{scope}[xshift=5.2cm]
+  \node[above] at (0,2.5) {dropped frames};
+  \foreach \x in {-0.9,0,0.9}{\draw[navy,thick,opacity=0.8] (\x,2)--(\x,1)--(\x-0.35,0.35);}
+  \draw[brick,very thick] (-0.25,0.25)--(0.25,2.2); \draw[brick,very thick] (0.25,0.25)--(-0.25,2.2);
+\end{scope}
+\end{tikzpicture}
+\caption{Schematic pose corruptions. These are controlled test interventions, not claims that one synthetic operator fully represents a real pose estimator.}
+\label{fig:pose-corruptions}
+\end{figure}
+
+\section{The central hypothesis in mathematical form}
+
+Let $M_\ell(c)$ be a retrieval metric for loss $\ell$ at corruption severity $c$. Define degradation
+\begin{equation}
+  \Delta_\ell(c)=M_\ell(0)-M_\ell(c).
+  \label{eq:degradation}
+\end{equation}
+The proposed hypothesis is not merely that contextual loss has larger clean $M(0)$, but that
+\begin{equation}
+  \Delta_{\mathrm{context}}(c)
+  <\Delta_{\mathrm{baseline}}(c)
+  \quad\text{over a meaningful severity range.}
+  \label{eq:hypothesis}
+\end{equation}
+
+% ================================================================
+\chapter{Implementation Blueprint}
+\label{chap:implementation}
+% ================================================================
+
+\section{Recommended staged implementation}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=5mm]
+  \node[impl,minimum width=42mm] (s0) {Stage 0\\split manifest, evaluator, corruptions};
+  \node[impl,right=of s0,minimum width=42mm] (s1) {Stage 1\\frozen MotionBERT features};
+  \node[impl,right=of s1,minimum width=42mm] (s2) {Stage 2\\train projection heads};
+  \node[impl,below=10mm of s1,minimum width=42mm] (s3) {Stage 3\\fine-tune full encoder};
+  \node[impl,right=of s3,minimum width=42mm] (s4) {Stage 4\\real estimator shift / sports};
+  \draw[arrow] (s0)--(s1); \draw[arrow] (s1)--(s2); \draw[arrow] (s2) to[bend left=20] (s3); \draw[arrow] (s3)--(s4);
+\end{tikzpicture}
+\caption{A low-risk sequence that isolates bugs and scientific effects.}
+\label{fig:stages}
+\end{figure}
+
+\begin{enumerate}[leftmargin=*,itemsep=5pt]
+  \item \textbf{Freeze the encoder first.} Validate query/gallery construction, cosine ranking, metrics, and deterministic corruption curves.
+  \item \textbf{Train only a projection head.} Compare losses while holding the representation backbone fixed.
+  \item \textbf{Fine-tune the encoder only after stability.} This prevents an encoder bug or optimizer difference from masquerading as a loss effect.
+  \item \textbf{Add a corruption-aware baseline.} Compare ordinary SupCon with and without the same corruption augmentation, then add a MaskCLR-style control if feasible.
+\end{enumerate}
+
+\section{Reference PyTorch implementation}
+
+The following implementation follows the paper's equations, parameterizes $k$, uses exact forward masks with custom backward gradients, and handles empty contrastive sets safely.
+
+\begin{lstlisting}
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict, Tuple
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class GreaterThanSTE(torch.autograd.Function):
+    """Exact >= in forward; constant surrogate gradient in backward."""
+
+    @staticmethod
+    def forward(ctx, x: torch.Tensor, y: torch.Tensor, alpha: float):
+        ctx.alpha = float(alpha)
+        return (x >= y).to(dtype=x.dtype)
+
+    @staticmethod
+    def backward(ctx, grad_output: torch.Tensor):
+        a = ctx.alpha
+        return grad_output * a, -grad_output * a, None
+
+
+def contextual_similarity(
+    embeddings: torch.Tensor,
+    *,
+    k: int,
+    eps: float,
+    alpha: float = 10.0,
+) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
+    """Compute W from normalized or unnormalized [n, d] embeddings."""
+    if embeddings.ndim != 2:
+        raise ValueError("embeddings must have shape [batch, dim]")
+    n = embeddings.shape[0]
+    if k < 2 or k > n:
+        raise ValueError(f"k must be in [2, {n}], got {k}")
+    if k % 2 != 0:
+        raise ValueError("k must be even for the k/2 reciprocal step")
+
+    z = F.normalize(embeddings, p=2, dim=1)
+    S = z @ z.T
+    D = (2.0 - 2.0 * S).clamp_min(0.0)
+
+    # Step 1: k+eps neighborhood.
+    neg_topk = (-D).topk(k, dim=1).values
+    neg_dk = neg_topk[:, -1:]
+    N = GreaterThanSTE.apply(-D + eps, neg_dk.detach(), alpha)
+
+    # Step 2: shared neighbors and shared non-neighbors.
+    N_count = N.sum(dim=1, keepdim=True).detach().clamp_min(1.0)
+    M_plus = (N @ N.T) / N_count
+
+    N_bar = 1.0 - N
+    N_bar_count = N_bar.sum(dim=1, keepdim=True).detach().clamp_min(1.0)
+    M_minus = (N_bar @ N_bar.T) / N_bar_count
+
+    W1 = 0.5 * (M_plus + M_minus) * N
+
+    # Step 3: reciprocal k/2 neighborhood and query expansion.
+    k2 = k // 2
+    neg_dk2 = neg_topk[:, k2 - 1 : k2]
+    N2 = GreaterThanSTE.apply(-D + eps, neg_dk2.detach(), alpha)
+    R = N2 * N2.T
+    R_count = R.sum(dim=1, keepdim=True).clamp_min(1.0)
+    W2 = (R @ W1) / R_count
+    W = 0.5 * (W2 + W2.T)
+
+    aux = {"z": z, "S": S, "D": D, "N": N, "W1": W1, "R": R}
+    return W, aux
+
+
+@dataclass(frozen=True)
+class ContextualLossConfig:
+    k: int
+    eps: float = 0.05
+    alpha: float = 10.0
+    lam: float = 0.2
+    gamma: float = 0.1
+    target_mean_similarity: float = 0.0
+    positive_margin: float = 0.9
+    negative_margin: float = 0.6
+
+
+class ContextualMetricLoss(nn.Module):
+    def __init__(self, cfg: ContextualLossConfig):
+        super().__init__()
+        self.cfg = cfg
+
+    @staticmethod
+    def _mean_active(x: torch.Tensor) -> torch.Tensor:
+        active = x > 0
+        if not torch.any(active):
+            return x.new_zeros(())
+        return x[active].mean()
+
+    def forward(self, embeddings: torch.Tensor, labels: torch.Tensor):
+        W, aux = contextual_similarity(
+            embeddings,
+            k=self.cfg.k,
+            eps=self.cfg.eps,
+            alpha=self.cfg.alpha,
+        )
+        S = aux["S"]
+        Y = labels[:, None].eq(labels[None, :]).to(S.dtype)
+        off_diag = 1.0 - torch.eye(S.shape[0], device=S.device, dtype=S.dtype)
+
+        L_context = (((W - Y) ** 2) * off_diag).mean()
+
+        pos_hinge = F.relu(self.cfg.positive_margin - S) * Y * off_diag
+        neg_hinge = F.relu(S - self.cfg.negative_margin) * (1.0 - Y)
+        L_contrast = self._mean_active(pos_hinge) + self._mean_active(neg_hinge)
+
+        L_reg = (S.mean() - self.cfg.target_mean_similarity).square()
+        total = (
+            self.cfg.lam * L_context
+            + (1.0 - self.cfg.lam) * L_contrast
+            + self.cfg.gamma * L_reg
+        )
+        stats = {
+            "loss": total.detach(),
+            "context": L_context.detach(),
+            "contrast": L_contrast.detach(),
+            "reg": L_reg.detach(),
+            "mean_similarity": S.mean().detach(),
+        }
+        return total, stats
+\end{lstlisting}
+
+\section{Training loop for pose sequences}
+
+\begin{lstlisting}
+for pose, valid_mask, label in train_loader:
+    pose = pose.to(device)          # [n, T, J, C]
+    valid_mask = valid_mask.to(device)
+    label = label.to(device)
+
+    h = motion_encoder(pose, valid_mask=valid_mask)
+    z = projection_head(h)
+
+    loss, stats = metric_loss(z, label)
+
+    optimizer.zero_grad(set_to_none=True)
+    loss.backward()
+    torch.nn.utils.clip_grad_norm_(parameters, max_norm=5.0)
+    optimizer.step()
+\end{lstlisting}
+
+\section{Sampler invariant}
+
+Every training batch should satisfy
+\begin{equation}
+  \#\{i:y_i=c\}=k
+  \quad\text{for every class }c\text{ represented in the batch}.
+  \label{eq:sampler-invariant}
+\end{equation}
+Use assertions during development:
+
+\begin{lstlisting}
+unique, counts = torch.unique(labels, return_counts=True)
+assert torch.all(counts == k), (unique, counts)
+assert batch_size % k == 0
+assert k % 2 == 0
+\end{lstlisting}
+
+\section{Complexity and memory}
+
+The dominant contextual operations multiply $n\times n$ matrices, so arithmetic scales as $O(n^3)$ with batch size. The paper also describes empirical time and space scaling as cubic, while emphasizing that GPU matrix multiplication makes the observed cost practical at its studied batch sizes. For pose models, the encoder may dominate compute, but long sequences can make batch size the binding constraint. Profile rather than assume.
+
+Practical levers:
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+  \item start with $16\times4=64$ or $32\times4=128$ batches;
+  \item shorten or subsample sequences before shrinking $k$ below four;
+  \item use mixed precision for the encoder, but inspect neighborhood ties and numerical stability;
+  \item gradient accumulation does \emph{not} enlarge the contextual neighborhood, because each micro-batch forms a separate graph;
+  \item parameterize $k$ explicitly---the public 256-pixel reference path hard-codes $k=4$.
+\end{itemize}
+
+\begin{warningbox}[title=Important implementation trap]
+Gradient accumulation increases effective optimizer batch size but does not reproduce a larger contextual batch. The loss only sees the current micro-batch's $n\times n$ graph. If neighborhood diversity matters, you need an actual larger forward batch, a memory-bank extension, or a changed method.
+\end{warningbox}
+
+\section{Unit tests before training}
+
+\begin{enumerate}[leftmargin=*,itemsep=4pt]
+  \item \textbf{Symmetry:} verify $W\approx W^\transpose$.
+  \item \textbf{Range:} verify $0\le W_{ij}\le1$ up to floating error.
+  \item \textbf{Perfect blocks:} construct embeddings with well-separated class clusters and check near-zero contextual loss.
+  \item \textbf{Broken pair:} move one negative into an anchor's top-$k$ set and check the loss increases.
+  \item \textbf{Gradient existence:} call backward and verify finite, nonzero gradients.
+  \item \textbf{Sampler:} assert exact $k$ counts per represented class.
+  \item \textbf{Deterministic corruptions:} fixed seed and sample ID must reproduce identical corrupted queries.
+\end{enumerate}
+
+% ================================================================
+\chapter{Retrieval Evaluation and a Fair Experimental Design}
+\label{chap:evaluation}
+% ================================================================
+
+\section{Query/gallery construction}
+
+Use disjoint query, gallery, and validation partitions. The query clip must not occur in the gallery. The primary deployment model is
+\[
+\text{corrupted query}\quad\longrightarrow\quad\text{fixed clean gallery}.
+\]
+A secondary experiment may corrupt both sides, but it answers a different question.
+
+\section{Recall at $K$}
+
+For query $q$, let $\pi_q(r)$ be the gallery item at rank $r$. Then
+\begin{equation}
+  \operatorname{R@K}(q)=
+  \ind\left[\exists r\le K:\operatorname{rel}(q,\pi_q(r))=1\right].
+  \label{eq:recallk}
+\end{equation}
+Dataset R@K is the mean over queries.
+
+\section{Average precision and mAP}
+
+Let $R_q$ be the number of relevant gallery items for $q$, and let $\operatorname{Prec}_q(r)$ be precision among the first $r$ retrieved items. Then
+\begin{equation}
+  \operatorname{AP}(q)=\frac{1}{R_q}
+  \sum_{r=1}^{m}\operatorname{Prec}_q(r)\,
+  \operatorname{rel}(q,\pi_q(r)),
+  \label{eq:ap}
+\end{equation}
+with
+\begin{equation}
+  \operatorname{mAP}=\frac{1}{\card{\mathcal Q}}
+  \sum_{q\in\mathcal Q}\operatorname{AP}(q).
+  \label{eq:map}
+\end{equation}
+R@1 asks whether the first answer is useful; mAP evaluates the ordering of all relevant examples.
+
+\section{Robustness curves}
+
+Report the raw metric and the clean-to-corrupted drop. A useful summary beyond the proposal is the normalized retention
+\begin{equation}
+  \rho_\ell(c)=\frac{M_\ell(c)}{M_\ell(0)+\eta}.
+  \label{eq:retention}
+\end{equation}
+This separates clean strength from robustness. It should supplement, not replace, absolute metrics.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.78\textwidth,height=6.2cm,xlabel={corruption severity},ylabel={retrieval metric},
+  xmin=0,xmax=4,ymin=0.3,ymax=0.95,xtick={0,1,2,3,4},xticklabels={clean,mild,medium,strong,severe},
+  grid=both,legend style={at={(0.5,-0.22)},anchor=north,legend columns=3}]
+  \addplot[navy,very thick,mark=*] coordinates {(0,0.86)(1,0.82)(2,0.76)(3,0.67)(4,0.55)};
+  \addplot[teal,very thick,mark=square*] coordinates {(0,0.84)(1,0.82)(2,0.79)(3,0.74)(4,0.66)};
+  \addplot[gold,very thick,mark=triangle*] coordinates {(0,0.87)(1,0.84)(2,0.80)(3,0.73)(4,0.62)};
+  \legend{SupCon,contextual,hybrid}
+\end{axis}
+\end{tikzpicture}
+\caption{Schematic robustness curves only---not experimental results. The target result is a smaller degradation slope, not necessarily the highest clean point.}
+\label{fig:robustness-schematic}
+\end{figure}
+
+\section{Core comparison matrix}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{>{\bfseries}l X X X}
+\toprule
+Method & Same encoder? & Same corruption exposure? & Scientific role \\
+\midrule
+cross-entropy embedding & yes & matched & classification baseline \\
+triplet or multi-similarity & yes & matched & conventional metric learning \\
+supervised contrastive & yes & matched & strong batch-contrastive baseline \\
+contextual only & yes & matched & isolate neighborhood objective \\
+hybrid contextual+contrastive & yes & matched & paper's complete mechanism \\
+corruption-aware SupCon & yes & same augmented inputs & separate loss effect from augmentation \\
+MaskCLR-style control & preferably yes & protocol-matched & robustness-specific comparator \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Fairness controls}
+
+Following the metric-learning methodology cautions in Musgrave et al., hold fixed:
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+  \item encoder architecture and initialization;
+  \item embedding dimension and normalization;
+  \item data split and query/gallery manifest;
+  \item augmentation and corruption exposure;
+  \item number of updates and tuning budget;
+  \item batch composition, except where a method inherently requires a different sampler;
+  \item model-selection metric and validation set;
+  \item reporting over multiple seeds.
+\end{itemize}
+
+\section{Recommended experiment order}
+
+\begin{enumerate}[leftmargin=*,itemsep=4pt]
+  \item clean frozen-feature retrieval;
+  \item corruption curves with no training;
+  \item projection-head SupCon vs contextual vs hybrid;
+  \item full-encoder fine-tuning;
+  \item corruption-aware training control;
+  \item cross-subject and cross-setup replication;
+  \item optional pose-estimator shift;
+  \item optional SportsPose or fine-grained sports extension.
+\end{enumerate}
+
+% ================================================================
+\chapter{Discussion Preparation}
+\label{chap:meeting}
+% ================================================================
+
+\section{A 60-second explanation}
+
+\begin{meetingbox}[title=Use this almost verbatim]
+``I want to test whether contextual metric learning transfers from image retrieval to pose-sequence retrieval. A temporal encoder maps each skeleton sequence to a normalized vector, and cosine similarity ranks a clean gallery. Standard metric losses supervise individual pairs or triplets. The contextual objective also compares their local neighborhoods: it builds a differentiable top-$k$ graph, measures shared and reciprocal neighbors, and trains that graph to match label agreement. The original paper shows robustness to label noise, but that does not imply robustness to corrupted pose coordinates. My experiment isolates that question by holding the encoder, data split, batch composition, and corruption protocol fixed while comparing supervised contrastive, contextual, and hybrid losses on clean and increasingly corrupted queries.''
+\end{meetingbox}
+
+\section{The five equations to narrate}
+
+\begin{enumerate}[leftmargin=*,itemsep=7pt]
+  \item $D(i,j)=2-2s_{ij}$: normalized cosine geometry.
+  \item $N_{ij}=\theta(-D_{ij}+\sg(D_{i,k})+\epsilon)$: differentiable neighborhood membership.
+  \item $W_1$: normalized agreement on shared neighbors and shared non-neighbors.
+  \item $W_2$ and $W$: reciprocal query expansion and symmetrization.
+  \item $\mathcal L=\lambda\mathcal L_{context}+(1-\lambda)\mathcal L_{contrast}+\gamma\mathcal L_{reg}$: ranking, margins, and space usage.
+\end{enumerate}
+
+\section{Likely questions and precise answers}
+
+\begin{longtable}{p{0.31\textwidth}p{0.62\textwidth}}
+\toprule
+\textbf{Question} & \textbf{Answer} \\
+\midrule
+What is the novelty? & Not pose retrieval itself and not a new encoder. The novelty is a controlled test of whether a supervised neighborhood-ranking objective improves \emph{retrieval robustness to corrupted pose inputs}. \\
+Why should context help input noise? & It may reduce reliance on one unstable pairwise comparison by aggregating local neighborhood evidence. That is a hypothesis; coherent neighborhood shifts could also make it fail. \\
+Why NTU120 first? & It provides scale, many action classes, standard subject/setup protocols, and compatibility with a public motion-embedding pipeline. It is an engineering and methodology benchmark, not proof of fine-grained technique understanding. \\
+Why $k$ equals samples per class? & Under balanced sampling, perfect top-$k$ neighborhoods then equal the same-label set. This is the condition behind the ranking proposition. \\
+Why not only use SupCon? & SupCon is the strongest simple baseline. The project asks whether explicit neighborhood overlap adds anything beyond many-positive contrastive learning. \\
+What is the cleanest primary endpoint? & The difference in degradation curves under query corruption, with the gallery fixed and clean, reported using R@1/5/10 and mAP. \\
+What would a null result mean? & Robustness comes mainly from encoder pretraining or corruption exposure rather than the neighborhood objective. That is still a useful separation of mechanisms. \\
+What is the main technical risk? & Batch-level cubic work and the need for enough samples per class. Profile $16\times4$ and $32\times4$ batches before full experiments. \\
+Could action-class relevance be too coarse? & Yes. It is appropriate for the first falsifiable benchmark, but it cannot support claims about movement quality, technique, or rehabilitation status. \\
+How will you ensure fairness? & Same backbone, initialization, split, sampler, augmentation, tuning budget, and evaluator; only the objective changes in the core comparison. \\
+\bottomrule
+\end{longtable}
+
+\section{Three decisions to ask the professor}
+
+\begin{enumerate}[leftmargin=*,itemsep=5pt]
+  \item Is NTU class-level retrieval an appropriate first scientific target, or should relevance be fine-grained from the outset?
+  \item Should the first deliverable be a single-backbone loss comparison, or include a full MaskCLR-style robustness baseline immediately?
+  \item Is the strongest framing ``contextual metric learning for temporal data'' or ``retrieval robustness under pose-estimation noise''?
+\end{enumerate}
+
+\section{Claims to avoid}
+
+\begin{warningbox}[title=Do not say these]
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+  \item ``Contextual loss is robust to pose noise.'' It has not yet been tested.
+  \item ``NTU retrieval measures technique quality.'' It measures class relevance under the chosen protocol.
+  \item ``The project invents a new motion architecture.'' The initial strength is controlled integration, not architecture novelty.
+  \item ``A higher clean R@1 proves robustness.'' Robustness requires degradation curves or cross-domain evaluation.
+  \item ``Gradient accumulation solves the batch-size problem.'' It does not create a larger contextual graph.
+\end{itemize}
+\end{warningbox}
+
+\section{Final mental model}
+
+\begin{conceptbox}[title=One sentence per layer]
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+  \item \textbf{Geometry:} normalized vectors turn cosine ranking into distance ranking.
+  \item \textbf{Graph:} top-$k$ comparisons turn the similarity matrix into a local directed graph.
+  \item \textbf{Context:} shared neighbors and non-neighbors compare graph signatures.
+  \item \textbf{Consensus:} reciprocal query expansion smooths scores through trusted neighbors.
+  \item \textbf{Learning:} MSE matches the contextual graph to label agreement, while contrastive margins and a mean-similarity regularizer stabilize the embedding.
+  \item \textbf{Research question:} does that graph-based inductive bias preserve motion retrieval when the observed skeleton is damaged?
+\end{enumerate}
+\end{conceptbox}
+
+% ================================================================
+\appendix
+\chapter{Notation Reference}
+% ================================================================
+
+\begin{longtable}{>{\bfseries}p{0.14\textwidth}p{0.75\textwidth}}
+\toprule
+Symbol & Meaning \\
+\midrule
+$x_i$ & input item; an image in the foundation paper or pose sequence in the proposal \\
+$h_i$ & unnormalized encoder output \\
+$z_i\in\R^d$ & unit-normalized embedding \\
+$s_{ij}$ & cosine similarity $z_i^\transpose z_j$ \\
+$D(i,j)$ & squared Euclidean distance $2-2s_{ij}$ \\
+$n$ & mini-batch size \\
+$k$ & samples per class and contextual neighborhood size \\
+$y_{ij}$ & binary label similarity \\
+$\theta$ & Heaviside comparison with custom backward gradient \\
+$\alpha$ & constant surrogate derivative for $\theta$ \\
+$\epsilon$ & neighborhood margin \\
+$N_{k+\epsilon}(i)$ & expanded $k$-nearest-neighbor set of sample $i$ \\
+$M_+$ & count of shared neighbors \\
+$M_-$ & count of shared non-neighbors \\
+$W_1$ & initial gated contextual similarity \\
+$R_{k/2+\epsilon}(i)$ & reciprocal close-neighbor set \\
+$W_2$ & query-expanded contextual similarity \\
+$w_{ij}$ & final symmetric contextual similarity \\
+$\delta_+,\delta_-$ & positive and negative contrastive margins \\
+$\tilde s$ & target mean cosine similarity \\
+$\lambda,\gamma$ & loss-mixture weights \\
+\bottomrule
+\end{longtable}
+
+% ================================================================
+\chapter{Detailed Algebra and Gradient Notes}
+% ================================================================
+
+\section{Complement-intersection simplification}
+
+Starting from
+\[
+M_-(i,j)=\sum_p(1-N_{ip})(1-N_{jp}),
+\]
+expand:
+\begin{align}
+M_-(i,j)
+&=\sum_p\left(1-N_{ip}-N_{jp}+N_{ip}N_{jp}\right)\\
+&=n-\sum_pN_{ip}-\sum_pN_{jp}+\sum_pN_{ip}N_{jp}\\
+&=n-2k+\inner{N_i}{N_j}.
+\end{align}
+Substituting into $W_1$ gives the constants $a$ and $b$ in \cref{eq:ab}.
+
+\section{Step-1 surrogate gradient}
+
+For the simplified loss
+\[
+\mathcal L_1=\operatorname{MSE}(y_{ij},N_{ij}),
+\]
+a negative sample inside $N(i)$ receives a constant push outward, while a positive sample outside $N(i)$ receives a constant pull inward. This resembles contrastive loss with a dynamic boundary: the current $k$-th-neighbor distance replaces a fixed margin.
+
+\section{Step-2 context gradient}
+
+For a wrongly included negative pair and $\epsilon=0$, the supplementary derivation shows that optimizing neighborhood overlap changes the distance from $i$ to every sample $p$ depending on whether $p$ lies inside $j$'s neighborhood. In compact qualitative form,
+\[
+\operatorname{sign}\!\left(\frac{\partial\mathcal L}{\partial D(i,p)}\right)
+=
+\begin{cases}
+-1,&p\in N(j),\\
++1,&p\notin N(j),
+\end{cases}
+\]
+under the paper's sign convention for the considered negative error. Gradient descent therefore increases distance to $j$'s context and decreases distance to points outside that context. The exact coefficients depend on $k$, $n-k$, $\alpha$, and the upstream MSE gradient.
+
+\section{Logical AND as multiplication}
+
+The reciprocal mask uses
+\[
+R=N_2\had N_2^\transpose.
+\]
+For binary inputs, multiplication equals logical AND. On the continuous backward surrogate, multiplication is smooth but has zero derivative when the other factor is zero. The paper's ablation favors multiplication over a minimum-based alternative.
+
+% ================================================================
+\chapter{Implementation Checklist}
+% ================================================================
+
+\begin{meetingbox}[title=Before the first real run]
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+  \item Freeze and version the query/gallery split manifest.
+  \item Verify no query ID appears in the gallery.
+  \item Save one deterministic corrupted copy per severity for debugging.
+  \item Confirm every batch has exactly $k$ examples per represented class.
+  \item Log $\mathcal L_{context}$, $\mathcal L_{contrast}$, $\mathcal L_{reg}$, mean similarity, and gradient norm separately.
+  \item Visualize $S$, $N$, $W_1$, and $W$ as heatmaps for a small batch.
+  \item Check clean retrieval before any corruption experiment.
+  \item Compare exact brute-force cosine retrieval against any FAISS index before using approximate search.
+  \item Tune each baseline on validation data with a matched budget; never select on test corruption curves.
+  \item Run at least three seeds once the pipeline is stable.
+\end{enumerate}
+\end{meetingbox}
+
+% ================================================================
+\chapter{Two-Minute Detachable Cheat Sheet}
+% ================================================================
+
+\begin{tcolorbox}[enhanced,breakable,colback=mist,colframe=navy,title=Core proposition,fonttitle=\bfseries]
+\textbf{Question:} Does contextual neighborhood optimization preserve pose-sequence retrieval better than standard metric losses as skeleton observations become corrupted?
+
+\textbf{Design:} same MotionBERT encoder, NTU120 split, batch sampler, augmentations, and evaluator; compare SupCon, contextual, and hybrid; corrupt query only against a fixed clean gallery.
+\end{tcolorbox}
+
+\begin{tcolorbox}[enhanced,breakable,colback=sky,colframe=teal,title=Five equations,fonttitle=\bfseries]
+\[
+D=2-2S
+\]
+\[
+N_{ij}=\theta(-D_{ij}+\sg(D_{i,k})+\epsilon)
+\]
+\[
+W_1=\frac12\left(\frac{NN^\transpose}{\card{N_i}}+
+\frac{(1-N)(1-N)^\transpose}{\card{N_i^c}}\right)\had N
+\]
+\[
+W=\tfrac12\left(\frac{RW_1}{\card{R_i}}+
+\left(\frac{RW_1}{\card{R_i}}\right)^\transpose\right)
+\]
+\[
+\mathcal L=\lambda\operatorname{MSE}(W,Y)+(1-\lambda)\mathcal L_{contrast}+\gamma\mathcal L_{reg}
+\]
+\end{tcolorbox}
+
+\begin{tcolorbox}[enhanced,breakable,colback=amber,colframe=gold,title=What makes the method non-standard,fonttitle=\bfseries]
+Exact binary top-$k$ comparisons in the forward pass; constant heuristic gradients in the backward pass; neighborhood overlap and reciprocal query expansion; $k$ tied to samples per class.
+\end{tcolorbox}
+
+\begin{tcolorbox}[enhanced,breakable,colback=rose,colframe=brick,title=What remains unknown,fonttitle=\bfseries]
+The paper's label-noise robustness does not prove pose-input robustness. The project must measure corruption degradation curves and include corruption-aware controls.
+\end{tcolorbox}
+
+% ================================================================
+\backmatter
+\chapter*{References}
+\addcontentsline{toc}{chapter}{References}
+\begin{thebibliography}{99}
+
+\bibitem{liao2023}
+C. Liao, T. Tsiligkaridis, and B. Kulis.
+\newblock Supervised Metric Learning to Rank for Retrieval via Contextual Similarity Optimization.
+\newblock In \emph{Proceedings of the 40th International Conference on Machine Learning}, 2023.
+
+\bibitem{khosla2020}
+P. Khosla et al.
+\newblock Supervised Contrastive Learning.
+\newblock In \emph{NeurIPS}, 2020.
+
+\bibitem{musgrave2020}
+K. Musgrave, S. Belongie, and S.-N. Lim.
+\newblock A Metric Learning Reality Check.
+\newblock In \emph{ECCV}, 2020.
+
+\bibitem{kim2022}
+S. Kim, D. Kim, M. Cho, and S. Kwak.
+\newblock Self-Taught Metric Learning without Labels.
+\newblock In \emph{CVPR}, 2022.
+
+\bibitem{ntu120}
+J. Liu et al.
+\newblock NTU RGB+D 120: A Large-Scale Benchmark for 3D Human Activity Understanding.
+\newblock \emph{IEEE TPAMI}, 2020.
+
+\bibitem{skeletonDML}
+R. Memmesheimer, S. Haring, N. Theisen, and D. Paulus.
+\newblock Skeleton-DML: Deep Metric Learning for Skeleton-Based One-Shot Action Recognition.
+\newblock In \emph{WACV}, 2022.
+
+\bibitem{motionbert}
+W. Zhu et al.
+\newblock MotionBERT: A Unified Perspective on Learning Human Motion Representations.
+\newblock In \emph{ICCV}, 2023.
+
+\bibitem{maskclr}
+M. Abdelfattah, M. Hassan, and A. Alahi.
+\newblock MaskCLR: Attention-Guided Contrastive Learning for Robust Action Representation Learning.
+\newblock In \emph{CVPR}, 2024.
+
+\bibitem{faiss}
+M. Douze et al.
+\newblock The FAISS Library.
+\newblock arXiv:2401.08281.
+
+\bibitem{repo}
+C. Liao.
+\newblock Reference implementation: \emph{metric-learning-using-contextual-similarity}.
+\newblock GitHub repository associated with \cite{liao2023}.
+
+\end{thebibliography}
+
+\end{document}
