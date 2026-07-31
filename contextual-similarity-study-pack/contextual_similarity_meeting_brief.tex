@@ -24,8 +24,8 @@
 \definecolor{green}{HTML}{2C7A4B}
 \definecolor{lightgreen}{HTML}{E7F3EB}
 \color{ink}
-\hypersetup{colorlinks=true,linkcolor=navy,urlcolor=brick,pdftitle={Contextual Pose Retrieval - Meeting Brief},pdfauthor={Prepared for Giacomo Cappelletto}}
-\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\textcolor{navy}{Contextual pose retrieval}}\fancyhead[R]{\small\textcolor{navy}{Meeting brief}}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0.3pt}
+\hypersetup{colorlinks=true,linkcolor=navy,urlcolor=brick,pdftitle={Comparative Metric Learning for Robust Pose Retrieval - Brief Proposal},pdfauthor={Giacomo Cappelletto}}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\textcolor{navy}{Comparative pose metric learning}}\fancyhead[R]{\small\textcolor{navy}{Brief proposal}}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0.3pt}
 \setlength{\parindent}{0pt}\setlength{\parskip}{3pt}
 \newtcolorbox{pitchbox}[1][]{enhanced,colback=sky,colframe=teal,boxrule=.8pt,arc=1.5mm,left=2mm,right=2mm,top=1.5mm,bottom=1.5mm,#1}
 \newtcolorbox{warnbox}[1][]{enhanced,colback=rose,colframe=brick,boxrule=.8pt,arc=1.5mm,left=2mm,right=2mm,top=1.5mm,bottom=1.5mm,#1}
@@ -36,16 +36,16 @@
 \newcommand{\ind}{\mathbb{1}}
 \begin{document}
 
-{\sffamily\bfseries\color{navy}\fontsize{20}{23}\selectfont Robust Pose-Sequence Retrieval with Contextual Metric Learning}\par
-{\large Final-proposal discussion brief}\hfill{\small July 2026}
+{\sffamily\bfseries\color{navy}\fontsize{19}{22}\selectfont Comparative Metric Learning for\\ Robust Pose-Sequence Retrieval}\par
+{\large Updated research-proposal brief}\hfill{\small July 31, 2026}
 \vspace{2mm}\hrule height 1pt\vspace{3mm}
 
 \begin{pitchbox}[title=\textbf{60-second pitch}]
-I propose to transfer contextual metric learning from image retrieval to temporal pose embeddings. A pretrained motion encoder maps each skeleton sequence to a normalized vector, and cosine similarity ranks a clean reference gallery. The experimental question is whether optimizing \emph{neighborhood structure}, rather than only direct pairs, causes retrieval quality to degrade more slowly when query poses contain joint jitter, missing joints or limbs, dropped frames, or pose-estimator shift. I would hold the encoder, split, sampler, augmentations, and evaluator fixed; compare supervised contrastive, contextual, and hybrid objectives; and report Recall@1/5/10, mAP, and clean-to-corrupted degradation.
+I will begin with the accepted pipeline: a fixed pretrained motion encoder, a clean reference gallery, and controlled pose corruptions to test whether contextual neighborhoods preserve retrieval better than standard objectives. Once that result is stable, I will keep the encoder and evaluator fixed and map the metric-learning losses evaluated in the 2023 contextual paper into the pose domain. A final screened extension will test selected post-2023 image and pose objectives. The outputs are retrieval and degradation curves plus an applicability map covering performance, robustness, compute, and implementation changes.
 \end{pitchbox}
 
 \begin{warnbox}[title=\textbf{Scientific boundary}]
-The foundation paper establishes reduced overfitting and label-noise robustness for \emph{image retrieval}. It does not prove robustness to corrupted pose coordinates. That transfer is the hypothesis to test, not a premise to assume.
+The foundation paper establishes reduced overfitting and label-noise robustness for \emph{image retrieval}; it does not prove pose-input robustness. Its tables also mix controlled loss re-runs with copied results from architecture-changing methods. The primary pose comparison includes the former, not every row indiscriminately.
 \end{warnbox}
 
 \textbf{Method in one picture}
@@ -76,7 +76,7 @@ For a balanced batch with exactly $k$ samples per class, $n>2k$, and $\epsilon=0
 \end{meetbox}
 
 \newpage
-{\sffamily\bfseries\color{navy}\Large Experimental design and discussion answers}\vspace{2mm}\hrule\vspace{3mm}
+{\sffamily\bfseries\color{navy}\Large Staged comparison and discussion answers}\vspace{2mm}\hrule\vspace{3mm}
 
 \textbf{Controlled experiment}\par\vspace{1mm}
 {\small
@@ -88,10 +88,13 @@ Component & Decision \\
 Dataset & NTU RGB+D 120; official cross-subject and cross-setup protocols. \\
 Encoder & Pretrained MotionBERT sequence encoder; normalized projection output. \\
 Retrieval & Disjoint query/gallery manifest; noisy queries against a fixed clean gallery. \\
-Losses & Cross-entropy embedding, SupCon, triplet or multi-similarity, contextual, contextual+contrastive, corruption-aware SupCon. \\
+Stage I & Cross-entropy embedding, SupCon, triplet/Multi-Similarity, contextual, contextual+contrastive, and corruption-aware SupCon. \\
+Stage II & Core 2023 reruns: contrastive, mined triplet, Multi-Similarity $\pm$ miner, Proxy Anchor/NCA, ROADMAP, and contextual. Appendix tier: NT-Xent, Fast-/Smooth-AP, then supplemental AP and reported proxy losses. \\
+Stage III & Core recent screen: SGSL, mean-field DML, and PFML. Method-faithful pilots: SimPLE and 2026 NC-Init+PI. Pose controls: continuous-label triplet, MaskCLR, class-aware contrast, and USDRL. \\
+Stage IV & Whole-system transfer, reported separately: IBC, S2SD, Metrix, and HIST first; then DRML, DIML, DiVA, MHGL, and AVSL if resources permit. \\
 Corruptions & Gaussian joint jitter; random joint/limb masking; frame dropout; 3D yaw rotation; pose-estimator shift when available. \\
 Metrics & Recall@1/5/10, mAP, retention $M(c)/M(0)$, and degradation $\Delta(c)=M(0)-M(c)$. \\
-Fairness & Same backbone, embedding dimension, sampler, split, tuning budget, augmentations, and seeds. \\
+Fairness & Strict track fixes backbone, embedding geometry, sampler, split, evaluator, tuning budget, augmentations, and seeds. Method-faithful variants are reported separately. \\
 \bottomrule
 \end{tabularx}}
 
@@ -99,9 +102,10 @@ Fairness & Same backbone, embedding dimension, sampler, split, tuning budget, au
 \begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=1pt]
 \item Freeze MotionBERT; validate splits, cosine retrieval, metrics, and deterministic corruptions.
 \item Train only small projection heads with SupCon, contextual, and hybrid losses.
-\item Profile contextual $O(n^3)$ batch operations; use balanced batches such as $16\times4=64$ or $32\times4=128$.
-\item Fine-tune the full encoder only after the loss-side comparison is stable.
-\item Add corruption-aware training and a MaskCLR-style robustness control.
+\item Complete representative pairwise, proxy, and AP/rank families before appendix-grade losses.
+\item Profile time/memory and fine-tune the encoder only after the loss matrix is stable.
+\item Select two or three recent methods with distinct mechanisms and reliable implementations.
+\item Add pose-specific controls; broaden the dataset only after the NTU study is complete.
 \end{enumerate}
 \end{implbox}
 
@@ -112,20 +116,19 @@ Fairness & Same backbone, embedding dimension, sampler, split, tuning budget, au
 \toprule
 Question & Answer \\
 \midrule
+What changed after the meeting? & The original contextual robustness study remains Stage I. The new contribution is a controlled transfer map of older and newer optimization families with the same pose encoder. \\
+Does ``all 2023 algorithms'' mean every table row? & The loss reruns form the causal same-encoder comparison. Copied architecture/framework rows remain a later whole-system transfer tier, with every deviation logged. \\
 Why retrieval rather than classification? & Classification can remain acceptable while the ordering of the embedding space deteriorates. Retrieval measures whether examples remain inspectable and useful for one-shot decisions. \\
-Where is the novelty? & Not sequence retrieval itself. The bounded gap is whether the contextual objective improves \emph{retrieval degradation curves under input corruption} when the temporal encoder and evaluator are fixed. \\
-Why might neighborhoods help? & A direct similarity can be unstable under local pose noise; shared and reciprocal neighborhoods provide a local-consensus signal. This is an inductive-bias hypothesis, not a guarantee. \\
-Why NTU120 first? & It provides scale, many examples per class, standard protocols, and compatibility with existing skeleton and one-shot pipelines. It supports a reproducible first test, not claims about fine-grained technique quality. \\
-What would a null result mean? & Robustness is mainly attributable to the encoder or corruption exposure rather than the contextual objective. That is still an informative controlled result. \\
-What is the main engineering risk? & Cubic batch computation and batch-structure sensitivity. Both are bounded by moderate balanced batches, matrix operations, and staged profiling. \\
+How is applicability measured? & Clean retrieval, degradation under each corruption, time/memory, seed and tuning stability, batch requirements, and whether the method needs changes beyond the loss. \\
+Why two fairness tracks? & Some methods add proxies, queues, learned scorers, masking, or decoders. A strict loss track isolates the objective; a method-faithful track measures practical transfer while logging every deviation. \\
+What would a null or reversed result mean? & It would show that robustness comes mainly from the encoder/corruption exposure, or that image-domain objective rankings do not transfer to temporal pose embeddings. \\
 \bottomrule
 \end{tabularx}}
 
 \begin{warnbox}[title=\textbf{Do not claim}]
-Do not claim that action-class retrieval measures movement quality, that label-noise robustness implies pose-noise robustness, or that a new motion architecture is being proposed. The contribution is a fair retrieval-first robustness test of the loss.
+Do not claim that action-class retrieval measures movement quality, that label-noise robustness implies pose-noise robustness, or that copied state-of-the-art rows are controlled baselines. The contribution is a staged, retrieval-first transfer study of optimization methods.
 \end{warnbox}
 
-\textbf{Closing sentence.} \emph{The project is deliberately narrow: it asks whether local neighborhood structure is a useful inductive bias when the observations, rather than the labels, become unreliable.}
+\textbf{Closing sentence.} \emph{The project begins with one falsifiable robustness question, then asks which metric-learning principles genuinely survive the move from images to pose sequences.}
 
-\vfill{\footnotesize Foundation: Liao, Tsiligkaridis, and Kulis (ICML 2023). Proposed study: MotionBERT + NTU RGB+D 120 with controlled pose corruptions.}
 \end{document}

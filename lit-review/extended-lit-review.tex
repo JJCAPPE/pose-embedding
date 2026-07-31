@@ -5,65 +5,230 @@
 \usepackage{geometry}
 \usepackage{hyperref}
 \usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
 
-\geometry{left=1in, right=1in, top=0.85in, bottom=0.85in}
+\geometry{left=0.9in, right=0.9in, top=0.8in, bottom=0.8in}
 \hypersetup{
     colorlinks=true,
     urlcolor=blue,
-    pdftitle={Robust Pose-Sequence Retrieval with Contextual Metric Learning},
+    pdftitle={Comparative Metric Learning for Robust Pose-Sequence Retrieval},
     pdfauthor={Giacomo Cappelletto}
 }
-\setlist[itemize]{leftmargin=*, itemsep=4pt, topsep=4pt}
-\setlength{\emergencystretch}{2em}
+\setlist[itemize]{leftmargin=*, itemsep=3pt, topsep=4pt}
+\setlist[enumerate]{leftmargin=*, itemsep=3pt, topsep=4pt}
+\setlength{\emergencystretch}{3em}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 
-\title{Robust Pose-Sequence Retrieval with Contextual Metric Learning\\
-\large Brief Literature Review and Feasibility Note}
+\title{Comparative Metric Learning for Robust Pose-Sequence Retrieval\\
+\large Extended Research Proposal and Feasibility Note}
 \author{Giacomo Cappelletto\\Prepared for Professor Brian Kulis}
-\date{July 18, 2026}
+\date{July 31, 2026}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-I propose to test whether contextual metric learning can make retrieval of human pose sequences more robust to imperfect skeleton inputs. The project combines two established lines of work: contextual objectives improve image retrieval by optimizing neighborhood structure, while pose models already learn useful sequence embeddings and can be trained to tolerate missing or noisy joints. What has not been established is whether contextual optimization helps when the \emph{input poses}, rather than the labels, are corrupted. This is a small, falsifiable project: compare contextual and standard metric-learning losses using the same pretrained motion encoder, dataset, and corruption protocol. Most required components already have public implementations, so the work is primarily careful integration and evaluation rather than new model development.
+I propose a staged study of metric-learning objectives for pose-sequence retrieval. The accepted first stage remains unchanged in substance: use a fixed pretrained motion encoder to test whether contextual similarity preserves retrieval quality as skeleton observations become noisy or incomplete. The extension is a broader controlled transfer study. Once that pipeline is reliable, I will replace only the training objective and reproduce the loss families evaluated by Liao, Tsiligkaridis, and Kulis in image retrieval, then screen selected methods published from 2023 onward in image and pose representation learning. Holding the encoder, data, evaluator, corruption protocol, and tuning budget fixed turns the project into a test of which optimization principles actually transfer to pose embeddings, rather than a contest between unrelated architectures.
+
+The main outputs will be clean and corrupted retrieval results, an applicability map for each objective, and an analysis of whether the ordering and robustness of metric-learning methods observed in image retrieval carry over to a temporal pose domain. This expansion strengthens the project while preserving a low-risk first result: the original contextual-versus-standard comparison is completed before any newer or more complicated method is added.
 \end{abstract}
 
-\section*{Aim}
+\section*{Aim and Research Questions}
 
-The research question is:
-\begin{quote}
-Does contextual neighborhood optimization preserve pose-sequence retrieval quality better than standard metric-learning objectives as skeleton observations become noisy or incomplete?
+The project asks two linked questions:
+
+\begin{enumerate}
+    \item \textbf{Accepted core question:} Does contextual neighborhood optimization preserve pose-sequence retrieval quality better than standard metric-learning objectives as skeleton observations become noisy or incomplete?
+    \item \textbf{Comparative extension:} With the pose encoder and evaluator fixed, which pairwise, proxy-based, listwise, contextual, and recent metric-learning objectives transfer effectively from image retrieval to pose-sequence retrieval?
+\end{enumerate}
+
+A third, explanatory question connects them:
+
+\begin{quote}\raggedright
+Which properties of an objective---local neighborhood consensus, hard-pair mining, class proxies, direct rank optimization, global embedding regularization, or pose-specific contrast---predict clean performance, robustness, computational cost, and tuning stability in the pose domain?
 \end{quote}
 
-The first experiment would use NTU RGB+D 120 action labels to define relevance. A MotionBERT encoder would map each pose sequence to a normalized embedding, and cosine similarity would rank a gallery for each query. The central comparison would hold the encoder, data split, batch composition, and augmentation fixed while comparing supervised contrastive loss with contextual loss and their hybrid. Evaluation would use clean queries and increasingly corrupted queries---joint jitter, missing joints or limbs, dropped frames, and, if available, a change of pose estimator---against a fixed clean gallery. Recall@1/5/10, mean average precision, and clean-to-corrupted degradation would provide a direct answer.
+This is not a claim that the best image-retrieval loss must remain best for pose. A different ordering is scientifically useful because pose sequences have temporal structure, structured corruptions, fewer semantically clean classes, and a more expensive encoder. The proposed ``mapping'' is therefore both quantitative (retrieval and robustness results) and practical (compatibility, compute, stability, and required method changes).
 
-\section*{Justification}
+\section*{Fixed Pose-Retrieval Pipeline}
 
-The project is feasible because every major component exists. MotionBERT provides a pretrained temporal pose encoder and public one-shot action-retrieval code. NTU RGB+D 120 provides a large public benchmark with standard cross-subject and cross-setup protocols. Skeleton-DML shows that deep metric learning on skeleton sequences is already viable, while MaskCLR supplies relevant corruption tests and shows that pose representations can be made robust to noise, occlusion, frame masking, and pose-estimator changes. The contextual-loss paper provides both the neighborhood objective and reference code.
+The first experiment will use NTU RGB+D 120 action labels to define relevance. A pretrained MotionBERT sequence encoder will map each skeleton sequence to a fixed-dimensional embedding, and a disjoint query/gallery manifest will prevent self-matches and leakage. Cosine similarity will rank a clean gallery for each query. Evaluation will use clean queries and increasingly corrupted queries---joint jitter, missing joints or limbs, dropped frames, temporal jitter, and, if available, a pose-estimator change---against the same clean gallery.
 
-The contribution is narrow but clear. Contextual metric learning has shown robustness to label noise in image retrieval, but this does not guarantee robustness to corrupted pose coordinates. Conversely, robust skeleton papers mainly report classification, which does not measure whether the ordering of an embedding space remains useful for retrieval. Holding the encoder and evaluator fixed isolates whether neighborhood-aware optimization adds value beyond ordinary contrastive learning and corruption augmentation.
-
-Implementation can be staged to keep cost and risk low. First, use frozen MotionBERT features to validate the query/gallery split, ranking metrics, and deterministic corruption curves. Second, train only small projection heads with the competing losses. Fine-tune the full encoder only if this comparison is stable. The main technical risk is the contextual loss's cubic scaling with batch size, but the published implementation already runs it through batched matrix operations; profiling a balanced, moderate batch is sufficient before larger experiments.
-
-A positive result would support contextual loss as a useful objective for robust motion retrieval. A null result would still be informative: it would show that robustness comes mainly from the encoder or from exposure to corrupted inputs. Either outcome can be obtained with public data, existing code, and a controlled experiment, making this a practical initial project rather than an open-ended architecture effort.
-
-\section*{Supporting Papers}
+The following components will be fixed in the controlled comparison:
 
 \begin{itemize}
-    \item Liao, Tsiligkaridis, and Kulis (ICML 2023), \href{https://arxiv.org/abs/2210.01908}{\emph{Supervised Metric Learning to Rank for Retrieval via Contextual Similarity Optimization}}. The central neighborhood-based objective and its image-retrieval evidence; \href{https://github.com/Chris210634/metric-learning-using-contextual-similarity}{code}.
-
-    \item Zhu et al. (ICCV 2023), \href{https://arxiv.org/abs/2210.06551}{\emph{MotionBERT: A Unified Perspective on Learning Human Motion Representations}}. A strong pretrained temporal encoder and the lowest-risk starting pipeline; \href{https://github.com/Walter0807/MotionBERT}{code}.
-
-    \item Memmesheimer et al. (WACV 2022), \href{https://arxiv.org/abs/2012.13823}{\emph{Skeleton-DML: Deep Metric Learning for Skeleton-Based One-Shot Action Recognition}}. Direct evidence that skeleton sequences support metric learning and nearest-neighbor recognition.
-
-    \item Abdelfattah, Hassan, and Alahi (CVPR 2024), \href{https://openaccess.thecvf.com/content/CVPR2024/html/Abdelfattah_MaskCLR_Attention-Guided_Contrastive_Learning_for_Robust_Action_Representation_Learning_CVPR_2024_paper.html}{\emph{MaskCLR: Attention-Guided Contrastive Learning for Robust Action Representation Learning}}. The closest robustness baseline and a source for pose-corruption protocols.
-
-    \item Liu et al. (TPAMI 2020), \href{https://arxiv.org/abs/1905.04757}{\emph{NTU RGB+D 120: A Large-Scale Benchmark for 3D Human Activity Understanding}}. The proposed first dataset, with standard evaluation protocols and 120 action classes.
-
-    \item Duan et al. (CVPR 2022), \href{https://arxiv.org/abs/2104.13586}{\emph{Revisiting Skeleton-Based Action Recognition}}. Additional evidence that useful and robust action representations can be learned from estimated poses.
-
-    \item Musgrave, Belongie, and Lim (ECCV 2020), \href{https://arxiv.org/abs/2003.08505}{\emph{A Metric Learning Reality Check}}. Motivation for matched architectures, tuning budgets, and evaluation when comparing losses.
+    \item encoder architecture, initialization, pooling, projection-head capacity, and embedding dimension;
+    \item train/validation/test identities, query/gallery manifests, batch composition, and corruption seeds;
+    \item optimizer family, training horizon, data augmentation, early-stopping rule, and number of random seeds;
+    \item validation-only hyperparameter selection with an equal trial budget for every objective; and
+    \item the retrieval evaluator and primary metrics: Recall@1/5/10, mean average precision, mAP@R, clean-to-corrupted drop, and normalized retention.
 \end{itemize}
+
+The original pipeline will be validated first with frozen MotionBERT features. I will then train small projection heads before deciding whether full encoder fine-tuning is computationally justified. This ordering separates evaluator bugs from optimization effects and keeps the initial result feasible.
+
+\section*{Stage I: Accepted Contextual-Loss Investigation}
+
+The first trained comparison will contain a classification embedding baseline, supervised contrastive loss, contextual loss, and the published contextual-plus-contrastive hybrid. Triplet and Multi-Similarity provide additional conventional anchors. This stage answers the accepted robustness question before the scope expands.
+
+The principal hypothesis remains deliberately narrow: contextual training may have similar clean performance but a smaller retrieval degradation as pose corruption increases. The foundation paper demonstrates reduced overfitting and label-noise sensitivity in \emph{image retrieval}; it does not establish robustness to corrupted pose coordinates. Input-noise robustness therefore remains an empirical hypothesis rather than a premise.
+
+\section*{Stage II: Reproducing the 2023 Loss Comparison in Pose Space}
+
+The 2023 contextual-similarity paper's headline tables mix two kinds of evidence. Some state-of-the-art values were copied from methods that modify architectures or add substantial training machinery. In contrast, the authors reran a representative set of objectives under a shared ResNet-50 setup. The pose transfer should reproduce this \emph{loss-side} comparison, not silently treat every row in the image tables as a loss swap.
+
+The primary paper-fidelity matrix therefore contains exactly seven comparators---contrastive, triplet with distance-weighted mining, Multi-Similarity with and without mining, Proxy Anchor, Proxy NCA, and ROADMAP---plus the contextual objective. NT-Xent, Fast-AP, and Smooth-AP form the controlled appendix tier. Normalized Softmax, Proxy-NCA++, SoftBin-AP, and Blackbox-AP are completeness targets, but will retain their original status as reported-only or supplemental rather than being mislabeled as main controlled reruns.
+
+\clearpage
+\begin{table}[ht]
+\centering
+\small
+\renewcommand{\arraystretch}{1.13}
+\begin{tabularx}{\textwidth}{L{0.18\textwidth}Y Y}
+\toprule
+\textbf{Family} & \textbf{Objectives to map into pose retrieval} & \textbf{Status in the 2023 paper and proposed use} \\
+\midrule
+Pairwise / tuple & Contrastive; triplet with its miner; Multi-Similarity with and without its miner & Controlled baselines in the main or appendix experiments. These are the first paper-fidelity comparisons after Stage I. \\
+\addlinespace
+Batch contrastive & NT-Xent; supervised contrastive & NT-Xent appears in the appendix comparison. SupCon was not part of that table but remains the strongest simple pose-domain anchor in this proposal. \\
+\addlinespace
+Proxy / classification & Proxy Anchor; Proxy NCA; Normalized Softmax; Proxy-NCA++ & Proxy Anchor and Proxy NCA were rerun in the main setting. Normalized Softmax and Proxy-NCA++ were reported from their original authors in the appendix; both are retained as completeness targets, but labeled separately from direct reproduction. \\
+\addlinespace
+Rank / AP surrogate & Fast-AP; Smooth-AP; ROADMAP & These directly optimize differentiable ranking surrogates and were evaluated by the contextual paper. They test whether optimizing an image-retrieval metric transfers to pose retrieval. \\
+\addlinespace
+Supplemental AP & SoftBin-AP; Blackbox-AP & Used in the paper's additional AP-surrogate study. These are appendix-grade targets after the main matrix is stable. \\
+\addlinespace
+Neighborhood & Contextual; contextual plus contrastive; similarity regularizer ablations & Central method and necessary ablations. Contextual-only, hybrid, and regularized variants distinguish the neighborhood term from its supporting components. \\
+\bottomrule
+\end{tabularx}
+\caption{Paper-fidelity objective map. ``All algorithms'' refers to objectives actually evaluated by the contextual paper, while preserving whether a result was rerun, reported, or supplemental.}
+\end{table}
+
+The remaining state-of-the-art rows in the screenshot are architecture or framework transfers. They are retained in Stage IV, where their required pose-domain adaptations can be measured without presenting them as interchangeable losses.
+
+\clearpage
+\section*{Stage III: Methods Published From 2023 Onward}
+
+The post-2023 literature suggests that the most useful additions are not a long list of nominally new losses. The valuable candidates represent distinct optimization ideas and can be tested without replacing the temporal encoder. The following list is a screened research backlog, not a promise to run every method before the core comparison is complete.
+
+\begin{table}[ht]
+\centering
+\small
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\textwidth}{L{0.20\textwidth}Y L{0.22\textwidth}}
+\toprule
+\textbf{Recent image-DML method} & \textbf{Reason to test transfer} & \textbf{Priority and boundary} \\
+\midrule
+\href{https://ojs.aaai.org/index.php/AAAI/article/view/25421}{SGSL (AAAI 2023)} & Stop-gradient softmax addresses convergence of L2-normalized, classification-based metric learning without a miner. & Core modern candidate: small loss/head change. Omit its backbone-specific BN--ReLU change in the strict track. \\
+\addlinespace
+\href{https://proceedings.iclr.cc/paper_files/paper/2024/hash/1e55c38dd7d465c2526ae29d7ec85861-Abstract-Conference.html}{Mean-field DML (ICLR 2024)} & Derives class-wise versions of contrastive and Multi-Similarity losses, replacing expensive sample-pair interactions with learned class fields. & Core modern candidate: same encoder plus class parameters; directly contrasts class-level and batch-neighborhood context. \\
+\addlinespace
+\href{https://openaccess.thecvf.com/content/CVPR2025/html/Bhatnagar_Potential_Field_Based_Deep_Metric_Learning_CVPR_2025_paper.html}{PFML (CVPR 2025)} & Superposes decaying attractive and repulsive fields from samples and proxies rather than mining tuples; the paper also studies intra-class variation and label noise. & High-value stretch: conceptually close to contextual structure, but it requires a new loss and proxy bank and has no verified public code. \\
+\addlinespace
+\href{https://openaccess.thecvf.com/content/ICCV2023/html/Wen_Pairwise_Similarity_Learning_is_SimPLE_ICCV_2023_paper.html}{SimPLE (ICCV 2023)} & Learns pairwise similarity as binary pair classification rather than through angular margins or class proxies. & Method-faithful pilot: its reported system adds a queue, moving-average encoder, and learned similarity geometry, so it is not a pure loss swap. \\
+\addlinespace
+\href{https://ojs.aaai.org/index.php/AAAI/article/view/37777}{NC-Init + PI (AAAI 2026)} & Initializes a proxy/classifier head from pretrained neural-collapse directions and injects small Gaussian perturbations during fine-tuning. & Current method-faithful pilot with public code; tests optimization and initialization rather than a standalone loss. \\
+\bottomrule
+\end{tabularx}
+\caption{Recent image-retrieval optimization candidates screened for transferability to the same pose encoder.}
+\end{table}
+
+\noindent Other 2024--2025 methods remain in the research backlog rather than the core matrix. Chance-constrained DML and DADA add outer-loop proxy selection or distribution alignment; Anti-Collapse and Deep Disentangled Metric Learning add global or nuisance regularization; ProcSim specifically targets label noise. They become useful only if the corresponding mechanism---multi-modal class structure, domain shift, collapse, nuisance factors, or label noise---is promoted to a primary experimental axis.
+
+\noindent A direct pose-domain control also matters even though it predates the requested window. \href{https://openaccess.thecvf.com/content_CVPR_2019/html/Kim_Deep_Metric_Learning_Beyond_Binary_Supervision_CVPR_2019_paper.html}{Deep Metric Learning Beyond Binary Supervision (CVPR 2019)} proposes a ratio-preserving triplet objective and mining rule for continuous labels and evaluates human-pose retrieval. If the chosen data supports a graded pose or transition distance, it should be compared with ordinary triplet and contextual training. This tests whether neighborhood context adds value beyond supervising pose similarity directly, rather than forcing every relation into a binary action label.
+
+\noindent Recent pose and motion work provides complementary controls:
+
+\begin{itemize}
+    \item \href{https://ojs.aaai.org/index.php/AAAI/article/view/25127}{HiCo (AAAI 2023)} performs instance-, domain-, clip-, and part-level contrast and reports skeleton retrieval. It is a useful pretrained or method-faithful reference, but it requires hierarchical intermediate features rather than only a pooled-embedding loss.
+    \item \href{https://openaccess.thecvf.com/content/ICCV2023/html/Petrovich_TMR_Text-to-Motion_Retrieval_Using_Contrastive_3D_Human_Motion_Synthesis_ICCV_2023_paper.html}{TMR (ICCV 2023)} combines cross-modal contrastive training, negative filtering, and motion-generation supervision. Its false-negative filtering and reconstruction regularization are transferable ideas, but the published task is text--motion rather than pose--pose retrieval.
+    \item \href{https://openaccess.thecvf.com/content/CVPR2024/html/Abdelfattah_MaskCLR_Attention-Guided_Contrastive_Learning_for_Robust_Action_Representation_Learning_CVPR_2024_paper.html}{MaskCLR (CVPR 2024)} is the closest robustness control: attention-guided joint masking plus sample- and class-level contrastive losses on NTU datasets. It should be evaluated after the ordinary corruption-aware SupCon control because it changes both augmentation and optimization.
+    \item \href{https://openaccess.thecvf.com/content/ACCV2024/html/Bian_Class-Aware_Contrastive_Learning_for_Fine-Grained_Skeleton-Based_Action_Recognition_ACCV_2024_paper.html}{Class-Aware Contrastive Learning (ACCV 2024)} prioritizes negatives from similar action classes and uses cross-sequence context and a memory bank. Its public code and direct skeleton setting make it a strong later pose-specific comparison.
+    \item \href{https://ojs.aaai.org/index.php/AAAI/article/view/32899}{USDRL (AAAI 2025)} replaces negative-heavy contrastive training with temporal, spatial, and instance-level feature decorrelation, and evaluates frozen features on action retrieval. It has public code and is a useful current pose-retrieval reference, but its dense encoder and multi-level pretraining place it in the method-faithful rather than strict loss track.
+    \item \href{https://www.nature.com/articles/s41598-024-81762-8}{Zhang and Nie (2024)} combine triplet, reconstruction, and cross-reconstruction losses for direct human-motion similarity. This is domain-relevant but lower priority because the published study relies on custom datasets and a coupled autoencoder rather than a simple loss replacement.
+\end{itemize}
+
+The review also found many recent motion-retrieval systems based on text, video, or audio queries. For example, \href{https://arxiv.org/abs/2507.23188}{Multi-Modal Motion Retrieval (2025)} uses fine-grained sequence-level contrast, while the \href{https://arxiv.org/abs/2603.23684}{MoCHA preprint (2026)} denoises caption supervision before contrastive alignment. These are useful evidence for contrastive alignment, false-negative filtering, reconstruction auxiliaries, token alignment, and supervision quality. They are not direct substitutes in the primary pose-to-pose, label-supervised loss matrix. A later cross-modal project could study them, but including multiple query modalities now would confound the research question.
+
+\section*{Stage IV: Whole-System Transfer From the Other 2023 Table Rows}
+
+The broader ``map every algorithm'' goal remains possible as a resource-dependent final tier. DRML, DIML, DiVA, IBC, S2SD, Metrix combinations, HIST, MHGL, and AVSL were copied into the 2023 paper's state-of-the-art table rather than rerun as common-encoder losses. In pose space, their transferable ideas would become relational reasoning, joint/temporal token matching, multi-task heads, batch message passing, training-only self-distillation, embedding mixup, hypergraph tuplets, global/local motion heads, and anatomical or temporal similarity hierarchies. The pose backbone and data can remain fixed, but the required heads, graphs, or scorers cannot.
+
+This tier will therefore be reported separately as whole-system transfer. The first wave will prioritize IBC, S2SD, Metrix, and HIST because they offer close contextual or high-feasibility comparisons; DRML, DIML, DiVA, MHGL, and AVSL follow only if resources permit. Every method will receive an implement, adapt, or external-reference disposition with a portability rationale. This satisfies the ambitious full-table mapping without contaminating the causal interpretation of the loss-only results.
+
+\section*{Two Fairness Tracks}
+
+Some objectives require different geometry or training machinery. For example, SimPLE uses a queue, moving-average encoder, and learned similarity function; NC-Init + PI changes proxy initialization and fine-tuning; MaskCLR requires attention-guided masking; class-aware contrast uses a memory bank; and reconstruction-based motion objectives require a decoder. A single ``same encoder'' label would hide these differences. Results will therefore be split into two tracks:
+
+\begin{enumerate}
+    \item \textbf{Strict loss-transfer track.} The backbone, initialization, projection dimension, L2 normalization, cosine evaluator, batch manifest, augmentation, and optimization budget are fixed. Only the objective and its necessary parameters or proxies change. This is the primary causal comparison.
+    \item \textbf{Method-faithful transfer track.} The backbone and data remain fixed, but a method may use its required scorer, miner, memory bank, masking rule, proxies, or auxiliary head. Every deviation and its compute cost will be reported. These results measure practical applicability, not an isolated loss effect.
+\end{enumerate}
+
+Each method will receive the same number of validation trials rather than the same hyperparameter values. Forcing one learning rate or margin across heterogeneous losses would be superficially identical but unfair. Final comparisons will use the same random seeds and report mean and variability. Clean performance, robustness retention, wall-clock time, peak memory, convergence failures, and tuning sensitivity will be shown together.
+
+\section*{Analysis and Expected Contribution}
+
+The result will be more than a leaderboard. Each objective will be mapped along five dimensions:
+
+\begin{enumerate}
+    \item \textbf{portability:} whether it consumes only embeddings and labels or requires image-specific or architecture-specific components;
+    \item \textbf{effectiveness:} clean Recall@K, mAP, and mAP@R with the fixed pose encoder;
+    \item \textbf{robustness:} absolute degradation, normalized retention, and area under the corruption-severity curve;
+    \item \textbf{efficiency:} time, memory, batch-size requirements, and compatibility with long pose sequences; and
+    \item \textbf{stability:} variance across seeds, sensitivity to batch composition, and validation effort.
+\end{enumerate}
+
+As a descriptive secondary analysis, I will compare the ordering of paper-fidelity methods on the original image benchmarks with their ordering in the pose benchmark. Any rank correlation will be interpreted cautiously because the datasets, encoders, and metrics differ. The more defensible conclusion will identify which optimization mechanisms transfer, which fail, and why.
+
+A positive result might show that contextual or another structure-aware objective preserves pose retrieval under corruption. A null result would still be valuable if conventional or pose-specific contrastive learning matches it under a fair budget. A reversal of the image-domain ordering would be particularly informative: it would demonstrate that gains attributed to a metric-learning objective are domain-dependent rather than universal.
+
+\section*{Scope, Risks, and Decision Gates}
+
+Running every objective, corruption, severity, and seed immediately would make the project too broad. The staged design uses explicit gates:
+
+\begin{enumerate}
+    \item \textbf{Gate A: pipeline validity.} Frozen features, deterministic query/gallery splits, metrics, and corruptions pass unit and leakage checks.
+    \item \textbf{Gate B: accepted result.} SupCon, contextual, and hybrid projection heads train stably and produce clean/noisy retrieval curves.
+    \item \textbf{Gate C: 2023 replication.} Complete the main loss families; add appendix-grade objectives only after representative pairwise, proxy, and listwise methods are stable.
+    \item \textbf{Gate D: recent methods.} Select two or three candidates with distinct mechanisms, preferring public code and compatibility. Add method-faithful pose controls separately.
+    \item \textbf{Gate E: whole-system transfer.} Implement IBC, S2SD, Metrix, and HIST first; expand to the remaining copied table methods only if the earlier stages are complete.
+    \item \textbf{Gate F: broader domain.} Only after the NTU study is complete, consider FineGym, AMASS/BABEL, SportsPose, or real pose-estimator shift.
+\end{enumerate}
+
+The main technical risks are contextual loss's cubic batch operations, AP losses' large similarity matrices, proxy objectives' extra class parameters, and the training cost of long temporal inputs. Balanced moderate batches, projection-head pilots, mixed precision, and early profiling bound those risks. A conceptual risk is that NTU action labels measure category retrieval rather than subtle movement quality. That limitation will be stated explicitly; a later fine-grained dataset is a validation extension, not a prerequisite for the first result.
+
+\section*{Supporting Primary Sources}
+
+\begin{itemize}
+    \item Liao, Tsiligkaridis, and Kulis (ICML 2023), \href{https://proceedings.mlr.press/v202/liao23b.html}{\emph{Supervised Metric Learning to Rank for Retrieval via Contextual Similarity Optimization}}: foundation objective, controlled image-retrieval baselines, and \href{https://github.com/Chris210634/metric-learning-using-contextual-similarity}{reference code}.
+    \item Musgrave, Belongie, and Lim (ECCV 2020), \href{https://arxiv.org/abs/2003.08505}{\emph{A Metric Learning Reality Check}}: motivation for matched architectures, comparable tuning budgets, and reproducible loss comparisons.
+    \item Yang, Wang, and Zhang (AAAI 2023), \href{https://ojs.aaai.org/index.php/AAAI/article/view/25421}{\emph{Stop-Gradient Softmax Loss for Deep Metric Learning}}: a feasible classification-based objective for L2-normalized retrieval embeddings.
+    \item Furusawa (ICLR 2024), \href{https://proceedings.iclr.cc/paper_files/paper/2024/hash/1e55c38dd7d465c2526ae29d7ec85861-Abstract-Conference.html}{\emph{Mean Field Theory in Deep Metric Learning}}: class-wise contrastive and Multi-Similarity objectives with reduced pair-interaction cost.
+    \item Bhatnagar and Ahuja (CVPR 2025), \href{https://openaccess.thecvf.com/content/CVPR2025/html/Bhatnagar_Potential_Field_Based_Deep_Metric_Learning_CVPR_2025_paper.html}{\emph{Potential Field Based Deep Metric Learning}}: a recent global interaction objective and label-noise comparison.
+    \item Wen et al. (ICCV 2023), \href{https://openaccess.thecvf.com/content/ICCV2023/html/Wen_Pairwise_Similarity_Learning_is_SimPLE_ICCV_2023_paper.html}{\emph{Pairwise Similarity Learning is SimPLE}}: a recent pair-classification approach with method-specific queue and scorer.
+    \item Park et al. (AAAI 2026), \href{https://ojs.aaai.org/index.php/AAAI/article/view/37777}{\emph{Neural Collapse-Informed Initialization with Perturbation Injection in Classification-based Metric Learning}}: the newest screened proxy optimization, with \href{https://github.com/jinnnnnnnnn/NC_init_PI}{public code}.
+    \item Kim et al. (CVPR 2019), \href{https://openaccess.thecvf.com/content_CVPR_2019/html/Kim_Deep_Metric_Learning_Beyond_Binary_Supervision_CVPR_2019_paper.html}{\emph{Deep Metric Learning Beyond Binary Supervision}}: a continuous-label objective evaluated on human-pose retrieval.
+    \item Zhu et al. (ICCV 2023), \href{https://arxiv.org/abs/2210.06551}{\emph{MotionBERT: A Unified Perspective on Learning Human Motion Representations}}: the fixed pretrained temporal encoder and lowest-risk starting pipeline; \href{https://github.com/Walter0807/MotionBERT}{code}.
+    \item Dong et al. (AAAI 2023), \href{https://ojs.aaai.org/index.php/AAAI/article/view/25127}{\emph{Hierarchical Contrast for Unsupervised Skeleton-Based Action Representation Learning}}: a multi-level skeleton contrastive method evaluated on retrieval; \href{https://github.com/HuiGuanLab/HiCo}{code}.
+    \item Petrovich, Black, and Varol (ICCV 2023), \href{https://openaccess.thecvf.com/content/ICCV2023/html/Petrovich_TMR_Text-to-Motion_Retrieval_Using_Contrastive_3D_Human_Motion_Synthesis_ICCV_2023_paper.html}{\emph{TMR: Text-to-Motion Retrieval Using Contrastive 3D Human Motion Synthesis}}: contrastive retrieval with negative filtering and generative regularization.
+    \item Abdelfattah, Hassan, and Alahi (CVPR 2024), \href{https://openaccess.thecvf.com/content/CVPR2024/html/Abdelfattah_MaskCLR_Attention-Guided_Contrastive_Learning_for_Robust_Action_Representation_Learning_CVPR_2024_paper.html}{\emph{MaskCLR}}: the closest pose-corruption and robustness control.
+    \item Bian et al. (ACCV 2024), \href{https://openaccess.thecvf.com/content/ACCV2024/html/Bian_Class-Aware_Contrastive_Learning_for_Fine-Grained_Skeleton-Based_Action_Recognition_ACCV_2024_paper.html}{\emph{Class-Aware Contrastive Learning for Fine-Grained Skeleton-Based Action Recognition}}: a recent supervised pose-specific contrastive strategy with \href{https://github.com/PRIS-CV/Class-Aware-Contrastive-Learning-for-Action-Recognition}{code}.
+    \item Weng et al. (AAAI 2025), \href{https://ojs.aaai.org/index.php/AAAI/article/view/32899}{\emph{USDRL: Unified Skeleton-Based Dense Representation Learning with Multi-Grained Feature Decorrelation}}: a current negative-free skeleton representation method evaluated on action retrieval; \href{https://github.com/wengwanjiang/USDRL}{code}.
+    \item Liu et al. (TPAMI 2020), \href{https://arxiv.org/abs/1905.04757}{\emph{NTU RGB+D 120}}: the proposed first dataset and its standard cross-subject/cross-setup protocols.
+\end{itemize}
+
+\section*{Proposed Final Claim}
+
+The project will not assume that contextual similarity is universally superior. Its intended contribution is a controlled domain-transfer result:
+
+\begin{quote}
+Using the same pose encoder and retrieval protocol, we identify which metric-learning optimization principles transfer from image retrieval to pose-sequence retrieval, and whether neighborhood-aware training offers a distinct advantage as pose observations become corrupted.
+\end{quote}
+
+This formulation preserves the accepted project, incorporates the full 2023 loss comparison at the correct level of fairness, creates a bounded path for newer image- and pose-domain optimizations, and retains a separate route for mapping the remaining whole-system methods.
 
 \end{document}
