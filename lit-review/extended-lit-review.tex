@@ -1,62 +1,101 @@
 \documentclass[10pt]{article}
 
-\usepackage[letterpaper,left=0.72in,right=0.72in,top=0.68in,bottom=0.68in]{geometry}
+\usepackage[
+  letterpaper,
+  left=0.76in,
+  right=0.76in,
+  top=0.72in,
+  bottom=0.72in,
+  headheight=14pt,
+  headsep=13pt,
+  footskip=25pt
+]{geometry}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
+\usepackage[scaled=0.96]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage{fancyhdr}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{lastpage}
 \usepackage{hyperref}
 
-\definecolor{navy}{HTML}{17324D}
-\definecolor{teal}{HTML}{147D82}
-\definecolor{slate}{HTML}{52606D}
-\definecolor{mist}{HTML}{EEF4F6}
+% Monochrome editorial palette: all values print cleanly in black and white.
+\definecolor{ink}{gray}{0.06}
+\definecolor{muted}{gray}{0.38}
+\definecolor{hairline}{gray}{0.68}
+\definecolor{panel}{gray}{0.95}
 
 \hypersetup{
-  colorlinks=true,
-  linkcolor=navy,
-  urlcolor=teal,
+  hidelinks,
   pdftitle={Robust Human-Motion Retrieval from Noisy Pose Sequences},
   pdfauthor={Giacomo Cappelletto}
 }
 
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[L]{\small\textcolor{navy}{Fall 2026 UROP Application}}
-\fancyhead[R]{\small\textcolor{navy}{Giacomo Cappelletto}}
-\fancyfoot[C]{\small\textcolor{slate}{\thepage}}
-\renewcommand{\headrulewidth}{0.3pt}
+\fancypagestyle{proposal}{%
+  \fancyhf{}
+  \fancyhead[L]{\scriptsize\bfseries\textls[55]{ROBUST HUMAN-MOTION RETRIEVAL}}
+  \fancyhead[R]{\scriptsize\textcolor{muted}{GIACOMO CAPPELLETTO}}
+  \fancyfoot[L]{\scriptsize\textcolor{muted}{BOSTON UNIVERSITY / FALL 2026 UROP}}
+  \fancyfoot[R]{\scriptsize\textcolor{muted}{\thepage\ / \pageref*{LastPage}}}
+  \renewcommand{\headrulewidth}{0.45pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+\fancypagestyle{firstpage}{%
+  \fancyhf{}
+  \fancyhead[L]{\scriptsize\bfseries\textls[55]{BOSTON UNIVERSITY}}
+  \fancyhead[R]{\scriptsize\textcolor{muted}{FALL 2026 / UROP APPLICATION}}
+  \fancyfoot[L]{\scriptsize\textcolor{muted}{COLLEGE OF ENGINEERING}}
+  \fancyfoot[R]{\scriptsize\textcolor{muted}{\thepage\ / \pageref*{LastPage}}}
+  \renewcommand{\headrulewidth}{0.45pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+\pagestyle{proposal}
 
 \titleformat{\section}
-  {\large\sffamily\bfseries\color{navy}}
+  {\bfseries\fontsize{12.4}{14}\selectfont\color{ink}}
   {}{0pt}{}
-  [\vspace{-0.35em}\textcolor{teal}{\rule{\textwidth}{0.55pt}}]
-\titlespacing*{\section}{0pt}{1.15em}{0.45em}
+  [\vspace{0.18em}\textcolor{hairline}{\titlerule[0.45pt]}]
+\titlespacing*{\section}{0pt}{1.05em}{0.48em}
 
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{4.2pt}
+\setlength{\parskip}{4.6pt}
 \setlength{\emergencystretch}{3em}
-\setlist[itemize]{leftmargin=1.35em,itemsep=1.5pt,topsep=2pt,parsep=0pt}
-\setlist[enumerate]{leftmargin=1.7em,itemsep=2.5pt,topsep=2pt,parsep=0pt}
+\linespread{1.025}
+\setlist[itemize]{leftmargin=1.25em,itemsep=1.4pt,topsep=2pt,parsep=0pt}
+\setlist[enumerate]{label=\textbf{\arabic*.},leftmargin=1.75em,itemsep=2.8pt,topsep=2pt,parsep=0pt}
 
 \begin{document}
+\color{ink}
+\thispagestyle{firstpage}
 
+{\scriptsize\bfseries\textls[90]{FINAL RESEARCH PROPOSAL}}\par
+\vspace{0.38em}
 % FIELD_START: title
-{\sffamily\bfseries\color{navy}\fontsize{20}{22}\selectfont
-Robust Human-Motion Retrieval\\[-0.08em]
+{\bfseries\fontsize{22.5}{24}\selectfont
+Robust Human-Motion Retrieval\\[-0.04em]
 from Noisy Pose Sequences}\par
 % FIELD_END: title
-\vspace{0.35em}
-{\sffamily\large Giacomo Cappelletto}\hfill
-{\sffamily\color{slate}Faculty Mentor: Professor Brian Kulis}\par
-{\sffamily\color{slate}Boston University College of Engineering}\hfill
-{\sffamily\color{slate}Final proposal - August 16, 2026}\par
-\vspace{0.45em}
-\colorbox{mist}{\parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
-\small\textbf{Research question.} Given one unmodified example of each new action, does contextual training help a model find the correct match when body joints or video frames are missing or inaccurate?}}
+\vspace{0.55em}
+\begin{tabularx}{\textwidth}{@{}Y>{\raggedleft\arraybackslash}X@{}}
+  {\small\bfseries GIACOMO CAPPELLETTO} & {\small\bfseries PROFESSOR BRIAN KULIS} \\
+  {\small\textcolor{muted}{Computer Engineering / College of Engineering}} &
+  {\small\textcolor{muted}{Faculty mentor / August 16, 2026}}
+\end{tabularx}\par
+\vspace{0.55em}
+\begingroup
+\setlength{\fboxsep}{7.5pt}
+\setlength{\fboxrule}{0.55pt}
+\noindent\fcolorbox{ink}{panel}{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{%
+{\scriptsize\bfseries\textls[65]{RESEARCH QUESTION}}\par\vspace{1.5pt}
+\small Given one unmodified example of each new action, does contextual training help a model find the correct match when body joints or video frames are missing or inaccurate?}}
+\endgroup
 
 \section*{Project Description and Goals}
 
@@ -79,7 +118,7 @@ The study tests whether this neighborhood-based objective transfers from static 
 % FIELD_END: significance
 
 \newpage
-\thispagestyle{fancy}
+\thispagestyle{proposal}
 \section*{Methodology / Process}
 
 % FIELD_START: methodology
@@ -99,14 +138,20 @@ The study tests whether this neighborhood-based objective transfers from static 
 \section*{Timeline}
 
 % FIELD_START: timeline
-\begin{itemize}
-  \item \textbf{Weeks 1-2 - Data and protocol:} obtain approved NTU files, compatible poses, official class split, and reference list; freeze validation and test episodes; add leakage checks.
-  \item \textbf{Weeks 3-4 - Evaluator and stress tests:} validate feature extraction and clean retrieval; implement metrics and deterministic joint-jitter, joint-masking, and frame-removal tests.
-  \item \textbf{Weeks 5-7 - Matched training:} train the three output layers with identical controls; select settings only on unmodified validation data and resolve unstable runs.
-  \item \textbf{Weeks 8-9 - Repeated evaluation:} run three paired seeds and all prespecified corruption severities; record clean and corrupted accuracy, time, memory, and failed runs.
-  \item \textbf{Weeks 10-11 - Analysis:} calculate accuracy losses and confidence intervals, inspect errors, compare corruption types, and run only essential ablations.
-  \item \textbf{Weeks 12-13 - Finalization:} reproduce figures from saved configurations, document permitted code, and prepare the final report and UROP presentation or poster.
-\end{itemize}
+{\small
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{0.92in}Y@{}}
+  \toprule
+  \textls[45]{PERIOD} & \textbf{\textls[45]{FOCUS AND OUTPUT}} \\
+  \midrule
+  Weeks 1-2 & \textbf{Data and protocol:} obtain approved NTU files, compatible poses, official class split, and reference list; freeze validation and test episodes; add leakage checks. \\
+  Weeks 3-4 & \textbf{Evaluator and stress tests:} validate feature extraction and clean retrieval; implement metrics and deterministic joint-jitter, joint-masking, and frame-removal tests. \\
+  Weeks 5-7 & \textbf{Matched training:} train the three output layers with identical controls; select settings only on unmodified validation data and resolve unstable runs. \\
+  Weeks 8-9 & \textbf{Repeated evaluation:} run three paired seeds and all prespecified corruption severities; record clean and corrupted accuracy, time, memory, and failed runs. \\
+  Weeks 10-11 & \textbf{Analysis:} calculate accuracy losses and confidence intervals, inspect errors, compare corruption types, and run only essential ablations. \\
+  Weeks 12-13 & \textbf{Finalization:} reproduce figures from saved configurations, document permitted code, and prepare the final report and UROP presentation or poster. \\
+  \bottomrule
+\end{tabularx}}
 
 The required result is the one-dataset, one-shot, three-objective comparison. If full feature extraction exceeds available resources, I will use a fixed subset of the training actions. Encoder fine-tuning, another dataset, and real pose-estimator shifts are future work.
 % FIELD_END: timeline
@@ -128,7 +173,7 @@ I will prepare and verify the data protocol, implement the evaluator and control
 
 % FIELD_START: bibliography
 {\small
-\begin{enumerate}[label={[\arabic*]},leftmargin=2.4em,itemsep=3pt]
+\begin{enumerate}[label={\textcolor{muted}{[\arabic*]}},leftmargin=2.35em,itemsep=3pt]
   \item C. Liao, T. Tsiligkaridis, and B. Kulis. ``Supervised Metric Learning to Rank for Retrieval via Contextual Similarity Optimization.'' \emph{Proceedings of the 40th International Conference on Machine Learning}, 2023.
   \item W. Zhu et al. ``MotionBERT: A Unified Perspective on Learning Human Motion Representations.'' \emph{Proceedings of the IEEE/CVF International Conference on Computer Vision}, 2023.
   \item J. Liu et al. ``NTU RGB+D 120: A Large-Scale Benchmark for 3D Human Activity Understanding.'' \emph{IEEE Transactions on Pattern Analysis and Machine Intelligence}, 42(10), 2020.
