@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "protocol_sha256": "REPLACE_WITH_PROTOCOL_SHA256",
+  "evaluation_plan_sha256": "REPLACE_WITH_EVALUATION_PLAN_SHA256",
+  "final_run_set_sha256": "REPLACE_WITH_FINAL_RUN_SET_SHA256",
+  "test_opening_ledger_sha256": "REPLACE_WITH_TEST_OPENING_LEDGER_SHA256",
+  "recorded_at": "REPLACE_AFTER_CORE_ANALYSIS_WITH_RFC3339_TIMESTAMP",
+  "gates": {
+    "nine_core_checkpoints_verified": {
+      "status": "met",
+      "evidence_path": "final-run-set.v1.json",
+      "evidence_sha256": "REPLACE_WITH_FINAL_RUN_SET_SHA256"
+    },
+    "full_core_result_matrix_verified": {
+      "status": "met",
+      "evidence_path": "core-report/summary.json",
+      "evidence_sha256": "REPLACE_WITH_CORE_REPORT_SUMMARY_SHA256"
+    },
+    "core_figures_reproducible": {
+      "status": "met",
+      "evidence_path": "core-report/summary.json",
+      "evidence_sha256": "REPLACE_WITH_CORE_REPORT_SUMMARY_SHA256"
+    },
+    "no_unresolved_core_failures": {
+      "status": "met",
+      "evidence_path": "core-report/summary.json",
+      "evidence_sha256": "REPLACE_WITH_CORE_REPORT_SUMMARY_SHA256"
+    }
+  }
+}

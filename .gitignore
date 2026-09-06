@@ -1,1 +1,75 @@
+# Operating-system and editor metadata
 .DS_Store
+**/.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Local configuration and secrets. Commit only explicit examples.
+.env
+.env.*
+!.env.example
+!.env.*.example
+.vercel/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# JavaScript / Next.js / Playwright
+node_modules/
+.next/
+.turbo/
+playwright-report/
+test-results/
+blob-report/
+
+# Supabase local state
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+
+# Research data and generated artifacts. Keep manifests and documentation.
+data/**
+!data/README.md
+!data/manifests/
+!data/manifests/**
+artifacts/
+runs/
+.cache/
+wandb/
+mlruns/
+tmp/
+output/
+
+# LaTeX render intermediates
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Serena: retain only the shared project configuration.
+.serena/cache/
+.serena/memories/
+.serena/project.local.yml

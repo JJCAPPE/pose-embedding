@@ -1,0 +1,15 @@
+{
+  "name": "pose-embed-workspace",
+  "private": true,
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "web:dev": "pnpm --filter @pose-embed/tracker dev",
+    "web:lint": "pnpm --filter @pose-embed/tracker lint",
+    "web:typecheck": "pnpm --filter @pose-embed/tracker typecheck",
+    "web:test": "pnpm --filter @pose-embed/tracker test",
+    "web:build": "pnpm --filter @pose-embed/tracker build"
+  }
+}

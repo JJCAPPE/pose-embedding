@@ -1,0 +1,56 @@
+schema_version = 1
+cache_directory = ".cache/upstreams"
+
+[[upstream]]
+name = "MotionBERT"
+repository = "https://github.com/Walter0807/MotionBERT.git"
+commit = "705d3a95354db8bdb696b3492e47a3b5537174ff"
+license = "Apache-2.0"
+license_files = ["LICENSE"]
+reference_only = false
+purpose = "Frozen motion encoder reference and numerical-parity oracle."
+
+[[upstream]]
+name = "MotionCLIP"
+repository = "https://github.com/GuyTevet/MotionCLIP.git"
+commit = "8eae36d59465711d52bcc14853d1e081022f5056"
+license = "MIT"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "Literature comparison only; outside the locked core experiment."
+
+[[upstream]]
+name = "contextual-similarity"
+repository = "https://github.com/Chris210634/metric-learning-using-contextual-similarity.git"
+commit = "8433dcb67c2205c0e30ec07ed1e5b2fb92da016d"
+license = "UNSPECIFIED"
+license_files = []
+reference_only = true
+purpose = "Paper-fidelity oracle for objective configuration; code must not be copied or vendored without permission."
+
+[[upstream]]
+name = "MMAction2"
+repository = "https://github.com/open-mmlab/mmaction2.git"
+commit = "a5a167dff2399e2d182a60332325f9c0d4663517"
+license = "Apache-2.0"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "Skeleton-action ecosystem reference; outside the locked core experiment."
+
+[[upstream]]
+name = "st-gcn"
+repository = "https://github.com/yysijie/st-gcn.git"
+commit = "221c0e152054b8da593774c0d483e59befdb9061"
+license = "BSD-3-Clause"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "Skeleton-action literature reference; outside the locked core experiment."
+
+[[upstream]]
+name = "text-to-motion-retrieval"
+repository = "https://github.com/mesnico/text-to-motion-retrieval.git"
+commit = "a9e92c45262c6aa99079645bf7e6ca9e01ceaf92"
+license = "MIT"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "Retrieval literature reference; outside the locked core experiment."

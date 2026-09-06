@@ -1,0 +1,22 @@
+schema_version: 1
+# This checked-in file declares the matrix only. Copy it to the protocol's
+# canonical artifact-root path and replace the null bindings before locking.
+status: template
+plan_id: final-evaluation-v1
+methods: [contrastive, supcon, contextual]
+seeds: [7, 17, 29]
+conditions:
+  [clean, 'coordinate_jitter:0.01', 'coordinate_jitter:0.025',
+   'coordinate_jitter:0.05', 'joint_mask:3', 'joint_mask:6', 'joint_mask:8',
+   'frame_mask:10', 'frame_mask:25', 'frame_mask:40']
+query_definitions: [primary, official]
+metrics: [top1, mrr, r_at_5]
+expected_rows: 180
+gallery_role: gallery_clean
+gallery_split: novel_anchor
+query_roles: [query_clean, query_corrupted]
+query_splits: [novel_query_primary, novel_query_official]
+source_inventory_manifest: null
+anchor_manifest: null
+official_query_manifest: null
+primary_query_manifest: null

@@ -1,0 +1,58 @@
+name: Tracker export
+
+on:
+  schedule:
+    - cron: "0 13 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tracker-export
+  cancel-in-progress: false
+
+jobs:
+  export:
+    name: Archive public Supabase state
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TRACKER_EXPORT_URL: ${{ vars.TRACKER_EXPORT_URL }}
+    steps:
+      - name: Require the production export URL
+        run: test -n "${TRACKER_EXPORT_URL}"
+      - name: Download public JSON export
+        run: >-
+          curl --fail --show-error --silent
+          --retry 3 --retry-all-errors
+          --max-time 60
+          --output pose-embed-tracker.json
+          "${TRACKER_EXPORT_URL%/}/api/export?format=json"
+      - name: Reject fallback or malformed exports
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          export_path = Path("pose-embed-tracker.json")
+          document = json.loads(export_path.read_text(encoding="utf-8"))
+          if document.get("dataSource") != "supabase":
+              raise SystemExit("refusing to archive a fallback export")
+          if document.get("schemaVersion") != "1.0.0":
+              raise SystemExit("unexpected tracker schemaVersion")
+          if len(document.get("weeks", [])) != 14:
+              raise SystemExit("tracker export does not contain 14 weeks")
+          forbidden_keys = {"owner_id", "ownerId", "actor_id", "actorId", "activity_log"}
+          export_text = export_path.read_text(encoding="utf-8")
+          leaked = {key for key in forbidden_keys if key in export_text}
+          if leaked:
+              raise SystemExit(f"private field name found in public export: {sorted(leaked)}")
+          PY
+      - name: Upload 90-day backup artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pose-embed-tracker-${{ github.run_id }}
+          path: pose-embed-tracker.json
+          if-no-files-found: error
+          retention-days: 90

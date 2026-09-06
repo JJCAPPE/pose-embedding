@@ -1,0 +1,664 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-09-06T18:00:00.000Z",
+  "project": {
+    "id": "pose-embed",
+    "slug": "pose-embed",
+    "title": "Robust human-motion retrieval",
+    "researchQuestion": "Given one clean reference per unseen action, does contextual training reduce retrieval degradation when query joints or frames are inaccurate or missing?",
+    "summary": "A leakage-free, reproducible comparison of metric-learning objectives for one-shot action retrieval from corrupted pose sequences.",
+    "startDate": "2026-09-15",
+    "endDate": "2026-12-18",
+    "timezone": "America/New_York",
+    "visibility": "public",
+    "version": 1
+  },
+  "manualActions": [
+    {
+      "id": "manual-supabase",
+      "dueDate": "2026-09-09",
+      "title": "Create the dedicated Supabase organization",
+      "details": "Create a Free organization named pose-embedding, acknowledge the displayed project cost, and create one email/password Auth user after the pose-embed-tracker project is provisioned. Keep the password private.",
+      "whyManual": "Billing acknowledgement and identity creation require your direct consent and private credentials.",
+      "weekTaskId": null
+    },
+    {
+      "id": "manual-ntu",
+      "dueDate": "2026-09-18",
+      "title": "Accept the NTU RGB+D 120 data terms",
+      "details": "Obtain the authorized HRNet-derived pose files, official one-shot split, and MotionBERT checkpoint. Place protected files only in the documented ignored data root.",
+      "whyManual": "The dataset license and any login-gated download must be accepted by the researcher.",
+      "weekTaskId": "w01-task-02"
+    },
+    {
+      "id": "manual-gpu",
+      "dueDate": "2026-09-18",
+      "title": "Make the GPU host available",
+      "details": "Provide scheduler, GPU model, driver and CUDA compatibility, storage quota, and job limits. Never share passwords or tokens in the tracker.",
+      "whyManual": "Institutional compute access and credentials cannot be delegated.",
+      "weekTaskId": "w01-task-03"
+    },
+    {
+      "id": "manual-approval",
+      "dueDate": "2026-09-20",
+      "title": "Obtain advisor and BU approval",
+      "details": "Ask the advisor to approve protocol-v1 and obtain the required BU data-governance or human-subjects determination.",
+      "whyManual": "Only the researcher, advisor, and authorized BU personnel can attest or approve these decisions.",
+      "weekTaskId": "w01-task-04"
+    }
+  ],
+  "protocol": {
+    "bindingSource": "lit-review/extended-lit-review.tex, beginning at line 96, is binding. The broader untracked UROP draft is not the study specification.",
+    "successDefinition": "Scientific success means completing the locked study faithfully, including a null or negative finding. It does not require contextual loss to win.",
+    "lockedDecisions": [
+      {"label":"Workload","value":"Approximately 8 focused research hours per week, reduced to 5 hours during the October holiday week and 4 hours during Thanksgiving and finals weeks."},
+      {"label":"Compute","value":"One NVIDIA GPU with at least 16 GB VRAM, preferably 24 GB."},
+      {"label":"Core methods","value":"Contrastive-only, supervised contrastive, and full contextual-plus-contrastive."},
+      {"label":"Gated stretch","value":"Multi-Similarity loss with MultiSimilarityMiner, using the exact pinned Liao configuration, only after the core study is complete."},
+      {"label":"Dataset","value":"NTU RGB+D 120 official one-shot protocol."},
+      {"label":"Encoder","value":"Frozen pretrained MotionBERT in evaluation mode."},
+      {"label":"Deadline","value":"Core results complete by November 20. Thanksgiving and finals are buffers, not core dependencies."},
+      {"label":"Release policy","value":"No new repository-wide reuse license until BU and advisor review. Preserve all upstream notices."}
+    ],
+    "experimentalDesign": [
+      {"label":"Research question","value":"Given one clean reference per unseen action, does contextual training reduce retrieval degradation when query joints or frames are inaccurate or missing?"},
+      {"label":"Development split","value":"Hold A2, A8, A14, A20, A26, A32, A38, A44, A50, A56, A62, A68, A74, A80, A86, A92, A98, A104, A110, and A116 out of the 100 auxiliary classes. Train on the remaining 80 while tuning, then retrain on all 100 after lock."},
+      {"label":"Novel test","value":"Use official novel classes A1, A7, A13, A19, A25, A31, A37, A43, A49, A55, A61, A67, A73, A79, A85, A91, A97, A103, A109, and A115. The primary query set excludes synchronized camera views of the anchor performance; a secondary set preserves the exact official protocol."},
+      {"label":"Embedding head","value":"Use MotionBERT ActionHeadEmbed semantics: mean over time and person, one linear projection from 17 by 512 to 2,048 dimensions, then L2 normalization."},
+      {"label":"Physical batches","value":"Use identical P by K batches for all methods, starting at P=8 and K=4 for batch size 32. Retain 32 unless every method fits at 64. Gradient accumulation is not equivalent for the contextual objective."},
+      {"label":"Contextual objective","value":"Use lambda=0.2 for contextual loss, 1-lambda for the contrastive component, and gamma=0.1 for the mean-similarity regularizer. Start from eps=0.05, alpha=10, target mean similarity 0, positive margin 0.9, and negative margin 0.6 in the audited reference."},
+      {"label":"Pairing","value":"Run three paired seeds. Within each seed, reuse head initialization, physical batch order, and sample selection across methods."},
+      {"label":"Tuning","value":"Use clean class-disjoint development validation only. Give each core method the same six-trial learning-rate and weight-decay budget, then repeat its best two candidates across three seeds."},
+      {"label":"Metrics","value":"Report top-1, MRR, and R@5. With one relevant gallery item, mAP is MRR and mAP@R at R=1 is top-1, so those redundant metrics are omitted."}
+    ],
+    "corruptionPrinciple": "Apply corruption only to deterministic 100-frame, 17-joint query tensors before encoder inference. Gallery references always remain clean. Randomness is derived from sample ID, family, and severity so every method receives the same query.",
+    "corruptions": [
+      {"label":"Coordinate jitter","value":"Independent zero-mean Gaussian xy noise at 1%, 2.5%, and 5% of each clean sequence's median torso scale."},
+      {"label":"Joint or limb masking","value":"Mask 3, 6, or 8 complete joint trajectories, chosen in connected limb-first groups with a sample-derived seed."},
+      {"label":"Consecutive-frame masking","value":"Zero a deterministic consecutive block of 10, 25, or 40 frames."},
+      {"label":"Mask semantics","value":"Set coordinates and confidence to zero. Do not delete or resample observations. Severity zero must remain byte-identical to clean input."},
+      {"label":"Amendment rule","value":"Week 5 may change a numeric level only when geometry shows an invalid, imperceptible, or degenerate input, never because of a retrieval score. Freeze any amendment before tuning ends."}
+    ],
+    "primaryFormula": "drop(m, s, c) = clean_top1(m, s) - corrupted_top1(m, s, c)",
+    "effectFormula": "effect = mean(drop(contextual) - drop(contrastive-only)) across three seeds and nine corruption cells",
+    "analysisRules": [
+      "A negative effect means contextual training degraded less.",
+      "Use 10,000 paired bootstrap replicates clustered by underlying performance: setup, performer, repetition, and action. Keep synchronized camera observations together.",
+      "Support the preregistered robustness claim only when the upper bound of the 95% paired interval is below zero.",
+      "Always report clean accuracy, every seed, and every corruption curve. Do not equate less degradation with higher overall retrieval when clean results differ.",
+      "Treat SupCon and the conditional Multi-Similarity extension as secondary or descriptive comparisons.",
+      "The final-test command must validate the protocol-v1 hash and timestamp. Do not train with the upstream script that selects on the novel set each epoch."
+    ],
+    "scopeExclusions": [
+      "No second dataset.",
+      "No encoder fine-tuning.",
+      "No raw-video pipeline.",
+      "No pose-estimator domain-shift experiment.",
+      "No clinical, biomechanical, or identity claims.",
+      "No full modern-loss survey."
+    ]
+  },
+  "weeks": [
+    {
+      "id": "week-01",
+      "projectId": "pose-embed",
+      "number": 1,
+      "startDate": "2026-09-15",
+      "endDate": "2026-09-20",
+      "phase": "Protocol",
+      "title": "Protocol and access",
+      "objective": "Turn the prospectus into a signed, testable protocol and prove that the required data and compute are reachable.",
+      "deliverable": "A signed protocol-v1, verified data and checkpoint inventory, and measured GPU profile.",
+      "risks": [
+        "NTU or checkpoint access may require manual license acceptance.",
+        "GPU availability may not match the planned memory or runtime assumptions.",
+        "Advisor or BU determination may arrive after technical setup begins."
+      ],
+      "advisorPrompt": "Do you approve the research question, test-opening rule, primary estimand, synchronized-view exclusion, and claim language as the binding protocol?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w01-task-01","weekId":"week-01","position":1,"title":"Finalize protocol-v1","details":"Resolve the objective formula, primary estimand, claim rule, validation split, synchronized-view rule, corruptions, test-opening rule, and failed-run policy.","expectedOutput":"Signed protocol document with a stable content hash.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w01-task-02","weekId":"week-01","position":2,"title":"Verify licensed inputs","details":"Confirm that the NTU HRNet-derived poses, official one-shot split, and pretrained MotionBERT checkpoint are readable. Record source URLs and SHA-256 checksums without committing licensed files.","expectedOutput":"Input inventory and checksum report.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w01-task-03","weekId":"week-01","position":3,"title":"Profile the GPU path","details":"Run one representative frozen MotionBERT forward pass at batch sizes 32 and 64. Record device, CUDA, memory, runtime, scheduler, quota, and job limits.","expectedOutput":"Compute profile with a justified physical batch-size decision.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w01-task-04","weekId":"week-01","position":4,"title":"Record governance decisions","details":"Attach advisor approval and the BU data-governance or human-subjects determination. Record unresolved conditions verbatim.","expectedOutput":"Approval evidence or a visible blocking record.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w01-task-05","weekId":"week-01","position":5,"title":"Close the weekly record","details":"Update actual hours, blockers, evidence links, and the first-week reflection in the tracker.","expectedOutput":"A complete Week 1 progress record.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w01-gate-01","weekId":"week-01","position":1,"criterion":"Protocol-v1 is advisor-approved and its hash is recorded.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w01-gate-02","weekId":"week-01","position":2,"criterion":"Dataset and checkpoint inputs are readable and checksummed.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w01-gate-03","weekId":"week-01","position":3,"criterion":"A representative GPU profile confirms a feasible physical batch size.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w01-gate-04","weekId":"week-01","position":4,"criterion":"Required BU governance determination is recorded.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-02",
+      "projectId": "pose-embed",
+      "number": 2,
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-27",
+      "phase": "Data",
+      "title": "Immutable data manifests",
+      "objective": "Create deterministic sample identities and split manifests that make class, exemplar, and synchronized-view leakage impossible.",
+      "deliverable": "Checksummed manifests for development, final training, anchors, and both novel-query definitions, plus a leakage audit.",
+      "risks": [
+        "NTU filename parsing mistakes can silently merge performances.",
+        "Synchronized cameras can leak the anchor performance into queries.",
+        "Upstream one-shot files may use a different action index convention."
+      ],
+      "advisorPrompt": "Does the primary deduplicated query definition answer the intended question while the exact-official query set preserves comparability?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w02-task-01","weekId":"week-02","position":1,"title":"Parse NTU sample identities","details":"Parse setup, camera, performer, replication, action, and body metadata from canonical filenames. Reject malformed and duplicate identifiers.","expectedOutput":"Tested parser and normalized sample inventory.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w02-task-02","weekId":"week-02","position":2,"title":"Generate split manifests","details":"Generate the 80-class development train, 20-class class-disjoint validation, final 100-class train, official novel, anchor, deduplicated-primary query, and exact-official query manifests.","expectedOutput":"Seven deterministic, checksummed manifest files.","required":true,"estimateMinutes":180,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w02-task-03","weekId":"week-02","position":3,"title":"Prove leakage invariants","details":"Test class disjointness, anchor uniqueness, sample uniqueness, synchronized-performance exclusions, stable ordering, and complete file coverage.","expectedOutput":"Passing leakage and duplication test suite.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w02-task-04","weekId":"week-02","position":4,"title":"Publish the manifest audit","details":"Record counts by class and split, checksum every manifest, and explain every query excluded from the primary set.","expectedOutput":"Human-readable manifest audit report.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w02-gate-01","weekId":"week-02","position":1,"criterion":"All seven manifests have frozen counts and checksums.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w02-gate-02","weekId":"week-02","position":2,"criterion":"Automated checks find zero forbidden overlap or duplicate identities.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w02-gate-03","weekId":"week-02","position":3,"criterion":"Every synchronized-view exclusion is reproducible from the manifest audit.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-03",
+      "projectId": "pose-embed",
+      "number": 3,
+      "startDate": "2026-09-28",
+      "endDate": "2026-10-04",
+      "phase": "Representation",
+      "title": "Frozen encoder and evaluator",
+      "objective": "Build a deterministic frozen MotionBERT feature path and a trustworthy one-shot retrieval evaluator.",
+      "deliverable": "Repeatable clean feature caches, verified retrieval metrics, and measured extraction cost.",
+      "risks": [
+        "The legacy upstream code assumes CUDA DataParallel and outdated dependencies.",
+        "Pooling or normalization drift can invalidate comparison with MotionBERT.",
+        "Feature caching without provenance can mix incompatible experiments."
+      ],
+      "advisorPrompt": "Are the frozen encoder, 2,048-dimensional head interface, cosine retrieval, and reported metrics faithful to the prospectus?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w03-task-01","weekId":"week-03","position":1,"title":"Port minimal MotionBERT inference","details":"Adapt only the required encoder modules with upstream notices. Load the pinned checkpoint, set evaluation mode, and prove every encoder parameter is frozen.","expectedOutput":"Device-agnostic frozen encoder with attribution.","required":true,"estimateMinutes":150,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w03-task-02","weekId":"week-03","position":2,"title":"Build provenance-aware feature caching","details":"Cache features by data, manifest, model, checkpoint, preprocessing, corruption, and code hashes. Reject partial or mismatched caches.","expectedOutput":"Repeatable cache plus machine-readable provenance manifest.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w03-task-03","weekId":"week-03","position":3,"title":"Implement retrieval evaluation","details":"Implement cosine ranking, top-1, MRR, and R@5. Verify ties and missing-relevant-item errors using hand-calculated fixtures.","expectedOutput":"Metric module with exact fixture tests.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w03-task-04","weekId":"week-03","position":4,"title":"Measure extraction reproducibility","details":"Run clean extraction twice, compare outputs, and record full-dataset runtime and storage projections.","expectedOutput":"Determinism report and remaining-compute forecast.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w03-gate-01","weekId":"week-03","position":1,"criterion":"Two clean feature extractions are identical within the declared tolerance.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w03-gate-02","weekId":"week-03","position":2,"criterion":"Hand-calculated top-1, MRR, and R@5 fixtures pass.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w03-gate-03","weekId":"week-03","position":3,"criterion":"Every cache contains complete provenance and incompatible reuse fails closed.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w03-gate-04","weekId":"week-03","position":4,"criterion":"Measured extraction time and storage fit the remaining schedule.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-04",
+      "projectId": "pose-embed",
+      "number": 4,
+      "startDate": "2026-10-05",
+      "endDate": "2026-10-11",
+      "phase": "Objectives",
+      "title": "Heads, losses, and sampler",
+      "objective": "Implement the identical embedding head and three core objectives under one paired, balanced training pipeline.",
+      "deliverable": "Verified core objectives, balanced batch sampler, and an end-to-end tiny-set overfit run.",
+      "risks": [
+        "Contextual loss is invalid when batches are not class-balanced.",
+        "Different initializations or batch order would weaken paired comparisons.",
+        "A numerically finite loss can still collapse embeddings."
+      ],
+      "advisorPrompt": "Do the shared head, physical P by K batches, and equal implementation path isolate the objective as the intended independent variable?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w04-task-01","weekId":"week-04","position":1,"title":"Implement the shared embedding head","details":"Reproduce mean pooling over time and people, a linear 17 by 512 to 2,048 projection, and L2 normalization for every objective.","expectedOutput":"One tested head implementation shared by all methods.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w04-task-02","weekId":"week-04","position":2,"title":"Implement three core objectives","details":"Implement contrastive-only, supervised contrastive, and contextual-plus-contrastive using the audited contextual defaults and exact objective weighting.","expectedOutput":"Finite-value and finite-gradient tests for all core losses.","required":true,"estimateMinutes":180,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w04-task-03","weekId":"week-04","position":3,"title":"Pair batches across objectives","details":"Create deterministic P=8, K=4 physical batches with the same samples and order for each method. Profile batch 64 without changing the default unless every method fits.","expectedOutput":"Persisted batch manifest and balance assertions.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w04-task-04","weekId":"week-04","position":4,"title":"Run golden and overfit checks","details":"Compare contextual forward values and gradients with the audited reference, then make each objective lower loss and overfit the tiny fixture.","expectedOutput":"Golden-equivalence report and three successful debug runs.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w04-gate-01","weekId":"week-04","position":1,"criterion":"All objectives lower loss and overfit the same debug set.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w04-gate-02","weekId":"week-04","position":2,"criterion":"Contextual outputs and gradients match the golden reference.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w04-gate-03","weekId":"week-04","position":3,"criterion":"Balanced batches, paired sample order, and identical head initialization are verified.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-05",
+      "projectId": "pose-embed",
+      "number": 5,
+      "startDate": "2026-10-12",
+      "endDate": "2026-10-18",
+      "phase": "Robustness",
+      "title": "Corruption freeze",
+      "objective": "Implement and visually validate deterministic query-only corruptions before any validation comparison can influence their design.",
+      "deliverable": "A frozen corruptions-v1 specification, visual audit, and deterministic test suite.",
+      "risks": [
+        "Fixed coordinate noise may not be comparable across body scales.",
+        "Masking can accidentally alter the gallery or tensor length.",
+        "Severity levels can be imperceptible or geometrically degenerate."
+      ],
+      "advisorPrompt": "Do the three corruption families and levels represent plausible input failures without changing the action label or testing a different task?",
+      "reflection": "",
+      "plannedMinutes": 300,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w05-task-01","weekId":"week-05","position":1,"title":"Implement scale-normalized jitter","details":"Apply deterministic Gaussian xy noise at 1%, 2.5%, and 5% of each clean sequence's median torso scale.","expectedOutput":"Jitter operator with deterministic hashes and geometry tests.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w05-task-02","weekId":"week-05","position":2,"title":"Implement joint and frame masking","details":"Mask 3, 6, or 8 connected limb-first joint trajectories, or a consecutive 10, 25, or 40-frame block. Set coordinates and confidence to zero without resampling.","expectedOutput":"Joint and frame operators with exact affected-count tests.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w05-task-03","weekId":"week-05","position":3,"title":"Inspect representative corruptions","details":"Render fixed examples for every family and level. Check visibility, action-label preservation, temporal placement, and monotonic geometric severity.","expectedOutput":"Advisor-readable corruption contact sheet and audit notes.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w05-task-04","weekId":"week-05","position":4,"title":"Freeze corruptions-v1","details":"Verify byte-identical severity zero, query-only application, unchanged tensor shape, and sample-derived seeds. Document any geometry-driven amendment.","expectedOutput":"Frozen corruption config with hash and amendment record.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w05-gate-01","weekId":"week-05","position":1,"criterion":"Severity zero is byte-identical and no gallery tensor changes.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w05-gate-02","weekId":"week-05","position":2,"criterion":"Affected proportions, temporal placement, and deterministic hashes pass.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w05-gate-03","weekId":"week-05","position":3,"criterion":"Corruptions-v1 is frozen with no amendment or an advisor-approved geometry-only amendment.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-06",
+      "projectId": "pose-embed",
+      "number": 6,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-25",
+      "phase": "Validation",
+      "title": "Equal-budget validation I",
+      "objective": "Run the same six clean-development trials for each core objective and identify viable settings without touching the novel test.",
+      "deliverable": "An equal-budget validation ledger with at least two viable configurations per core method.",
+      "risks": [
+        "Run duration may exceed the Week 1 estimate.",
+        "A method may collapse or require debugging inside the fixed budget.",
+        "Accidental access to novel-test manifests would invalidate the lock."
+      ],
+      "advisorPrompt": "Are the six trials genuinely equal in budget and is the viability rule defined without privileging a method?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w06-task-01","weekId":"week-06","position":1,"title":"Freeze the tuning grid","details":"Write the six shared learning-rate and weight-decay trials, common epoch cap, clean metric, seed, and failure criteria into versioned configs.","expectedOutput":"Checksummed equal-budget tuning specification.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w06-task-02","weekId":"week-06","position":2,"title":"Run first-seed validation","details":"Run all 18 method-by-configuration jobs on clean development data with identical batch manifests and record every attempted run.","expectedOutput":"Complete first-seed validation result ledger.","required":true,"estimateMinutes":300,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w06-task-03","weekId":"week-06","position":3,"title":"Inspect training health","details":"Check convergence, embedding norms, collapse diagnostics, runtime, memory, and sampler invariants. Reproduce rather than silently discard failures.","expectedOutput":"Health report and classified failure list.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w06-task-04","weekId":"week-06","position":4,"title":"Select viable candidates","details":"Apply the predeclared clean-validation rule to retain at least two settings per method for paired multi-seed confirmation.","expectedOutput":"Candidate list with evidence and no novel-test access.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w06-gate-01","weekId":"week-06","position":1,"criterion":"The equal-budget ledger contains every planned run and classified failure.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w06-gate-02","weekId":"week-06","position":2,"criterion":"At least two viable configurations remain for each core method.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w06-gate-03","weekId":"week-06","position":3,"criterion":"Audit evidence confirms that no novel-test manifest or score was loaded.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-07",
+      "projectId": "pose-embed",
+      "number": 7,
+      "startDate": "2026-10-26",
+      "endDate": "2026-11-01",
+      "phase": "Lock",
+      "title": "Validation II and protocol lock",
+      "objective": "Confirm the top candidates across paired seeds and lock every decision before final training and novel evaluation.",
+      "deliverable": "Advisor-approved final configs, analysis plan, and protocol-lock hash.",
+      "risks": [
+        "High seed variance may make the candidate choice unstable.",
+        "Late changes can create unequal tuning or accidental test flexibility.",
+        "Stretch planning can distract from unresolved core instability."
+      ],
+      "advisorPrompt": "Do you approve these final hyperparameters, fixed epoch counts, paired seeds, analysis code, and the decision to keep or cancel the stretch method?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w07-task-01","weekId":"week-07","position":1,"title":"Repeat candidates across seeds","details":"Run the best two clean-validation candidates for each method over all three paired seeds, reusing seed-specific initialization and batch order.","expectedOutput":"Complete multi-seed candidate matrix.","required":true,"estimateMinutes":240,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w07-task-02","weekId":"week-07","position":2,"title":"Select final settings","details":"Choose learning rate, weight decay, and fixed epoch count by the preregistered mean clean-validation rule. Preserve all seed results.","expectedOutput":"One final config per core method with decision trace.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w07-task-03","weekId":"week-07","position":3,"title":"Audit comparison fairness","details":"Verify data, frozen encoder, head, sampler, budget, seeds, evaluator, corruption configs, and failure policy. Confirm test-loader access logs are empty.","expectedOutput":"Signed fairness and leakage audit.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w07-task-04","weekId":"week-07","position":4,"title":"Lock protocol and stretch config","details":"Hash the final protocol and analysis plan. Predeclare the exact pinned Multi-Similarity-plus-miner setup, but cancel stretch work if core stability is unresolved.","expectedOutput":"Protocol-lock record and conditional stretch decision.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w07-gate-01","weekId":"week-07","position":1,"criterion":"Final core configs are stable across paired seeds and have complete decision traces.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w07-gate-02","weekId":"week-07","position":2,"criterion":"Advisor approves the final hashes, fairness audit, and analysis plan.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w07-gate-03","weekId":"week-07","position":3,"criterion":"No unresolved instability remains and the novel-test loader is unused.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-08",
+      "projectId": "pose-embed",
+      "number": 8,
+      "startDate": "2026-11-02",
+      "endDate": "2026-11-08",
+      "phase": "Training",
+      "title": "Final core training",
+      "objective": "Train all locked core methods on all 100 auxiliary classes with complete, immutable provenance.",
+      "deliverable": "Nine checksummed core checkpoints and their complete run manifests.",
+      "risks": [
+        "GPU interruption can produce partial checkpoints.",
+        "A failed run may tempt an unplanned seed replacement.",
+        "Incomplete provenance would make paired results unverifiable."
+      ],
+      "advisorPrompt": "Do the run manifests demonstrate that all nine checkpoints used the locked settings and the predefined failed-run policy?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w08-task-01","weekId":"week-08","position":1,"title":"Train nine core runs","details":"Train three methods over three paired seeds on all 100 auxiliary classes, using the locked configs and immutable batch manifests.","expectedOutput":"Nine completed checkpoints and training logs.","required":true,"estimateMinutes":300,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w08-task-02","weekId":"week-08","position":2,"title":"Archive run provenance","details":"Record Git, dependency, upstream, model, data, config, device, seed, timing, and output hashes for each run.","expectedOutput":"Nine complete machine-readable run manifests.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w08-task-03","weekId":"week-08","position":3,"title":"Apply the failed-run policy","details":"Classify interruptions, numerical failures, and infrastructure failures. Resume or rerun only as allowed by the locked policy and never substitute a favorable seed.","expectedOutput":"Failure ledger with every retry justified.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w08-task-04","weekId":"week-08","position":4,"title":"Verify final checkpoints","details":"Load each checkpoint, verify hashes and dimensions, and run a clean fixture evaluation without accessing novel-test scores.","expectedOutput":"Nine passing checkpoint verification records.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w08-gate-01","weekId":"week-08","position":1,"criterion":"All nine core checkpoints load and match recorded checksums.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w08-gate-02","weekId":"week-08","position":2,"criterion":"Every run has complete provenance, logs, and justified failure handling.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w08-gate-03","weekId":"week-08","position":3,"criterion":"No checkpoint was selected or replaced using novel-test outcomes.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-09",
+      "projectId": "pose-embed",
+      "number": 9,
+      "startDate": "2026-11-09",
+      "endDate": "2026-11-15",
+      "phase": "Evaluation",
+      "title": "One-time novel evaluation",
+      "objective": "Open the official novel test once and generate the full clean and corrupted result matrix without post-test tuning.",
+      "deliverable": "An immutable 180-row core result matrix with query-count and provenance audits.",
+      "risks": [
+        "A protocol mismatch at test opening can invalidate the preregistration.",
+        "Different corruption realizations across methods would break pairing.",
+        "Missing or repeated queries can produce misleading aggregate scores."
+      ],
+      "advisorPrompt": "Does the evaluation log prove a single protocol-locked opening, identical query tensors across methods, and complete reporting for both query definitions?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w09-task-01","weekId":"week-09","position":1,"title":"Verify the test-opening lock","details":"Validate protocol-v1 hash, timestamp, final configs, checkpoint set, analysis code, and empty prior-access log before enabling the novel-test command.","expectedOutput":"Signed test-opening event with exact code and protocol hashes.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w09-task-02","weekId":"week-09","position":2,"title":"Encode clean and corrupted queries","details":"Evaluate clean plus nine corruption cells for every method and seed against clean anchors, reusing deterministic query tensors across methods.","expectedOutput":"Checksummed predictions and metrics for all core conditions.","required":true,"estimateMinutes":240,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w09-task-03","weekId":"week-09","position":3,"title":"Evaluate both query definitions","details":"Calculate top-1, MRR, and R@5 for the deduplicated-primary and exact-official query sets without changing configs or checkpoints.","expectedOutput":"Complete matrix of 3 methods by 3 seeds by 10 conditions by 2 query definitions.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w09-task-04","weekId":"week-09","position":4,"title":"Freeze and audit results","details":"Verify constant query counts, paired sample IDs, complete cells, stable hashes, and no post-test training. Mark the result set immutable.","expectedOutput":"180-row result matrix and audit report.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w09-gate-01","weekId":"week-09","position":1,"criterion":"The novel test was opened under the exact locked protocol and code hashes.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w09-gate-02","weekId":"week-09","position":2,"criterion":"All 180 core rows exist with constant query counts and paired sample identities.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w09-gate-03","weekId":"week-09","position":3,"criterion":"No training, tuning, or selective rerun occurred after test opening.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-10",
+      "projectId": "pose-embed",
+      "number": 10,
+      "startDate": "2026-11-16",
+      "endDate": "2026-11-22",
+      "phase": "Analysis",
+      "title": "Locked core analysis",
+      "objective": "Turn the immutable result matrix into the preregistered paired effect, uncertainty estimates, complete figures, and defensible conclusions.",
+      "deliverable": "Reproducible core analysis, figures, tables, and report outline completed by November 20.",
+      "risks": [
+        "Treating synchronized views as independent can understate uncertainty.",
+        "A clean-accuracy tradeoff can be hidden by reporting degradation alone.",
+        "Exploratory per-class patterns can be mistaken for confirmatory results."
+      ],
+      "advisorPrompt": "Are the clustered paired interval, clean-performance context, and claim language sufficient to support either a positive, null, or negative result?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w10-task-01","weekId":"week-10","position":1,"title":"Compute the primary paired effect","details":"Calculate clean-to-corrupted top-1 drops and the equally weighted contextual-minus-contrastive effect across three seeds and nine corruption cells.","expectedOutput":"Primary estimate and 10,000-replicate performance-cluster bootstrap interval.","required":true,"estimateMinutes":150,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w10-task-02","weekId":"week-10","position":2,"title":"Complete secondary analysis","details":"Report clean top-1, MRR, R@5, every seed, every corruption curve, runtime, memory, per-class errors, and both query definitions.","expectedOutput":"Complete secondary tables with confirmatory and exploratory labels.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w10-task-03","weekId":"week-10","position":3,"title":"Generate final core figures","details":"Create degradation curves, interval plot, clean-versus-robustness comparison, representative errors, and supporting tables only from immutable outputs.","expectedOutput":"Publication-ready, script-generated figures and captions.","required":true,"estimateMinutes":150,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w10-task-04","weekId":"week-10","position":4,"title":"Write evidence-matched conclusions","details":"Map each conclusion to a preregistered result. Distinguish less degradation from higher retrieval accuracy and report null or negative findings plainly.","expectedOutput":"Core result narrative and full report outline by November 20.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w10-gate-01","weekId":"week-10","position":1,"criterion":"The primary estimate and 95% paired cluster-bootstrap interval reproduce from immutable results.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w10-gate-02","weekId":"week-10","position":2,"criterion":"Every claim maps to a preregistered result and clean accuracy is reported beside degradation.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w10-gate-03","weekId":"week-10","position":3,"criterion":"All core figures and tables regenerate and the report outline is complete by November 20.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-11",
+      "projectId": "pose-embed",
+      "number": 11,
+      "startDate": "2026-11-23",
+      "endDate": "2026-11-29",
+      "phase": "Buffer",
+      "title": "Recovery or gated stretch",
+      "objective": "Protect the completed core study first, then run the predeclared Multi-Similarity extension only if every core-readiness gate passes.",
+      "deliverable": "A verified core recovery record or clearly labeled exploratory Multi-Similarity results.",
+      "risks": [
+        "Thanksgiving reduces available work time.",
+        "Stretch work can consume the buffer needed for core repair.",
+        "A new method can invite unplanned tuning after seeing core results."
+      ],
+      "advisorPrompt": "Have all four stretch-entry checks passed, or should this week remain exclusively a core recovery buffer?",
+      "reflection": "",
+      "plannedMinutes": 240,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w11-task-01","weekId":"week-11","position":1,"title":"Assess core readiness","details":"Verify nine checkpoints, full matrices, reproducible figures, and no unresolved failure. If any check fails, use the full week for core recovery.","expectedOutput":"Signed recovery-or-stretch decision.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w11-task-02","weekId":"week-11","position":2,"title":"Run the pinned stretch method","details":"Only after a positive entry decision, train three paired Multi-Similarity-plus-miner seeds using the predeclared pinned implementation and existing clean feature caches.","expectedOutput":"Three checksummed exploratory checkpoints, or a documented cancellation.","required":false,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w11-task-03","weekId":"week-11","position":3,"title":"Evaluate the stretch identically","details":"Apply the locked evaluator and corruption tensors with no new tuning. Preserve the same query definitions and reporting metrics.","expectedOutput":"Exploratory result matrix, or a documented cancellation.","required":false,"estimateMinutes":30,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w11-task-04","weekId":"week-11","position":4,"title":"Document the buffer outcome","details":"Record core repairs, stretch status, deviations, and why the primary conclusions remain unchanged.","expectedOutput":"Complete Week 11 decision and evidence record.","required":true,"estimateMinutes":30,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w11-gate-01","weekId":"week-11","position":1,"criterion":"The core study remains complete, reproducible, and unchanged by stretch outcomes.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w11-gate-02","weekId":"week-11","position":2,"criterion":"Any stretch result is labeled exploratory and uses only the predeclared configuration.","required":false,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-12",
+      "projectId": "pose-embed",
+      "number": 12,
+      "startDate": "2026-11-30",
+      "endDate": "2026-12-06",
+      "phase": "Reproduction",
+      "title": "Reproduction and draft",
+      "objective": "Prove the project can be reconstructed independently and turn the complete evidence into a full report draft.",
+      "deliverable": "A successful fresh-clone reproduction, regenerated results, and a full advisor draft.",
+      "risks": [
+        "The working machine may hide undeclared dependencies or paths.",
+        "Large licensed artifacts cannot be bundled with the repository.",
+        "Writing may expose missing provenance or methods detail late."
+      ],
+      "advisorPrompt": "Can you follow the methods and evidence trail without oral context, and which argument or limitation needs the most revision?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w12-task-01","weekId":"week-12","position":1,"title":"Reconstruct from a fresh clone","details":"Install pinned dependencies, fetch exact upstream sources, configure external data roots, and verify manifests on a clean checkout.","expectedOutput":"Fresh-clone environment and dependency audit.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w12-task-02","weekId":"week-12","position":2,"title":"Run the CPU debug pipeline","details":"Execute parsing, feature fixture, each loss, training, evaluation, and report generation through one documented debug command.","expectedOutput":"Passing end-to-end CPU smoke run.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w12-task-03","weekId":"week-12","position":3,"title":"Regenerate results from archives","details":"Rebuild final tables and figures from explicit immutable run manifests and compare output checksums with the Week 10 release candidates.","expectedOutput":"Reproduction report with matching or explained hashes.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w12-task-04","weekId":"week-12","position":4,"title":"Write the full report draft","details":"Complete methods, results, limitations, compute, failure handling, deviations, and negative findings. Link every figure to its generating command.","expectedOutput":"Full report draft delivered to the advisor.","required":true,"estimateMinutes":150,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w12-gate-01","weekId":"week-12","position":1,"criterion":"A fresh clone installs and completes the documented CPU debug pipeline.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w12-gate-02","weekId":"week-12","position":2,"criterion":"Final tables and figures regenerate from archived immutable outputs.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w12-gate-03","weekId":"week-12","position":3,"criterion":"A complete report draft has been sent to the advisor.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-13",
+      "projectId": "pose-embed",
+      "number": 13,
+      "startDate": "2026-12-07",
+      "endDate": "2026-12-13",
+      "phase": "Communication",
+      "title": "Final communication",
+      "objective": "Resolve advisor feedback and package the study so its question, evidence, limits, and reproduction path stand on their own.",
+      "deliverable": "Final report, poster or slides, abstract, captions, source ledger, and advisor-facing walkthrough.",
+      "risks": [
+        "Late feedback may expand beyond correction into a new analysis request.",
+        "Visual summaries can overstate findings when space is tight.",
+        "The artifact inventory may expose missing attribution or licenses."
+      ],
+      "advisorPrompt": "Does the final package communicate the result and its limits accurately, and are all requested corrections complete without adding post-hoc analysis?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w13-task-01","weekId":"week-13","position":1,"title":"Resolve advisor feedback","details":"Classify each comment as correction, clarification, limitation, or new analysis. Complete the first three and defer unplanned analysis to future work after December 10.","expectedOutput":"Resolved feedback log and final report text.","required":true,"estimateMinutes":180,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w13-task-02","weekId":"week-13","position":2,"title":"Finalize poster or slides","details":"Present the research question, controlled comparison, corruption design, primary effect, clean tradeoff, limitations, and reproduction path without selective results.","expectedOutput":"Final advisor-ready poster or slide deck.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w13-task-03","weekId":"week-13","position":3,"title":"Complete the evidence package","details":"Finalize the abstract, captions, source ledger, third-party notices, artifact inventory, deviations, and commands behind every result.","expectedOutput":"Self-contained documented experiment package.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w13-task-04","weekId":"week-13","position":4,"title":"Run the advisor walkthrough","details":"Use the public tracker to walk through weeks, evidence, gates, conclusions, limitations, and remaining archive work. Record final corrections.","expectedOutput":"Completed walkthrough and bounded correction list.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w13-gate-01","weekId":"week-13","position":1,"criterion":"Final report and poster or slides are understandable without oral explanation.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w13-gate-02","weekId":"week-13","position":2,"criterion":"Advisor feedback is resolved or explicitly deferred as future work.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w13-gate-03","weekId":"week-13","position":3,"criterion":"No opportunistic post-test analysis was introduced after classes ended.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    },
+    {
+      "id": "week-14",
+      "projectId": "pose-embed",
+      "number": 14,
+      "startDate": "2026-12-14",
+      "endDate": "2026-12-18",
+      "phase": "Handoff",
+      "title": "Handoff and archive",
+      "objective": "Close the project with a verified release, recoverable public tracker, permitted artifacts, and an honest retrospective.",
+      "deliverable": "Tagged release, verified backups, final tracker export, reproduction smoke result, and future-work backlog.",
+      "risks": [
+        "Finals-week availability is limited.",
+        "Licensed data or model weights can accidentally enter an archive.",
+        "A backup can appear successful while containing fallback rather than live data."
+      ],
+      "advisorPrompt": "Is the handoff complete, appropriately licensed, reproducible, and clear about deviations and future work?",
+      "reflection": "",
+      "plannedMinutes": 240,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 1,
+      "tasks": [
+        {"id":"w14-task-01","weekId":"week-14","position":1,"title":"Create the final release","details":"Verify the release commit, changelog, report, configs, manifests, summary results, and notices, then create the final tag.","expectedOutput":"Immutable final source release and tag.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w14-task-02","weekId":"week-14","position":2,"title":"Archive permitted artifacts","details":"Archive run manifests, small summary results, report sources, and reproduction instructions. Explicitly exclude licensed data, checkpoints, credentials, and caches.","expectedOutput":"Checksum-verified, license-safe archive.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w14-task-03","weekId":"week-14","position":3,"title":"Export and back up the tracker","details":"Export public progress plus the owner-only activity history. Confirm the export source is Supabase and verify independent copies.","expectedOutput":"Dated JSON and Markdown exports with verified backups.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w14-task-04","weekId":"week-14","position":4,"title":"Run final smoke and retrospective","details":"Run the fresh-clone smoke path, verify the public site, record protocol deviations and lessons, and create a bounded future-work backlog.","expectedOutput":"Final verification record and retrospective.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+      ],
+      "gates": [
+        {"id":"w14-gate-01","weekId":"week-14","position":1,"criterion":"Release, archive, and tracker exports are checksummed and independently backed up.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w14-gate-02","weekId":"week-14","position":2,"criterion":"Licensed data, checkpoints, secrets, and caches are absent from the release.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w14-gate-03","weekId":"week-14","position":3,"criterion":"Final smoke reproduction and public tracker checks pass.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w14-gate-04","weekId":"week-14","position":4,"criterion":"Deviations, limitations, retrospective, and future work are recorded.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "source-contextual",
+      "title": "Supervised Metric Learning to Rank for Retrieval via Contextual Similarity Optimization",
+      "authors": "Liao et al.",
+      "year": 2023,
+      "canonicalUrl": "https://proceedings.mlr.press/v202/liao23b.html",
+      "purpose": "Defines the contextual objective, controlled metric-learning comparisons, and the limits of the original robustness evidence.",
+      "verifiedAt": "2026-09-06"
+    },
+    {
+      "id": "source-motionbert",
+      "title": "MotionBERT: A Unified Perspective on Learning Human Motion Representations",
+      "authors": "Zhu et al.",
+      "year": 2023,
+      "canonicalUrl": "https://openaccess.thecvf.com/content/ICCV2023/html/Zhu_MotionBERT_A_Unified_Perspective_on_Learning_Human_Motion_Representations_ICCV_2023_paper.html",
+      "purpose": "Specifies the pretrained pose encoder and its NTU RGB+D 120 one-shot evaluation context.",
+      "verifiedAt": "2026-09-06"
+    },
+    {
+      "id": "source-maskclr",
+      "title": "MaskCLR: Attention-Guided Contrastive Learning for Robust Action Representation Learning",
+      "authors": "Abdelfattah et al.",
+      "year": 2024,
+      "canonicalUrl": "https://openaccess.thecvf.com/content/CVPR2024/html/Abdelfattah_MaskCLR_Attention-Guided_Contrastive_Learning_for_Robust_Action_Representation_Learning_CVPR_2024_paper.html",
+      "purpose": "Grounds the use of Gaussian noise and joint or frame masking as pose-robustness stress tests.",
+      "verifiedAt": "2026-09-06"
+    },
+    {
+      "id": "source-skeleton-dml",
+      "title": "Skeleton-DML: Deep Metric Learning for Skeleton-Based One-Shot Action Recognition",
+      "authors": "Memmesheimer et al.",
+      "year": 2022,
+      "canonicalUrl": "https://openaccess.thecvf.com/content/WACV2022/html/Memmesheimer_Skeleton-DML_Deep_Metric_Learning_for_Skeleton-Based_One-Shot_Action_Recognition_WACV_2022_paper.html",
+      "purpose": "Provides precedent for class-disjoint development validation within the NTU one-shot setup.",
+      "verifiedAt": "2026-09-06"
+    },
+    {
+      "id": "source-ntu",
+      "title": "NTU RGB+D 120 dataset and one-shot protocol",
+      "authors": "Liu et al.",
+      "year": 2019,
+      "canonicalUrl": "https://github.com/shahroudy/NTURGB-D/blob/master/README.md",
+      "purpose": "Canonical dataset access, action indexing, and one-shot split reference.",
+      "verifiedAt": "2026-09-06"
+    },
+    {
+      "id": "source-prospectus",
+      "title": "Robust Human-Motion Retrieval from Noisy Pose Sequences",
+      "authors": "Giacomo Cappelletto",
+      "year": 2026,
+      "canonicalUrl": "https://github.com/JJCAPPE/pose-embedding",
+      "purpose": "Binding local prospectus and scope authority for the project.",
+      "verifiedAt": "2026-09-06"
+    },
+    {
+      "id": "source-bu-calendar",
+      "title": "Boston University semester dates",
+      "authors": "Boston University",
+      "year": 2026,
+      "canonicalUrl": "https://www.bu.edu/reg/calendars/semester/",
+      "purpose": "Defines holiday, class-end, study-period, and final-exam constraints on the schedule.",
+      "verifiedAt": "2026-09-06"
+    }
+  ],
+  "weekSources": [
+    {"weekId":"week-01","sourceId":"source-prospectus","purpose":"Lock the final scientific scope and claims.","priority":"required"},
+    {"weekId":"week-01","sourceId":"source-ntu","purpose":"Verify licensed data and official one-shot inputs.","priority":"required"},
+    {"weekId":"week-02","sourceId":"source-ntu","purpose":"Implement official action and exemplar semantics.","priority":"required"},
+    {"weekId":"week-02","sourceId":"source-skeleton-dml","purpose":"Apply class-disjoint development-validation precedent.","priority":"required"},
+    {"weekId":"week-03","sourceId":"source-motionbert","purpose":"Reproduce the frozen encoder and one-shot embedding head interface.","priority":"required"},
+    {"weekId":"week-04","sourceId":"source-contextual","purpose":"Implement and validate the contextual objective and controlled comparators.","priority":"required"},
+    {"weekId":"week-05","sourceId":"source-maskclr","purpose":"Ground corruption families and visual validation practice.","priority":"required"},
+    {"weekId":"week-06","sourceId":"source-contextual","purpose":"Maintain equal-budget objective comparisons.","priority":"required"},
+    {"weekId":"week-07","sourceId":"source-contextual","purpose":"Pin the conditional Multi-Similarity configuration before test access.","priority":"recommended"},
+    {"weekId":"week-09","sourceId":"source-ntu","purpose":"Preserve exact-official one-shot comparability.","priority":"required"},
+    {"weekId":"week-10","sourceId":"source-prospectus","purpose":"Match claims to the preregistered primary effect.","priority":"required"},
+    {"weekId":"week-11","sourceId":"source-contextual","purpose":"Run the gated stretch with the controlled published configuration.","priority":"recommended"},
+    {"weekId":"week-12","sourceId":"source-motionbert","purpose":"Audit method and encoder reporting in the draft.","priority":"recommended"},
+    {"weekId":"week-13","sourceId":"source-bu-calendar","purpose":"Respect the end-of-classes analysis freeze.","priority":"required"},
+    {"weekId":"week-14","sourceId":"source-prospectus","purpose":"Verify the final release against the binding scope.","priority":"required"}
+  ]
+}
