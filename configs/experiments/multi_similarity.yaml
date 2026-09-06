@@ -1,0 +1,25 @@
+schema_version: 1
+name: multi-similarity-with-miner-stretch
+objective: multi_similarity_with_miner
+seed: 7
+input_dimension: 8704
+embedding_dimension: 2048
+epochs: 50
+learning_rate: 0.0001
+weight_decay: 0.0001
+classes_per_batch: 8
+samples_per_class: 4
+temperature: 0.07
+positive_margin: 0.9
+negative_margin: 0.6
+multi_similarity:
+  library: pytorch-metric-learning
+  library_version: 2.9.0
+  loss_alpha: 2.0
+  loss_beta: 50.0
+  loss_base: 0.5
+  miner_epsilon: 0.1
+  distance: cosine_similarity
+  normalize_embeddings: true
+  distance_p: 2
+  distance_power: 1

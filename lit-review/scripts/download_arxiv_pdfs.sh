@@ -10,3 +10,7 @@ while IFS= read -r line; do
   curl -L --fail --retry 3 --retry-delay 3 -o "pdfs/${id}.pdf" "$url"
   sleep 1
  done < arxiv_pdf_urls.txt
+
+if [[ -f pdfs.sha256 ]]; then
+  shasum -a 256 -c pdfs.sha256
+fi

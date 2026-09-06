@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python and workspace
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.11"
+      - name: Install uv
+        run: python -m pip install --disable-pip-version-check uv==0.11.27
+      - name: Install locked dependencies without the GPU wheel
+        run: >-
+          uv sync --locked --group dev
+          --no-install-package torch
+          --no-install-package triton
+          --no-install-package nvidia-cublas-cu12
+          --no-install-package nvidia-cuda-cupti-cu12
+          --no-install-package nvidia-cuda-nvrtc-cu12
+          --no-install-package nvidia-cuda-runtime-cu12
+          --no-install-package nvidia-cudnn-cu12
+          --no-install-package nvidia-cufft-cu12
+          --no-install-package nvidia-cufile-cu12
+          --no-install-package nvidia-curand-cu12
+          --no-install-package nvidia-cusolver-cu12
+          --no-install-package nvidia-cusparse-cu12
+          --no-install-package nvidia-cusparselt-cu12
+          --no-install-package nvidia-nccl-cu12
+          --no-install-package nvidia-nvjitlink-cu12
+          --no-install-package nvidia-nvshmem-cu12
+          --no-install-package nvidia-nvtx-cu12
+      - name: Install the exact CPU PyTorch wheel
+        run: >-
+          uv pip install --python .venv/bin/python --no-deps
+          --default-index https://download.pytorch.org/whl/cpu
+          'torch==2.9.1+cpu'
+      - name: Verify workspace policy
+        run: python scripts/verify_workspace.py
+      - name: Lint Python
+        run: uv run --no-sync ruff check src tests scripts
+      - name: Check Python formatting
+        run: uv run --no-sync ruff format --check src tests scripts
+      - name: Test research package
+        run: uv run --no-sync pytest
+
+  tracker:
+    name: Tracker
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          run_install: false
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: "24"
+          cache: pnpm
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint tracker
+        run: pnpm --filter @pose-embed/tracker lint
+      - name: Type-check tracker
+        run: pnpm --filter @pose-embed/tracker typecheck
+      - name: Run tracker unit tests
+        run: pnpm --filter @pose-embed/tracker test
+      - name: Build tracker
+        run: pnpm --filter @pose-embed/tracker build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://offline.invalid
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_offline
+          EDITING_ENABLED: "true"
+      - name: Install Chromium
+        run: pnpm --filter @pose-embed/tracker exec playwright install --with-deps chromium
+      - name: Run tracker browser tests
+        run: pnpm --filter @pose-embed/tracker e2e
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://offline.invalid
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_offline
+          EDITING_ENABLED: "false"
+
+  database:
+    name: Supabase schema and RLS
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@46f7f98c7f948ad727d22c1e67fab04c223a0520 # v3.0.0
+        with:
+          version: 2.116.0
+      - name: Start local Postgres
+        run: supabase db start
+      - name: Rebuild from migrations
+        run: supabase db reset
+      - name: Lint SQL
+        run: supabase db lint --local --schema public,private --level warning --fail-on error
+      - name: Test grants, RLS, and tracker invariants
+        run: supabase test db supabase/tests --local
+      - name: Run security advisors
+        run: supabase db advisors --local --type security --level warn --fail-on warn

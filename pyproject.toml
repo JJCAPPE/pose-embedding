@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pose-embed"
+version = "0.1.0"
+description = "Reproducible one-shot pose-retrieval experiments under controlled corruptions"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "numpy>=1.26,<3",
+  "pydantic>=2.6,<3",
+  "pytorch-metric-learning==2.9.0",
+  "PyYAML>=6.0,<7",
+  "torch==2.9.1",
+]
+
+[project.scripts]
+pose-embed = "pose_embed.cli:entrypoint"
+
+[dependency-groups]
+dev = [
+  "pytest>=8,<10",
+  "ruff>=0.12,<1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

@@ -13,13 +13,14 @@ This ZIP contains the source package for the pose embedding / contextual metric 
 - `repositories_url_files/`: one Markdown file per public code repository.
 - `dataset_and_profile_sources/`: dataset/profile/source links that are not papers.
 - `bib/references_minimal.bib`: minimal BibTeX-style entries for arXiv papers.
-- `scripts/download_arxiv_pdfs.sh`: downloads arXiv PDFs into `pdfs/` when run on a machine with internet access.
-- `scripts/clone_repositories.sh`: clones the referenced public GitHub repositories into `repos/`.
+- `scripts/download_arxiv_pdfs.sh`: downloads arXiv PDFs into the ignored `pdfs/` directory and verifies them against `pdfs.sha256`.
+- `pdfs.sha256`: checksums for the literature snapshot used during the review.
+- `third_party/upstreams.toml` at the repository root replaces the former repository-clone script with pinned upstream commits.
 - `project_brief/kulis_contextual_motion_research_brief.md`: the uploaded project brief used as context.
 
 ## Important note
 
-The execution environment used to generate this archive could not resolve external hosts for direct PDF downloads, so PDFs themselves are not embedded. Instead, this archive includes stable abstract-page URLs, direct PDF URLs, and downloader scripts. This avoids silently creating an incomplete PDF bundle.
+PDFs and upstream repositories are intentionally not tracked in Git. The archive instead includes stable abstract-page URLs, direct PDF URLs, checksums, and reproducible fetch instructions. Existing local copies may remain in the ignored directories.
 
 ## Suggested use
 
@@ -27,7 +28,7 @@ From the extracted ZIP root:
 
 ```bash
 bash scripts/download_arxiv_pdfs.sh
-bash scripts/clone_repositories.sh
+uv run python ../scripts/fetch_upstreams.py
 ```
 
-This will produce local `pdfs/` and `repos/` directories.
+This produces ignored local PDF and upstream-source caches without adding large third-party artifacts to the repository.

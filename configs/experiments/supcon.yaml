@@ -1,0 +1,14 @@
+schema_version: 1
+name: supcon-core
+objective: supcon
+seed: 7
+input_dimension: 8704
+embedding_dimension: 2048
+epochs: 50
+learning_rate: 0.0001
+weight_decay: 0.0001
+classes_per_batch: 8
+samples_per_class: 4
+temperature: 0.07
+positive_margin: 0.9
+negative_margin: 0.6

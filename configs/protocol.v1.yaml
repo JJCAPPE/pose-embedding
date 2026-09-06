@@ -1,0 +1,196 @@
+schema_version: 1
+protocol_id: protocol-v1
+title: Robust Human-Motion Retrieval from Noisy Pose Sequences
+timezone: America/New_York
+schedule:
+  starts_on: 2026-09-15
+  ends_on: 2026-12-18
+  core_results_due_on: 2026-11-20
+research_question: >-
+  Given one clean reference example per unseen action, does contextual training
+  reduce retrieval degradation when query joints or frames are inaccurate or
+  missing?
+dataset:
+  name: NTU RGB+D 120
+  representation: HRNet-derived 2D pose sequences
+  frames: 100
+  joints: 17
+  expected_source_sample_count: 114480
+  novel_actions: [1, 7, 13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79, 85, 91, 97, 103, 109, 115]
+  development_validation_actions: [2, 8, 14, 20, 26, 32, 38, 44, 50, 56, 62, 68, 74, 80, 86, 92, 98, 104, 110, 116]
+  official_protocol_source_commit: ac2ebc87e6e9777ea6bac67e65e53b325b903f74
+  official_protocol_source_url: https://github.com/shahroudy/NTURGB-D/blob/ac2ebc87e6e9777ea6bac67e65e53b325b903f74/README.md
+  official_one_shot_exemplars:
+    [S001C003P008R001A001, S001C003P008R001A007,
+     S001C003P008R001A013, S001C003P008R001A019,
+     S001C003P008R001A025, S001C003P008R001A031,
+     S001C003P008R001A037, S001C003P008R001A043,
+     S001C003P008R001A049, S001C003P008R001A055,
+     S018C003P008R001A061, S018C003P008R001A067,
+     S018C003P008R001A073, S018C003P008R001A079,
+     S018C003P008R001A085, S018C003P008R001A091,
+     S018C003P008R001A097, S018C003P008R001A103,
+     S018C003P008R001A109, S018C003P008R001A115]
+  exclude_anchor_performance_views_from_primary_queries: true
+input_pipeline:
+  tensor_layout: people_frames_joints_channels
+  dtype: float32
+  raw_joint_convention: coco17_hrnet
+  encoder_joint_convention: h36m17_motionbert
+  channels: [x, y, confidence]
+  encoder_joint_names:
+    [pelvis, right_hip, right_knee, right_ankle, left_hip, left_knee,
+     left_ankle, belly, neck, nose, head, left_shoulder, left_elbow,
+     left_wrist, right_shoulder, right_elbow, right_wrist]
+  coco_to_h36m_sources:
+    [[11, 12], [12], [14], [16], [11], [13], [15], [11, 12, 5, 6],
+     [5, 6], [0], [1, 2], [5], [7], [9], [6], [8], [10]]
+  derived_coordinate_rule: arithmetic_mean_of_sources
+  derived_confidence_rule: minimum_of_source_confidences
+  confidence_compatibility: local_corrected_h36m_mapping_not_upstream_bit_parity
+  parity_layers:
+    [camera_normalization, person_tracking, coordinate_mapping,
+     temporal_sampling, single_person_padding, spatial_normalization,
+     encoder_representation, action_head]
+  camera_normalization: divide_xy_by_long_image_side_multiply_two_subtract_one
+  person_tracking: motionbert_two_person_minimum_frame_displacement
+  temporal_sampling: deterministic_uniform_floor_100_frames
+  single_person_padding: append_one_all_zero_person
+  spatial_normalization: valid_confidence_bbox_crop_scale_ratio_one_clip_minus_one_plus_one
+  random_move: false
+  operation_order:
+    [camera_normalization, person_tracking, joint_and_confidence_conversion,
+     temporal_sampling, single_person_padding, spatial_normalization]
+  corruption_stage: after_preprocessing_before_frozen_encoder
+encoder:
+  name: MotionBERT
+  frozen: true
+  evaluation_mode: true
+  representation_dimension: 512
+  embedding_dimension: 2048
+  people: 2
+batch:
+  classes_per_batch: 8
+  samples_per_class: 4
+  physical_batch_size: 32
+  profile_batch_size: 64
+objectives:
+  core: [contrastive, supcon, contextual]
+  contrastive:
+    positive_margin: 0.9
+    negative_margin: 0.6
+    normalize_embeddings: true
+  supcon:
+    temperature: 0.07
+    normalize_embeddings: true
+  contextual:
+    epsilon: 0.05
+    straight_through_alpha: 10.0
+    contextual_weight: 0.2
+    regularizer_weight: 0.1
+    target_mean_similarity: 0.0
+    positive_margin: 0.9
+    negative_margin: 0.6
+    neighborhood_size: 4
+    normalize_embeddings: true
+    comparison_operator: greater_than_or_equal_with_constant_ste_gradient
+  stretch:
+    method: multi_similarity_with_miner
+    exploratory_only: true
+    predeclared_hyperparameters_sha256: 2c5aa5a0cb540840de3a14a263b7aeb10a5a3fa4cde590076fbc39a682ccd559
+    library: pytorch-metric-learning
+    library_version: 2.9.0
+    loss_alpha: 2.0
+    loss_beta: 50.0
+    loss_base: 0.5
+    miner_epsilon: 0.1
+    distance: cosine_similarity
+    normalize_embeddings: true
+    distance_p: 2
+    distance_power: 1
+    entry_gates:
+      [nine_core_checkpoints_verified, full_core_result_matrix_verified,
+       core_figures_reproducible, no_unresolved_core_failures]
+training:
+  seeds: [7, 17, 29]
+  tuning_trials_per_method: 6
+  tune_on: development_validation_clean_only
+  epochs: 50
+  optimizer: adamw
+  tuning_grid:
+    - {learning_rate: 0.001, weight_decay: 0.0}
+    - {learning_rate: 0.001, weight_decay: 0.0001}
+    - {learning_rate: 0.0003, weight_decay: 0.0}
+    - {learning_rate: 0.0003, weight_decay: 0.0001}
+    - {learning_rate: 0.0001, weight_decay: 0.0}
+    - {learning_rate: 0.0001, weight_decay: 0.0001}
+  initial_screen_seed: 7
+  retain_candidates_per_method: 2
+  final_selection_metric: top1
+  final_selection_aggregation: mean_across_three_paired_seeds
+  final_selection_tie_breakers: [higher_mrr, lower_seed_standard_deviation, lexical_config_id]
+  paired_initialization: same_seed_same_linear_state_across_methods
+  paired_batch_plan: same_seed_epoch_and_ordered_sample_indices_across_methods
+  gradient_accumulation_equivalent: false
+  failed_run_policy:
+    preserve_every_attempt: true
+    infrastructure_failure: rerun_same_config_seed_initialization_and_batch_plan_from_scratch
+    numerical_failure: mark_failed_debug_on_development_only_and_require_amendment_for_parameter_change
+    seed_replacement: forbidden
+    novel_outcome_based_rerun: forbidden
+corruptions:
+  query_only: true
+  joint_convention: h36m17_motionbert
+  required_channels: [x, y, confidence]
+  coordinate_jitter_fractions: [0.01, 0.025, 0.05]
+  jitter_distribution: independent_zero_mean_gaussian_xy
+  jitter_scale: median_distance_between_shoulder_midpoint_and_hip_midpoint
+  torso_joint_indices: {left_shoulder: 11, right_shoulder: 14, left_hip: 4, right_hip: 1}
+  jitter_support: confidence_greater_than_zero_only
+  jitter_confidence_behavior: unchanged
+  joint_mask_counts: [3, 6, 8]
+  joint_mask_groups: [[11, 12, 13], [14, 15, 16], [1, 2, 3], [4, 5, 6], [0, 7, 8, 9, 10]]
+  joint_selection: seeded_group_order_then_proximal_to_distal_unique_prefix
+  consecutive_frame_mask_counts: [10, 25, 40]
+  frame_selection: one_seeded_contiguous_block_shared_across_people_and_joints
+  masking_value: 0.0
+  masking_channels: [x, y, confidence]
+  preserve_tensor_shape: true
+  severity_zero: byte_identical_copy
+  seed_derivation: sha256_protocol_id_sample_id_family_canonical_severity_first_63_bits
+  gallery_corruption: forbidden
+  amendments:
+    allowed_until: before_tuning_ends_and_before_test_opening
+    allowed_reason: geometric_invalid_imperceptible_or_degenerate_only
+    retrieval_score_motivated_change: forbidden
+    advisor_approval_required: true
+    new_protocol_hash_and_lock_required: true
+analysis:
+  metrics: [top1, mrr, r_at_5]
+  bootstrap_replicates: 10000
+  bootstrap_cluster: [setup, performer, repetition, action]
+  confidence_level: 0.95
+  primary_comparison: contextual_minus_contrastive_degradation
+  observation: paired_query_top1_correctness
+  cell_weighting: equal_across_three_seeds_and_nine_corruption_cells
+  effect_direction: negative_means_contextual_degraded_less
+  support_rule: upper_confidence_bound_below_zero
+  claim_caveat: less_degradation_is_not_higher_overall_retrieval_when_clean_accuracy_differs
+  required_reporting: [clean_accuracy, every_seed, every_corruption_curve, runtime, memory, failures]
+  confirmatory_methods: [contrastive, contextual]
+  secondary_methods: [supcon, multi_similarity_with_miner]
+test_access:
+  state: sealed
+  final_evaluation_requires_lock: true
+  evaluation_plan_template: configs/evaluation-plan.v1.yaml
+  artifact_root_environment: POSE_EMBED_ARTIFACT_ROOT
+  protocol_lock_relative_path: locks/protocol-lock.v1.json
+  evaluation_plan_relative_path: locks/evaluation-plan.v1.yaml
+  final_run_set_relative_path: locks/final-run-set.v1.json
+  opening_ledger_relative_path: locks/test-opening.v1.json
+  stretch_gate_evidence_relative_path: locks/stretch-gates.v1.json
+  opening_policy: one_atomic_immutable_ledger_event
+  ledger_reuse: same_protocol_lock_evaluation_plan_and_run_set_hashes_only
+  reject_future_lock_timestamps: true
+  training_after_opening: core_forbidden_exploratory_stretch_requires_verified_gates
+  confirmatory_changes_after_opening: forbidden

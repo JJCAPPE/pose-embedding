@@ -1,0 +1,380 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[default]{sourcesanspro}
+\usepackage{geometry}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{needspace}
+\usepackage{tcolorbox}
+\usepackage{amssymb}
+
+\tcbuselibrary{breakable,skins}
+
+\geometry{
+  left=0.90in,
+  right=0.90in,
+  top=0.80in,
+  bottom=0.72in,
+  headheight=22pt,
+  headsep=8pt,
+  footskip=24pt
+}
+
+\definecolor{Accent}{HTML}{1E4D7B}
+\definecolor{DarkAccent}{HTML}{163653}
+\definecolor{BodyText}{HTML}{1F2933}
+\definecolor{Muted}{HTML}{66727D}
+\definecolor{PaleBlue}{HTML}{EAF2F8}
+\definecolor{PaleGold}{HTML}{FFF5D9}
+\definecolor{PaleGray}{HTML}{F3F5F7}
+\definecolor{GoldRule}{HTML}{D39B27}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Accent,
+  urlcolor=Accent,
+  citecolor=Accent,
+  pdftitle={BU UROP Fall 2026 Application Draft},
+  pdfsubject={Comparative metric learning for robust pose-sequence retrieval},
+  pdfauthor={Giacomo Cappelletto},
+  pdfkeywords={BU UROP, metric learning, pose retrieval, MotionBERT, contextual similarity}
+}
+\urlstyle{same}
+\setlength{\emergencystretch}{3em}
+
+\color{BodyText}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5.5pt}
+\linespread{1.08}
+\raggedbottom
+
+\setlist[itemize]{
+  leftmargin=1.40em,
+  itemsep=2.5pt,
+  topsep=3pt,
+  parsep=0pt
+}
+\setlist[enumerate]{
+  leftmargin=1.55em,
+  itemsep=2.5pt,
+  topsep=3pt,
+  parsep=0pt
+}
+
+\titleformat{\section}
+  {\needspace{4\baselineskip}\color{Accent}\bfseries\fontsize{16}{19}\selectfont}
+  {}{0pt}{}
+\titlespacing*{\section}{0pt}{14pt}{7pt}
+
+\titleformat{\subsection}
+  {\needspace{3\baselineskip}\color{Accent}\bfseries\fontsize{13}{16}\selectfont}
+  {}{0pt}{}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\color{Accent}\bfseries\footnotesize BU UROP \textperiodcentered\ FALL 2026}
+\fancyhead[R]{\color{Muted}\footnotesize WORKING DRAFT \textperiodcentered\ 31 JULY 2026}
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{Accent!35}\leaders\hrule height \headrulewidth\hfill}}
+\fancyfoot[C]{\color{Muted}\footnotesize Giacomo Cappelletto \textperiodcentered\ \thepage}
+
+\newcommand{\CharCount}[2]{%
+  \begin{flushright}
+    \vspace{-7pt}
+    {\color{Muted}\bfseries\footnotesize #1 / #2 characters, including spaces}
+  \end{flushright}
+  \vspace{-3pt}
+}
+
+\newtcolorbox{warningbox}[1][]{
+  enhanced,
+  breakable,
+  colback=PaleGold,
+  colframe=GoldRule,
+  boxrule=0pt,
+  leftrule=2.2pt,
+  arc=0pt,
+  left=8pt,
+  right=8pt,
+  top=6pt,
+  bottom=6pt,
+  before skip=7pt,
+  after skip=8pt,
+  #1
+}
+
+\newtcolorbox{infobox}[1][]{
+  enhanced,
+  breakable,
+  colback=PaleBlue,
+  colframe=Accent,
+  boxrule=0pt,
+  leftrule=2.2pt,
+  arc=0pt,
+  left=8pt,
+  right=8pt,
+  top=6pt,
+  bottom=6pt,
+  before skip=7pt,
+  after skip=8pt,
+  #1
+}
+
+\newtcolorbox{titlebox}{
+  enhanced,
+  colback=PaleBlue,
+  colframe=Accent,
+  boxrule=0pt,
+  leftrule=2.2pt,
+  arc=0pt,
+  left=8pt,
+  right=8pt,
+  top=5pt,
+  bottom=5pt,
+  before skip=3pt,
+  after skip=7pt
+}
+
+\newcommand{\checkbox}{\(\square\)}
+
+\begin{document}
+
+\begin{center}
+  {\color{Accent}\bfseries\small BU UROP \textperiodcentered\ FALL 2026\par}
+  \vspace{7pt}
+  {\color{DarkAccent}\bfseries\fontsize{22}{26}\selectfont
+    Comparative Metric Learning for Robust Pose-Sequence Retrieval\par}
+  \vspace{7pt}
+  {\color{Muted}\itshape Funding application working draft -- verified 31 July 2026\par}
+\end{center}
+
+\vspace{7pt}
+
+\textbf{\color{DarkAccent}Applicant}\quad
+Giacomo Cappelletto \textperiodcentered\ B.S. Computer Engineering, Boston University
+
+\textbf{\color{DarkAccent}Faculty mentor}\quad
+Prof. Brian Kulis \textperiodcentered\ Electrical \& Computer Engineering; affiliated with CS, SE, and CDS
+
+\textbf{\color{DarkAccent}Funding period}\quad
+Fall 2026 \textperiodcentered\ ten paid weeks
+
+\begin{warningbox}
+\textbf{\color{DarkAccent}Three confirmations before submission}
+
+1) Choose SRA or FMG and confirm any faculty match with Prof. Kulis.
+2) Confirm whether you have previously received UROP funding.
+3) Obtain a BU IRB determination for the secondary analysis of an existing human-motion dataset before answering the human-subjects item.
+\end{warningbox}
+
+\section*{Verified application facts}
+
+\begin{itemize}
+  \item \textbf{Student deadline:} Friday, September 11, 2026, at 12:00 p.m.; the mentor recommendation is due by midnight.
+  \item \textbf{Components:} A student application and a confidential faculty-mentor recommendation are both required.
+  \item \textbf{Eligibility:} Full-time BU undergraduate, BU faculty supervision, no simultaneous academic credit and UROP stipend for the same research, and no more than two prior funded terms under the current eligibility page.
+  \item \textbf{Drafting format:} The currently linked sample lists 500 characters for the title and 3,000 characters for each main narrative field. Recheck the live Fall 2026 form when it opens in early August.
+  \item \textbf{Mentor action:} BU pages conflict about automatic mentor notification. Send Prof. Kulis the faculty recommendation link directly and do not rely on an automated email.
+\end{itemize}
+
+\textbf{Official BU sources:}
+\href{https://www.bu.edu/urop/get-involved/application-2/}{application}
+\textperiodcentered\
+\href{https://www.bu.edu/urop/get-involved/deadlines/}{deadlines}
+\textperiodcentered\
+\href{https://www.bu.edu/urop/get-involved/funding-eligibility/}{funding and eligibility}
+\textperiodcentered\
+\href{https://www.bu.edu/urop/get-involved/application-tips/}{application tips}
+
+\section*{Funding decision}
+
+\begin{center}
+\rowcolors{2}{white}{PaleGray}
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.14\textwidth} C{0.17\textwidth} C{0.17\textwidth} Y}
+  \rowcolor{Accent}
+  \color{white}Option &
+  \color{white}\bfseries Hours/week &
+  \color{white}\bfseries Award &
+  \color{white}\bfseries Funding source \\
+  SRA & 5 & \$750 & UROP provides the full amount \\
+  FMG & 5 & \$750 & \$375 UROP + \$375 mentor \\
+  FMG & 8 & \$1,200 & \$600 UROP + \$600 mentor \\
+  FMG & 10 & \$1,500 & \$750 UROP + \$750 mentor \\
+\end{tabularx}
+\end{center}
+
+\textbf{Scope recommendation.}
+An 8-hour FMG best matches the comparative scope if Prof. Kulis confirms the \$600 faculty match. If the application uses the 5-hour SRA, preserve the contextual/SupCon/triplet/Multi-Similarity core and treat the proxy, rank-loss, and recent-method experiments as decision-gated extensions.
+
+\begin{infobox}
+\textbf{\color{DarkAccent}Authorship and review}
+
+The UROP form requires you to certify that the application is your own work and that sources are acknowledged. Review every sentence, revise it into your voice, verify the live form, and have Prof. Kulis review the complete application at least once before submission.
+\end{infobox}
+
+\section*{Copy-Paste Application Responses}
+
+\textbf{Use note.}
+Counts below include spaces and the response text only. They leave substantial margin under the currently published limits; confirm each count in the live Fall 2026 form.
+
+\subsection*{Project Title}
+\CharCount{62}{500}
+\begin{titlebox}
+\textbf{\color{DarkAccent}Comparative Metric Learning for Robust Pose-Sequence Retrieval}
+\end{titlebox}
+
+\subsection*{Project Description and Goals}
+\CharCount{2,139}{3,000}
+
+Human-motion retrieval systems map a sequence of body-joint coordinates to an embedding so that motions with the same semantics appear near one another. This supports nearest-neighbor search for action recognition, technique comparison, and retrieval of reference movements. Unlike ordinary image embeddings, pose sequences are usually estimated from video and therefore contain structured errors: joint jitter, occlusion, missing limbs or frames, timing noise, and estimator-dependent bias.
+
+I will test whether contextual metric learning, introduced by Liao, Tsiligkaridis, and Kulis for image retrieval [1], transfers to pose-sequence retrieval. Contextual loss does not optimize only the similarity of individual pairs; it also encourages examples that should match to share local neighborhoods. My core hypothesis is that this neighborhood constraint will preserve ranking quality more effectively than direct pairwise or tuple losses as pose observations become corrupted. This is an untested input-noise question: the 2023 paper established robustness to label noise in images, not to corrupted skeleton coordinates.
+
+During Fall 2026 I will (1) build a reproducible retrieval pipeline using NTU RGB+D 120 skeleton sequences [3] and a fixed pretrained MotionBERT encoder [2]; (2) validate a clean baseline and compare supervised contrastive, triplet, Multi-Similarity, contextual-only, and the published contextual-plus-contrastive objective; (3) evaluate the same models on deterministic pose corruptions while keeping a clean gallery; and (4) begin a paper-fidelity transfer of representative pairwise, proxy, and rank-optimization objectives from the 2023 study without changing the encoder. Planned deliverables are tested code, fixed data manifests, clean/noisy Recall@K and mean-average-precision curves, and an analysis of robustness, runtime, and failure modes. If the core matrix is stable, I will pilot one recent compatible method rather than broaden the encoder or dataset. My individual role is to implement the pipeline, run the experiments, analyze the results, and prepare the report under Prof. Kulis's supervision.
+
+\subsection*{Project Significance / Importance}
+\CharCount{2,039}{3,000}
+
+Pose embeddings can make large motion collections searchable: a new sequence can retrieve actions or reference movements with similar structure instead of requiring an exact label or a hand-designed distance. This capability is relevant to video archives, sports technique analysis, and rehabilitation research, but only if retrieval remains reliable when the input skeleton is incomplete or noisy.
+
+The scientific gap is not simply the absence of another motion model. Contextual similarity and many competing metric-learning objectives were developed and ranked on images. Pose sequences have different geometry: joints are anatomically coupled, time matters, similarity may be graded, and errors affect connected body parts across frames. Consequently, an objective that performs well for clean images may not transfer---or may fail differently---on corrupted motion data. The contextual paper studied label noise [1], while recent skeleton work has shown that small pose perturbations and changes of pose estimator can substantially degrade learned representations [8].
+
+This project will isolate the optimization objective by holding the encoder, embedding dimension, data splits, training budget, and evaluator fixed. That control is important because published metric-learning comparisons often mix losses with different backbones, miners, or training recipes [4]. The result will show whether neighborhood context, pair mining, class proxies, or direct rank optimization best preserves pose retrieval under controlled corruption.
+
+Either outcome is informative. A positive result would identify a robustness advantage for contextual training; a null result would show that a simpler objective is sufficient under a fair budget; and a reversal of the image-domain ranking would establish that objective gains are domain-dependent. The code, corruption protocol, and portability analysis will provide a reproducible basis for later fine-grained motion or real-video studies without making clinical or performance claims in this semester.
+
+\subsection*{Methodology / Process}
+\CharCount{2,698}{3,000}
+
+\textbf{\color{DarkAccent}Data and split.}
+I will use the existing NTU RGB+D 120 skeleton dataset [3]. The standard cross-subject protocol will separate training and test identities; I will derive a subject-disjoint validation partition from the training side. Test samples will be assigned once to disjoint query and gallery manifests, with action class defining relevance. Self-matches and duplicate sequence leakage will be excluded.
+
+\textbf{\color{DarkAccent}Representation.}
+After root-centering, scale normalization, and deterministic temporal handling, a pretrained MotionBERT/DSTFormer encoder [2] will produce sequence features. I will first freeze the encoder, use one fixed pooling rule, and train the same small projection head for every objective. A frozen-feature baseline will verify the evaluator before training. Full encoder fine-tuning will be attempted only if compute permits and then applied identically across compared objectives.
+
+\textbf{\color{DarkAccent}Controlled objectives.}
+The core comparison will include supervised contrastive loss [5], triplet loss with its miner, Multi-Similarity with and without mining [6], contextual-only loss, and the published contextual objective (contextual + contrastive + similarity regularization) [1]. Once these pass deterministic smoke tests, I will add representative objectives from the 2023 paper-fidelity suite: contrastive, Proxy Anchor, Proxy NCA, and ROADMAP. The backbone, initialization, projection dimension, batches, optimizer family, horizon, and seeds will remain fixed. Each loss will receive the same number of validation trials, rather than inappropriate identical margin values.
+
+\textbf{\color{DarkAccent}Corruption benchmark.}
+Clean and corrupted versions of each query will be evaluated against the same clean gallery. Seeded operators will apply joint-coordinate jitter scaled to skeleton size, missing-joint or limb masks, frame dropout, and temporal jitter at several severity levels. Unit tests will verify that labels, gallery items, and non-target joints remain unchanged. If the core comparison is complete, I will pilot one compatible post-2023 method or a pose-specific robustness control such as MaskCLR [8].
+
+\textbf{\color{DarkAccent}Evaluation and analysis.}
+Cosine similarity will rank gallery embeddings. I will report Recall@1, Recall@5, Recall@10, mean average precision, mAP@R, absolute degradation from clean performance, normalized retention, and area under each corruption-severity curve. Paired corruption seeds and repeated training seeds will support mean/standard-deviation reporting. I will also record training time, peak memory, convergence failures, and method-specific parameters. Fixed manifests, configuration files, unit tests, and a results table generated from saved outputs will make the comparison auditable.
+
+\subsection*{Timeline}
+\CharCount{1,965}{3,000}
+
+\begin{itemize}
+  \item \textbf{\color{DarkAccent}Week 1 -- Protocol and access:} finalize the research question with Prof. Kulis; confirm NTU RGB+D 120 access, compute resources, and the subject-disjoint split; freeze success criteria and configuration schema.
+  \item \textbf{\color{DarkAccent}Week 2 -- Data pipeline:} implement preprocessing, sequence masks or resampling, deterministic train/validation/test manifests, and a small debug subset; add leakage and shape tests.
+  \item \textbf{\color{DarkAccent}Week 3 -- Retrieval baseline:} extract frozen MotionBERT features; implement cosine query/gallery evaluation and Recall@K, mAP, and mAP@R; verify self-match exclusion and reproduce results from saved embeddings.
+  \item \textbf{\color{DarkAccent}Week 4 -- Corruptions:} implement seeded joint jitter, missing joints/limbs, frame dropout, and temporal jitter; validate severity scaling and generate clean-versus-corrupted baseline curves.
+  \item \textbf{\color{DarkAccent}Week 5 -- Core objectives:} train the shared projection head with supervised contrastive, triplet, and Multi-Similarity objectives under matched manifests and validation budgets.
+  \item \textbf{\color{DarkAccent}Week 6 -- Contextual objective:} validate contextual-only and full contextual training, including balanced-batch requirements, gradient checks, and component ablations.
+  \item \textbf{\color{DarkAccent}Week 7 -- Core comparison:} run paired clean/corrupted evaluations across multiple seeds; profile time and memory; diagnose unstable or unfair settings before expansion.
+  \item \textbf{\color{DarkAccent}Week 8 -- Transfer extension:} add one proxy objective and one rank-oriented objective from the 2023 comparison. If the core matrix is not stable, use this week for replication and ablation instead of adding methods.
+  \item \textbf{\color{DarkAccent}Week 9 -- Analysis:} aggregate mean and variability, robustness retention, severity-curve area, and compute cost; compare the pose-domain method ordering with the image-domain evidence and document limitations.
+  \item \textbf{\color{DarkAccent}Week 10 -- Deliverables:} complete the reproducible experiment package, technical report, final figures/tables, and a short presentation or poster; review conclusions and next-stage objective priorities with Prof. Kulis.
+\end{itemize}
+
+\subsection*{Background Experience}
+\CharCount{1,898}{3,000}
+
+I am a Boston University Computer Engineering student with completed coursework in Computational Linear Algebra (ENG EK 103), Probability, Statistics, and Data Science (ENG EK 381), Introduction to Software Engineering (ENG EC 327), multivariable calculus, and differential equations. This preparation is directly relevant to vector-space representations, stochastic evaluation, optimization, and reproducible software.
+
+From January through May 2026, I worked as an undergraduate machine-learning researcher in the BU College of Engineering on a video-first rowing-biomechanics pipeline. I built Python components for 2D pose extraction with MMPose/Sports2D, MotionBERT-based 3D motion representations, temporal alignment of kinematics with force telemetry, quality-control checks, and sequence-to-sequence regression. That work gave me direct experience with the exact failure modes motivating this project: occlusion, joint jitter, camera-dependent error, timing drift, and imperfect 2D-to-3D lifting.
+
+My technical experience includes Python, PyTorch, NumPy, SciPy, scikit-learn, pandas, Git, automated tests, and experiment/report pipelines. In preparation for this project, I have reviewed the contextual-similarity paper and its official implementation, surveyed pose and metric-learning baselines, and assembled an auditable PyTorch reference implementation with deterministic gradient and shape checks.
+
+I developed this proposal after discussing the research direction with Prof. Kulis. His feedback led to the controlled extension: keep the pose encoder fixed, first establish the contextual-loss result, and then map the 2023 comparison objectives and selected newer methods into the pose domain. The project advances my goal of conducting rigorous machine-learning and computer-vision research while building on a demonstrated ability to implement and evaluate pose-processing systems.
+
+\subsection*{Bibliography}
+\CharCount{1,610}{3,000}
+
+\begin{enumerate}
+  \item Liao, C., Tsiligkaridis, T., \& Kulis, B. (2023). Supervised Metric Learning to Rank for Retrieval via Contextual Similarity Optimization. ICML, PMLR 202:20906--20938. \url{https://proceedings.mlr.press/v202/liao23b.html}
+  \item Zhu, W., Ma, X., Liu, Z., Liu, L., Wu, W., \& Wang, Y. (2023). MotionBERT: A Unified Perspective on Learning Human Motion Representations. ICCV. \url{https://arxiv.org/abs/2210.06551}
+  \item Liu, J., Shahroudy, A., Perez, M., Wang, G., Duan, L.-Y., \& Kot, A. C. (2020). NTU RGB+D 120: A Large-Scale Benchmark for 3D Human Activity Understanding. IEEE TPAMI, 42(10), 2684--2701. \url{https://doi.org/10.1109/TPAMI.2019.2916873}
+  \item Musgrave, K., Belongie, S., \& Lim, S.-N. (2020). A Metric Learning Reality Check. ECCV. \url{https://arxiv.org/abs/2003.08505}
+  \item Khosla, P., Teterwak, P., Wang, C., et al. (2020). Supervised Contrastive Learning. NeurIPS 33. \url{https://arxiv.org/abs/2004.11362}
+  \item Wang, X., Han, X., Huang, W., Dong, D., \& Scott, M. R. (2019). Multi-Similarity Loss with General Pair Weighting for Deep Metric Learning. CVPR, 5022--5030.
+  \item Kim, S., Kim, D., Cho, M., \& Kwak, S. (2020). Proxy Anchor Loss for Deep Metric Learning. CVPR, 3238--3247.
+  \item Abdelfattah, M., Hassan, M., \& Alahi, A. (2024). MaskCLR: Attention-Guided Contrastive Learning for Robust Action Representation Learning. CVPR, 18678--18687. \url{https://doi.org/10.1109/CVPR52733.2024.01767}
+  \item Kim, S., Seo, M., Laptev, I., Cho, M., \& Kwak, S. (2019). Deep Metric Learning Beyond Binary Supervision. CVPR, 2288--2297. \url{https://openaccess.thecvf.com/content_CVPR_2019/html/Kim_Deep_Metric_Learning_Beyond_Binary_Supervision_CVPR_2019_paper.html}
+\end{enumerate}
+
+\section*{Funds Requested}
+
+\textbf{Select exactly one option in the live form after mentor confirmation.}
+
+\subsection*{Option A -- FMG, 8 hours/week}
+\CharCount{352}{3,000}
+
+I request a \$1,200 Faculty Matching Grant for approximately eight hours per week during the ten-week Fall 2026 award period. UROP would provide \$600 and the faculty mentor would provide the required \$600 match. I am not requesting separate supplies or travel funding; the project will use an existing research dataset and available computing resources.
+
+\subsection*{Option B -- SRA, 5 hours/week}
+\CharCount{263}{3,000}
+
+I request a \$750 Student Research Award for approximately five hours per week during the ten-week Fall 2026 award period. I am not requesting separate supplies or travel funding; the project will use an existing research dataset and available computing resources.
+
+\section*{Safety and Research Compliance}
+
+\begin{warningbox}
+\textbf{\color{DarkAccent}IRB determination required before selecting the form response}
+
+The planned work is a secondary computational analysis of an existing human-motion dataset. It involves no recruitment, interaction, intervention, or new collection by the student. That fact does not authorize an independent ``no human subjects'' determination. Contact the BU IRB with Prof. Kulis and retain the office's written decision or exemption documentation before submission or before beginning any work for which review is required.
+\end{warningbox}
+
+\begin{itemize}
+  \item \textbf{Animal subjects:} No animals are planned.
+  \item \textbf{Human subjects:} Answer only after written guidance from the BU IRB; upload the required approval or exemption documentation if applicable.
+  \item \textbf{Safety training:} Computational work only; no chemical, biological, radiological, clinical, or fabrication procedures are planned. Complete any standard computing or data-governance training required by the mentor or dataset.
+  \item \textbf{Data handling:} Use only the approved research dataset and BU-approved storage/compute; do not attempt re-identification or combine subject metadata beyond the approved protocol.
+\end{itemize}
+
+\section*{Administrative Preflight}
+
+\begin{itemize}[label=\checkbox]
+  \item Fill in BU ID, BU email, school/class year, and any other live-form applicant fields.
+  \item Optional GPA: 3.97 on the unofficial transcript printed June 11, 2026; recheck before entering it.
+  \item Confirm prior UROP funding status. If yes, draft both 1,500-character continuation fields and verify eligibility under the current two-award cap.
+  \item Choose one stipend option; confirm the FMG match in writing if applicable.
+  \item Confirm that no academic credit or duplicate pay will cover the same research hours.
+  \item Check total on-campus employment against BU's 20-hour weekly academic-year limit.
+  \item Obtain the IRB determination and any required document before answering the human-subjects questions.
+  \item Paste each response into the live form and recheck its displayed character count.
+  \item Send the complete draft to Prof. Kulis for review; revise after his feedback.
+  \item Send Prof. Kulis the Kerberos-protected recommendation-form link directly.
+  \item Submit the student application before noon on September 11, 2026; verify mentor submission before midnight.
+\end{itemize}
+
+\section*{Known BU Source Conflicts}
+
+\begin{itemize}
+  \item \textbf{Mentor notification:} The Application page says the system notifies the mentor; Application Tips says it does not. Send the link directly.
+  \item \textbf{Appendix length:} Application Tips says two pages; the linked March 2025 sample says one. No appendix is recommended for this draft.
+  \item \textbf{Prior funding cap:} The current eligibility page says two funded terms; the older sample says three. Use the current two-award rule unless UROP confirms otherwise.
+\end{itemize}
+
+\begin{center}
+  \vspace{7pt}
+  {\color{Muted}\itshape\small End of working draft}
+\end{center}
+
+\end{document}
