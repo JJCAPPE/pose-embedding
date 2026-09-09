@@ -60,3 +60,7 @@ not contain an owner UUID.
 The web application needs only `NEXT_PUBLIC_SUPABASE_URL` and
 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Never configure a secret or service-role
 key in a `NEXT_PUBLIC_` variable or in Vercel previews.
+
+The production tracker project is hosted in `us-west-2` (Oregon). This differs
+from the initial Ohio preference and was explicitly accepted by the researcher
+on September 9, 2026; see `docs/decisions/0002-supabase-production-region.md`.
