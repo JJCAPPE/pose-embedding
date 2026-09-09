@@ -1,0 +1,6 @@
+-- Production was seeded atomically from plan/research-plan.v1.json when the
+-- hosted project was provisioned. This marker preserves the hosted migration
+-- history without duplicating generated seed SQL in Git.
+--
+-- Fresh local environments remain empty after `supabase db reset`; populate
+-- them with `./supabase/scripts/seed_plan.sh` as documented in the README.
