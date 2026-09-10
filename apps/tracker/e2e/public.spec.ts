@@ -16,7 +16,7 @@ test("an unavailable configured database falls back to the visible plan snapshot
   test.skip(health.dataSource !== "seed", "This deployment has a reachable live database.");
 
   await page.goto("/");
-  await expect(page.getByRole("status")).toContainText("Read-only plan snapshot");
+  await expect(page.getByRole("status")).toContainText("Viewing saved snapshot");
   await expect(page.getByRole("list", { name: undefined }).last().getByRole("listitem")).toHaveCount(14);
 });
 
@@ -67,7 +67,7 @@ test("public exports and health endpoint report their current data source", asyn
 
 test("invalid week renders a useful not-found state", async ({ page }) => {
   await page.goto("/weeks/15");
-  await expect(page.getByRole("heading", { name: "That week is outside the plan." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
   await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute("content", /noindex/);
 });
 

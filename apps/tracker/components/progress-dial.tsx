@@ -1,13 +1,15 @@
+"use client";
+
+import { Progress } from "antd";
+
 export function ProgressDial({ percent }: { percent: number }) {
   const bounded = Math.max(0, Math.min(percent, 100));
   return (
-    <div
-      className="progress-dial"
-      style={{ "--progress": `${bounded * 3.6}deg` } as React.CSSProperties}
-      role="img"
+    <Progress
       aria-label={`${bounded}% of required tasks complete`}
-    >
-      <span>{bounded}%</span>
-    </div>
+      className="progress-dial"
+      percent={bounded}
+      strokeLinecap="round"
+    />
   );
 }

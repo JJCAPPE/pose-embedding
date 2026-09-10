@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { Tag } from "antd";
 import { dateInTimezone } from "@/lib/domain";
 
 const subscribe = () => () => undefined;
@@ -23,5 +24,5 @@ export function CurrentWeekMarker({
     () => false,
   );
 
-  return isCurrent ? <span className="current-marker">Current week</span> : null;
+  return isCurrent ? <Tag className="current-marker">Current week</Tag> : null;
 }
