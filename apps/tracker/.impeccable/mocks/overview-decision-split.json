@@ -1,0 +1,7 @@
+{
+  "surface": "app/page.tsx",
+  "concept": "decision-led split",
+  "approved": true,
+  "approval": "Delegated by the user's implementation brief; selected for the clearest next-step, deliverable, and decision hierarchy.",
+  "notes": "Use the composition, not generated claims or checkbox affordances. All shipped copy and state come from the tracked plan."
+}

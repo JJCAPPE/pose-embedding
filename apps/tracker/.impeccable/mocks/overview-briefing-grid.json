@@ -1,0 +1,6 @@
+{
+  "surface": "app/page.tsx",
+  "concept": "briefing grid",
+  "approved": false,
+  "notes": "Rejected: four equal summary cards flatten the requested hierarchy, and generated body copy is not product truth."
+}

@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-10T15:21:23Z",
+  "title": "Design System: Pose Embed",
+  "extensions": {
+    "colorMeta": {
+      "ink-strong": {
+        "role": "primary",
+        "displayName": "Commitment Black",
+        "tonalRamp": ["#000000", "#1d1d1f", "#333333", "#515154", "#86868b", "#b8b8bd", "#d2d2d7", "#f5f5f7"]
+      },
+      "action": {
+        "role": "primary",
+        "displayName": "Action Charcoal",
+        "tonalRamp": ["#111111", "#242424", "#3a3a3c", "#515154", "#86868b", "#b8b8bd", "#e5e5e7", "#f5f5f7"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Reading Ink",
+        "tonalRamp": ["#1d1d1f", "#333333", "#515154", "#6e6e73", "#a1a1a6", "#d2d2d7", "#e5e5e7", "#f5f5f7"]
+      },
+      "ink-hover": {
+        "role": "neutral",
+        "displayName": "Hover Charcoal",
+        "tonalRamp": ["#111111", "#1d1d1f", "#333333", "#515154", "#86868b", "#b8b8bd", "#d2d2d7", "#f5f5f7"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Graphite",
+        "tonalRamp": ["#1d1d1f", "#333333", "#515154", "#6e6e73", "#86868b", "#b8b8bd", "#d2d2d7", "#f5f5f7"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Structural Line",
+        "tonalRamp": ["#1d1d1f", "#515154", "#6e6e73", "#86868b", "#a1a1a6", "#b8b8bd", "#d2d2d7", "#f5f5f7"]
+      },
+      "line-soft": {
+        "role": "neutral",
+        "displayName": "Quiet Divider",
+        "tonalRamp": ["#333333", "#515154", "#6e6e73", "#86868b", "#b8b8bd", "#d2d2d7", "#e5e5e7", "#f5f5f7"]
+      },
+      "selected": {
+        "role": "neutral",
+        "displayName": "Selected Gray",
+        "tonalRamp": ["#333333", "#515154", "#6e6e73", "#86868b", "#b8b8bd", "#d2d2d7", "#e8e8ed", "#f5f5f7"]
+      },
+      "surface-subtle": {
+        "role": "neutral",
+        "displayName": "Workspace Gray",
+        "tonalRamp": ["#333333", "#515154", "#6e6e73", "#a1a1a6", "#d2d2d7", "#e5e5e7", "#eeeeef", "#f5f5f7"]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Raised Paper",
+        "tonalRamp": ["#333333", "#515154", "#6e6e73", "#a1a1a6", "#d2d2d7", "#e5e5e7", "#f5f5f7", "#fbfbfd"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "tonalRamp": ["#333333", "#515154", "#6e6e73", "#a1a1a6", "#d2d2d7", "#e5e5e7", "#f5f5f7", "#ffffff"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Plain-language page questions and top-level outcomes."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Major section headings that organize the briefing."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Week, record, and dense list-item titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default reading, explanation, and control text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Eyebrows, card labels, metrics, and compact metadata."
+      }
+    },
+    "shadows": [
+      {
+        "name": "contained-surface",
+        "value": "0 8px 30px rgba(0, 0, 0, 0.06)",
+        "purpose": "Low ambient separation for a focused panel such as authentication."
+      },
+      {
+        "name": "floating-surface",
+        "value": "0 16px 48px rgba(0, 0, 0, 0.08)",
+        "purpose": "Drawers and truly floating overlays only."
+      },
+      {
+        "name": "interactive-lift",
+        "value": "0 10px 28px rgba(0, 0, 0, 0.05)",
+        "purpose": "Quiet hover feedback on clickable week and record rows."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "160ms",
+        "purpose": "Fast Ant Design control feedback."
+      },
+      {
+        "name": "state-standard",
+        "value": "180ms ease",
+        "purpose": "Links, borders, transforms, and common surface transitions."
+      },
+      {
+        "name": "state-mid",
+        "value": "220ms",
+        "purpose": "Standard Ant Design component transitions."
+      },
+      {
+        "name": "state-slow",
+        "value": "300ms",
+        "purpose": "The slowest allowed interface transition."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "navigation-stack",
+        "value": "900px"
+      },
+      {
+        "name": "compact-mobile",
+        "value": "680px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single leading action in a work region.",
+      "html": "<button class=\"ds-btn-primary\">Start Week 1 <span aria-hidden=\"true\">→</span></button>",
+      "css": ".ds-btn-primary { min-height: 44px; border: 0; border-radius: 10px; background: var(--action, #111111); color: var(--surface, #ffffff); padding: 0 16px; font: 600 15px/1.5 -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif; cursor: pointer; transition: background 180ms ease; } .ds-btn-primary:hover { background: var(--ink-hover, #333333); } .ds-btn-primary:focus-visible { outline: 3px solid var(--ink-strong, #000000); outline-offset: 3px; } .ds-btn-primary:active { background: var(--ink-strong, #000000); }"
+    },
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "A quiet secondary action for return, cancel, or supporting paths.",
+      "html": "<button class=\"ds-btn-default\">Return to overview</button>",
+      "css": ".ds-btn-default { min-height: 44px; border: 1px solid var(--line, #d2d2d7); border-radius: 10px; background: var(--surface, #ffffff); color: var(--ink, #1d1d1f); padding: 0 16px; font: 600 15px/1.5 -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif; cursor: pointer; transition: border-color 180ms ease, background 180ms ease; } .ds-btn-default:hover { border-color: var(--muted, #6e6e73); background: var(--surface-subtle, #f5f5f7); } .ds-btn-default:focus-visible { outline: 3px solid var(--ink-strong, #000000); outline-offset: 3px; } .ds-btn-default:active { background: var(--selected, #e8e8ed); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "A labeled 44px field for owner forms and authentication.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Email</span><span class=\"ds-input-wrap\"><svg class=\"ds-input-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 5h18v14H3V5Zm2 2v.5l7 4.7 7-4.7V7H5Zm14 10V9.9l-7 4.6-7-4.6V17h14Z\" fill=\"currentColor\"/></svg><input class=\"ds-input\" type=\"email\" placeholder=\"name@example.com\"></span></label>",
+      "css": ".ds-field { display: grid; gap: 7px; color: var(--ink, #1d1d1f); font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif; } .ds-field-label { font-size: 13px; font-weight: 620; } .ds-input-wrap { display: flex; align-items: center; min-height: 44px; border: 1px solid var(--line, #d2d2d7); border-radius: 10px; background: var(--surface, #ffffff); transition: border-color 180ms ease, box-shadow 180ms ease; } .ds-input-wrap:hover { border-color: #86868b; } .ds-input-wrap:focus-within { border-color: var(--action, #111111); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.10); } .ds-input-icon { width: 16px; height: 16px; margin-left: 12px; color: var(--muted, #6e6e73); } .ds-input { width: 100%; min-width: 0; height: 42px; border: 0; outline: 0; background: transparent; color: var(--ink, #1d1d1f); padding: 10px 12px 10px 8px; font: 400 15px/1.5 -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif; }"
+    },
+    {
+      "name": "Primary Navigation",
+      "kind": "nav",
+      "refersTo": "navigation-item",
+      "description": "A restrained horizontal route switcher with a neutral selected fill.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Primary navigation\"><a class=\"ds-nav-item ds-nav-item-selected\" href=\"#overview\" aria-current=\"page\">Overview</a><a class=\"ds-nav-item\" href=\"#protocol\">Protocol</a><a class=\"ds-nav-item\" href=\"#sources\">Sources</a><a class=\"ds-nav-item\" href=\"#manage\">Manage</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif; } .ds-nav-item { display: inline-flex; align-items: center; height: 38px; border-radius: 10px; color: var(--muted, #6e6e73); padding: 0 16px; font-size: 15px; text-decoration: none; transition: color 180ms ease, background 180ms ease; } .ds-nav-item:hover { background: var(--surface-subtle, #f5f5f7); color: var(--action, #111111); } .ds-nav-item:focus-visible { outline: 3px solid var(--ink-strong, #000000); outline-offset: 3px; } .ds-nav-item-selected { background: #eeeeef; color: var(--action, #111111); }"
+    },
+    {
+      "name": "Status Tags",
+      "kind": "chip",
+      "description": "Monochrome status variants that retain explicit icons and labels.",
+      "html": "<div class=\"ds-status-row\"><span class=\"ds-status ds-status-done\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m9.2 16.2-4.1-4.1 1.4-1.4 2.7 2.7 8.3-8.3 1.4 1.4-9.7 9.7Z\" fill=\"currentColor\"/></svg>Done</span><span class=\"ds-status ds-status-active\">● Active</span><span class=\"ds-status ds-status-blocked\">■ Blocked</span></div>",
+      "css": ".ds-status-row { display: flex; flex-wrap: wrap; gap: 8px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif; } .ds-status { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; border: 1px solid var(--line, #d2d2d7); border-radius: 6px; background: var(--surface, #ffffff); color: var(--ink, #1d1d1f); padding: 0 8px; font-size: 12px; font-weight: 570; line-height: 26px; } .ds-status svg { width: 14px; height: 14px; } .ds-status-done { border-color: var(--ink-strong, #000000); background: var(--ink-strong, #000000); color: var(--surface, #ffffff); } .ds-status-active { border-color: #b8b8bd; background: var(--selected, #e8e8ed); color: var(--ink-strong, #000000); } .ds-status-blocked { border-style: dashed; border-color: var(--ink, #1d1d1f); }"
+    },
+    {
+      "name": "Interactive Week Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "A compact, border-led record row with quiet hover lift.",
+      "html": "<a class=\"ds-week-card\" href=\"#week-1\"><span class=\"ds-week-index\">01</span><span class=\"ds-week-copy\"><small>Protocol · Sep 15–20</small><strong>Protocol and access</strong><span>Turn the prospectus into a signed, testable protocol.</span></span><span class=\"ds-week-open\">Open →</span></a>",
+      "css": ".ds-week-card { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 18px; border: 1px solid var(--line-soft, #e5e5e7); border-radius: 14px; background: var(--surface, #ffffff); color: var(--ink, #1d1d1f); padding: 18px 20px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif; text-decoration: none; transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease; } .ds-week-card:hover { border-color: #a1a1a6; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05); transform: translateY(-1px); } .ds-week-card:focus-visible { outline: 3px solid var(--ink-strong, #000000); outline-offset: 3px; } .ds-week-card:active { transform: translateY(0); } .ds-week-index { color: var(--muted, #6e6e73); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-week-copy { display: grid; gap: 4px; } .ds-week-copy small, .ds-week-copy span { color: var(--muted, #6e6e73); font-size: 12px; } .ds-week-copy strong { color: var(--ink-strong, #000000); font-size: 17px; font-weight: 630; letter-spacing: -0.015em; } .ds-week-open { font-size: 13px; font-weight: 620; }"
+    },
+    {
+      "name": "Next Step Card",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "The dominant action-first card at the start of a work page.",
+      "html": "<section class=\"ds-priority-card\"><p class=\"ds-card-label\">☑ Next step</p><h2>Start Week 1: Protocol and access</h2><p class=\"ds-priority-copy\">Turn the prospectus into a signed, testable protocol and prove that the required data and compute are reachable.</p><button class=\"ds-priority-action\">Start Week 1 →</button></section>",
+      "css": ".ds-priority-card { display: flex; min-height: 270px; flex-direction: column; align-items: flex-start; border: 1px solid var(--line, #d2d2d7); border-radius: 16px; background: var(--surface, #ffffff); color: var(--ink, #1d1d1f); padding: 24px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif; } .ds-card-label { margin: 0; color: var(--muted, #6e6e73); font-size: 12px; font-weight: 650; letter-spacing: 0.02em; } .ds-priority-card h2 { max-width: 20ch; margin: 18px 0 8px; color: var(--ink-strong, #000000); font-size: clamp(1.75rem, 3vw, 2.65rem); font-weight: 680; letter-spacing: -0.035em; line-height: 1.05; } .ds-priority-copy { max-width: 60ch; margin: 0 0 22px; color: var(--muted, #6e6e73); font-size: 16px; line-height: 1.55; } .ds-priority-action { min-height: 44px; margin-top: auto; border: 0; border-radius: 10px; background: var(--action, #111111); color: var(--surface, #ffffff); padding: 0 16px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 180ms ease; } .ds-priority-action:hover { background: var(--ink-hover, #333333); } .ds-priority-action:focus-visible { outline: 3px solid var(--ink-strong, #000000); outline-offset: 3px; } .ds-priority-action:active { background: var(--ink-strong, #000000); }"
+    },
+    {
+      "name": "Deliverable Band",
+      "kind": "custom",
+      "refersTo": "deliverable-card",
+      "description": "The signature full-width commitment band beneath the action and decision split.",
+      "html": "<section class=\"ds-deliverable\"><p class=\"ds-deliverable-label\">▣ Deliverable</p><p class=\"ds-deliverable-copy\">A signed protocol-v1, verified data and checkpoint inventory, and measured GPU profile.</p></section>",
+      "css": ".ds-deliverable { display: grid; grid-template-columns: minmax(150px, 0.3fr) minmax(0, 1.7fr); align-items: center; gap: 32px; border-radius: 16px; background: var(--ink-strong, #000000); color: var(--surface, #ffffff); padding: 24px; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif; } .ds-deliverable-label { margin: 0; font-size: 12px; font-weight: 650; letter-spacing: 0.02em; } .ds-deliverable-copy { max-width: 72ch; margin: 0; font-size: clamp(1.15rem, 2vw, 1.55rem); font-weight: 570; letter-spacing: -0.02em; line-height: 1.35; } @media (max-width: 680px) { .ds-deliverable { grid-template-columns: 1fr; gap: 12px; padding: 20px; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Research Briefing",
+    "overview": "Pose Embed should feel like a calm, carefully prepared briefing placed in front of a researcher and advisor. The interface is restrained and direct: one clear question, action, deliverable, or decision leads each work surface, while supporting evidence waits at the next level of hierarchy.\n\nThe system is strictly black, white, and neutral gray. Apple-like system typography, generous whitespace, precise dividers, modest rounding, and progressive disclosure keep dense protocol content readable without making it feel ornamental or promotional. Ant Design supplies the interaction primitives; the visual system makes them feel native to this quiet research workspace.",
+    "keyCharacteristics": [
+      "Strict black, white, and neutral gray.",
+      "Action-first hierarchy before technical detail.",
+      "Generous whitespace with precise, low-contrast dividers.",
+      "Ant Design primitives with calm, consistent states.",
+      "Progressive disclosure for scientific and operational depth."
+    ],
+    "rules": [
+      {
+        "name": "The No Hue Rule",
+        "body": "Do not introduce semantic or decorative hues; encode meaning with labels, icons, weight, fill, border, and line style.",
+        "section": "colors"
+      },
+      {
+        "name": "The Brief Before Detail Rule",
+        "body": "Use the strongest type for the plain-language question or required action, then step down quickly to calm body copy and compact labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-by-Default Rule",
+        "body": "Keep working surfaces flat and border-defined; reserve shadows for floating overlays, contained authentication surfaces, and subtle hover feedback.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do surface Next step, Decision needed, Deliverable, and a plain-language summary before technical detail on work pages.",
+      "Do keep meaning independent of color through explicit labels, icons, fill, border, and line style.",
+      "Do preserve 44px standard controls, visible focus rings, and reduced-motion behavior.",
+      "Do use whitespace and dividers to organize dense records before adding containers or decoration."
+    ],
+    "donts": [
+      "Don't introduce hue, gradients, or decorative accent colors.",
+      "Don't turn a research work page into a marketing hero or generic analytics dashboard.",
+      "Don't use shadows as the default boundary for cards and sections.",
+      "Don't make technical details compete with the primary briefing; place them in supporting sections or disclosure controls.",
+      "Don't collapse status distinctions to fill alone."
+    ]
+  }
+}

@@ -1,5 +1,7 @@
 "use client";
 
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { Input } from "antd";
 import { useActionState } from "react";
 import { loginAction } from "@/app/actions";
 import { ActionFeedback } from "@/components/action-feedback";
@@ -12,16 +14,25 @@ export function LoginForm() {
     <form action={action} className="auth-form">
       <div className="field">
         <label htmlFor="email">Email</label>
-        <input autoComplete="email" id="email" name="email" required type="email" />
+        <Input
+          autoComplete="email"
+          id="email"
+          name="email"
+          prefix={<MailOutlined />}
+          required
+          size="large"
+          type="email"
+        />
       </div>
       <div className="field">
         <label htmlFor="password">Password</label>
-        <input
+        <Input.Password
           autoComplete="current-password"
           id="password"
           name="password"
+          prefix={<LockOutlined />}
           required
-          type="password"
+          size="large"
         />
       </div>
       <ActionFeedback state={state} />
