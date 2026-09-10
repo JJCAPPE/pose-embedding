@@ -1,4 +1,4 @@
-import type { LoadedPlan, ResearchPlan, Week } from "@/lib/schema";
+import type { LoadedPlan, ResearchPlan, Task, Week } from "@/lib/schema";
 
 const DATE_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
 
@@ -86,6 +86,34 @@ export function projectProgress(plan: Pick<ResearchPlan, "weeks">) {
         ? 0
         : Math.round((completedRequiredTasks / requiredTasks) * 100),
   };
+}
+
+export function recentCompletedTasks(
+  plan: Pick<ResearchPlan, "weeks">,
+  limit = 5,
+) {
+  const completions: Array<{
+    completedAt: string;
+    task: Task;
+    weekNumber: number;
+    weekTitle: string;
+  }> = [];
+
+  for (const week of plan.weeks) {
+    for (const task of week.tasks) {
+      if (task.state !== "done" || task.completedAt === null) continue;
+      completions.push({
+        completedAt: task.completedAt,
+        task,
+        weekNumber: week.number,
+        weekTitle: week.title,
+      });
+    }
+  }
+
+  return completions
+    .sort((left, right) => Date.parse(right.completedAt) - Date.parse(left.completedAt))
+    .slice(0, Math.max(0, limit));
 }
 
 export function weekProgress(week: Week) {

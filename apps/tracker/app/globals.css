@@ -756,6 +756,68 @@ a {
   gap: 32px;
 }
 
+.recent-completions-section {
+  margin-top: 64px;
+}
+
+.recent-list {
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.recent-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.recent-list li:last-child {
+  border-bottom: 0;
+}
+
+.recent-completion-week {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 620;
+}
+
+.recent-completion-copy h3 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 17px;
+  letter-spacing: -0.015em;
+}
+
+.recent-completion-meta {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.recent-completion-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.recent-completions-empty {
+  margin: 0;
+  padding: 20px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+  background: var(--surface);
+}
+
 .week-status-stack {
   max-width: 260px;
   justify-content: flex-end;
@@ -2013,6 +2075,15 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .recent-list li {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .recent-completion-meta {
+    justify-items: start;
+  }
+
   .summary-metrics > div,
   .editor-summary > div {
     border-right: 0;
@@ -2238,5 +2309,23 @@ a {
   .side-section {
     break-inside: avoid;
     box-shadow: none !important;
+  }
+
+  .protocol-collapse .ant-collapse-panel,
+  .task-collapse .ant-collapse-panel,
+  .side-collapse .ant-collapse-panel,
+  .protocol-collapse .ant-collapse-content,
+  .task-collapse .ant-collapse-content,
+  .side-collapse .ant-collapse-content {
+    display: block !important;
+    height: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .protocol-collapse .ant-collapse-expand-icon,
+  .task-collapse .ant-collapse-expand-icon,
+  .side-collapse .ant-collapse-expand-icon {
+    display: none !important;
   }
 }
