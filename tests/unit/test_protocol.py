@@ -83,6 +83,10 @@ def test_protocol_has_locked_action_partitions(protocol_path: Path) -> None:
 
     assert protocol.dataset.novel_actions == tuple(range(1, 116, 6))
     assert protocol.dataset.development_validation_actions == tuple(range(2, 117, 6))
+    assert protocol.training.final_training_actions == "all_100_auxiliary_actions"
+    assert protocol.training.insufficient_compute_policy == (
+        "block_and_require_advisor_approved_amendment_before_test_opening"
+    )
     assert protocol.batch.physical_batch_size == 32
     assert protocol.objectives.core == ("contrastive", "supcon", "contextual")
 

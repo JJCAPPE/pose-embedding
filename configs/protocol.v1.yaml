@@ -115,6 +115,8 @@ training:
   seeds: [7, 17, 29]
   tuning_trials_per_method: 6
   tune_on: development_validation_clean_only
+  final_training_actions: all_100_auxiliary_actions
+  insufficient_compute_policy: block_and_require_advisor_approved_amendment_before_test_opening
   epochs: 50
   optimizer: adamw
   tuning_grid:

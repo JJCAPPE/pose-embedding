@@ -1,6 +1,7 @@
 # Protocol v1: noisy one-shot pose retrieval
 
-Status: **scientifically specified, not advisor-locked**. The machine-readable
+Status: **advisor-approved and scientifically locked**. The public-safe
+approval record is `docs/protocol/protocol-v1-approval.md`; the machine-readable
 source of truth is `configs/protocol.v1.yaml`.
 
 ## Question and outcome
@@ -19,6 +20,10 @@ negative result is a valid successful outcome.
   P=8, K=4 batch plans.
 - Tune only on the 20 class-disjoint development actions A2, A8, ..., A116.
   Retrain on all 100 auxiliary actions only after settings are frozen.
+- The prospectus's fixed-subset contingency is superseded for the confirmatory
+  study. If training on all 100 auxiliary actions is infeasible, record a
+  blocker and obtain an advisor-approved protocol amendment before opening the
+  novel test; do not silently substitute a subset.
 - Evaluate the official 20 novel actions A1, A7, ..., A115 once. The primary
   query set excludes every synchronized camera view of the anchor performance;
   the exact official query set is a secondary comparability result.
@@ -210,7 +215,7 @@ Use `docs/protocol/week-1-evidence-template.md` to collect the public-safe
 approval, access, checksum, and GPU evidence without placing secrets or licensed
 inputs in the repository.
 
-- [ ] Advisor approves the research question, primary estimand, action splits,
+- [x] Advisor approves the research question, primary estimand, action splits,
       query exclusion, corruption family/levels, test seal, and failed-run rule.
 - [ ] BU provides the applicable human-subjects/data-governance determination.
 - [ ] Dataset terms are accepted and authorized files are stored outside Git.

@@ -70,7 +70,9 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(0);
+    expect(progress.percent).toBe(2);
+    expect(progress.completedRequiredTasks).toBe(1);
+    expect(progress.decidedRequiredGates).toBe(1);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(2);
   });
