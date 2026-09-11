@@ -150,6 +150,7 @@ export function ProtocolView({
           items={[
             {
               key: "design",
+              forceRender: true,
               label: <h2 id="design-title">Experimental design</h2>,
               children: (
                 <>
@@ -171,6 +172,7 @@ export function ProtocolView({
             },
             {
               key: "corruptions",
+              forceRender: true,
               label: <h2 id="corruption-title">Corruption protocol</h2>,
               children: (
                 <>
@@ -189,6 +191,7 @@ export function ProtocolView({
             },
             {
               key: "analysis",
+              forceRender: true,
               label: <h2 id="analysis-title">Primary analysis</h2>,
               children: (
                 <>
@@ -196,6 +199,7 @@ export function ProtocolView({
                     {[protocol.primaryFormula, protocol.effectFormula].map((formula) => (
                       <Typography.Text
                         key={formula}
+                        tabIndex={0}
                         style={{
                           background: "#000000",
                           borderRadius: 10,
@@ -230,6 +234,7 @@ export function ProtocolView({
             },
             {
               key: "scope",
+              forceRender: true,
               label: <h2 id="scope-title">Scope and provenance</h2>,
               children: (
                 <>

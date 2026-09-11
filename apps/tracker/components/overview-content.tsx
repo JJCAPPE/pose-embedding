@@ -1,12 +1,24 @@
+import Link from "next/link";
 import { DataNotice } from "@/components/data-notice";
 import { PriorityBrief } from "@/components/priority-brief";
 import { SummaryMetrics } from "@/components/summary-metrics";
 import { Timeline } from "@/components/timeline";
-import { formatDateRange, projectProgress, weekProgress } from "@/lib/domain";
+import {
+  formatDateRange,
+  projectProgress,
+  recentCompletedTasks,
+  weekProgress,
+} from "@/lib/domain";
 import type { LoadedPlan } from "@/lib/schema";
 
 export function OverviewContent({ plan }: { plan: LoadedPlan }) {
   const progress = projectProgress(plan);
+  const recentCompletions = recentCompletedTasks(plan);
+  const completionTime = new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: plan.project.timezone,
+  });
   const openWeek = plan.weeks.find((week) => week.state !== "closed");
   const nextWeek = openWeek ?? plan.weeks.at(-1)!;
   const nextWeekProgress = weekProgress(nextWeek);
@@ -87,6 +99,42 @@ export function OverviewContent({ plan }: { plan: LoadedPlan }) {
           </p>
         </div>
         <SummaryMetrics {...progress} />
+      </section>
+
+      <section aria-labelledby="recent-completions-title" className="recent-completions-section">
+        <div className="section-heading compact">
+          <h2 id="recent-completions-title">Recent completions</h2>
+          <p>The latest finished work and the public record that supports it.</p>
+        </div>
+        {recentCompletions.length > 0 ? (
+          <ol className="recent-list">
+            {recentCompletions.map(({ completedAt, task, weekNumber, weekTitle }) => (
+              <li key={task.id}>
+                <div className="recent-completion-copy">
+                  <p className="recent-completion-week">
+                    Week {weekNumber} · {weekTitle}
+                  </p>
+                  <h3>{task.title}</h3>
+                </div>
+                <div className="recent-completion-meta">
+                  <time dateTime={completedAt}>{completionTime.format(new Date(completedAt))}</time>
+                  <div className="recent-completion-links">
+                    <Link href={`/weeks/${weekNumber}`}>View weekly record</Link>
+                    {task.evidenceUrl ? (
+                      <a href={task.evidenceUrl} rel="noreferrer" target="_blank">
+                        Open evidence
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="recent-completions-empty">
+            No tasks are complete yet. Finished work and its evidence will appear here.
+          </p>
+        )}
       </section>
 
       <section aria-labelledby="question-title">

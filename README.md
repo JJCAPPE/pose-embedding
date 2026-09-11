@@ -17,7 +17,7 @@ owner editor for tasks, evidence, reflections, and advancement gates.
 - `tests/` — unit, integration, and tiny CPU fixtures
 - `apps/tracker/` — Next.js public tracker and owner editor
 - `supabase/` — local configuration, migration, RLS tests, and seed bridge
-- `docs/` — protocol, decisions, proposal, and result documents
+- `docs/` — protocol, compliance, decisions, proposal, and result documents
 - `third_party/` — pinned source manifest; checkouts live only in ignored `.cache/`
 - `lit-review/` and `contextual-similarity-study-pack/` — legacy evidence archives
 
@@ -110,6 +110,10 @@ and allow only the exact redirect origins needed. The checked
 Dataset terms, GPU access, advisor approval, and BU governance determinations
 also require the researcher. Everything else is represented as checked code,
 migrations, CI, or tracker gates.
+
+The repository keeps a reference copy of the
+[NTU RGB+D release agreement](docs/compliance/ntu-rgbd-release-agreement.md).
+It is not proof of acceptance; keep private acceptance evidence outside Git.
 
 This repository intentionally has no project-wide reuse license while advisor
 and BU review is pending. Third-party material retains its own license and

@@ -206,6 +206,7 @@ export function WeekDetailView({
               defaultActiveKey={nextRequiredTask ? [nextRequiredTask.id] : []}
               items={week.tasks.map((task) => ({
                 key: task.id,
+                forceRender: true,
                 label: (
                   <div className="task-heading">
                     <span className="task-position">{task.position}</span>
@@ -354,6 +355,7 @@ export function WeekDetailView({
                 items={[
                   {
                     key: "risks",
+                    forceRender: true,
                     label: <h2 id="risks-title">Watch closely</h2>,
                     children: (
                       <div className="risk-list" role="list">
@@ -377,6 +379,7 @@ export function WeekDetailView({
                 items={[
                   {
                     key: "reflection",
+                    forceRender: true,
                     label: <h2 id="reflection-title">Reflection</h2>,
                     children: <MarkdownText>{week.reflection}</MarkdownText>,
                   },

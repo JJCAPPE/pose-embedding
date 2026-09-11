@@ -31,6 +31,11 @@ records it; it is not itself an approval.
 
 ## Licensed input inventory
 
+Review the
+[NTU RGB+D release agreement reference](../compliance/ntu-rgbd-release-agreement.md)
+and its linked current request form before recording access. The checked-in
+reference is not proof of acceptance.
+
 | Input | Authorized source | Local path below `POSE_EMBED_DATA_ROOT` | Bytes | SHA-256 | Verified UTC |
 |---|---|---|---:|---|---|
 | NTU RGB+D 120 HRNet pose files | `<source>` | `<relative path>` | `<bytes>` | `<sha256>` | `<timestamp>` |

@@ -4,6 +4,8 @@ import AxeBuilder from "@axe-core/playwright";
 test("public dashboard exposes all published weeks", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("protocol lock");
+  await expect(page.getByRole("heading", { name: "Recent completions" })).toBeVisible();
+  await expect(page.getByText("No tasks are complete yet.", { exact: false })).toBeVisible();
   await expect(page.getByRole("list", { name: undefined }).last().getByRole("listitem")).toHaveCount(14);
 });
 
@@ -48,6 +50,31 @@ test("protocol preserves locked decisions and manual actions", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Actions only you can complete" })).toBeVisible();
   await expect(page.getByText("Contrastive-only, supervised contrastive, and full contextual-plus-contrastive.")).toBeVisible();
   await expect(page.getByText("drop(m, s, c)", { exact: false })).toBeVisible();
+});
+
+test("protocol formula scrollers are keyboard accessible", async ({ page }) => {
+  await page.goto("/protocol");
+  await expect(page.getByRole("heading", { name: "The rules before the result." })).toBeVisible();
+  await expect(page.locator(".formula-pair [tabindex='0']")).toHaveCount(2);
+
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(results.violations).toEqual([]);
+});
+
+test("print output includes collapsed protocol and weekly detail", async ({ page }) => {
+  await page.emulateMedia({ media: "print" });
+  await page.goto("/protocol");
+  await expect(page.getByRole("heading", { name: "The rules before the result." })).toBeVisible();
+  await expect(page.getByText("Development split", { exact: true })).toBeVisible();
+  await expect(page.getByText("Coordinate jitter", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Outside this semester" })).toBeVisible();
+
+  await page.goto("/weeks/5");
+  await expect(page.getByRole("heading", { name: "Corruption freeze" })).toBeVisible();
+  await expect(page.locator("#task-w05-task-04")).toBeVisible();
+  await expect(page.getByText("Fixed coordinate noise may not be comparable across body scales.")).toBeVisible();
 });
 
 test("public exports and health endpoint report their current data source", async ({ request }) => {

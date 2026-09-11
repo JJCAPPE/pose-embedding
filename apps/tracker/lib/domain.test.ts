@@ -4,6 +4,7 @@ import {
   dateInTimezone,
   formatDateRange,
   projectProgress,
+  recentCompletedTasks,
   weekCanClose,
   weekIsReady,
 } from "@/lib/domain";
@@ -72,5 +73,29 @@ describe("readiness and progress rules", () => {
     expect(progress.percent).toBe(0);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(2);
+  });
+
+  it("returns the newest completed tasks for the public dashboard", () => {
+    const plan = structuredClone(seedPlan);
+    plan.weeks[0].tasks[0] = {
+      ...plan.weeks[0].tasks[0],
+      state: "done",
+      completedAt: "2026-09-16T14:00:00Z",
+    };
+    plan.weeks[1].tasks[0] = {
+      ...plan.weeks[1].tasks[0],
+      state: "done",
+      completedAt: "2026-09-23T16:30:00Z",
+    };
+
+    const completions = recentCompletedTasks(plan, 1);
+
+    expect(completions).toHaveLength(1);
+    expect(completions[0]).toMatchObject({
+      completedAt: "2026-09-23T16:30:00Z",
+      weekNumber: 2,
+      weekTitle: "Immutable data manifests",
+    });
+    expect(completions[0].task.id).toBe("w02-task-01");
   });
 });
