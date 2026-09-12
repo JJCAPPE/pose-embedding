@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-09-11T17:41:08.000Z",
+  "generatedAt": "2026-09-12T00:55:59.000Z",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -26,7 +26,7 @@
       "id": "manual-ntu",
       "dueDate": "2026-09-18",
       "title": "Accept the NTU RGB+D 120 data terms",
-      "details": "Obtain the authorized HRNet-derived pose files, official one-shot split, and MotionBERT checkpoint. Place protected files only in the documented ignored data root.",
+      "details": "Wait for NTU approval, then obtain and verify the authorized HRNet-derived pose aggregate. The official one-shot definition and MotionBERT checkpoint are already verified; protected pose data stays only in the documented ignored data root.",
       "whyManual": "The dataset license and any login-gated download must be accepted by the researcher.",
       "weekTaskId": "w01-task-02"
     },
@@ -123,7 +123,7 @@
       "version": 1,
       "tasks": [
         {"id":"w01-task-01","weekId":"week-01","position":1,"title":"Finalize protocol-v1","details":"Resolve the objective formula, primary estimand, claim rule, validation split, synchronized-view rule, corruptions, test-opening rule, and failed-run policy.","expectedOutput":"Signed protocol document with a stable content hash.","required":true,"estimateMinutes":120,"state":"done","completionNote":"All binding scientific choices were confirmed, including mandatory final training on all 100 auxiliary actions. Advisor approval is recorded in docs/protocol/protocol-v1-approval.md. Protocol SHA-256: 12cf4d9a322f5bd5ea76fb2d9ffc070a6a2681fe8474a05cff1f62b6e43368e2.","evidenceUrl":null,"completedAt":"2026-09-11T13:41:08-04:00","version":2},
-        {"id":"w01-task-02","weekId":"week-01","position":2,"title":"Verify licensed inputs","details":"Confirm that the NTU HRNet-derived poses, official one-shot split, and pretrained MotionBERT checkpoint are readable. Record source URLs and SHA-256 checksums without committing licensed files.","expectedOutput":"Input inventory and checksum report.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w01-task-02","weekId":"week-01","position":2,"title":"Verify licensed inputs","details":"Confirm that the NTU HRNet-derived poses, official one-shot split, and pretrained MotionBERT checkpoint are readable. Record source URLs and SHA-256 checksums without committing licensed files.","expectedOutput":"Input inventory and checksum report.","required":true,"estimateMinutes":120,"state":"blocked","completionNote":"Partially verified on 2026-09-11: the pretrained MotionBERT checkpoint and locked NTU one-shot definition are readable and checksummed. The maintained OpenMMLab HRNet aggregate is reachable and byte-matched to MotionBERT's legacy URL, but its licensed body has not been downloaded while NTU approval is pending. The unavailable MotionBERT one-shot pickle is not required because the locked split is derived in memory. The task and gate remain open.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-input-inventory.md","completedAt":null,"version":2},
         {"id":"w01-task-03","weekId":"week-01","position":3,"title":"Profile the GPU path","details":"Run one representative frozen MotionBERT forward pass at batch sizes 32 and 64. Record device, CUDA, memory, runtime, scheduler, quota, and job limits.","expectedOutput":"Compute profile with a justified physical batch-size decision.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
         {"id":"w01-task-04","weekId":"week-01","position":4,"title":"Record governance decisions","details":"Attach advisor approval and the BU data-governance or human-subjects determination. Record unresolved conditions verbatim.","expectedOutput":"Approval evidence or a visible blocking record.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
         {"id":"w01-task-05","weekId":"week-01","position":5,"title":"Close the weekly record","details":"Update actual hours, blockers, evidence links, and the first-week reflection in the tracker.","expectedOutput":"A complete Week 1 progress record.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}

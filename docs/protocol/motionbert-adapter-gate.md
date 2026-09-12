@@ -7,23 +7,29 @@ scientific MotionBERT feature caches. `validate_feature_artifact` rejects every
 
 The pinned Apache-2.0 checkout is available through
 `scripts/fetch_upstreams.py` at MotionBERT commit
-`705d3a95354db8bdb696b3492e47a3b5537174ff`. No pretrained MotionBERT checkpoint
-is present in the workspace, and no authorized NTU HRNet sample is available,
-so numerical encoder parity cannot honestly be established yet.
+`705d3a95354db8bdb696b3492e47a3b5537174ff`. The pretrained MotionBERT
+checkpoint has been verified below the ignored local data root, with
+public-safe metadata in `data/manifests/motionbert-checkpoint.v1.json`. No
+authorized NTU HRNet sample is available, so numerical encoder parity cannot
+honestly be established yet.
 
 ## Smallest remaining implementation
 
-1. Put the authorized `ntu120_hrnet.pkl` and `ntu120_hrnet_oneshot.pkl` below
-   `POSE_EMBED_DATA_ROOT`. Implement a trusted importer that hashes each complete
-   container before loading it, derives canonical sample IDs only from
-   `annotations[].frame_dir`, validates the exact source count, NTU field ranges,
-   duplicate IDs, zero-based action labels, and the official anchors, then emits
-   canonicalized per-sample artifacts and a metadata-only inventory. The current
-   generic `data verify --check-files` command does not inspect aggregate pickle
-   entries and must not be cited as aggregate verification.
-2. Put the authorized pretrained checkpoint below `POSE_EMBED_DATA_ROOT` and add
-   only its filename, source URL, expected architecture/config ID, byte size,
-   and SHA-256 to a metadata-only manifest. Never commit the weights.
+1. Put the authorized `ntu120_hrnet.pkl` below `POSE_EMBED_DATA_ROOT`. Implement
+   a trusted importer that hashes the complete container before loading it,
+   derives canonical sample IDs only from `annotations[].frame_dir`, validates
+   the exact source count, NTU field ranges, duplicate IDs, zero-based action
+   labels, and the official anchors, then derives the locked one-shot partitions
+   in memory and emits canonicalized per-sample artifacts plus a metadata-only
+   inventory. Do not create a replacement `ntu120_hrnet_oneshot.pkl`; the public
+   NTU class and exemplar definition in `configs/protocol.v1.yaml` is the
+   authoritative split input. The current generic `data verify --check-files`
+   command does not inspect aggregate pickle entries and must not be cited as
+   aggregate verification.
+2. Use the verified pretrained checkpoint below `POSE_EMBED_DATA_ROOT`, whose
+   filename, source URLs, architecture/config ID, byte size, and SHA-256 are
+   recorded in `data/manifests/motionbert-checkpoint.v1.json`. Never commit the
+   weights.
 3. Record the GPU model, driver, CUDA runtime, storage/job constraints, and then
    lock the compatible PyTorch wheel. The current CPU lock is not evidence of
    GPU compatibility.

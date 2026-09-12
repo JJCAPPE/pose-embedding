@@ -38,8 +38,8 @@ reference is not proof of acceptance.
 
 | Input | Authorized source | Local path below `POSE_EMBED_DATA_ROOT` | Bytes | SHA-256 | Verified UTC |
 |---|---|---|---:|---|---|
-| NTU RGB+D 120 HRNet pose files | `<source>` | `<relative path>` | `<bytes>` | `<sha256>` | `<timestamp>` |
-| Official one-shot manifest | `<source>` | `<relative path>` | `<bytes>` | `<sha256>` | `<timestamp>` |
+| NTU RGB+D 120 HRNet pose aggregate | `<source>` | `<relative path>` | `<bytes>` | `<sha256>` | `<timestamp>` |
+| Official one-shot definition | `<public source>` | `Not applicable (public metadata)` | `<bytes>` | `<sha256>` | `<timestamp>` |
 | MotionBERT checkpoint | `<source/config ID>` | `<relative path>` | `<bytes>` | `<sha256>` | `<timestamp>` |
 
 Do not commit the listed inputs or an authenticated download URL.
