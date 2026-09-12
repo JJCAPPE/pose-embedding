@@ -5,7 +5,7 @@ test("public dashboard exposes all published weeks", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("protocol lock");
   await expect(page.getByRole("heading", { name: "Recent completions" })).toBeVisible();
-  await expect(page.getByText("No tasks are complete yet.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Finalize protocol-v1" })).toBeVisible();
   await expect(page.getByRole("list", { name: undefined }).last().getByRole("listitem")).toHaveCount(14);
 });
 

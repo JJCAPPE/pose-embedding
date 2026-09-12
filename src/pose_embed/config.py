@@ -345,6 +345,10 @@ class TrainingProtocolConfig(StrictModel):
     seeds: tuple[int, ...]
     tuning_trials_per_method: int = Field(gt=0)
     tune_on: Literal["development_validation_clean_only"]
+    final_training_actions: Literal["all_100_auxiliary_actions"]
+    insufficient_compute_policy: Literal[
+        "block_and_require_advisor_approved_amendment_before_test_opening"
+    ]
     epochs: int = Field(gt=0)
     optimizer: Literal["adamw"]
     tuning_grid: tuple[TuningTrial, ...]
