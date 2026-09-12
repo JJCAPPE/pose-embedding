@@ -1,0 +1,10 @@
+{
+  "filename": "checkpoints/MB_release/latest_epoch.bin",
+  "source_urls": [
+    "https://github.com/Walter0807/MotionBERT/blob/705d3a95354db8bdb696b3492e47a3b5537174ff/README.md#model-zoo",
+    "https://huggingface.co/walterzhu/MotionBERT/blob/370a9196aa3c89198b134c82476143b01c0fb32c/checkpoint/pretrain/MB_release/latest_epoch.bin"
+  ],
+  "architecture_config_id": "MotionBERT configs/pretrain/MB_pretrain.yaml @ 705d3a95354db8bdb696b3492e47a3b5537174ff (sha256: bc58dfbe5b00424afb6542217c820cca3817f2a859fe84667ef678a08a6b58f8)",
+  "bytes": 169958969,
+  "sha256": "02a9ee017e5c9d688b5dd41e0055bddb75b6eee7f5eed326a8cdc6e5bf08eaf8"
+}
