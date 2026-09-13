@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "filename": "ntu120_hrnet.pkl",
+  "source_urls": [
+    "https://github.com/Walter0807/MotionBERT/blob/705d3a95354db8bdb696b3492e47a3b5537174ff/docs/action.md#data",
+    "https://github.com/open-mmlab/mmaction2/blob/a5a167dff2399e2d182a60332325f9c0d4663517/tools/data/skeleton/README.md#prepare-annotations",
+    "https://download.openmmlab.com/mmaction/v1.0/skeleton/data/ntu120_2d.pkl"
+  ],
+  "bytes": 1238461428,
+  "md5": "31c0efd891f18b942403de3376cee000",
+  "sha256": "aaf1f928b4629fa9a0850528d43fdd8d920532805d16672bfdda78085b649df8",
+  "verified_utc": "2026-09-13T02:07:49Z",
+  "format_validation": {
+    "top_level_keys": [
+      "annotations",
+      "split"
+    ],
+    "annotation_count": 113945,
+    "unique_frame_dir_count": 113945,
+    "action_range": [
+      1,
+      120
+    ],
+    "official_one_shot_exemplars_found": 20,
+    "keypoint_layout": "people x frames x COCO-17 joints x xy",
+    "confidence_layout": "people x frames x COCO-17 joints",
+    "finite_values": true
+  },
+  "official_missing_skeletons": {
+    "source_url": "https://github.com/shahroudy/NTURGB-D/blob/ac2ebc87e6e9777ea6bac67e65e53b325b903f74/Matlab/NTU_RGBD120_samples_with_missing_skeletons.txt",
+    "filename": "provenance/sources/NTU_RGBD120_samples_with_missing_skeletons.txt",
+    "bytes": 11451,
+    "sha256": "ab14fe64e89be63d2b08141713fcc31f6ebc7b01955009c3585d8d3367e0facc",
+    "count": 535,
+    "present_in_aggregate": 0
+  },
+  "protocol_count_status": {
+    "nominal_capture_count": 114480,
+    "usable_annotation_count": 113945,
+    "difference_matches_official_missing_skeleton_count": true,
+    "status": "advisor_amendment_required_before_novel_test"
+  }
+}
