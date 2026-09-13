@@ -1,31 +1,37 @@
 # Week 1 gate: real MotionBERT feature extraction
 
-Status: **blocked deliberately**. The repository can exercise the complete
-artifact plumbing with synthetic fixtures, but it cannot yet create or consume
-scientific MotionBERT feature caches. `validate_feature_artifact` rejects every
-`backend: motionbert` sidecar until this gate is implemented and verified.
+Status: **licensed input acquired; implementation still blocked deliberately**.
+The repository can exercise the complete artifact plumbing with synthetic
+fixtures, but it cannot yet create or consume scientific MotionBERT feature
+caches. `validate_feature_artifact` rejects every `backend: motionbert` sidecar
+until this gate is implemented and verified.
 
 The pinned Apache-2.0 checkout is available through
 `scripts/fetch_upstreams.py` at MotionBERT commit
 `705d3a95354db8bdb696b3492e47a3b5537174ff`. The pretrained MotionBERT
 checkpoint has been verified below the ignored local data root, with
-public-safe metadata in `data/manifests/motionbert-checkpoint.v1.json`. No
-authorized NTU HRNet sample is available, so numerical encoder parity cannot
-honestly be established yet.
+public-safe metadata in `data/manifests/motionbert-checkpoint.v1.json`. The
+authorized HRNet aggregate is also present and verified, with public-safe
+metadata in `data/manifests/ntu120-hrnet.v1.json`. Its 113,945 usable
+annotations reconcile exactly to the nominal 114,480 captures after applying
+the dataset authors' 535-item missing-skeleton list. Protocol v1 still requires
+a result-blind advisor-approved count resolution before the novel test can be
+opened.
 
 ## Smallest remaining implementation
 
-1. Put the authorized `ntu120_hrnet.pkl` below `POSE_EMBED_DATA_ROOT`. Implement
-   a trusted importer that hashes the complete container before loading it,
-   derives canonical sample IDs only from `annotations[].frame_dir`, validates
-   the exact source count, NTU field ranges, duplicate IDs, zero-based action
-   labels, and the official anchors, then derives the locked one-shot partitions
-   in memory and emits canonicalized per-sample artifacts plus a metadata-only
-   inventory. Do not create a replacement `ntu120_hrnet_oneshot.pkl`; the public
-   NTU class and exemplar definition in `configs/protocol.v1.yaml` is the
-   authoritative split input. The current generic `data verify --check-files`
-   command does not inspect aggregate pickle entries and must not be cited as
-   aggregate verification.
+1. Use the acquired `ntu120_hrnet.pkl` below `POSE_EMBED_DATA_ROOT`, resolve the
+   113,945-valid-skeleton protocol count, and implement a trusted importer that
+   hashes the complete container before loading it, derives canonical sample
+   IDs only from `annotations[].frame_dir`, validates the amended exact source
+   count, NTU field ranges, duplicate IDs, zero-based action labels, and the
+   official anchors, then derives the locked one-shot partitions in memory and
+   emits canonicalized per-sample artifacts plus a metadata-only inventory. Do
+   not create a replacement `ntu120_hrnet_oneshot.pkl`; the public NTU class and
+   exemplar definition in `configs/protocol.v1.yaml` is the authoritative split
+   input. The current generic `data verify --check-files` command does not
+   inspect aggregate pickle entries and must not be cited as aggregate
+   verification.
 2. Use the verified pretrained checkpoint below `POSE_EMBED_DATA_ROOT`, whose
    filename, source URLs, architecture/config ID, byte size, and SHA-256 are
    recorded in `data/manifests/motionbert-checkpoint.v1.json`. Never commit the

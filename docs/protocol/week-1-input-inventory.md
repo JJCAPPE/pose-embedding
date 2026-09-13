@@ -1,8 +1,11 @@
 # Week 1 input inventory
 
-Status: **partially verified** at `2026-09-12T00:44:48Z`. This record does not
-close `w01-task-02` or meet `w01-gate-02` until the licensed aggregate pose file
-is present and checked.
+Status: **inputs verified; protocol-count review required** at
+`2026-09-13T02:07:49Z`. The licensed pose aggregate is present, checksummed,
+readable, and structurally valid. This record does not close `w01-task-02` or
+meet `w01-gate-02` because the aggregate contains the 113,945 usable skeleton
+samples left after the dataset authors' 535-item missing-skeleton exclusion,
+while protocol v1 currently requires a 114,480-row source inventory.
 
 All local paths below are relative to `POSE_EMBED_DATA_ROOT`. Protected files
 remain outside Git; this repository contains only public-safe provenance and
@@ -15,6 +18,8 @@ The primary-source audit supporting the acquisition decision is recorded in
 
 | Input | Public source | Local path | Bytes | SHA-256 | Readability result |
 |---|---|---|---:|---|---|
+| NTU RGB+D 120 HRNet poses | [MotionBERT action-data instructions](https://github.com/Walter0807/MotionBERT/blob/705d3a95354db8bdb696b3492e47a3b5537174ff/docs/action.md#data); [pinned OpenMMLab instructions](https://github.com/open-mmlab/mmaction2/blob/a5a167dff2399e2d182a60332325f9c0d4663517/tools/data/skeleton/README.md#prepare-annotations); [current OpenMMLab mirror](https://download.openmmlab.com/mmaction/v1.0/skeleton/data/ntu120_2d.pkl) | `ntu120_hrnet.pkl` | 1,238,461,428 | `aaf1f928b4629fa9a0850528d43fdd8d920532805d16672bfdda78085b649df8` | The trusted pickle loaded in 4.3 seconds. Its `split` and `annotations` structures contain 113,945 unique canonical IDs spanning A001-A120, no label/ID mismatch, finite COCO-17 coordinates and confidence, and all 20 official exemplars. The local MD5 is `31c0efd891f18b942403de3376cee000`, matching the server ETag and `Content-MD5`. |
+| Official NTU RGB+D 120 missing-skeleton list | [NTURGB-D list at locked commit](https://github.com/shahroudy/NTURGB-D/blob/ac2ebc87e6e9777ea6bac67e65e53b325b903f74/Matlab/NTU_RGBD120_samples_with_missing_skeletons.txt) | `provenance/sources/NTU_RGBD120_samples_with_missing_skeletons.txt` | 11,451 | `ab14fe64e89be63d2b08141713fcc31f6ebc7b01955009c3585d8d3367e0facc` | The source contains 535 unique canonical IDs. None occurs in the HRNet aggregate, and the 535-item exclusion exactly explains the difference between 114,480 nominal captures and 113,945 usable annotations. |
 | Official NTU RGB+D 120 one-shot protocol definition | [NTURGB-D README at locked commit](https://github.com/shahroudy/NTURGB-D/blob/ac2ebc87e6e9777ea6bac67e65e53b325b903f74/README.md#evaluation-protocol-of-one-shot-action-recognition-on-ntu-rgbd-120) | Not applicable (public source) | 14,328 | `1968e07f83bd7e9ea2ac6f9797bbfe880e59828b7b0f1644b3e5736ea68acc33` | UTF-8 source parsed; its 20 exemplar IDs are unique and match `configs/protocol.v1.yaml` in exact order. |
 | Generic pretrained MotionBERT | [Pinned model-zoo entry](https://github.com/Walter0807/MotionBERT/blob/705d3a95354db8bdb696b3492e47a3b5537174ff/README.md#model-zoo); [immutable author mirror](https://huggingface.co/walterzhu/MotionBERT/blob/370a9196aa3c89198b134c82476143b01c0fb32c/checkpoint/pretrain/MB_release/latest_epoch.bin) | `checkpoints/MB_release/latest_epoch.bin` | 169,958,969 | `02a9ee017e5c9d688b5dd41e0055bddb75b6eee7f5eed326a8cdc6e5bf08eaf8` | `torch.load(..., weights_only=True)` parsed 260 tensors. After removing the upstream `module.` prefix, strict loading into the pinned full MotionBERT DSTformer reported no missing or unexpected keys; a CPU smoke input produced a finite `float32` representation with shape `[1, 100, 17, 512]`. |
 
@@ -42,9 +47,8 @@ publish the same dataset as
 At the verification time above, both endpoints returned the same
 `Content-Length` (1,238,461,428), `Content-MD5`/ETag
 (`31c0efd891f18b942403de3376cee000`), and OSS CRC64
-(`1947771371206224206`). These independent server fields are strong evidence
-that the current path is a renamed mirror, but they do not replace the required
-local SHA-256 after authorized download.
+(`1947771371206224206`). The downloaded current-mirror payload matches those
+fields and now has the independently computed local SHA-256 recorded above.
 
 The two Google Drive archives linked by the NTU authors are not substitutes.
 They resolve to `nturgbd_skeletons_s001_to_s017.zip` (6,181,024,200 bytes) and
@@ -52,25 +56,38 @@ They resolve to `nturgbd_skeletons_s001_to_s017.zip` (6,181,024,200 bytes) and
 Kinect 25-joint 3D skeleton modality; this protocol requires the OpenMMLab
 HRNet-W32 17-joint COCO 2D coordinates and confidence scores.
 
-## Inputs still required
+## Protocol-count discrepancy
 
-| Input | Intended source | Intended local path | Known remote bytes | SHA-256 | Blocker |
-|---|---|---|---:|---|---|
-| NTU RGB+D 120 HRNet poses | [MotionBERT action-data instructions](https://github.com/Walter0807/MotionBERT/blob/705d3a95354db8bdb696b3492e47a3b5537174ff/docs/action.md#data); [pinned OpenMMLab path](https://download.openmmlab.com/mmaction/pyskl/data/nturgbd/ntu120_hrnet.pkl); [current OpenMMLab mirror](https://download.openmmlab.com/mmaction/v1.0/skeleton/data/ntu120_2d.pkl) | `ntu120_hrnet.pkl` | 1,238,461,428 | Pending local download | The researcher's NTU access request is pending. Download and use must wait until NTU grants access under its release agreement. |
+The dataset authors state that 535 captured NTU RGB+D 120 samples have missing
+or incomplete skeleton data and should be ignored for skeleton-based analysis.
+The locked source list contains exactly 535 unique IDs; none occurs in the
+downloaded HRNet aggregate. The aggregate's 113,945 unique annotations plus
+those 535 exclusions exactly reproduce the dataset's nominal 114,480 captures.
+All 120 action labels and all 20 official one-shot exemplars remain present.
+
+This evidence rules out truncation, but it does not authorize silently changing
+the advisor-approved protocol. `configs/protocol.v1.yaml` and
+`docs/protocol/protocol-v1.md` currently require a 114,480-row canonical source
+inventory and explicitly require an amendment when an authorized complete
+inventory differs. Before the novel test can be opened, obtain a result-blind
+advisor-approved amendment that either binds the 113,945 usable annotations and
+the missing-list digest above or records another approved resolution.
 
 ## Checks required before completion
 
-1. Confirm that the current NTU RGB+D release agreement has been accepted by
-   the researcher and that use of the HRNet-derived release is authorized.
-2. Download the full HRNet aggregate from either byte-matched OpenMMLab
-   endpoint into the ignored data root, name it `ntu120_hrnet.pkl`, compute its
-   SHA-256 before loading it, and record its byte size and UTC verification
-   time.
-3. Parse the container and verify the expected top-level `split` and
-   `annotations` structures, all 114,480 canonical `frame_dir` identifiers,
-   zero-based action labels, field ranges, duplicate absence, and presence of
-   the exact 20 official anchors. Derive the locked one-shot memberships in
-   memory and verify that each novel class has exactly one anchor. A truncated
-   or merely syntactically valid pickle is not sufficient.
-4. Re-run `git status`, `git check-ignore`, and
-   `python scripts/verify_workspace.py`; only then update the task and gate.
+1. [x] Confirm approval from ROSE Lab and authenticated access to the current
+   NTU RGB+D/120 download portal. The private approval record remains outside
+   Git; the portal displayed an expiry of `2026 October 12 21:00` without a
+   timezone label.
+2. [x] Download the full HRNet aggregate from the current byte-matched
+   OpenMMLab endpoint into the ignored data root, name it `ntu120_hrnet.pkl`,
+   and verify its byte count, MD5, and local SHA-256 before loading it.
+3. [x] Parse every available annotation; verify the top-level structures,
+   canonical identifiers, zero-based labels, ranges, duplicate absence, finite
+   pose arrays, and exact 20 official anchors; reconcile the 535 absent records
+   to the locked dataset-author exclusion list.
+4. [ ] Obtain the result-blind advisor-approved protocol-count resolution
+   described above before opening the novel test.
+5. [ ] After that resolution, re-run `git status`, `git check-ignore`, and
+   `python scripts/verify_workspace.py`; then update the task and gate without
+   changing or overwriting the protected input files.
