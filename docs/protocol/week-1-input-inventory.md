@@ -1,11 +1,12 @@
 # Week 1 input inventory
 
-Status: **inputs verified; protocol-count review required** at
+Status: **inputs verified; protocol input-contract review required** at
 `2026-09-13T02:07:49Z`. The licensed pose aggregate is present, checksummed,
 readable, and structurally valid. This record does not close `w01-task-02` or
 meet `w01-gate-02` because the aggregate contains the 113,945 usable skeleton
 samples left after the dataset authors' 535-item missing-skeleton exclusion,
-while protocol v1 currently requires a 114,480-row source inventory.
+while protocol v1 currently requires a 114,480-row inventory backed by declared
+per-sample files.
 
 All local paths below are relative to `POSE_EMBED_DATA_ROOT`. Protected files
 remain outside Git; this repository contains only public-safe provenance and
@@ -56,7 +57,7 @@ They resolve to `nturgbd_skeletons_s001_to_s017.zip` (6,181,024,200 bytes) and
 Kinect 25-joint 3D skeleton modality; this protocol requires the OpenMMLab
 HRNet-W32 17-joint COCO 2D coordinates and confidence scores.
 
-## Protocol-count discrepancy
+## Protocol input-contract discrepancy
 
 The dataset authors state that 535 captured NTU RGB+D 120 samples have missing
 or incomplete skeleton data and should be ignored for skeleton-based analysis.
@@ -70,8 +71,10 @@ the advisor-approved protocol. `configs/protocol.v1.yaml` and
 `docs/protocol/protocol-v1.md` currently require a 114,480-row canonical source
 inventory and explicitly require an amendment when an authorized complete
 inventory differs. Before the novel test can be opened, obtain a result-blind
-advisor-approved amendment that either binds the 113,945 usable annotations and
-the missing-list digest above or records another approved resolution.
+advisor-approved amendment that binds both the 113,945 usable annotations plus
+the missing-list digest above and verification of those two hash-pinned physical
+inputs in place of 114,480 declared per-sample files, or records another
+approved resolution.
 
 ## Checks required before completion
 
@@ -86,7 +89,7 @@ the missing-list digest above or records another approved resolution.
    canonical identifiers, zero-based labels, ranges, duplicate absence, finite
    pose arrays, and exact 20 official anchors; reconcile the 535 absent records
    to the locked dataset-author exclusion list.
-4. [ ] Obtain the result-blind advisor-approved protocol-count resolution
+4. [ ] Obtain the result-blind advisor-approved input-contract resolution
    described above before opening the novel test.
 5. [ ] After that resolution, re-run `git status`, `git check-ignore`, and
    `python scripts/verify_workspace.py`; then update the task and gate without

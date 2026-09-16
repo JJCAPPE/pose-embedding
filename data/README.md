@@ -23,14 +23,14 @@ class and exemplar IDs in `configs/protocol.v1.yaml`. MotionBERT's unavailable
 of poses required by this study. Do not create or redistribute a replacement
 pose pickle.
 
-The current `data verify --check-files` path intentionally accepts only
-canonicalized per-sample files whose filenames are NTU IDs; it does **not**
-claim to inspect entries inside the aggregate pickle. Do not manufacture
-114,480 repeated per-row hashes for one pickle. The Week 2 trusted importer must
-verify the container SHA-256 first, derive IDs from
-`annotations[].frame_dir`, validate counts/ranges/duplicates/labels and the
-official anchors, derive the locked partitions, and then create the per-sample
-inventory consumed here.
+`pose-embed data generate` is the trusted aggregate importer. It verifies the
+container and official missing-skeleton hashes before unpickling, derives IDs
+from `annotations[].frame_dir`, validates counts/ranges/duplicates/labels and
+pose metadata, proves the official anchor and query partitions, and writes one
+normalized source inventory plus seven immutable split manifests. Do not
+manufacture 113,945 repeated per-row hashes for one pickle. The older `data
+verify --check-files` path remains available only for genuinely per-sample
+files whose filenames are canonical NTU IDs.
 
 Expected inputs for the fixture backend are documented by
 `pose-embed features extract --help`. Real MotionBERT extraction is deliberately

@@ -15,23 +15,22 @@ authorized HRNet aggregate is also present and verified, with public-safe
 metadata in `data/manifests/ntu120-hrnet.v1.json`. Its 113,945 usable
 annotations reconcile exactly to the nominal 114,480 captures after applying
 the dataset authors' 535-item missing-skeleton list. Protocol v1 still requires
-a result-blind advisor-approved count resolution before the novel test can be
-opened.
+a result-blind advisor-approved amendment before the novel test can be opened.
+It must bind both the 113,945 usable-row count and verification of the
+hash-pinned aggregate plus missing-skeleton list in place of per-sample files.
 
 ## Smallest remaining implementation
 
-1. Use the acquired `ntu120_hrnet.pkl` below `POSE_EMBED_DATA_ROOT`, resolve the
-   113,945-valid-skeleton protocol count, and implement a trusted importer that
-   hashes the complete container before loading it, derives canonical sample
-   IDs only from `annotations[].frame_dir`, validates the amended exact source
-   count, NTU field ranges, duplicate IDs, zero-based action labels, and the
-   official anchors, then derives the locked one-shot partitions in memory and
-   emits canonicalized per-sample artifacts plus a metadata-only inventory. Do
-   not create a replacement `ntu120_hrnet_oneshot.pkl`; the public NTU class and
-   exemplar definition in `configs/protocol.v1.yaml` is the authoritative split
-   input. The current generic `data verify --check-files` command does not
-   inspect aggregate pickle entries and must not be cited as aggregate
-   verification.
+1. Use the verified Week 2 manifest bundle as the source-identity contract. Its
+   trusted importer hashes the complete `ntu120_hrnet.pkl` container and
+   missing-skeleton list before loading, derives IDs only from
+   `annotations[].frame_dir`, validates count accounting, NTU fields, duplicate
+   absence, labels, pose metadata, and official anchors, and emits a normalized
+   inventory plus seven metadata-only manifests. Populate the final evaluation
+   plan with `kind: ntu_aggregate_inventory` and the two physical source hashes.
+   Do not emit fictional per-sample files or create a replacement
+   `ntu120_hrnet_oneshot.pkl`. Obtain the result-blind amendment described above
+   before treating the bundle as final-test authorization.
 2. Use the verified pretrained checkpoint below `POSE_EMBED_DATA_ROOT`, whose
    filename, source URLs, architecture/config ID, byte size, and SHA-256 are
    recorded in `data/manifests/motionbert-checkpoint.v1.json`. Never commit the

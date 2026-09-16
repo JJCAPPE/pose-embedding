@@ -267,8 +267,19 @@ def build_manifest_records(
     protocol: ProtocolConfig,
 ) -> list[ManifestRecord]:
     """Build deterministic split records from authorized IDs and official anchors."""
-    samples = sorted({parse_ntu_sample_id(value) for value in sample_ids})
-    anchors = {parse_ntu_sample_id(value).sample_id for value in anchor_ids}
+    samples = [parse_ntu_sample_id(value) for value in sample_ids]
+    counts = Counter(sample.sample_id for sample in samples)
+    duplicates = sorted(sample_id for sample_id, count in counts.items() if count > 1)
+    if duplicates:
+        raise ValueError(f"duplicate sample IDs: {duplicates}")
+    parsed_anchors = [parse_ntu_sample_id(value).sample_id for value in anchor_ids]
+    anchor_counts = Counter(parsed_anchors)
+    duplicate_anchors = sorted(
+        sample_id for sample_id, count in anchor_counts.items() if count > 1
+    )
+    if duplicate_anchors:
+        raise ValueError(f"duplicate anchor IDs: {duplicate_anchors}")
+    anchors = set(parsed_anchors)
     official_anchors = set(protocol.dataset.official_one_shot_exemplars)
     if anchors != official_anchors:
         missing = sorted(official_anchors - anchors)

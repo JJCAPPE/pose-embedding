@@ -8,7 +8,7 @@ import os
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -22,6 +22,10 @@ from pose_embed.config import (
     load_protocol,
     validate_experiment_against_protocol,
 )
+
+if TYPE_CHECKING:
+    from pose_embed.data.inventory import NTUInventoryRecord
+    from pose_embed.data.manifest import ManifestRecord
 
 
 class ProtocolLock(BaseModel):
@@ -47,6 +51,38 @@ class ProtocolLock(BaseModel):
         return value
 
 
+class LockedAggregateSource(BaseModel):
+    """The two hash-pinned physical inputs behind an aggregate inventory."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    aggregate_relative_path: str = Field(min_length=1)
+    aggregate_bytes: int = Field(gt=0)
+    aggregate_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    missing_list_relative_path: str = Field(min_length=1)
+    missing_list_bytes: int = Field(ge=0)
+    missing_list_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    missing_sample_count: int = Field(ge=0)
+    nominal_capture_count: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def paths_are_normalized_and_distinct(self) -> LockedAggregateSource:
+        paths = (self.aggregate_relative_path, self.missing_list_relative_path)
+        for value in paths:
+            path = PurePosixPath(value)
+            if (
+                path.is_absolute()
+                or value != path.as_posix()
+                or any(part in {"", ".", ".."} for part in path.parts)
+            ):
+                raise ValueError(
+                    "locked aggregate paths must be normalized and relative"
+                )
+        if len(set(paths)) != 2:
+            raise ValueError("aggregate and missing-list paths must be distinct")
+        return self
+
+
 class LockedManifest(BaseModel):
     """Exact bytes and ordered identity set for one final-evaluation manifest."""
 
@@ -56,6 +92,8 @@ class LockedManifest(BaseModel):
     sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     sample_count: int = Field(gt=0)
     sample_ids: tuple[str, ...]
+    kind: Literal["manifest_records", "ntu_aggregate_inventory"] = "manifest_records"
+    aggregate_source: LockedAggregateSource | None = None
 
     @model_validator(mode="after")
     def path_and_identities_are_exact(self) -> LockedManifest:
@@ -76,6 +114,12 @@ class LockedManifest(BaseModel):
             parse_ntu_sample_id(value).sample_id != value for value in self.sample_ids
         ):
             raise ValueError("locked manifest sample IDs must be canonical NTU IDs")
+        if (self.kind == "ntu_aggregate_inventory") != (
+            self.aggregate_source is not None
+        ):
+            raise ValueError(
+                "only an ntu_aggregate_inventory binding requires aggregate_source"
+            )
         return self
 
 
@@ -158,6 +202,18 @@ class EvaluationPlan(BaseModel):
         assert anchors is not None
         assert official is not None
         assert primary is not None
+        if any(
+            manifest.kind != "manifest_records"
+            for manifest in (anchors, official, primary)
+        ):
+            raise ValueError("evaluation subsets must use manifest-record bindings")
+        if source.aggregate_source is not None and (
+            source.sample_count + source.aggregate_source.missing_sample_count
+            != source.aggregate_source.nominal_capture_count
+        ):
+            raise ValueError(
+                "aggregate usable and missing counts must equal nominal captures"
+            )
         if anchors.sample_count != 20:
             raise ValueError("locked anchor manifest requires exactly 20 samples")
         anchor_ids = set(anchors.sample_ids)
@@ -392,6 +448,45 @@ def validate_locked_manifest(
     return sample_ids
 
 
+def validate_locked_inventory(
+    binding: LockedManifest,
+    path: str | Path,
+) -> tuple[NTUInventoryRecord, ...]:
+    """Require exact bytes, rows, and order for an aggregate source inventory."""
+    from pose_embed.data.inventory import load_inventory
+    from pose_embed.provenance import sha256_file
+
+    if binding.kind != "ntu_aggregate_inventory":
+        raise ValueError("source inventory binding is not aggregate-aware")
+    inventory_path = Path(path)
+    if sha256_file(inventory_path) != binding.sha256:
+        raise ValueError(f"inventory hash differs from locked plan: {inventory_path}")
+    records = load_inventory(inventory_path)
+    sample_ids = tuple(record.sample_id for record in records)
+    if len(records) != binding.sample_count or sample_ids != binding.sample_ids:
+        raise ValueError(
+            f"inventory identities/count differ from locked plan: {inventory_path}"
+        )
+    return tuple(records)
+
+
+def _load_locked_source_records(
+    binding: LockedManifest,
+    path: str | Path,
+    protocol: ProtocolConfig,
+) -> tuple[ManifestRecord | NTUInventoryRecord, ...]:
+    """Validate and load either supported physical source-inventory contract."""
+    if binding.kind == "ntu_aggregate_inventory":
+        return validate_locked_inventory(binding, path)
+
+    validate_locked_manifest(binding, path)
+    from pose_embed.data import load_manifest, verify_manifests
+
+    records = load_manifest(path)
+    verify_manifests(records, protocol)
+    return tuple(records)
+
+
 def validate_evaluation_manifests(
     protocol: ProtocolConfig,
     plan: EvaluationPlan,
@@ -430,27 +525,39 @@ def validate_evaluation_manifests(
     for name, optional_binding in bindings.items():
         assert optional_binding is not None
         path = _locked_path(root, optional_binding.relative_path)
-        validate_locked_manifest(
-            optional_binding,
-            path,
-            expected_split=expected_splits[name],
-        )
+        if name != "source_inventory":
+            validate_locked_manifest(
+                optional_binding,
+                path,
+                expected_split=expected_splits[name],
+            )
         paths[name] = path
 
     from pose_embed.data import load_manifest, verify_manifests
     from pose_embed.data.ntu import parse_ntu_sample_id
 
-    source_records = load_manifest(paths["source_inventory"])
-    verify_manifests(source_records, protocol)
+    source_records = list(
+        _load_locked_source_records(
+            source_binding,
+            paths["source_inventory"],
+            protocol,
+        )
+    )
+    aggregate_backed = source_binding.kind == "ntu_aggregate_inventory"
     if {record.ntu.action for record in source_records} != set(range(1, 121)):
         raise ValueError("source inventory must cover all 120 dataset actions")
-    if any(
-        record.relative_path is None or record.sha256 is None
-        for record in source_records
-    ):
-        raise ValueError("source inventory requires one path and checksum per sample")
-    if len({record.relative_path for record in source_records}) != len(source_records):
-        raise ValueError("source inventory paths must be unique")
+    if not aggregate_backed:
+        if any(
+            record.relative_path is None or record.sha256 is None
+            for record in source_records
+        ):
+            raise ValueError(
+                "source inventory requires one path and checksum per sample"
+            )
+        if len({record.relative_path for record in source_records}) != len(
+            source_records
+        ):
+            raise ValueError("source inventory paths must be unique")
 
     anchors = load_manifest(paths["anchor"])
     official = load_manifest(paths["official"])
@@ -489,33 +596,69 @@ def validate_evaluation_manifests(
         )
 
     source_by_id = {record.sample_id: record for record in source_records}
-    for record in anchors:
-        source = source_by_id.get(record.sample_id)
-        if source is None or source.split != "novel_anchor":
-            raise ValueError("source inventory does not identify every official anchor")
-    for record in official:
-        source = source_by_id.get(record.sample_id)
-        if source is None or source.split != "novel_query_official":
-            raise ValueError("source inventory does not identify every official query")
-    for records in (anchors, official, primary):
-        for record in records:
-            source = source_by_id[record.sample_id]
-            if (
-                record.relative_path != source.relative_path
-                or record.sha256 != source.sha256
-            ):
+    if aggregate_backed:
+        if any(
+            record.sample_id not in source_by_id
+            for record in (*anchors, *official, *primary)
+        ):
+            raise ValueError(
+                "evaluation subset identity is absent from source inventory"
+            )
+        if any(
+            record.relative_path is not None or record.sha256 is not None
+            for record in (*anchors, *official, *primary)
+        ):
+            raise ValueError(
+                "aggregate-backed evaluation subsets cannot claim per-sample files"
+            )
+        aggregate_source = source_binding.aggregate_source
+        assert aggregate_source is not None
+        inventory_payload = [
+            {
+                "relative_path": aggregate_source.aggregate_relative_path,
+                "bytes": aggregate_source.aggregate_bytes,
+                "sha256": aggregate_source.aggregate_sha256,
+            },
+            {
+                "relative_path": aggregate_source.missing_list_relative_path,
+                "bytes": aggregate_source.missing_list_bytes,
+                "sha256": aggregate_source.missing_list_sha256,
+            },
+        ]
+        source_file_count = len(inventory_payload)
+    else:
+        for record in anchors:
+            source = source_by_id.get(record.sample_id)
+            if source is None or source.split != "novel_anchor":
                 raise ValueError(
-                    "evaluation subset path/checksum differs from source inventory"
+                    "source inventory does not identify every official anchor"
                 )
+        for record in official:
+            source = source_by_id.get(record.sample_id)
+            if source is None or source.split != "novel_query_official":
+                raise ValueError(
+                    "source inventory does not identify every official query"
+                )
+        for records in (anchors, official, primary):
+            for record in records:
+                source = source_by_id[record.sample_id]
+                if (
+                    record.relative_path != source.relative_path
+                    or record.sha256 != source.sha256
+                ):
+                    raise ValueError(
+                        "evaluation subset path/checksum differs from source inventory"
+                    )
+        inventory_payload = [
+            {
+                "sample_id": record.sample_id,
+                "relative_path": record.relative_path,
+                "sha256": record.sha256,
+            }
+            for record in source_records
+        ]
+        source_file_count = len(source_records)
 
-    inventory_payload = [
-        {
-            "sample_id": record.sample_id,
-            "relative_path": record.relative_path,
-            "sha256": record.sha256,
-        }
-        for record in source_records
-    ]
     source_files_sha256 = hashlib.sha256(
         json.dumps(
             inventory_payload,
@@ -534,52 +677,80 @@ def validate_evaluation_manifests(
         if not resolved_data_root.is_absolute():
             raise ValueError("POSE_EMBED_DATA_ROOT must be an absolute path")
         resolved_data_root = resolved_data_root.resolve()
-        verify_manifests(
-            source_records,
-            protocol,
-            data_root=resolved_data_root,
-            check_files=True,
-        )
-        discovered: dict[str, str] = {}
-        for candidate in resolved_data_root.rglob("*"):
-            if not candidate.is_file():
-                continue
-            try:
-                sample = parse_ntu_sample_id(candidate.name)
-            except ValueError:
-                continue
-            resolved_candidate = candidate.resolve()
-            try:
-                relative_path = resolved_candidate.relative_to(
-                    resolved_data_root
-                ).as_posix()
-            except ValueError as exc:
+        if aggregate_backed:
+            from pose_embed.data.inventory import inspect_ntu_aggregate_sources
+
+            aggregate_source = source_binding.aggregate_source
+            assert aggregate_source is not None
+            inspected = inspect_ntu_aggregate_sources(
+                resolved_data_root,
+                protocol,
+                aggregate_relative_path=(aggregate_source.aggregate_relative_path),
+                aggregate_bytes=aggregate_source.aggregate_bytes,
+                aggregate_sha256=aggregate_source.aggregate_sha256,
+                missing_list_relative_path=(
+                    aggregate_source.missing_list_relative_path
+                ),
+                missing_list_bytes=aggregate_source.missing_list_bytes,
+                missing_list_sha256=aggregate_source.missing_list_sha256,
+                missing_sample_count=aggregate_source.missing_sample_count,
+                usable_annotation_count=source_binding.sample_count,
+                nominal_capture_count=aggregate_source.nominal_capture_count,
+            )
+            if inspected.records != tuple(source_records):
                 raise ValueError(
-                    "source inventory data path escapes data root"
-                ) from exc
-            previous = discovered.setdefault(sample.sample_id, relative_path)
-            if previous != relative_path:
-                raise ValueError(
-                    f"multiple physical files identify source sample {sample.sample_id}"
+                    "locked inventory metadata differs from the verified aggregate"
                 )
-        declared = {record.sample_id: record.relative_path for record in source_records}
-        if discovered != declared:
-            missing = sorted(set(discovered) - set(declared))
-            extra = sorted(set(declared) - set(discovered))
-            mismatched = sorted(
-                sample_id
-                for sample_id in set(discovered) & set(declared)
-                if discovered[sample_id] != declared[sample_id]
+        else:
+            verify_manifests(
+                source_records,
+                protocol,
+                data_root=resolved_data_root,
+                check_files=True,
             )
-            raise ValueError(
-                "source inventory is not a complete filesystem-derived inventory; "
-                f"unlisted={missing[:10]}, absent={extra[:10]}, "
-                f"path_mismatches={mismatched[:10]}"
-            )
+            discovered: dict[str, str] = {}
+            for candidate in resolved_data_root.rglob("*"):
+                if not candidate.is_file():
+                    continue
+                try:
+                    sample = parse_ntu_sample_id(candidate.name)
+                except ValueError:
+                    continue
+                resolved_candidate = candidate.resolve()
+                try:
+                    relative_path = resolved_candidate.relative_to(
+                        resolved_data_root
+                    ).as_posix()
+                except ValueError as exc:
+                    raise ValueError(
+                        "source inventory data path escapes data root"
+                    ) from exc
+                previous = discovered.setdefault(sample.sample_id, relative_path)
+                if previous != relative_path:
+                    raise ValueError(
+                        "multiple physical files identify source sample "
+                        f"{sample.sample_id}"
+                    )
+            declared = {
+                record.sample_id: record.relative_path for record in source_records
+            }
+            if discovered != declared:
+                missing = sorted(set(discovered) - set(declared))
+                extra = sorted(set(declared) - set(discovered))
+                mismatched = sorted(
+                    sample_id
+                    for sample_id in set(discovered) & set(declared)
+                    if discovered[sample_id] != declared[sample_id]
+                )
+                raise ValueError(
+                    "source inventory is not a complete filesystem-derived inventory; "
+                    f"unlisted={missing[:10]}, absent={extra[:10]}, "
+                    f"path_mismatches={mismatched[:10]}"
+                )
 
     return EvaluationManifestValidation(
         paths=paths,
-        source_file_count=len(source_records),
+        source_file_count=source_file_count,
         source_files_sha256=source_files_sha256,
         source_files_verified=check_source_files,
     )
@@ -617,6 +788,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/protocol.py",
         "src/pose_embed/test_access.py",
         "src/pose_embed/data/__init__.py",
+        "src/pose_embed/data/inventory.py",
         "src/pose_embed/data/manifest.py",
         "src/pose_embed/data/ntu.py",
     ),
@@ -991,12 +1163,16 @@ def _validate_training_run_artifacts(
     source_manifest_path = _locked_path(
         root, plan.source_inventory_manifest.relative_path
     )
-    validate_locked_manifest(plan.source_inventory_manifest, source_manifest_path)
     from pose_embed.data import load_manifest, verify_manifests
 
-    source_records = load_manifest(source_manifest_path)
+    source_records = list(
+        _load_locked_source_records(
+            plan.source_inventory_manifest,
+            source_manifest_path,
+            protocol,
+        )
+    )
     training_records = load_manifest(training_manifest_candidates[0])
-    verify_manifests(source_records, protocol)
     verify_manifests(training_records, protocol)
     expected_training_ids = tuple(
         record.sample_id
