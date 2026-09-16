@@ -12,6 +12,7 @@ from pose_embed.data import load_manifest, verify_manifests
 from pose_embed.data.inventory import inspect_ntu_aggregate, write_manifest_bundle
 from pose_embed.evaluation.runner import evaluate_files
 from pose_embed.features import apply_trained_head, extract_fixture_features
+from pose_embed.gpu_profile import profile_motionbert_gpu
 from pose_embed.protocol import current_code_hashes, verify_protocol
 from pose_embed.report import build_report
 from pose_embed.training import train_head
@@ -25,6 +26,13 @@ def _parser() -> argparse.ArgumentParser:
         description="Protocol-locked one-shot pose-retrieval experiments",
     )
     commands = parser.add_subparsers(dest="area", required=True)
+
+    profile = commands.add_parser("profile", help="profile compute prerequisites")
+    profile_commands = profile.add_subparsers(dest="operation", required=True)
+    profile_gpu = profile_commands.add_parser(
+        "gpu", help="profile the pinned frozen MotionBERT encoder"
+    )
+    profile_gpu.add_argument("--output", required=True)
 
     protocol = commands.add_parser("protocol", help="validate the study protocol")
     protocol_commands = protocol.add_subparsers(dest="operation", required=True)
@@ -178,6 +186,9 @@ def _print(payload: object) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        if args.area == "profile":
+            _print(profile_motionbert_gpu(args.output))
+            return 0
         if args.area == "protocol":
             protocol, digest = verify_protocol(
                 args.config,
