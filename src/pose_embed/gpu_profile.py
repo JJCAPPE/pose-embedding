@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import gc
+import inspect
 import json
 import os
 import re
@@ -21,6 +22,7 @@ import torch
 import yaml
 from torch import nn
 
+from pose_embed.protocol import verify_protocol
 from pose_embed.provenance import (
     capture_provenance,
     require_path_within,
@@ -34,11 +36,14 @@ _CHECKPOINT_MANIFEST = (
     _REPOSITORY / "data" / "manifests" / "motionbert-checkpoint.v1.json"
 )
 _JOB_SCRIPT = _REPOSITORY / "scripts" / "profile_motionbert_gpu.qsub"
+_PROTOCOL_CONFIG = _REPOSITORY / "configs" / "protocol.v1.yaml"
 _BATCH_SIZES = (32, 64)
 _PEOPLE = 2
 _FRAMES = 100
 _JOINTS = 17
 _CHANNELS = 3
+_REPRESENTATION_DIMENSION = 512
+_PROFILE_SEED = 20260912
 _WARMUPS = 3
 _REPEATS = 10
 
@@ -79,6 +84,40 @@ def _disk_usage(path: Path) -> dict[str, int | str]:
     }
 
 
+def _profile_contract() -> dict[str, object]:
+    protocol, digest = verify_protocol(_PROTOCOL_CONFIG)
+    declared = {
+        "batch_sizes": (
+            protocol.batch.physical_batch_size,
+            protocol.batch.profile_batch_size,
+        ),
+        "people": protocol.encoder.people,
+        "frames": protocol.dataset.frames,
+        "joints": protocol.dataset.joints,
+        "channels": len(protocol.input_pipeline.channels),
+        "dtype": protocol.input_pipeline.dtype,
+        "tensor_layout": protocol.input_pipeline.tensor_layout,
+        "representation_dimension": protocol.encoder.representation_dimension,
+    }
+    expected = {
+        "batch_sizes": _BATCH_SIZES,
+        "people": _PEOPLE,
+        "frames": _FRAMES,
+        "joints": _JOINTS,
+        "channels": _CHANNELS,
+        "dtype": "float32",
+        "tensor_layout": "people_frames_joints_channels",
+        "representation_dimension": _REPRESENTATION_DIMENSION,
+    }
+    if declared != expected:
+        raise ValueError("GPU profile constants differ from protocol v1")
+    return {
+        "protocol_id": protocol.protocol_id,
+        "protocol_sha256": digest,
+        **declared,
+    }
+
+
 def _load_frozen_encoder(data_root: Path) -> tuple[nn.Module, dict[str, object]]:
     with _UPSTREAM_MANIFEST.open("rb") as stream:
         upstream_document = tomllib.load(stream)
@@ -96,6 +135,16 @@ def _load_frozen_encoder(data_root: Path) -> tuple[nn.Module, dict[str, object]]
         or commit_result.get("stdout") != motionbert["commit"]
     ):
         raise ValueError("the pinned MotionBERT checkout is missing or changed")
+    status_result = _command(
+        "git",
+        "-C",
+        str(upstream_root),
+        "status",
+        "--short",
+        "--untracked-files=no",
+    )
+    if status_result.get("returncode") != 0 or status_result.get("stdout"):
+        raise ValueError("the pinned MotionBERT checkout has tracked changes")
     for license_file in motionbert["license_files"]:
         if not (upstream_root / license_file).is_file():
             raise ValueError(f"MotionBERT license file is missing: {license_file}")
@@ -125,6 +174,10 @@ def _load_frozen_encoder(data_root: Path) -> tuple[nn.Module, dict[str, object]]
         from lib.model.DSTformer import DSTformer
     finally:
         sys.path.remove(str(upstream_root))
+    implementation_path = Path(inspect.getfile(DSTformer)).resolve()
+    expected_implementation_path = upstream_root / "lib" / "model" / "DSTformer.py"
+    if implementation_path != expected_implementation_path:
+        raise ValueError("MotionBERT imported from outside the pinned checkout")
 
     encoder = DSTformer(
         dim_in=_CHANNELS,
@@ -160,6 +213,8 @@ def _load_frozen_encoder(data_root: Path) -> tuple[nn.Module, dict[str, object]]
     return encoder, {
         "upstream_root": str(upstream_root),
         "upstream_commit": motionbert["commit"],
+        "implementation_path": str(implementation_path),
+        "implementation_sha256": sha256_file(implementation_path),
         "config_path": str(config_path),
         "config_sha256": sha256_file(config_path),
         "checkpoint_path": str(checkpoint_path),
@@ -175,8 +230,11 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
     device = torch.device("cuda", torch.cuda.current_device())
     poses: torch.Tensor | None = None
     represented: torch.Tensor | None = None
+    stage = "input_allocation"
     try:
-        generator = torch.Generator(device=device).manual_seed(20260912)
+        torch.cuda.empty_cache()
+        torch.cuda.reset_peak_memory_stats(device)
+        generator = torch.Generator(device=device).manual_seed(_PROFILE_SEED)
         poses = torch.rand(
             (batch_size, _PEOPLE, _FRAMES, _JOINTS, _CHANNELS),
             dtype=torch.float32,
@@ -184,6 +242,7 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
             generator=generator,
         )
         flattened = poses.reshape(batch_size * _PEOPLE, _FRAMES, _JOINTS, _CHANNELS)
+        stage = "warmup"
         with torch.inference_mode():
             for _ in range(_WARMUPS):
                 represented = encoder.get_representation(flattened)  # type: ignore[attr-defined]
@@ -193,6 +252,7 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
             torch.cuda.reset_peak_memory_stats(device)
 
             elapsed_ms: list[float] = []
+            stage = "timed_forward"
             for _ in range(_REPEATS):
                 start = torch.cuda.Event(enable_timing=True)
                 end = torch.cuda.Event(enable_timing=True)
@@ -201,6 +261,25 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
                 end.record()
                 end.synchronize()
                 elapsed_ms.append(float(start.elapsed_time(end)))
+
+        expected_shape = [
+            batch_size * _PEOPLE,
+            _FRAMES,
+            _JOINTS,
+            _REPRESENTATION_DIMENSION,
+        ]
+        if list(represented.shape) != expected_shape:
+            raise RuntimeError(
+                f"MotionBERT output shape differs from the protocol: "
+                f"{list(represented.shape)}"
+            )
+        if represented.dtype != torch.float32:
+            raise RuntimeError(
+                "MotionBERT output dtype differs from the protocol: "
+                f"{represented.dtype}"
+            )
+        if not bool(torch.isfinite(represented).all().item()):
+            raise RuntimeError("MotionBERT output contains a non-finite value")
 
         median_ms = statistics.median(elapsed_ms)
         return {
@@ -212,6 +291,7 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
             "output_shape": list(represented.shape),
             "warmups": _WARMUPS,
             "repeats": _REPEATS,
+            "timing_source": "torch_cuda_event_device_time",
             "forward_times_ms": elapsed_ms,
             "median_forward_ms": median_ms,
             "samples_per_second_at_median": batch_size / (median_ms / 1000),
@@ -225,6 +305,9 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
             "encoder_batch_size": batch_size * _PEOPLE,
             "input_shape": [batch_size, _PEOPLE, _FRAMES, _JOINTS, _CHANNELS],
             "input_dtype": "torch.float32",
+            "failure_stage": stage,
+            "peak_allocated_bytes": torch.cuda.max_memory_allocated(device),
+            "peak_reserved_bytes": torch.cuda.max_memory_reserved(device),
         }
     finally:
         del represented, poses
@@ -241,19 +324,65 @@ def _scheduler_profile() -> dict[str, object]:
             "QUEUE",
             "NSLOTS",
             "PE",
+            "PROJECT",
             "SGE_CELL",
             "SGE_ROOT",
         )
         if name in os.environ
     }
     job_id = scheduler_environment.get("JOB_ID")
+    queue = scheduler_environment.get("QUEUE")
+    project = scheduler_environment.get("PROJECT")
     return {
         "kind": "Grid Engine",
         "environment": scheduler_environment,
         "version": _command("qstat", "-help"),
         "job": _command("qstat", "-j", str(job_id)),
         "global_limits": _command("qconf", "-sconf"),
-        "resource_quota_sets": _command("qconf", "-srqs"),
+        "scheduler_limits": _command("qconf", "-ssconf"),
+        "assigned_queue": _command("qconf", "-sq", str(queue)),
+        "shared_gpu_limits": _command("qconf", "-srqs", "shared_gpu_queue_limits"),
+        "shared_gpu_slot_limits": _command(
+            "qconf", "-srqs", "shared_gpu_queue_limits_2"
+        ),
+        "project": _command("qconf", "-sprj", str(project)),
+    }
+
+
+def _command_succeeded(record: object) -> bool:
+    if not isinstance(record, dict) or record.get("returncode") != 0:
+        return False
+    return bool(record.get("stdout") or record.get("stderr"))
+
+
+def _profile_decision(
+    batches: list[dict[str, object]], *, evidence_complete: bool
+) -> dict[str, object]:
+    batch_32_ok = batches[0]["status"] == "success"
+    batch_64_ok = batches[1]["status"] == "success"
+    if not batch_32_ok:
+        status = "no_feasible_protocol_batch"
+        justification = "Physical batch 32 did not complete on the assigned GPU."
+    elif not evidence_complete:
+        status = "profile_evidence_incomplete"
+        justification = (
+            "Physical batch 32 completed, but required device, scheduler, or quota "
+            "evidence could not be captured."
+        )
+    elif not batch_64_ok:
+        status = "retain_physical_batch_32"
+        justification = "Batch 32 completed and batch 64 exhausted CUDA memory."
+    else:
+        status = "retain_physical_batch_32_pending_core_method_profile"
+        justification = (
+            "Both encoder forwards completed, but protocol v1 permits batch 64 only "
+            "after every core objective fits during the Week 4 method-level profile."
+        )
+    return {
+        "physical_batch_size": 32 if batch_32_ok else None,
+        "status": status,
+        "justification": justification,
+        "week_1_gate_supported": batch_32_ok and evidence_complete,
     }
 
 
@@ -277,31 +406,58 @@ def profile_motionbert_gpu(output_path: str | Path) -> dict[str, object]:
         raise ValueError(f"refusing to overwrite immutable artifact: {destination}")
 
     started_at = datetime.now(UTC)
+    contract = _profile_contract()
     encoder, model_profile = _load_frozen_encoder(data_root)
     device_index = torch.cuda.current_device()
     device = torch.device("cuda", device_index)
     encoder.to(device)
     properties = torch.cuda.get_device_properties(device)
     batches = [_profile_batch(encoder, size) for size in _BATCH_SIZES]
-    batch_32_ok = batches[0]["status"] == "success"
-    batch_64_ok = batches[1]["status"] == "success"
-    if not batch_32_ok:
-        decision = "no_feasible_protocol_batch"
-        justification = "Physical batch 32 did not complete on the assigned GPU."
-    elif not batch_64_ok:
-        decision = "retain_physical_batch_32"
-        justification = "Batch 32 completed and batch 64 exhausted CUDA memory."
-    else:
-        decision = "retain_physical_batch_32_pending_core_method_profile"
-        justification = (
-            "Both encoder forwards completed, but protocol v1 permits batch 64 only "
-            "after every core objective fits during the Week 4 method-level profile."
-        )
+    driver_profile = _command(
+        "nvidia-smi",
+        "--query-gpu=driver_version",
+        "--format=csv,noheader",
+    )
+    scheduler_profile = _scheduler_profile()
+    scheduler_environment = scheduler_profile["environment"]
+    if not isinstance(scheduler_environment, dict):
+        raise RuntimeError("scheduler environment evidence is malformed")
+    project = scheduler_environment.get("PROJECT")
+    storage_profile = {
+        "data_root": _disk_usage(data_root),
+        "artifact_root": _disk_usage(artifact_root),
+        "home_quota": _command("quota", "-s"),
+        "project_quota": _command("pquota", "-u", str(project)),
+    }
+    evidence_commands = {
+        "device_driver": driver_profile,
+        "scheduler_version": scheduler_profile["version"],
+        "scheduler_job": scheduler_profile["job"],
+        "scheduler_global_limits": scheduler_profile["global_limits"],
+        "scheduler_limits": scheduler_profile["scheduler_limits"],
+        "assigned_queue": scheduler_profile["assigned_queue"],
+        "shared_gpu_limits": scheduler_profile["shared_gpu_limits"],
+        "shared_gpu_slot_limits": scheduler_profile["shared_gpu_slot_limits"],
+        "scheduler_project": scheduler_profile["project"],
+        "home_quota": storage_profile["home_quota"],
+        "project_quota": storage_profile["project_quota"],
+    }
+    failed_evidence = [
+        name
+        for name, record in evidence_commands.items()
+        if not _command_succeeded(record)
+    ]
+    evidence_complete = not failed_evidence
+    decision = _profile_decision(batches, evidence_complete=evidence_complete)
 
     ended_at = datetime.now(UTC)
     profile: dict[str, Any] = {
         "schema_version": 1,
-        "profile_scope": "synthetic-input compute profile; not encoder parity evidence",
+        "profile_scope": (
+            "dense synthetic-input compute and memory profile only; not "
+            "preprocessing or encoder-parity evidence"
+        ),
+        "protocol": contract,
         "started_at": started_at.isoformat(),
         "ended_at": ended_at.isoformat(),
         "host": socket.gethostname(),
@@ -311,11 +467,7 @@ def profile_motionbert_gpu(output_path: str | Path) -> dict[str, object]:
             "total_memory_bytes": properties.total_memory,
             "compute_capability": list(torch.cuda.get_device_capability(device)),
             "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
-            "driver": _command(
-                "nvidia-smi",
-                "--query-gpu=driver_version",
-                "--format=csv,noheader",
-            ),
+            "driver": driver_profile,
         },
         "software": {
             "torch": torch.__version__,
@@ -323,19 +475,14 @@ def profile_motionbert_gpu(output_path: str | Path) -> dict[str, object]:
             "cudnn": torch.backends.cudnn.version(),
         },
         "model": model_profile,
-        "scheduler": _scheduler_profile(),
-        "storage": {
-            "data_root": _disk_usage(data_root),
-            "artifact_root": _disk_usage(artifact_root),
-            "account_quota": _command("quota", "-s"),
+        "scheduler": scheduler_profile,
+        "storage": storage_profile,
+        "evidence": {
+            "complete": evidence_complete,
+            "failed_commands": failed_evidence,
         },
         "batches": batches,
-        "decision": {
-            "physical_batch_size": 32 if batch_32_ok else None,
-            "status": decision,
-            "justification": justification,
-            "week_1_gate_supported": batch_32_ok,
-        },
+        "decision": decision,
     }
     profile["provenance"] = capture_provenance(
         command=f"pose-embed profile gpu --output {destination}",
@@ -347,14 +494,18 @@ def profile_motionbert_gpu(output_path: str | Path) -> dict[str, object]:
             "channels": _CHANNELS,
             "warmups": _WARMUPS,
             "repeats": _REPEATS,
+            "profile_seed": _PROFILE_SEED,
+            "protocol_sha256": contract["protocol_sha256"],
         },
         inputs=(
             Path(__file__),
             _JOB_SCRIPT,
             _UPSTREAM_MANIFEST,
             _CHECKPOINT_MANIFEST,
-            model_profile["config_path"],
-            model_profile["checkpoint_path"],
+            _PROTOCOL_CONFIG,
+            Path(str(model_profile["implementation_path"])),
+            Path(str(model_profile["config_path"])),
+            Path(str(model_profile["checkpoint_path"])),
         ),
         repository=_REPOSITORY,
         started_at=started_at,
