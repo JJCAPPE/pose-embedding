@@ -8,6 +8,7 @@
 #$ -l gpu_c=7.0
 #$ -l gpu_memory=16G
 #$ -l mem_per_core=8G
+#$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT
 
 set -euo pipefail
 
