@@ -70,6 +70,26 @@ def test_manifest_builder_rejects_nonofficial_one_shot_exemplars(
         build_manifest_records(samples, samples, protocol)
 
 
+def test_manifest_builder_rejects_duplicate_identifiers_before_normalization(
+    protocol_path: Path,
+) -> None:
+    protocol = load_protocol(protocol_path)
+    anchors = list(protocol.dataset.official_one_shot_exemplars)
+
+    with pytest.raises(ValueError, match="duplicate sample IDs"):
+        build_manifest_records([*anchors, anchors[0].lower()], anchors, protocol)
+
+
+def test_manifest_builder_rejects_duplicate_anchor_identifiers(
+    protocol_path: Path,
+) -> None:
+    protocol = load_protocol(protocol_path)
+    anchors = list(protocol.dataset.official_one_shot_exemplars)
+
+    with pytest.raises(ValueError, match="duplicate anchor IDs"):
+        build_manifest_records(anchors, [*anchors, anchors[0].lower()], protocol)
+
+
 def test_manifest_verifier_rejects_primary_anchor_performance_leakage(
     protocol_path: Path,
 ) -> None:

@@ -12,8 +12,11 @@ from pose_embed.config import (
     validate_experiment_against_protocol,
 )
 from pose_embed.data import ManifestRecord
+from pose_embed.data.inventory import NTUInventoryRecord
+from pose_embed.data.ntu import parse_ntu_sample_id
 from pose_embed.protocol import (
     SCIENTIFIC_CODE_PATHS,
+    EvaluationPlan,
     FinalRunSet,
     LockedManifest,
     current_code_hashes,
@@ -369,6 +372,79 @@ def test_final_run_artifacts_must_match_locked_files_and_current_code(
             tmp_path,
             protocol=protocol,
         )
+
+
+def test_final_run_artifacts_accept_locked_aggregate_inventory(
+    repository_root: Path,
+    protocol_path: Path,
+    tmp_path: Path,
+) -> None:
+    protocol = load_protocol(protocol_path)
+    base_plan = locked_plan()
+    assert base_plan.source_inventory_manifest is not None
+    inventory_records = []
+    for index, sample_id in enumerate(base_plan.source_inventory_manifest.sample_ids):
+        sample = parse_ntu_sample_id(sample_id)
+        inventory_records.append(
+            NTUInventoryRecord(
+                sample_id=sample.sample_id,
+                annotation_index=index,
+                setup=sample.setup,
+                camera=sample.camera,
+                performer=sample.performer,
+                repetition=sample.repetition,
+                action=sample.action,
+                label=sample.action - 1,
+                pose_track_count=1,
+                nonempty_track_count=1,
+                total_frames=2,
+                keypoint_shape=(1, 2, 17, 2),
+                keypoint_score_shape=(1, 2, 17),
+                image_shape=(1080, 1920),
+                original_shape=(1080, 1920),
+            )
+        )
+    inventory_payload = (
+        "\n".join(record.model_dump_json() for record in inventory_records) + "\n"
+    )
+    inventory_path = tmp_path / base_plan.source_inventory_manifest.relative_path
+    inventory_path.parent.mkdir(parents=True, exist_ok=True)
+    inventory_path.write_text(inventory_payload, encoding="utf-8")
+
+    plan_payload = base_plan.model_dump(mode="json")
+    plan_payload["source_inventory_manifest"].update(
+        {
+            "kind": "ntu_aggregate_inventory",
+            "sha256": sha256_file(inventory_path),
+            "aggregate_source": {
+                "aggregate_relative_path": "ntu120.pkl",
+                "aggregate_bytes": 1,
+                "aggregate_sha256": "a" * 64,
+                "missing_list_relative_path": "missing.txt",
+                "missing_list_bytes": 0,
+                "missing_list_sha256": "b" * 64,
+                "missing_sample_count": 0,
+                "nominal_capture_count": len(inventory_records),
+            },
+        }
+    )
+    plan = EvaluationPlan.model_validate(plan_payload)
+    run_set = materialize_final_run_set(
+        tmp_path,
+        repository_root,
+        protocol,
+        plan,
+    )
+    inventory_path.write_text(inventory_payload, encoding="utf-8")
+
+    files = validate_final_run_artifacts(
+        run_set,
+        run_set.runs[0],
+        tmp_path,
+        protocol=protocol,
+    )
+
+    assert files["checkpoint"].is_file()
 
 
 def test_final_run_rejects_seed_specific_config_semantic_mismatch(

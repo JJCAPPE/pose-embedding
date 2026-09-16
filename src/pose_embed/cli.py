@@ -9,6 +9,7 @@ import sys
 from collections.abc import Sequence
 
 from pose_embed.data import load_manifest, verify_manifests
+from pose_embed.data.inventory import inspect_ntu_aggregate, write_manifest_bundle
 from pose_embed.evaluation.runner import evaluate_files
 from pose_embed.features import apply_trained_head, extract_fixture_features
 from pose_embed.protocol import current_code_hashes, verify_protocol
@@ -54,6 +55,17 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="validate a development subset without requiring every protocol class",
     )
+    data_generate = data_commands.add_parser(
+        "generate",
+        help="hash-verify the trusted NTU aggregate and write immutable manifests",
+    )
+    data_generate.add_argument("--data-root")
+    data_generate.add_argument("--output-dir", required=True)
+    data_generate.add_argument(
+        "--source-metadata",
+        default="data/manifests/ntu120-hrnet.v1.json",
+    )
+    data_generate.add_argument("--config", default=DEFAULT_PROTOCOL)
 
     features = commands.add_parser("features", help="extract cached representations")
     feature_commands = features.add_subparsers(dest="operation", required=True)
@@ -186,6 +198,17 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
         if args.area == "data":
             protocol, _ = verify_protocol(args.config)
+            if args.operation == "generate":
+                data_root = args.data_root or os.environ.get("POSE_EMBED_DATA_ROOT")
+                if not data_root:
+                    raise ValueError("POSE_EMBED_DATA_ROOT or --data-root is required")
+                inventory = inspect_ntu_aggregate(
+                    data_root,
+                    args.source_metadata,
+                    protocol,
+                )
+                _print(write_manifest_bundle(inventory, protocol, args.output_dir))
+                return 0
             records = [
                 record
                 for manifest in args.manifest
