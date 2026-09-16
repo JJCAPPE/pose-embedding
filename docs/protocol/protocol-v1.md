@@ -219,5 +219,5 @@ inputs in the repository.
       query exclusion, corruption family/levels, test seal, and failed-run rule.
 - [ ] BU provides the applicable human-subjects/data-governance determination.
 - [ ] Dataset terms are accepted and authorized files are stored outside Git.
-- [ ] GPU model, scheduler, CUDA/driver compatibility, quota, and job limits are
+- [x] GPU model, scheduler, CUDA/driver compatibility, quota, and job limits are
       recorded.

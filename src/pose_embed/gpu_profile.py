@@ -245,6 +245,7 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
         stage = "warmup"
         with torch.inference_mode():
             for _ in range(_WARMUPS):
+                represented = None
                 represented = encoder.get_representation(flattened)  # type: ignore[attr-defined]
             torch.cuda.synchronize(device)
             represented = None
@@ -254,6 +255,7 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
             elapsed_ms: list[float] = []
             stage = "timed_forward"
             for _ in range(_REPEATS):
+                represented = None
                 start = torch.cuda.Event(enable_timing=True)
                 end = torch.cuda.Event(enable_timing=True)
                 start.record()
@@ -261,7 +263,12 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
                 end.record()
                 end.synchronize()
                 elapsed_ms.append(float(start.elapsed_time(end)))
+            peak_allocated_bytes = torch.cuda.max_memory_allocated(device)
+            peak_reserved_bytes = torch.cuda.max_memory_reserved(device)
 
+        stage = "output_validation"
+        if represented is None:
+            raise RuntimeError("MotionBERT produced no representation")
         expected_shape = [
             batch_size * _PEOPLE,
             _FRAMES,
@@ -278,7 +285,7 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
                 "MotionBERT output dtype differs from the protocol: "
                 f"{represented.dtype}"
             )
-        if not bool(torch.isfinite(represented).all().item()):
+        if not bool(torch.isfinite(represented.detach().cpu()).all().item()):
             raise RuntimeError("MotionBERT output contains a non-finite value")
 
         median_ms = statistics.median(elapsed_ms)
@@ -295,8 +302,8 @@ def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:
             "forward_times_ms": elapsed_ms,
             "median_forward_ms": median_ms,
             "samples_per_second_at_median": batch_size / (median_ms / 1000),
-            "peak_allocated_bytes": torch.cuda.max_memory_allocated(device),
-            "peak_reserved_bytes": torch.cuda.max_memory_reserved(device),
+            "peak_allocated_bytes": peak_allocated_bytes,
+            "peak_reserved_bytes": peak_reserved_bytes,
         }
     except torch.OutOfMemoryError:
         return {
@@ -324,7 +331,6 @@ def _scheduler_profile() -> dict[str, object]:
             "QUEUE",
             "NSLOTS",
             "PE",
-            "PROJECT",
             "SGE_CELL",
             "SGE_ROOT",
         )
@@ -332,7 +338,6 @@ def _scheduler_profile() -> dict[str, object]:
     }
     job_id = scheduler_environment.get("JOB_ID")
     queue = scheduler_environment.get("QUEUE")
-    project = scheduler_environment.get("PROJECT")
     return {
         "kind": "Grid Engine",
         "environment": scheduler_environment,
@@ -345,7 +350,6 @@ def _scheduler_profile() -> dict[str, object]:
         "shared_gpu_slot_limits": _command(
             "qconf", "-srqs", "shared_gpu_queue_limits_2"
         ),
-        "project": _command("qconf", "-sprj", str(project)),
     }
 
 
@@ -392,6 +396,13 @@ def profile_motionbert_gpu(output_path: str | Path) -> dict[str, object]:
         raise RuntimeError("a CUDA GPU is required for the MotionBERT profile")
     if not os.environ.get("JOB_ID") or not os.environ.get("QUEUE"):
         raise RuntimeError("the GPU profile must run inside a Grid Engine job")
+    visible_devices = [
+        item.strip()
+        for item in os.environ.get("CUDA_VISIBLE_DEVICES", "").split(",")
+        if item.strip()
+    ]
+    if len(visible_devices) != 1:
+        raise RuntimeError("the profile requires exactly one scheduler-assigned GPU")
 
     data_root = _required_root("POSE_EMBED_DATA_ROOT")
     artifact_root = _required_root("POSE_EMBED_ARTIFACT_ROOT")
@@ -415,6 +426,7 @@ def profile_motionbert_gpu(output_path: str | Path) -> dict[str, object]:
     batches = [_profile_batch(encoder, size) for size in _BATCH_SIZES]
     driver_profile = _command(
         "nvidia-smi",
+        f"--id={visible_devices[0]}",
         "--query-gpu=driver_version",
         "--format=csv,noheader",
     )
@@ -422,12 +434,11 @@ def profile_motionbert_gpu(output_path: str | Path) -> dict[str, object]:
     scheduler_environment = scheduler_profile["environment"]
     if not isinstance(scheduler_environment, dict):
         raise RuntimeError("scheduler environment evidence is malformed")
-    project = scheduler_environment.get("PROJECT")
     storage_profile = {
         "data_root": _disk_usage(data_root),
         "artifact_root": _disk_usage(artifact_root),
         "home_quota": _command("quota", "-s"),
-        "project_quota": _command("pquota", "-u", str(project)),
+        "project_quotas": _command("pquota"),
     }
     evidence_commands = {
         "device_driver": driver_profile,
@@ -438,9 +449,8 @@ def profile_motionbert_gpu(output_path: str | Path) -> dict[str, object]:
         "assigned_queue": scheduler_profile["assigned_queue"],
         "shared_gpu_limits": scheduler_profile["shared_gpu_limits"],
         "shared_gpu_slot_limits": scheduler_profile["shared_gpu_slot_limits"],
-        "scheduler_project": scheduler_profile["project"],
         "home_quota": storage_profile["home_quota"],
-        "project_quota": storage_profile["project_quota"],
+        "project_quotas": storage_profile["project_quotas"],
     }
     failed_evidence = [
         name
