@@ -770,6 +770,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/cli.py",
         "src/pose_embed/config.py",
         "src/pose_embed/features.py",
+        "src/pose_embed/gpu_profile.py",
         "src/pose_embed/provenance.py",
         "src/pose_embed/training/__init__.py",
         "src/pose_embed/training/runner.py",

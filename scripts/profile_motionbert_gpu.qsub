@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#$ -cwd
+#$ -j y
+#$ -N pose_mb_profile
+#$ -l h_rt=00:30:00
+#$ -l gpus=1
+#$ -l gpu_c=8.0
+#$ -l gpu_memory=24G
+#$ -l mem_per_core=8G
+
+set -euo pipefail
+
+: "${POSE_EMBED_DATA_ROOT:?POSE_EMBED_DATA_ROOT must be set}"
+: "${POSE_EMBED_ARTIFACT_ROOT:?POSE_EMBED_ARTIFACT_ROOT must be set}"
+
+if [[ ! -x .venv/bin/pose-embed ]]; then
+  printf '.venv/bin/pose-embed is missing; create the locked Linux environment first\n' >&2
+  exit 2
+fi
+
+.venv/bin/python scripts/fetch_upstreams.py --check --name MotionBERT
+
+profile_directory="$POSE_EMBED_ARTIFACT_ROOT/profiles"
+profile_timestamp=$(date -u +%Y%m%dT%H%M%SZ)
+profile_output="$profile_directory/motionbert-gpu-${JOB_ID}-${profile_timestamp}.json"
+mkdir -p "$profile_directory"
+
+.venv/bin/pose-embed profile gpu --output "$profile_output"
+printf 'PROFILE_OUTPUT=%s\n' "$profile_output"
