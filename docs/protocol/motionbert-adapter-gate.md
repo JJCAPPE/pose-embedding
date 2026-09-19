@@ -1,4 +1,4 @@
-# Week 1 gate: real MotionBERT feature extraction
+# Week 3 gate: real MotionBERT feature extraction
 
 Status: **licensed input acquired; implementation still blocked deliberately**.
 The repository can exercise the complete artifact plumbing with synthetic

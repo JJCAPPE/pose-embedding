@@ -67,6 +67,9 @@ equivalence.
 - [ ] Protocol approval and digest are recorded.
 - [ ] BU determination is recorded.
 - [ ] All authorized inputs are readable and checksummed.
-- [ ] The pinned MotionBERT adapter/parity gate is complete.
+- [ ] The MotionBERT checkpoint is readable and passes the pinned compatibility smoke test.
 - [ ] GPU profile supports a feasible physical batch size.
 - [ ] Tracker tasks, actual hours, blockers, evidence, and reflection are current.
+
+The real MotionBERT adapter, layer-by-layer parity check, and clean feature
+extraction are Week 3 work. They are not Week 1 closure requirements.
