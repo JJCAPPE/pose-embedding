@@ -38,6 +38,7 @@ test("week details show tasks, gates, risks, and advisor checkpoint", async ({ p
 
 test("first week always shows its protocol prerequisites", async ({ page }) => {
   await page.goto("/weeks/1");
+  await expect(page.getByText("No prior-week dependency", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Begin from the locked protocol." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Review manual actions" })).toHaveAttribute(
     "href",

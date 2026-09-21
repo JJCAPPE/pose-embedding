@@ -45,6 +45,12 @@ export function WeekDetailView({
 
   const progress = weekProgress(week);
   const ready = weekIsReady(plan.weeks, week.number);
+  const readinessLabel =
+    week.number === 1
+      ? "No prior-week dependency"
+      : ready
+        ? "Prerequisites ready"
+        : "Prerequisites blocked";
   const previous = plan.weeks.find((candidate) => candidate.number === week.number - 1);
   const next = plan.weeks.find((candidate) => candidate.number === week.number + 1);
   const previousRequiredGates = previous?.gates.filter((gate) => gate.required) ?? [];
@@ -118,7 +124,7 @@ export function WeekDetailView({
             bordered
             icon={ready ? <CheckCircleOutlined /> : <WarningOutlined />}
           >
-            {ready ? "Prerequisites ready" : "Prerequisites blocked"}
+            {readinessLabel}
           </Tag>
           <CurrentWeekMarker
             startDate={week.startDate}
