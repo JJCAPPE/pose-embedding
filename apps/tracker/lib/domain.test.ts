@@ -7,6 +7,7 @@ import {
   recentCompletedTasks,
   weekCanClose,
   weekIsReady,
+  weekProgress,
 } from "@/lib/domain";
 import { seedPlan } from "@/lib/seed";
 
@@ -70,11 +71,19 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(11);
-    expect(progress.completedRequiredTasks).toBe(6);
+    expect(progress.percent).toBe(13);
+    expect(progress.completedRequiredTasks).toBe(7);
     expect(progress.decidedRequiredGates).toBe(4);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(2);
+  });
+
+  it("reports three of five Week 1 tasks complete", () => {
+    expect(weekProgress(seedPlan.weeks[0])).toEqual({
+      required: 5,
+      completed: 3,
+      percent: 60,
+    });
   });
 
   it("returns the newest completed tasks for the public dashboard", () => {
