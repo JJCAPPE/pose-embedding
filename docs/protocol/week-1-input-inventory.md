@@ -1,12 +1,14 @@
 # Week 1 input inventory
 
-Status: **inputs verified; protocol input-contract review required** at
-`2026-09-13T02:07:49Z`. The licensed pose aggregate is present, checksummed,
-readable, and structurally valid. This record does not close `w01-task-02` or
-meet `w01-gate-02` because the aggregate contains the 113,945 usable skeleton
-samples left after the dataset authors' 535-item missing-skeleton exclusion,
-while protocol v1 currently requires a 114,480-row inventory backed by declared
-per-sample files.
+Status: **technical input verification complete; protocol acceptance pending**.
+The initial verification at `2026-09-13T02:07:49Z` was reproduced on the GPU
+host at `2026-09-24T15:35:26Z`; see the [remote setup evidence](week-1-remote-setup.md).
+The licensed pose aggregate is present, checksummed, readable, and structurally
+valid. The inventory/checksum deliverable closes `w01-task-02`, but the separate
+`w01-gate-02` remains pending: the aggregate contains 113,945 usable skeleton
+samples after the official 535-item exclusion, while protocol v1 requires a
+114,480-row inventory backed by declared per-sample files. Technical verification
+does not authorize that protocol amendment.
 
 All local paths below are relative to `POSE_EMBED_DATA_ROOT`. Protected files
 remain outside Git; this repository contains only public-safe provenance and
@@ -76,7 +78,7 @@ the missing-list digest above and verification of those two hash-pinned physical
 inputs in place of 114,480 declared per-sample files, or records another
 approved resolution.
 
-## Checks required before completion
+## Completed technical checks
 
 1. [x] Confirm approval from ROSE Lab and authenticated access to the current
    NTU RGB+D/120 download portal. The private approval record remains outside
@@ -89,8 +91,16 @@ approved resolution.
    canonical identifiers, zero-based labels, ranges, duplicate absence, finite
    pose arrays, and exact 20 official anchors; reconcile the 535 absent records
    to the locked dataset-author exclusion list.
-4. [ ] Obtain the result-blind advisor-approved input-contract resolution
-   described above before opening the novel test.
-5. [ ] After that resolution, re-run `git status`, `git check-ignore`, and
-   `python scripts/verify_workspace.py`; then update the task and gate without
-   changing or overwriting the protected input files.
+4. [x] Preserve the required inputs and provenance on the GPU host, recheck
+   physical-file SHA-256 digests, and regenerate the entire manifest bundle
+   byte-for-byte under a fresh artifact path. The remote workspace verifier,
+   Ruff checks, and all 108 tests passed; licensed inputs remain outside Git.
+
+## Pending protocol acceptance
+
+1. [ ] Obtain the result-blind advisor-approved input-contract resolution
+   described above before opening the novel test. The
+   [prepared amendment](input-contract-amendment-draft.md) is an unapproved draft.
+2. [ ] Apply only the approved amendment, reverify the bound inputs and protocol
+   digest, and update `w01-gate-02` with the actual decision evidence. Do not
+   overwrite historical inputs or artifacts, or infer approval from task completion.
