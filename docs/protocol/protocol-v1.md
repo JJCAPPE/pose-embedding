@@ -220,7 +220,9 @@ inputs in the repository.
 
 - [x] Record the research question, primary estimand, action splits,
       query exclusion, corruption family/levels, test seal, and failed-run rule.
-- [ ] BU provides the applicable human-subjects/data-governance determination.
+- [x] BU provides the applicable human-subjects/data-governance determination.
+      Researcher-confirmed on 2026-09-24 without an attachment; see
+      `docs/compliance/computational-research-scope.md` for the confirmation record.
 - [ ] Dataset terms are accepted and authorized files are stored outside Git.
 - [x] GPU model, scheduler, CUDA/driver compatibility, quota, and job limits are
       recorded.

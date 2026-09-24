@@ -37,9 +37,11 @@ protocol, evaluation-plan, manifest, and final-run-set locks. This governance
 change neither creates those later-stage locks nor opens the test seal.
 
 Dataset licensing, upstream attribution, and applicable BU requirements are
-unchanged. The pending institutional determination is not an advisor approval
-and is not waived here. Actual research time must still be recorded by the
-researcher. No task, gate, or week is newly marked complete by this change.
+unchanged. The institutional determination is not an advisor approval and is
+not waived here. Its subsequent researcher confirmation is recorded in
+`docs/compliance/computational-research-scope.md`. Actual research time must still
+be recorded by the researcher. No task, gate, or week is newly marked complete
+by this governance change.
 
 The tracker retains its legacy `advisorPrompt` / `advisor_prompt` storage names
 for compatibility, but presents them only as researcher review prompts under

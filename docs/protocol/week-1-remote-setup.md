@@ -125,8 +125,9 @@ requirements without adopting the input-contract amendment.
 Week closure still requires:
 
 1. The documented input-contract amendment (`w01-gate-02`).
-2. The applicable BU governance determination (`w01-gate-04`); the existing
-   [scope statement](../compliance/computational-research-scope.md) is not that decision.
+2. The applicable BU governance determination (`w01-gate-04`), subsequently
+   confirmed by the researcher on 2026-09-24 without an attachment. See the
+   [confirmation record](../compliance/computational-research-scope.md).
 3. The researcher's actual Week 1 minutes, not an estimate inferred from planned
    hours, elapsed automation time, or GPU runtime.
 
