@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import date
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Literal
 
 import yaml
@@ -30,12 +30,39 @@ class ScheduleConfig(StrictModel):
         return self
 
 
+class AggregateSourceConfig(StrictModel):
+    aggregate_relative_path: str = Field(min_length=1)
+    aggregate_bytes: int = Field(gt=0)
+    aggregate_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    missing_list_relative_path: str = Field(min_length=1)
+    missing_list_bytes: int = Field(ge=0)
+    missing_list_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    missing_sample_count: int = Field(ge=0)
+    nominal_capture_count: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def paths_are_normalized_and_distinct(self) -> AggregateSourceConfig:
+        paths = (self.aggregate_relative_path, self.missing_list_relative_path)
+        for value in paths:
+            path = PurePosixPath(value)
+            if (
+                path.is_absolute()
+                or value != path.as_posix()
+                or any(part in {"", ".", ".."} for part in path.parts)
+            ):
+                raise ValueError("aggregate paths must be normalized and relative")
+        if len(set(paths)) != 2:
+            raise ValueError("aggregate and missing-list paths must be distinct")
+        return self
+
+
 class DatasetConfig(StrictModel):
     name: str
     representation: str
     frames: int = Field(gt=0)
     joints: int = Field(gt=0)
-    expected_source_sample_count: Literal[114480]
+    expected_source_sample_count: Literal[113945]
+    source_contract: AggregateSourceConfig
     novel_actions: tuple[int, ...]
     development_validation_actions: tuple[int, ...]
     official_protocol_source_url: str
@@ -45,6 +72,12 @@ class DatasetConfig(StrictModel):
 
     @model_validator(mode="after")
     def action_partitions_are_valid(self) -> DatasetConfig:
+        if (
+            self.expected_source_sample_count
+            + self.source_contract.missing_sample_count
+            != self.source_contract.nominal_capture_count
+        ):
+            raise ValueError("usable and missing counts must equal nominal captures")
         novel = set(self.novel_actions)
         validation = set(self.development_validation_actions)
         if len(novel) != 20 or len(validation) != 20:

@@ -15,7 +15,16 @@ dataset:
   representation: HRNet-derived 2D pose sequences
   frames: 100
   joints: 17
-  expected_source_sample_count: 114480
+  expected_source_sample_count: 113945
+  source_contract:
+    aggregate_relative_path: ntu120_hrnet.pkl
+    aggregate_bytes: 1238461428
+    aggregate_sha256: aaf1f928b4629fa9a0850528d43fdd8d920532805d16672bfdda78085b649df8
+    missing_list_relative_path: provenance/sources/NTU_RGBD120_samples_with_missing_skeletons.txt
+    missing_list_bytes: 11451
+    missing_list_sha256: ab14fe64e89be63d2b08141713fcc31f6ebc7b01955009c3585d8d3367e0facc
+    missing_sample_count: 535
+    nominal_capture_count: 114480
   novel_actions: [1, 7, 13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79, 85, 91, 97, 103, 109, 115]
   development_validation_actions: [2, 8, 14, 20, 26, 32, 38, 44, 50, 56, 62, 68, 74, 80, 86, 92, 98, 104, 110, 116]
   official_protocol_source_commit: ac2ebc87e6e9777ea6bac67e65e53b325b903f74

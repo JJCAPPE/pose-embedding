@@ -50,11 +50,14 @@ S018C003P008R001A097  S018C003P008R001A103
 S018C003P008R001A109  S018C003P008R001A115
 ```
 
-The source inventory is expected to describe all 114,480 NTU RGB+D 120 source
-samples. A smaller convenience subset is never sufficient to authorize final
-evaluation. If the authorized HRNet-derived release legitimately has a
-different complete inventory, that discrepancy requires a documented protocol
-amendment before the novel test is opened.
+The [adopted input-contract amendment](input-contract-amendment.v1.md) defines
+the complete usable HRNet inventory as exactly 113,945 unique annotations.
+The hash-pinned official missing-skeleton list accounts for a separate 535
+nominal captures, with no overlap, completing the nominal 114,480. A smaller
+convenience subset is never sufficient to authorize final evaluation. The
+physical source is the verified HRNet aggregate and the official missing list,
+not 114,480 per-sample pose files. Both files' relative paths, byte counts,
+and SHA-256 digests are bound by the machine-readable protocol.
 
 ## Input tensor convention
 
@@ -121,18 +124,17 @@ accept a caller-selected ledger path. Before the test can be opened:
    cross-binding. It also prints the current component code digests.
 6. Run `pose-embed evaluate --mode final` without lock or ledger path flags.
    On the first test opening it validates the four exact manifests, the complete
-   114,480-row canonicalized source inventory, every declared per-sample file,
-   and the selected config, checkpoint, batch plan, metrics, attempt, outcome,
-   run manifest, and code hashes. The first attempt atomically creates
+   113,945-row usable inventory, both hash-pinned physical source files, all
+   535 official exclusions and their non-overlap, and the selected config,
+   checkpoint, batch plan, metrics, attempt, outcome, run manifest, and code
+   hashes. The first attempt atomically creates
    `$POSE_EMBED_ARTIFACT_ROOT/locks/test-opening.v1.json`; later cells must match
    its protocol-lock, evaluation-plan, final-run-set, source-inventory digest,
-   source-file count, and source-file digest. Later cells do not rescan all
-   114,480 licensed inputs: they consume and rehash the immutable feature caches
-   whose sidecars bind the already-verified source inventory. This command
-   remains deliberately unavailable for the upstream aggregate HRNet pickle
-   until the Week 2 trusted importer has hash-verified it and produced that
-   canonicalized inventory. Extra, missing, renamed, or byte-changed source
-   files fail the initial opening; changes after opening cannot alter the
+   two-file count, and combined source-file digest. Later cells do not rescan
+   the 1.2 GB aggregate: they consume and rehash immutable feature caches
+   whose sidecars bind the already-verified source inventory. Missing, renamed,
+   or byte-changed source files fail the initial opening; changes after opening
+   cannot alter the
    already-hashed caches and should be detected by a separate storage audit.
 
 Changing protocol content invalidates the lock. Do not update the lock after

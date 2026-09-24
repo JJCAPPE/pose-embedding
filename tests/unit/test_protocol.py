@@ -252,7 +252,7 @@ def test_final_manifest_validation_rejects_a_tiny_claimed_source_inventory(
 ) -> None:
     protocol = load_protocol(protocol_path)
 
-    with pytest.raises(ValueError, match="114480"):
+    with pytest.raises(ValueError, match="113945"):
         validate_evaluation_manifests(
             protocol,
             locked_plan(),
