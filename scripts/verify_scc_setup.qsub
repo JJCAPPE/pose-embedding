@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+#$ -cwd
+#$ -j y
+#$ -N pose_setup_verify
+#$ -l h_rt=00:30:00
+#$ -pe omp 4
+#$ -l mem_per_core=4G
+#$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,UV_PYTHON_INSTALL_DIR
+
+set -euo pipefail
+umask 077
+
+: "${POSE_EMBED_DATA_ROOT:?POSE_EMBED_DATA_ROOT must be set}"
+: "${POSE_EMBED_ARTIFACT_ROOT:?POSE_EMBED_ARTIFACT_ROOT must be set}"
+: "${UV_PYTHON_INSTALL_DIR:?UV_PYTHON_INSTALL_DIR must be set}"
+: "${TMPDIR:?Grid Engine must provide node-local temporary storage}"
+: "${JOB_ID:?Run this verification through Grid Engine}"
+
+export OMP_NUM_THREADS="$NSLOTS"
+export MKL_NUM_THREADS="$NSLOTS"
+export OPENBLAS_NUM_THREADS="$NSLOTS"
+export UV_CACHE_DIR="$TMPDIR/pose-embed-uv-cache"
+export UV_LINK_MODE=copy
+export UV_NO_PROGRESS=1
+
+uv sync --locked --group dev --python 3.11
+.venv/bin/python scripts/verify_workspace.py
+.venv/bin/python scripts/fetch_upstreams.py --check --name MotionBERT
+.venv/bin/pose-embed protocol verify
+.venv/bin/ruff check src tests scripts
+.venv/bin/ruff format --check src tests scripts
+# Tests construct isolated synthetic artifacts, not the live study roots.
+env -u POSE_EMBED_DATA_ROOT -u POSE_EMBED_ARTIFACT_ROOT .venv/bin/pytest
+
+(
+  cd "$POSE_EMBED_DATA_ROOT"
+  sha256sum --check SHA256SUMS
+)
+
+reference="$POSE_EMBED_ARTIFACT_ROOT/manifests/ntu120-v1-release-20260916"
+generated="$POSE_EMBED_ARTIFACT_ROOT/manifests/scc-verification-${JOB_ID}"
+.venv/bin/pose-embed data generate --output-dir "$generated"
+for reference_file in "$reference"/*; do
+  cmp "$reference_file" "$generated/$(basename "$reference_file")"
+done
+printf 'All regenerated manifest files match the existing release byte-for-byte.\n'
+sha256sum "$generated"/*
+
+test ! -e "$POSE_EMBED_ARTIFACT_ROOT/locks/test-opening.v1.json"
+printf 'The novel-test opening ledger is absent.\n'
+git rev-parse HEAD
+.venv/bin/python --version
+quota -s
+printf 'POSE_SETUP_VERIFIED job=%s completed_utc=%s\n' "$JOB_ID" "$(date -u +%FT%TZ)"

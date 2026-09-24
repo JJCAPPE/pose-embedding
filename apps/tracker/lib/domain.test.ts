@@ -71,23 +71,36 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(13);
-    expect(progress.completedRequiredTasks).toBe(7);
+    expect(progress.percent).toBe(15);
+    expect(progress.completedRequiredTasks).toBe(8);
     expect(progress.decidedRequiredGates).toBe(4);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(2);
   });
 
-  it("reports three of five Week 1 tasks complete", () => {
-    expect(weekProgress(seedPlan.weeks[0])).toEqual({
+  it("reports four of five Week 1 tasks complete while required decisions remain pending", () => {
+    const week = seedPlan.weeks[0];
+    expect(weekProgress(week)).toEqual({
       required: 5,
-      completed: 3,
-      percent: 60,
+      completed: 4,
+      percent: 80,
     });
+    expect(
+      week.gates
+        .filter((gate) => gate.required && gate.state === "pending")
+        .map((gate) => gate.id),
+    ).toEqual(["w01-gate-02", "w01-gate-04"]);
+    expect(weekCanClose(week)).toBe(false);
+    expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
   });
 
   it("returns the newest completed tasks for the public dashboard", () => {
     const plan = structuredClone(seedPlan);
+    for (const week of plan.weeks) {
+      for (const task of week.tasks) {
+        task.completedAt = null;
+      }
+    }
     plan.weeks[0].tasks[0] = {
       ...plan.weeks[0].tasks[0],
       state: "done",
