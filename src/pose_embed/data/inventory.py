@@ -579,14 +579,20 @@ def _render_manifest_audit(summary: Mapping[str, object]) -> str:
     if not isinstance(exclusions, list):
         raise TypeError("audit exclusions must be a list")
 
+    amendment_required = protocol_count["amendment_required"]
+    status = (
+        "Status: manifest construction is complete for the verified usable "
+        "aggregate. Final novel evaluation remains sealed until the documented "
+        "result-blind protocol amendment is adopted."
+        if amendment_required
+        else "Status: the adopted input contract matches the verified usable "
+        "aggregate. Final novel evaluation remains sealed until the separate "
+        "evaluation-plan and run-set locks are complete."
+    )
     lines = [
         "# NTU RGB+D 120 manifest audit v1",
         "",
-        "Status: manifest construction is complete for the verified usable "
-        "aggregate. Final novel evaluation remains sealed until the documented "
-        "result-blind protocol amendment is documented and adopted for the usable "
-        "source count and the aggregate-aware physical-source verification "
-        "contract.",
+        status,
         "",
         "## Source accounting",
         "",
@@ -601,9 +607,14 @@ def _render_manifest_audit(summary: Mapping[str, object]) -> str:
         f"{protocol_count['locked_expected_rows']}",
         "- Protocol amendment required: "
         f"`{str(protocol_count['amendment_required']).lower()}`",
-        "- Required amendment scope: 113,945 usable rows plus verification of the "
-        "hash-pinned aggregate and official missing-skeleton list instead of "
-        "114,480 declared per-sample files.",
+        (
+            "- Required amendment scope: 113,945 usable rows plus verification "
+            "of the hash-pinned aggregate and official missing-skeleton list "
+            "instead of 114,480 declared per-sample files."
+            if amendment_required
+            else "- Adopted source contract: usable aggregate plus the hash-pinned "
+            "official missing-skeleton list; two physical inputs."
+        ),
         "- Pose-track counts: "
         f"`{json.dumps(inventory_metadata['pose_track_counts'], sort_keys=True)}`",
         "- Nonempty-track counts: "
@@ -709,6 +720,21 @@ def write_manifest_bundle(
     output_dir: str | Path,
 ) -> dict[str, object]:
     """Atomically write one immutable inventory and seven split manifests."""
+    actual_source = {
+        "aggregate_relative_path": inventory.aggregate_relative_path,
+        "aggregate_bytes": inventory.aggregate_bytes,
+        "aggregate_sha256": inventory.aggregate_sha256,
+        "missing_list_relative_path": inventory.missing_list_relative_path,
+        "missing_list_bytes": inventory.missing_list_bytes,
+        "missing_list_sha256": inventory.missing_list_sha256,
+        "missing_sample_count": len(inventory.missing_sample_ids),
+        "nominal_capture_count": inventory.nominal_capture_count,
+    }
+    if (
+        len(inventory.records) != protocol.dataset.expected_source_sample_count
+        or actual_source != protocol.dataset.source_contract.model_dump()
+    ):
+        raise ValueError("aggregate inventory differs from the locked source contract")
     output = Path(output_dir)
     if output.exists():
         raise ValueError(f"manifest output already exists: {output}")

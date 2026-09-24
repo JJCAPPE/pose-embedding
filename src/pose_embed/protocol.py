@@ -513,6 +513,14 @@ def validate_evaluation_manifests(
             f"source inventory must contain exactly {expected_source_count} "
             "NTU RGB+D 120 samples"
         )
+    if source_binding.kind != "ntu_aggregate_inventory":
+        raise ValueError("final source inventory must be aggregate-aware")
+    if (
+        source_binding.aggregate_source is None
+        or source_binding.aggregate_source.model_dump()
+        != protocol.dataset.source_contract.model_dump()
+    ):
+        raise ValueError("aggregate physical inputs differ from the locked protocol")
 
     root = Path(artifact_root).resolve()
     paths: dict[str, Path] = {}
