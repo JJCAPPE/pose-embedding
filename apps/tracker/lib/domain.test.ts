@@ -73,12 +73,12 @@ describe("readiness and progress rules", () => {
     const progress = projectProgress(seedPlan);
     expect(progress.percent).toBe(15);
     expect(progress.completedRequiredTasks).toBe(8);
-    expect(progress.decidedRequiredGates).toBe(4);
+    expect(progress.decidedRequiredGates).toBe(6);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(2);
   });
 
-  it("reports four of five Week 1 tasks complete while required decisions remain pending", () => {
+  it("reports four of five Week 1 tasks complete while the BU decision remains pending", () => {
     const week = seedPlan.weeks[0];
     expect(weekProgress(week)).toEqual({
       required: 5,
@@ -89,7 +89,7 @@ describe("readiness and progress rules", () => {
       week.gates
         .filter((gate) => gate.required && gate.state === "pending")
         .map((gate) => gate.id),
-    ).toEqual(["w01-gate-02", "w01-gate-04"]);
+    ).toEqual(["w01-gate-04"]);
     expect(weekCanClose(week)).toBe(false);
     expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
   });

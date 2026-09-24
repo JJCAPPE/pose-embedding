@@ -385,10 +385,9 @@ def test_manifest_bundle_is_byte_stable_and_checksummed(
     protocol_path: Path,
     tmp_path: Path,
 ) -> None:
-    protocol = load_protocol(protocol_path)
     metadata_path = _write_source_files(tmp_path, _complete_annotations(protocol_path))
-    inventory = inspect_ntu_aggregate(tmp_path, metadata_path, protocol)
     protocol = _synthetic_protocol(protocol_path, metadata_path)
+    inventory = inspect_ntu_aggregate(tmp_path, metadata_path, protocol)
     first = tmp_path / "first"
     second = tmp_path / "second"
 
@@ -401,6 +400,8 @@ def test_manifest_bundle_is_byte_stable_and_checksummed(
     for first_path in first.iterdir():
         assert first_path.read_bytes() == (second / first_path.name).read_bytes()
     assert first_summary == second_summary
+    assert first_summary["protocol_count"]["amendment_required"] is False
+    assert "adopted input contract" in (first / "manifest-audit.md").read_text()
     assert load_inventory(first / "source-inventory.jsonl") == list(inventory.records)
     assert first_summary["inventory_metadata"] == {
         "pose_track_counts": {"1": 180},
@@ -422,10 +423,9 @@ def test_aggregate_inventory_is_accepted_by_the_locked_evaluation_validator(
     protocol_path: Path,
     tmp_path: Path,
 ) -> None:
-    protocol = load_protocol(protocol_path)
     metadata_path = _write_source_files(tmp_path, _complete_annotations(protocol_path))
-    inventory = inspect_ntu_aggregate(tmp_path, metadata_path, protocol)
     protocol = _synthetic_protocol(protocol_path, metadata_path)
+    inventory = inspect_ntu_aggregate(tmp_path, metadata_path, protocol)
     output = tmp_path / "bundle"
     summary = write_manifest_bundle(inventory, protocol, output)
     manifests = build_split_manifests(inventory.records, protocol)
@@ -511,6 +511,18 @@ def test_aggregate_inventory_is_accepted_by_the_locked_evaluation_validator(
                 output,
                 check_source_files=False,
             )
+
+    altered = json.loads(json.dumps(plan_payload))
+    altered_source = altered["source_inventory_manifest"]["aggregate_source"]
+    altered_source["missing_sample_count"] = 1
+    altered_source["nominal_capture_count"] = len(inventory.records) + 1
+    with pytest.raises(ValueError, match="physical inputs"):
+        validate_evaluation_manifests(
+            protocol,
+            EvaluationPlan.model_validate(altered),
+            output,
+            check_source_files=False,
+        )
 
     altered = json.loads(json.dumps(plan_payload))
     altered["source_inventory_manifest"]["kind"] = "manifest_records"

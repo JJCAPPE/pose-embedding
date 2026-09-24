@@ -52,10 +52,10 @@ hash, missing-count, and nominal-count fields recorded by the bundle. The test
 seal then rehashes both physical inputs, re-inspects the aggregate, and requires
 its normalized records to equal the locked inventory exactly; evaluation subset
 rows deliberately make no per-sample file or checksum claim. The currently
-locked 114,480-row expectation still fails closed until the documented
-result-blind amendment is approved. That amendment must bind both the 113,945
-usable-row count and this aggregate-plus-missing-list verification contract in
-place of the protocol's current per-sample-file requirement.
+adopted protocol expects all 113,945 usable rows and binds this exact
+aggregate-plus-missing-list verification contract in place of a per-sample-file
+requirement. The [result-blind amendment](../../docs/protocol/input-contract-amendment.v1.md)
+records the decision; the novel-test seal remains a separate later-stage gate.
 
 Generate one immutable bundle below the artifact root with:
 

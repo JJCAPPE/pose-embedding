@@ -1,14 +1,15 @@
 # Week 1 input inventory
 
-Status: **technical input verification complete; protocol acceptance pending**.
+Status: **technical input verification and protocol acceptance complete**.
 The initial verification at `2026-09-13T02:07:49Z` was reproduced on the GPU
-host at `2026-09-24T15:35:26Z`; see the [remote setup evidence](week-1-remote-setup.md).
+host at `2026-09-24T15:35:26Z` and under the amended protocol at
+`2026-09-24T16:32:58Z`; see the [remote setup evidence](week-1-remote-setup.md)
+and [v2 manifest audit](ntu-manifest-audit.v2.md).
 The licensed pose aggregate is present, checksummed, readable, and structurally
-valid. The inventory/checksum deliverable closes `w01-task-02`, but the separate
-`w01-gate-02` remains pending: the aggregate contains 113,945 usable skeleton
-samples after the official 535-item exclusion, while protocol v1 requires a
-114,480-row inventory backed by declared per-sample files. Technical verification
-does not authorize that protocol amendment.
+valid. The inventory/checksum deliverable closes `w01-task-02`; the
+[result-blind amended input contract](input-contract-amendment.v1.md) now
+matches the 113,945 usable annotations and 535 official exclusions, so
+`w01-gate-02` is met. The novel test remains sealed.
 
 All local paths below are relative to `POSE_EMBED_DATA_ROOT`. Protected files
 remain outside Git; this repository contains only public-safe provenance and
@@ -59,7 +60,7 @@ They resolve to `nturgbd_skeletons_s001_to_s017.zip` (6,181,024,200 bytes) and
 Kinect 25-joint 3D skeleton modality; this protocol requires the OpenMMLab
 HRNet-W32 17-joint COCO 2D coordinates and confidence scores.
 
-## Protocol input-contract discrepancy
+## Protocol input-contract resolution
 
 The dataset authors state that 535 captured NTU RGB+D 120 samples have missing
 or incomplete skeleton data and should be ignored for skeleton-based analysis.
@@ -68,15 +69,13 @@ downloaded HRNet aggregate. The aggregate's 113,945 unique annotations plus
 those 535 exclusions exactly reproduce the dataset's nominal 114,480 captures.
 All 120 action labels and all 20 official one-shot exemplars remain present.
 
-This evidence rules out truncation, but it does not authorize silently changing
-the hash-bound protocol. `configs/protocol.v1.yaml` and
-`docs/protocol/protocol-v1.md` currently require a 114,480-row canonical source
-inventory and explicitly require an amendment when an authorized complete
-inventory differs. Before the novel test can be opened, record a result-blind
-documented amendment that binds both the 113,945 usable annotations plus
-the missing-list digest above and verification of those two hash-pinned physical
-inputs in place of 114,480 declared per-sample files, or records another
-documented resolution.
+This evidence rules out truncation. The former 114,480-row per-sample contract
+was corrected by the [adopted amendment](input-contract-amendment.v1.md),
+recorded before novel-test opening and without retrieval outcomes. The amended
+protocol binds all 113,945 usable annotations, the exact 535-item official
+missing list, and both physical files' paths, sizes, and hashes. The
+[independent SCC rerun](ntu-manifest-audit.v2.md) verified the new protocol
+hash and reproduced every JSONL manifest byte-for-byte.
 
 ## Completed technical checks
 
@@ -95,12 +94,17 @@ documented resolution.
    physical-file SHA-256 digests, and regenerate the entire manifest bundle
    byte-for-byte under a fresh artifact path. The remote workspace verifier,
    Ruff checks, and all 108 tests passed; licensed inputs remain outside Git.
+5. [x] Regenerate again under the adopted protocol in a separate immutable
+   SCC artifact directory. Job `7721684` passed all 113 Python tests, both
+   physical-source checksums, the 113,945+535 accounting, all eight JSONL byte
+   comparisons, and the absent novel-test opening-ledger check.
 
-## Pending protocol acceptance
+## Completed protocol acceptance
 
-1. [ ] Record the result-blind input-contract resolution
-   described above before opening the novel test. The
-   [prepared amendment](input-contract-amendment-draft.md) is a draft that has not been adopted.
-2. [ ] Apply only the documented amendment, reverify the bound inputs and protocol
-   digest, and update `w01-gate-02` with the actual decision evidence. Do not
-   overwrite historical inputs or artifacts, or infer protocol adoption from task completion.
+1. [x] Record the [result-blind input-contract resolution](input-contract-amendment.v1.md)
+   before opening the novel test. The earlier prepared draft remains historical.
+2. [x] Apply the documented amendment, verify protocol SHA-256
+   `c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f`,
+   and regenerate the manifests under the exact two-file contract. The
+   historical bundle remains untouched. `w01-gate-02` is met; the separate BU
+   determination, actual time entry, and later test locks are not inferred.

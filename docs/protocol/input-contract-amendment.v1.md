@@ -5,7 +5,8 @@ Status: **adopted before novel-test opening**. Recorded
 The researcher explicitly directed implementation without advisor approval on
 2026-09-24. This is a result-blind input-accounting correction, not a change
 made in response to retrieval outcomes. The novel-test opening ledger was
-absent at the time of the decision; the SCC rerun must confirm that again.
+absent at the time of the decision; the [SCC rerun](ntu-manifest-audit.v2.md)
+confirmed it remained absent after adoption.
 
 Previous protocol canonical SHA-256:
 `1b43d1bedb833f71936d0bc36d30a9b6f7ed6d2d00a5b8c8b781b787ad66d265`.
