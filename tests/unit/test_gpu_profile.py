@@ -19,7 +19,7 @@ def test_gpu_profile_contract_matches_locked_protocol() -> None:
     assert contract["channels"] == 3
     assert contract["representation_dimension"] == 512
     assert contract["protocol_sha256"] == (
-        "12cf4d9a322f5bd5ea76fb2d9ffc070a6a2681fe8474a05cff1f62b6e43368e2"
+        "1b43d1bedb833f71936d0bc36d30a9b6f7ed6d2d00a5b8c8b781b787ad66d265"
     )
 
 

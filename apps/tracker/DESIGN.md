@@ -109,7 +109,7 @@ components:
 
 **Creative North Star: "The Quiet Research Briefing"**
 
-Pose Embed should feel like a calm, carefully prepared briefing placed in front of a researcher and advisor. The interface is restrained and direct: one clear question, action, deliverable, or decision leads each work surface, while supporting evidence waits at the next level of hierarchy.
+Pose Embed should feel like a calm, carefully prepared briefing placed in front of a researcher and readers. The interface is restrained and direct: one clear question, action, deliverable, or decision leads each work surface, while supporting evidence waits at the next level of hierarchy.
 
 The system is strictly black, white, and neutral gray. Apple-like system typography, generous whitespace, precise dividers, modest rounding, and progressive disclosure keep dense protocol content readable without making it feel ornamental or promotional. Ant Design supplies the interaction primitives; the visual system makes them feel native to this quiet research workspace.
 

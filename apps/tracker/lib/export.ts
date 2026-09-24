@@ -81,7 +81,7 @@ export function planToMarkdown(plan: LoadedPlan): string {
 
     lines.push("", "### Risks", "");
     for (const risk of week.risks) lines.push(`- ${risk}`);
-    lines.push("", `**Advisor prompt:** ${week.advisorPrompt}`, "");
+    lines.push("", `**Review prompt:** ${week.advisorPrompt}`, "");
   }
 
   lines.push("## Literature", "");

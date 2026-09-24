@@ -69,14 +69,14 @@ those 535 exclusions exactly reproduce the dataset's nominal 114,480 captures.
 All 120 action labels and all 20 official one-shot exemplars remain present.
 
 This evidence rules out truncation, but it does not authorize silently changing
-the advisor-approved protocol. `configs/protocol.v1.yaml` and
+the hash-bound protocol. `configs/protocol.v1.yaml` and
 `docs/protocol/protocol-v1.md` currently require a 114,480-row canonical source
 inventory and explicitly require an amendment when an authorized complete
-inventory differs. Before the novel test can be opened, obtain a result-blind
-advisor-approved amendment that binds both the 113,945 usable annotations plus
+inventory differs. Before the novel test can be opened, record a result-blind
+documented amendment that binds both the 113,945 usable annotations plus
 the missing-list digest above and verification of those two hash-pinned physical
 inputs in place of 114,480 declared per-sample files, or records another
-approved resolution.
+documented resolution.
 
 ## Completed technical checks
 
@@ -98,9 +98,9 @@ approved resolution.
 
 ## Pending protocol acceptance
 
-1. [ ] Obtain the result-blind advisor-approved input-contract resolution
+1. [ ] Record the result-blind input-contract resolution
    described above before opening the novel test. The
-   [prepared amendment](input-contract-amendment-draft.md) is an unapproved draft.
-2. [ ] Apply only the approved amendment, reverify the bound inputs and protocol
+   [prepared amendment](input-contract-amendment-draft.md) is a draft that has not been adopted.
+2. [ ] Apply only the documented amendment, reverify the bound inputs and protocol
    digest, and update `w01-gate-02` with the actual decision evidence. Do not
-   overwrite historical inputs or artifacts, or infer approval from task completion.
+   overwrite historical inputs or artifacts, or infer protocol adoption from task completion.

@@ -23,7 +23,7 @@ test("an unavailable configured database falls back to the visible plan snapshot
   await expect(page.getByRole("list", { name: undefined }).last().getByRole("listitem")).toHaveCount(14);
 });
 
-test("week details show tasks, gates, risks, and advisor checkpoint", async ({ page }) => {
+test("week details show tasks, gates, risks, and research checkpoint", async ({ page }) => {
   await page.goto("/weeks/5");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Corruption freeze");
   await expect(page.getByText("5h planned", { exact: true })).toBeVisible();
@@ -33,7 +33,7 @@ test("week details show tasks, gates, risks, and advisor checkpoint", async ({ p
   await expect(page.getByRole("heading", { name: "Work for the week" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Advance when" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Watch closely" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Advisor checkpoint" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Research checkpoint" })).toBeVisible();
 });
 
 test("first week always shows its protocol prerequisites", async ({ page }) => {
@@ -52,6 +52,7 @@ test("protocol preserves locked decisions and manual actions", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Actions only you can complete" })).toBeVisible();
   await expect(page.getByText("Contrastive-only, supervised contrastive, and full contextual-plus-contrastive.")).toBeVisible();
   await expect(page.getByText("drop(m, s, c)", { exact: false })).toBeVisible();
+  await expect(page.getByText(/Independent research: the researcher records protocol decisions/)).toBeVisible();
 });
 
 test("protocol formula scrollers are keyboard accessible", async ({ page }) => {

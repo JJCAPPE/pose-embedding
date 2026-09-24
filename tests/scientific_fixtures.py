@@ -490,7 +490,7 @@ def write_lock_bundle(root: Path, protocol_sha256: str) -> tuple[Path, Path, Pat
     assert plan.anchor_manifest is not None
     assert plan.official_query_manifest is not None
     assert plan.primary_query_manifest is not None
-    approved = datetime(2026, 9, 1, tzinfo=UTC)
+    recorded = datetime(2026, 9, 1, tzinfo=UTC)
     lock_path.write_text(
         json.dumps(
             {
@@ -504,9 +504,9 @@ def write_lock_bundle(root: Path, protocol_sha256: str) -> tuple[Path, Path, Pat
                 "official_query_manifest_sha256": (plan.official_query_manifest.sha256),
                 "primary_query_manifest_sha256": (plan.primary_query_manifest.sha256),
                 "final_run_set_sha256": final_run_set_digest(run_set),
-                "advisor_approved_by": "Advisor",
-                "advisor_approved_at": approved.isoformat(),
-                "locked_at": approved.isoformat(),
+                "recorded_by": "Researcher",
+                "recorded_at": recorded.isoformat(),
+                "locked_at": recorded.isoformat(),
             }
         ),
         encoding="utf-8",

@@ -15,7 +15,7 @@ authorized HRNet aggregate is also present and verified, with public-safe
 metadata in `data/manifests/ntu120-hrnet.v1.json`. Its 113,945 usable
 annotations reconcile exactly to the nominal 114,480 captures after applying
 the dataset authors' 535-item missing-skeleton list. Protocol v1 still requires
-a result-blind advisor-approved amendment before the novel test can be opened.
+a documented result-blind amendment before the novel test can be opened.
 It must bind both the 113,945 usable-row count and verification of the
 hash-pinned aggregate plus missing-skeleton list in place of per-sample files.
 

@@ -8,6 +8,6 @@
   "primary_query_manifest_sha256": "REPLACE_WITH_PRIMARY_QUERY_MANIFEST_SHA256",
   "final_run_set_sha256": "REPLACE_WITH_FINAL_RUN_SET_DIGEST",
   "locked_at": "REPLACE_WITH_RFC3339_TIMESTAMP",
-  "advisor_approved_by": "REPLACE_WITH_NAME",
-  "advisor_approved_at": "REPLACE_WITH_RFC3339_TIMESTAMP"
+  "recorded_by": "REPLACE_WITH_RESEARCHER_NAME",
+  "recorded_at": "REPLACE_WITH_RFC3339_TIMESTAMP"
 }

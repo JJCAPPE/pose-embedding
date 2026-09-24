@@ -533,8 +533,8 @@ export function WeekDetailsForm({ week }: { week: Week }) {
           >
             <TextArea defaultValue={week.risks.join("\n")} id="week-risks" name="risks" rows={4} />
           </FormItem>
-          <FormItem className="field span-two" htmlFor="week-advisor" label="Advisor prompt" required>
-            <TextArea defaultValue={week.advisorPrompt} id="week-advisor" name="advisorPrompt" required rows={3} />
+          <FormItem className="field span-two" htmlFor="week-review" label="Review prompt" required>
+            <TextArea defaultValue={week.advisorPrompt} id="week-review" name="advisorPrompt" required rows={3} />
           </FormItem>
           <FormItem className="field span-two" htmlFor="week-reflection" label="Reflection">
             <TextArea defaultValue={week.reflection} id="week-reflection" name="reflection" rows={5} />

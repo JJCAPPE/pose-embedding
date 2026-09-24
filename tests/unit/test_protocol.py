@@ -53,7 +53,7 @@ def _write_locked_artifacts(
     run_set_path.write_text(
         json.dumps(run_set.model_dump(mode="json")), encoding="utf-8"
     )
-    approved = datetime(2026, 9, 1, 13, tzinfo=UTC)
+    recorded = datetime(2026, 9, 1, 13, tzinfo=UTC)
     assert plan.source_inventory_manifest is not None
     assert plan.anchor_manifest is not None
     assert plan.official_query_manifest is not None
@@ -71,9 +71,9 @@ def _write_locked_artifacts(
                 "official_query_manifest_sha256": (plan.official_query_manifest.sha256),
                 "primary_query_manifest_sha256": (plan.primary_query_manifest.sha256),
                 "final_run_set_sha256": final_run_set_digest(run_set),
-                "advisor_approved_by": "Advisor",
-                "advisor_approved_at": approved.isoformat(),
-                "locked_at": (approved + timedelta(minutes=1)).isoformat(),
+                "recorded_by": "Researcher",
+                "recorded_at": recorded.isoformat(),
+                "locked_at": (recorded + timedelta(minutes=1)).isoformat(),
             }
         ),
         encoding="utf-8",
@@ -88,7 +88,7 @@ def test_protocol_has_locked_action_partitions(protocol_path: Path) -> None:
     assert protocol.dataset.development_validation_actions == tuple(range(2, 117, 6))
     assert protocol.training.final_training_actions == "all_100_auxiliary_actions"
     assert protocol.training.insufficient_compute_policy == (
-        "block_and_require_advisor_approved_amendment_before_test_opening"
+        "block_and_require_documented_amendment_before_test_opening"
     )
     assert protocol.batch.physical_batch_size == 32
     assert protocol.objectives.core == ("contrastive", "supcon", "contextual")
@@ -127,6 +127,45 @@ def test_protocol_lock_detects_content_change(
 def test_final_operation_cannot_omit_protocol_lock(protocol_path: Path) -> None:
     with pytest.raises(ValueError, match="required"):
         verify_protocol(protocol_path, require_locked=True)
+
+
+@pytest.mark.parametrize(
+    ("change", "message"),
+    [
+        ({"recorded_by": None}, "recorded_by"),
+        ({"recorded_by": "   "}, "recorded_by"),
+        ({"recorded_at": "2026-09-01T13:00:00"}, "timezone"),
+        ({"recorded_at": "2026-09-01T13:02:00Z"}, "must not precede recorded_at"),
+        ({"advisor_approved_by": "Legacy advisor"}, "Extra inputs"),
+    ],
+)
+def test_researcher_lock_preserves_record_and_timestamp_requirements(
+    protocol_path: Path, tmp_path: Path, change: dict, message: str
+) -> None:
+    lock_path, plan_path, run_set_path = _write_locked_artifacts(
+        tmp_path, protocol_digest(load_protocol(protocol_path))
+    )
+    payload = json.loads(lock_path.read_text(encoding="utf-8"))
+    assert "advisor_approved_by" not in payload
+    assert "advisor_approved_at" not in payload
+    # A complete researcher record requires no external advisor fields.
+    verify_protocol(
+        protocol_path,
+        lock_path=lock_path,
+        evaluation_plan_path=plan_path,
+        final_run_set_path=run_set_path,
+        require_locked=True,
+    )
+    payload.update(change)
+    lock_path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match=message):
+        verify_protocol(
+            protocol_path,
+            lock_path=lock_path,
+            evaluation_plan_path=plan_path,
+            final_run_set_path=run_set_path,
+            require_locked=True,
+        )
 
 
 def test_lock_rejects_future_timestamps(

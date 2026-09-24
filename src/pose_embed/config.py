@@ -347,7 +347,7 @@ class TrainingProtocolConfig(StrictModel):
     tune_on: Literal["development_validation_clean_only"]
     final_training_actions: Literal["all_100_auxiliary_actions"]
     insufficient_compute_policy: Literal[
-        "block_and_require_advisor_approved_amendment_before_test_opening"
+        "block_and_require_documented_amendment_before_test_opening"
     ]
     epochs: int = Field(gt=0)
     optimizer: Literal["adamw"]
@@ -418,7 +418,7 @@ class AmendmentPolicy(StrictModel):
     allowed_until: Literal["before_tuning_ends_and_before_test_opening"]
     allowed_reason: Literal["geometric_invalid_imperceptible_or_degenerate_only"]
     retrieval_score_motivated_change: Literal["forbidden"]
-    advisor_approval_required: Literal[True]
+    documented_amendment_required: Literal[True]
     new_protocol_hash_and_lock_required: Literal[True]
 
 
