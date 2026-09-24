@@ -56,7 +56,7 @@ def test_test_opening_is_atomic_immutable_and_bound_to_lock_and_plan(
     assert len(validated_runs) == 9
 
     lock_payload = json.loads(lock_path.read_text(encoding="utf-8"))
-    lock_payload["advisor_approved_by"] = "Changed"
+    lock_payload["recorded_by"] = "Changed"
     lock_path.write_text(json.dumps(lock_payload), encoding="utf-8")
     with pytest.raises(ValueError, match="different protocol lock"):
         open_final_test_once(

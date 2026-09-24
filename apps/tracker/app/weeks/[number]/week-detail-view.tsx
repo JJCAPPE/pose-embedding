@@ -160,7 +160,7 @@ export function WeekDetailView({
             <Space direction="vertical" size={16}>
               <Typography.Text>
                 There is no earlier weekly gate. Confirm the manual access actions and protocol
-                approvals as part of Week 1.
+                decisions as part of Week 1.
               </Typography.Text>
               <InternalLinkButton href="/protocol#manual-actions">
                 Review manual actions
@@ -345,10 +345,10 @@ export function WeekDetailView({
             </Card>
           </section>
 
-          <section aria-labelledby="advisor-title">
+          <section aria-labelledby="research-checkpoint-title">
             <Card
               className="week-side-card"
-              title={<h2 id="advisor-title">Advisor checkpoint</h2>}
+              title={<h2 id="research-checkpoint-title">Research checkpoint</h2>}
             >
               <p>{week.advisorPrompt}</p>
             </Card>

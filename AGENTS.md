@@ -6,6 +6,9 @@ These rules apply to every automated or human change in this repository.
 
 - Read `plan/research-plan.v1.json`, the final tracked prospectus, and
   `docs/protocol/protocol-v1.md` before changing scientific behavior.
+- This is independent research. `docs/protocol/independent-research.md`
+  supersedes historical advisor sign-off requirements. Record researcher
+  decisions and result-blind amendments; retain all scientific and licensing safeguards.
 - The core comparison is contrastive-only, supervised contrastive, and full
   contextual-plus-contrastive with a frozen MotionBERT encoder. Multi-Similarity
   plus its miner is gated stretch work only.
@@ -15,7 +18,7 @@ These rules apply to every automated or human change in this repository.
 ## Data and experiment safety
 
 - Never commit NTU data, checkpoints, embeddings, caches, full run artifacts,
-  credentials, participant information, or private advisor correspondence.
+  credentials, participant information, or private correspondence.
 - Use `POSE_EMBED_DATA_ROOT` and `POSE_EMBED_ARTIFACT_ROOT` for licensed inputs
   and generated runs. Keep only manifests, hashes, configs, compact summaries,
   and permitted final deliverables in Git.
@@ -34,7 +37,7 @@ These rules apply to every automated or human change in this repository.
   reference-only: do not copy, vendor, adapt, or redistribute its code.
 - Retain upstream headers and attribution for any permitted minimal MotionBERT
   compatibility port. Do not add a repository-wide license without explicit
-  advisor/BU approval.
+  researcher authorization following rights review and applicable BU requirements.
 
 ## Tracker and database
 

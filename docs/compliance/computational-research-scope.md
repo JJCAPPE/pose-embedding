@@ -25,9 +25,10 @@ Boston University requirements.
 
 ## Approval and determination status
 
-Advisor approval of the scientific protocol is already recorded separately in
-`docs/protocol/protocol-v1-approval.md`. No additional advisor approval is
-being asserted by this scope statement.
+The scientific protocol is researcher-controlled under
+[Independent research governance](../protocol/independent-research.md).
+Advisor approval is not required. This does not replace an institutional
+determination.
 
 The unresolved institutional condition is recorded verbatim from protocol-v1:
 

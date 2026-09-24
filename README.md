@@ -6,7 +6,7 @@ contextual metric-learning objectives while holding the frozen MotionBERT
 encoder, data protocol, physical batches, tuning budget, and evaluator fixed.
 
 The project runs from September 15 through December 18, 2026. Its companion
-tracker provides a public advisor view of all 14 weeks and an authenticated
+tracker provides a public research view of all 14 weeks and an authenticated
 owner editor for tasks, evidence, reflections, and advancement gates.
 
 ## Repository map
@@ -107,14 +107,17 @@ dashboard. In hosted Supabase Auth, disable all public
 sign-up, set and verify the Site URL against the final Vercel production origin,
 and allow only the exact redirect origins needed. The checked
 `supabase/config.toml` is local-only and must not be copied to hosted Auth.
-Dataset terms, GPU access, advisor approval, and BU governance determinations
-also require the researcher. Everything else is represented as checked code,
+Dataset terms, GPU access, and BU governance determinations also require the
+researcher. Scientific decisions follow the
+[independent research governance record](docs/protocol/independent-research.md),
+with no advisor approval requirement. Everything else is represented as checked code,
 migrations, CI, or tracker gates.
 
 The repository keeps a reference copy of the
 [NTU RGB+D release agreement](docs/compliance/ntu-rgbd-release-agreement.md).
 It is not proof of acceptance; keep private acceptance evidence outside Git.
 
-This repository intentionally has no project-wide reuse license while advisor
-and BU review is pending. Third-party material retains its own license and
+This repository intentionally has no project-wide reuse license. Adding one
+requires an explicit researcher decision after rights review and applicable BU
+requirements. Third-party material retains its own license and
 attribution requirements.

@@ -1,12 +1,12 @@
-# Input-contract amendment — draft for advisor review
+# Input-contract amendment — draft for researcher decision
 
-Status: **DRAFT — not approved and not effective**. Prepared 2026-09-24.
+Status: **DRAFT — not adopted and not effective**. Prepared 2026-09-24.
 This document proposes a narrow correction to the locked input contract. It
-does not change the protocol, configuration, code, approval record, or test
+does not change the protocol, configuration, code, decision record, or test
 seal, and it does not constitute a BU governance determination.
 
 Current protocol: `protocol-v1`, canonical SHA-256
-`12cf4d9a322f5bd5ea76fb2d9ffc070a6a2681fe8474a05cff1f62b6e43368e2`.
+`1b43d1bedb833f71936d0bc36d30a9b6f7ed6d2d00a5b8c8b781b787ad66d265`.
 
 ## Reason for the proposed amendment
 
@@ -25,7 +25,7 @@ must not be represented by fabricated poses or placeholder inventory rows.
 
 ## Proposed decision wording
 
-> Approve an input-contract amendment, before novel-test opening and without
+> Adopt an input-contract amendment, before novel-test opening and without
 > using novel-test outcomes, that defines the complete usable HRNet source
 > inventory as exactly 113,945 unique annotations. Account separately for the
 > 535 officially excluded nominal captures using the hash-pinned missing-skeleton
@@ -37,8 +37,8 @@ must not be represented by fabricated poses or placeholder inventory rows.
 > replaces the requirement for 114,480 physical per-sample pose files. All
 > other scientific controls and test-opening prerequisites remain unchanged.
 
-The wording above is a proposal for an authorized advisor decision; it is not
-an assertion that approval has been given.
+The wording above is a proposal for a documented researcher decision; it is not
+an assertion that the amendment has been adopted.
 
 ## Exact proposed input binding
 
@@ -78,47 +78,47 @@ source-file count would be **2**; usable source-row count would be **113,945**.
 - Dataset access terms and the separate requirement for the applicable BU
   human-subjects/data-governance determination.
 
-## Approval fields — unfilled
+## Decision fields — unfilled
 
-- Advisor decision: ____________________
-- Advisor decision date and time, including timezone: ____________________
+- Researcher decision: ____________________
+- Researcher decision date and time, including timezone: ____________________
 - Result-blind review confirmation and public-safe evidence reference: ____________________
 - Conditions or requested changes: ____________________
-- Approved amended protocol canonical SHA-256: ____________________
+- Adopted amended protocol canonical SHA-256: ____________________
 
 Private correspondence must remain outside Git and public tracker exports.
-The existing protocol approval does not fill these amendment fields.
+The governance-only revision does not fill these amendment fields.
 
-## Implementation follow-up after approval
+## Implementation follow-up after adoption
 
-1. Record the actual advisor decision and conditions. Confirm that the novel
+1. Record the actual researcher decision and conditions. Confirm that the novel
    test has not been opened and no novel-test outcomes informed the amendment.
-   Preserve the existing approval and every prior run or lock artifact.
-2. Apply only the approved input-contract change to `configs/protocol.v1.yaml`
+   Preserve the historical decision records and every prior run or lock artifact.
+2. Apply only the adopted input-contract change to `configs/protocol.v1.yaml`
    and `docs/protocol/protocol-v1.md`. Update
    `DatasetConfig.expected_source_sample_count` in `src/pose_embed/config.py`,
-   which currently permits only `114480`, to enforce the approved usable count.
-   Bind the approved input hashes and nominal/excluded counts explicitly; do
+   which currently permits only `114480`, to enforce the adopted usable count.
+   Bind the specified input hashes and nominal/excluded counts explicitly; do
    not weaken the count check to accept arbitrary subsets.
 3. Confirm and test the existing `ntu_aggregate_inventory` validation path in
    `src/pose_embed/protocol.py`. It must verify both physical files, revalidate
    annotations, reject missing-list overlap and changed or incomplete inputs,
    and bind the exact source inventory and ordered final subsets. Retain the
    existing test seal and immutable feature-cache provenance checks.
-4. Run `uv run pose-embed data generate` with the approved protocol, verified
+4. Run `uv run pose-embed data generate` with the amended protocol, verified
    data root, and a fresh `--output-dir` under `POSE_EMBED_ARTIFACT_ROOT`.
    Compare the generated identities and manifest digests against the existing
    audit. Explain any difference before acceptance; never overwrite an earlier
    bundle. Run the inventory, manifest, and protocol tests, plus
    `python scripts/verify_workspace.py` and the applicable project checks.
 5. Obtain the canonical amended digest from `uv run pose-embed protocol verify`
-   and bind the advisor's approval to that exact digest. Preserve obsolete
-   locks as historical records; use newly approved bindings for future
+   and bind the researcher's decision to that exact digest. Preserve obsolete
+   locks as historical records; use newly recorded bindings for future
    artifacts. Complete evaluation-plan, final-run-set, and protocol-lock
    records only at their prescribed stages, then require
    `pose-embed protocol verify --require-locked` before any final evaluation.
 6. Update the public input evidence and tracker task/gate using verified
-   results and the actual approval reference. Week closure still requires
+   results and the actual decision reference. Week closure still requires
    the separate BU determination, actual time record, and all other required
    tasks and gates. This draft alone cannot authorize novel-test access,
    satisfy institutional governance, or close the week.

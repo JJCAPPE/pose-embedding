@@ -10,7 +10,7 @@ web
 
 ## Users
 
-The primary user is the student researcher who plans and closes weekly work, records evidence, and makes protocol-gated decisions. The advisor is the primary reviewer. Public visitors can inspect the public-safe schedule and progress without signing in.
+The primary user is the independent researcher who plans and closes weekly work, records evidence, and makes protocol-gated decisions. Public visitors can inspect the public-safe schedule and progress without signing in.
 
 ## Product Purpose
 
@@ -18,11 +18,11 @@ Pose Embed turns a fourteen-week research protocol into an inspectable sequence 
 
 ## Positioning
 
-The tracker connects each weekly task to expected evidence and explicit gates while preserving a public advisor view and an authenticated, auditable owner workflow. It is a research decision record, not a generic project-management dashboard.
+The tracker connects each weekly task to expected evidence and explicit gates while preserving a public research view and an authenticated, auditable owner workflow. It is a research decision record, not a generic project-management dashboard.
 
 ## Operating Context
 
-The study runs from September 15 through December 18, 2026. The researcher works from the plan week by week, the advisor reviews progress and decisions, and public visitors can follow the public-safe record. The application always has a checked-in read-only plan; configured deployments can load live progress from Supabase. Owner edits publish to the advisor view.
+The study runs from September 15 through December 18, 2026. The researcher works from the plan week by week, the researcher records decisions and reviews evidence, and public visitors can follow the public-safe record. The application always has a checked-in read-only plan; configured deployments can load live progress from Supabase. Owner edits publish to the public research view.
 
 ## Capabilities and Constraints
 
@@ -48,7 +48,7 @@ The product name is Pose Embed. The requested replacement interface uses Ant Des
 
 1. State the next meaningful step before presenting detail.
 2. Make the expected deliverable concrete and easy to find.
-3. Separate decisions and approval gates from ordinary tasks.
+3. Separate decisions and evidence gates from ordinary tasks.
 4. Start with plain-language context, then reveal scientific and operational detail progressively.
 5. Preserve the locked protocol, honest reporting, and public/private boundary over visual convenience.
 

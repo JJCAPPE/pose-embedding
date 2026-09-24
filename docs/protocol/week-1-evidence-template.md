@@ -1,20 +1,20 @@
-# Week 1 approval and access record
+# Week 1 decision and access record
 
 Complete this public-safe record before closing Week 1. Keep credentials,
 licensed file URLs, private correspondence, and data outside Git; link only to
-evidence that may safely be shared with the advisor.
+evidence that may safely be shared publicly.
 
-## Protocol approval
+## Researcher protocol record
 
 - Protocol ID: `protocol-v1`
 - Protocol digest: `<run pose-embed protocol verify and paste sha256>`
 - Evaluation-plan digest: `<record when the final-test lock is created>`
-- Advisor decision: `<approved / approved with conditions / pending>`
+- Researcher decision: `<adopted / adopted with conditions / pending>`
 - Decision date and timezone: `<RFC 3339 timestamp>`
-- Public-safe evidence or meeting record: `<URL or repository path>`
+- Public-safe decision evidence: `<URL or repository path>`
 - Conditions or unresolved questions: `<text>`
 
-Approval covers the research question, auxiliary/novel split, synchronized-view
+The record covers the research question, auxiliary/novel split, synchronized-view
 exclusion, corruption protocol, primary estimand and claim rule, tuning budget,
 test-opening rule, and failed-run policy.
 
@@ -64,7 +64,7 @@ equivalence.
 
 ## Closure checklist
 
-- [ ] Protocol approval and digest are recorded.
+- [ ] Researcher protocol decision and digest are recorded.
 - [ ] BU determination is recorded.
 - [ ] All authorized inputs are readable and checksummed.
 - [ ] The MotionBERT checkpoint is readable and passes the pinned compatibility smoke test.

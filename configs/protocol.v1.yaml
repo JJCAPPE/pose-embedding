@@ -116,7 +116,7 @@ training:
   tuning_trials_per_method: 6
   tune_on: development_validation_clean_only
   final_training_actions: all_100_auxiliary_actions
-  insufficient_compute_policy: block_and_require_advisor_approved_amendment_before_test_opening
+  insufficient_compute_policy: block_and_require_documented_amendment_before_test_opening
   epochs: 50
   optimizer: adamw
   tuning_grid:
@@ -165,7 +165,7 @@ corruptions:
     allowed_until: before_tuning_ends_and_before_test_opening
     allowed_reason: geometric_invalid_imperceptible_or_degenerate_only
     retrieval_score_motivated_change: forbidden
-    advisor_approval_required: true
+    documented_amendment_required: true
     new_protocol_hash_and_lock_required: true
 analysis:
   metrics: [top1, mrr, r_at_5]

@@ -113,16 +113,18 @@ SHA-256 `c287a507a184c256a3a0f9dd89e3258ce888d4d3cff9e1f4e78c48c044ee0ead`.
 
 ## Remaining closure decisions
 
-Technical input verification and institutional/protocol approval are separate.
+Technical input verification, protocol decisions, and institutional requirements are separate.
 The [input-contract amendment draft](input-contract-amendment-draft.md) is
-prepared but **not approved**. The locked protocol still requires 114,480
-source rows and therefore needs the advisor's result-blind decision accepting
-the verified usable aggregate and physical-source binding. The protocol hash
-remains `12cf4d9a322f5bd5ea76fb2d9ffc070a6a2681fe8474a05cff1f62b6e43368e2`.
+prepared but **not adopted**. The protocol still requires 114,480 source rows
+and therefore needs a documented result-blind amendment accepting the verified
+usable aggregate and physical-source binding. The setup evidence above binds
+the original protocol hash. The subsequent governance-only revision is recorded
+in [Independent research governance](independent-research.md); it removes advisor
+requirements without adopting the input-contract amendment.
 
 Week closure still requires:
 
-1. The advisor-approved input-contract amendment (`w01-gate-02`).
+1. The documented input-contract amendment (`w01-gate-02`).
 2. The applicable BU governance determination (`w01-gate-04`); the existing
    [scope statement](../compliance/computational-research-scope.md) is not that decision.
 3. The researcher's actual Week 1 minutes, not an estimate inferred from planned

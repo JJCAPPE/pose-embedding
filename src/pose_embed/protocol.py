@@ -40,10 +40,10 @@ class ProtocolLock(BaseModel):
     primary_query_manifest_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     final_run_set_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     locked_at: datetime
-    advisor_approved_by: str = Field(min_length=1)
-    advisor_approved_at: datetime
+    recorded_by: str = Field(min_length=1, pattern=r"\S")
+    recorded_at: datetime
 
-    @field_validator("locked_at", "advisor_approved_at")
+    @field_validator("locked_at", "recorded_at")
     @classmethod
     def timestamp_has_timezone(cls, value: datetime) -> datetime:
         if value.tzinfo is None or value.utcoffset() is None:
@@ -1959,12 +1959,12 @@ def verify_protocol_lock(
         raise ValueError("anchor manifest actions differ from the protocol novel set")
     if {run.seed for run in final_run_set.runs} != set(protocol.training.seeds):
         raise ValueError("final run-set seeds differ from the protocol")
-    if lock.advisor_approved_at > lock.locked_at:
-        raise ValueError("locked_at must not precede advisor_approved_at")
+    if lock.recorded_at > lock.locked_at:
+        raise ValueError("locked_at must not precede recorded_at")
     current_time = now or datetime.now(UTC)
     if current_time.tzinfo is None or current_time.utcoffset() is None:
         raise ValueError("verification time must include a timezone")
-    if lock.locked_at > current_time or lock.advisor_approved_at > current_time:
+    if lock.locked_at > current_time or lock.recorded_at > current_time:
         raise ValueError("protocol lock timestamps must not be in the future")
     if final_run_set.locked_at > lock.locked_at:
         raise ValueError("protocol lock must not precede final run-set finalization")
@@ -1985,7 +1985,7 @@ def verify_protocol(
     require_locked: bool = False,
     now: datetime | None = None,
 ) -> tuple[ProtocolConfig, str]:
-    """Validate a protocol and, when supplied or required, its approval lock."""
+    """Validate a protocol and, when supplied or required, its recorded lock."""
     protocol = load_protocol(protocol_path)
     digest = protocol_digest(protocol)
     if require_locked and lock_path is None:

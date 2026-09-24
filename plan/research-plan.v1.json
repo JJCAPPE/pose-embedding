@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-09-24T15:35:26Z",
+  "generatedAt": "2026-09-24T16:01:54Z",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -26,8 +26,8 @@
       "id": "manual-ntu",
       "dueDate": "2026-09-18",
       "title": "Resolve the verified NTU input count",
-      "details": "Access is approved and the licensed HRNet-derived pose aggregate is downloaded, readable, and checksummed. Before opening the novel test, obtain a result-blind advisor-approved amendment that binds its 113,945 usable annotations, the official 535-item missing-skeleton list, and aggregate-aware physical-source verification in place of the locked per-sample-file contract.",
-      "whyManual": "Only the researcher and advisor can approve the source-count and source-verification-contract amendment for the licensed dataset.",
+      "details": "Access is approved and the licensed HRNet-derived pose aggregate is downloaded, readable, and checksummed. Before opening the novel test, document and implement a result-blind protocol amendment that binds its 113,945 usable annotations, the official 535-item missing-skeleton list, and aggregate-aware physical-source verification in place of the locked per-sample-file contract.",
+      "whyManual": "The independent researcher owns this result-blind protocol decision; document its rationale and exact hash before test opening.",
       "weekTaskId": "w01-task-02"
     },
     {
@@ -42,15 +42,16 @@
       "id": "manual-approval",
       "dueDate": "2026-09-20",
       "title": "Obtain the BU governance determination",
-      "details": "Protocol-v1 advisor approval is already recorded. A researcher-authored computational-scope statement is available, but the applicable BU data-governance or human-subjects determination remains pending.",
+      "details": "A researcher-authored computational-scope statement is available, but the applicable BU data-governance or human-subjects determination remains pending.",
       "whyManual": "Only authorized BU personnel can provide the institutional determination; the researcher-authored scope statement cannot replace it.",
       "weekTaskId": "w01-task-04"
     }
   ],
   "protocol": {
-    "bindingSource": "lit-review/extended-lit-review.tex, beginning at line 96, is binding. The broader untracked UROP draft is not the study specification.",
+    "bindingSource": "The scientific design in lit-review/extended-lit-review.tex, beginning at line 96, is binding. docs/protocol/independent-research.md supersedes advisor sign-off requirements. The broader untracked UROP draft is not the study specification.",
     "successDefinition": "Scientific success means completing the locked study faithfully, including a null or negative finding. It does not require contextual loss to win.",
     "lockedDecisions": [
+      {"label":"Governance","value":"Independent research: the researcher records protocol decisions and result-blind amendments. No advisor approval is required. Dataset terms, applicable institutional requirements, protocol hashes, and the novel-test seal remain binding."},
       {"label":"Workload","value":"Approximately 8 focused research hours per week, reduced to 5 hours during the October holiday week and 4 hours during Thanksgiving and finals weeks."},
       {"label":"Compute","value":"One NVIDIA GPU with at least 16 GB VRAM, preferably 24 GB."},
       {"label":"Core methods","value":"Contrastive-only, supervised contrastive, and full contextual-plus-contrastive."},
@@ -58,7 +59,7 @@
       {"label":"Dataset","value":"NTU RGB+D 120 official one-shot protocol."},
       {"label":"Encoder","value":"Frozen pretrained MotionBERT in evaluation mode."},
       {"label":"Deadline","value":"Core results complete by November 20. Thanksgiving and finals are buffers, not core dependencies."},
-      {"label":"Release policy","value":"No new repository-wide reuse license until BU and advisor review. Preserve all upstream notices."}
+      {"label":"Release policy","value":"No new repository-wide reuse license without an explicit researcher decision following rights review and applicable BU requirements. Preserve all upstream notices."}
     ],
     "experimentalDesign": [
       {"label":"Research question","value":"Given one clean reference per unseen action, does contextual training reduce retrieval degradation when query joints or frames are inaccurate or missing?"},
@@ -107,30 +108,30 @@
       "endDate": "2026-09-20",
       "phase": "Protocol",
       "title": "Protocol and access",
-      "objective": "Turn the prospectus into an advisor-approved, hash-bound, testable protocol and prove that the required data and compute are reachable.",
-      "deliverable": "An advisor-approved, hash-bound protocol-v1, verified data and checkpoint inventory, and measured GPU profile.",
+      "objective": "Turn the prospectus into a documented, hash-bound, testable protocol and prove that the required data and compute are reachable.",
+      "deliverable": "A documented, hash-bound protocol-v1, verified data and checkpoint inventory, and measured GPU profile.",
       "risks": [
         "NTU or checkpoint access may require manual license acceptance.",
         "GPU availability may not match the planned memory or runtime assumptions.",
-        "Advisor or BU determination may arrive after technical setup begins."
+        "Protocol amendments or the BU determination may remain unresolved after technical setup begins."
       ],
-      "advisorPrompt": "Do you approve the research question, test-opening rule, primary estimand, synchronized-view exclusion, and claim language as the binding protocol?",
-      "reflection": "Week 1 established an advisor-approved, hash-bound protocol, verified the licensed HRNet aggregate, official one-shot split, and MotionBERT checkpoint, and confirmed physical batch 32 on an SCC A40. The required inputs and setup are now verified on the GPU host. The inventory accounts for 113,945 usable annotations plus 535 official missing-skeleton exclusions. Acquisition and setup are complete; the input-contract amendment draft is unapproved, the BU governance determination is pending, and researcher-supplied actual minutes are still required. The novel test remains sealed and the weekly record remains open.",
+      "advisorPrompt": "Are the research question, test-opening rule, primary estimand, synchronized-view exclusion, and claim language documented as the binding protocol?",
+      "reflection": "Week 1 established a documented, hash-bound protocol, verified the licensed HRNet aggregate, official one-shot split, and MotionBERT checkpoint, and confirmed physical batch 32 on an SCC A40. The required inputs and setup are now verified on the GPU host. The inventory accounts for 113,945 usable annotations plus 535 official missing-skeleton exclusions. Acquisition and setup are complete; the input-contract amendment is not yet adopted, the BU governance determination is pending, and researcher-supplied actual minutes are still required. The novel test remains sealed and the weekly record remains open.",
       "plannedMinutes": 480,
       "actualMinutes": 0,
       "state": "blocked",
       "closedAt": null,
-      "version": 3,
+      "version": 4,
       "tasks": [
-        {"id":"w01-task-01","weekId":"week-01","position":1,"title":"Finalize protocol-v1","details":"Resolve the objective formula, primary estimand, claim rule, validation split, synchronized-view rule, corruptions, test-opening rule, and failed-run policy.","expectedOutput":"Advisor-approved, hash-bound protocol document.","required":true,"estimateMinutes":120,"state":"done","completionNote":"All binding scientific choices were confirmed, including mandatory final training on all 100 auxiliary actions. Advisor approval is recorded in docs/protocol/protocol-v1-approval.md. Protocol SHA-256: 12cf4d9a322f5bd5ea76fb2d9ffc070a6a2681fe8474a05cff1f62b6e43368e2.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/protocol-v1-approval.md","completedAt":"2026-09-11T13:41:08-04:00","version":3},
-        {"id":"w01-task-02","weekId":"week-01","position":2,"title":"Verify licensed inputs","details":"Confirm that the NTU HRNet-derived poses, official one-shot split, and pretrained MotionBERT checkpoint are readable. Record source URLs and SHA-256 checksums without committing licensed files.","expectedOutput":"Input inventory and checksum report.","required":true,"estimateMinutes":120,"state":"done","completionNote":"Verified 2026-09-24: dataset access remains active, the complete usable HRNet aggregate, official missing-skeleton list, one-shot definition, and MotionBERT checkpoint are readable and checksummed, and the required inputs and setup are verified on the GPU host. The aggregate contains 113,945 usable annotations and all 20 official exemplars; the official 535-item missing-skeleton list accounts for the remaining nominal captures. This completes input acquisition and verification. The separate w01-gate-02 remains pending because the input-contract amendment draft is unapproved; the novel test remains sealed.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md","completedAt":"2026-09-24T15:35:26Z","version":5},
+        {"id":"w01-task-01","weekId":"week-01","position":1,"title":"Finalize protocol-v1","details":"Resolve the objective formula, primary estimand, claim rule, validation split, synchronized-view rule, corruptions, test-opening rule, and failed-run policy.","expectedOutput":"Documented, hash-bound protocol document.","required":true,"estimateMinutes":120,"state":"done","completionNote":"All binding scientific choices were confirmed, including mandatory final training on all 100 auxiliary actions. Independent research governance is recorded in docs/protocol/independent-research.md. Protocol SHA-256: 1b43d1bedb833f71936d0bc36d30a9b6f7ed6d2d00a5b8c8b781b787ad66d265.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/independent-research.md","completedAt":"2026-09-11T13:41:08-04:00","version":4},
+        {"id":"w01-task-02","weekId":"week-01","position":2,"title":"Verify licensed inputs","details":"Confirm that the NTU HRNet-derived poses, official one-shot split, and pretrained MotionBERT checkpoint are readable. Record source URLs and SHA-256 checksums without committing licensed files.","expectedOutput":"Input inventory and checksum report.","required":true,"estimateMinutes":120,"state":"done","completionNote":"Verified 2026-09-24: dataset access remains active, the complete usable HRNet aggregate, official missing-skeleton list, one-shot definition, and MotionBERT checkpoint are readable and checksummed, and the required inputs and setup are verified on the GPU host. The aggregate contains 113,945 usable annotations and all 20 official exemplars; the official 535-item missing-skeleton list accounts for the remaining nominal captures. This completes input acquisition and verification. The separate w01-gate-02 remains pending because the input-contract amendment is not yet adopted; the novel test remains sealed.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md","completedAt":"2026-09-24T15:35:26Z","version":6},
         {"id":"w01-task-03","weekId":"week-01","position":3,"title":"Profile the GPU path","details":"Run one representative frozen MotionBERT forward pass at batch sizes 32 and 64. Record device, CUDA, memory, runtime, scheduler, quota, and job limits.","expectedOutput":"Compute profile with a justified physical batch-size decision.","required":true,"estimateMinutes":120,"state":"done","completionNote":"Completed 2026-09-16: a real frozen MotionBERT encoder profile ran on a scheduler-assigned BU SCC A40 using dense protocol-shaped float32 inputs. Physical batch 32 completed with 2.572 GiB peak allocated, 2.855 GiB peak reserved, and an 842.164 ms median forward; batch 64 completed with 4.977 GiB allocated, 5.514 GiB reserved, and a 1,685.400 ms median. Required device, CUDA, scheduler, quota, and job-limit evidence was captured. Physical batch 32 remains selected because protocol v1 permits 64 only after all core methods fit. This is compute evidence only, not preprocessing or encoder-parity evidence.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-gpu-profile.md","completedAt":"2026-09-16T12:41:15-04:00","version":2},
-        {"id":"w01-task-04","weekId":"week-01","position":4,"title":"Record governance decisions","details":"Attach advisor approval and the BU data-governance or human-subjects determination. Record unresolved conditions verbatim.","expectedOutput":"Approval evidence or a visible blocking record.","required":true,"estimateMinutes":60,"state":"done","completionNote":"Researcher-authored scope statement recorded on 2026-09-15: the project performs computational model training and evaluation on existing licensed pose annotations. It involves no participant recruitment, interaction, intervention, prospective data collection, direct identifiers, re-identification, or animal work. Because the source poses were derived from recordings of people, the statement does not itself establish BU human-subjects/data-governance status. The existing protocol advisor approval remains recorded separately. Unresolved condition (verbatim): 'BU provides the applicable human-subjects/data-governance determination.' The visible blocking record satisfies this task's required output; w01-gate-04 remains pending until BU issues the determination.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/compliance/computational-research-scope.md","completedAt":"2026-09-16T12:07:48-04:00","version":3},
-        {"id":"w01-task-05","weekId":"week-01","position":5,"title":"Close the weekly record","details":"Update actual hours, blockers, evidence links, and the first-week reflection in the tracker.","expectedOutput":"A complete Week 1 progress record.","required":true,"estimateMinutes":60,"state":"blocked","completionNote":"Verified input acquisition and remote setup are recorded in the Week 1 evidence. Final closeout remains blocked until researcher-supplied actual minutes, the advisor-approved input-contract amendment, and the BU governance determination are recorded. The amendment draft is unapproved; no approval, hours, or week closure is inferred.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md","completedAt":null,"version":3}
+        {"id":"w01-task-04","weekId":"week-01","position":4,"title":"Record governance decisions","details":"Record researcher-controlled protocol decisions and the BU data-governance or human-subjects determination. Record unresolved conditions verbatim.","expectedOutput":"Decision evidence or a visible blocking record.","required":true,"estimateMinutes":60,"state":"done","completionNote":"Researcher-authored scope statement recorded on 2026-09-15: the project performs computational model training and evaluation on existing licensed pose annotations. It involves no participant recruitment, interaction, intervention, prospective data collection, direct identifiers, re-identification, or animal work. Because the source poses were derived from recordings of people, the statement does not itself establish BU human-subjects/data-governance status. Unresolved condition (verbatim): 'BU provides the applicable human-subjects/data-governance determination.' The visible blocking record satisfies this task's required output; w01-gate-04 remains pending until BU issues the determination.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/compliance/computational-research-scope.md","completedAt":"2026-09-16T12:07:48-04:00","version":4},
+        {"id":"w01-task-05","weekId":"week-01","position":5,"title":"Close the weekly record","details":"Update actual hours, blockers, evidence links, and the first-week reflection in the tracker.","expectedOutput":"A complete Week 1 progress record.","required":true,"estimateMinutes":60,"state":"blocked","completionNote":"Verified input acquisition and remote setup are recorded in the Week 1 evidence. Final closeout remains blocked until researcher-supplied actual minutes, the documented input-contract amendment, and the BU governance determination are recorded. The amendment is not yet adopted; no decision, hours, or week closure is inferred.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md","completedAt":null,"version":4}
       ],
       "gates": [
-        {"id":"w01-gate-01","weekId":"week-01","position":1,"criterion":"Protocol-v1 is advisor-approved and its hash is recorded.","required":true,"state":"met","evidence":"Advisor approval is recorded in docs/protocol/protocol-v1-approval.md. Protocol SHA-256: 12cf4d9a322f5bd5ea76fb2d9ffc070a6a2681fe8474a05cff1f62b6e43368e2.","waiverReason":"","decidedAt":"2026-09-11T13:41:08-04:00","version":2},
-        {"id":"w01-gate-02","weekId":"week-01","position":2,"criterion":"Verified input inventory matches the approved protocol input contract.","required":true,"state":"pending","evidence":"Verified 2026-09-24: the local and GPU-host inputs account for 113,945 usable HRNet annotations plus 535 official missing-skeleton exclusions, with readable, checksummed data and checkpoint inputs. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md. The amendment at https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/input-contract-amendment-draft.md remains an unapproved draft. This gate remains pending until advisor approval binds the usable count and aggregate-plus-missing-list verification contract; the novel test remains sealed.","waiverReason":"","decidedAt":null,"version":4},
+        {"id":"w01-gate-01","weekId":"week-01","position":1,"criterion":"Protocol-v1 is documented under researcher control and its hash is recorded.","required":true,"state":"met","evidence":"Independent research governance is recorded in docs/protocol/independent-research.md. Protocol SHA-256: 1b43d1bedb833f71936d0bc36d30a9b6f7ed6d2d00a5b8c8b781b787ad66d265.","waiverReason":"","decidedAt":"2026-09-11T13:41:08-04:00","version":3},
+        {"id":"w01-gate-02","weekId":"week-01","position":2,"criterion":"Verified input inventory matches the recorded protocol input contract.","required":true,"state":"pending","evidence":"Verified 2026-09-24: the local and GPU-host inputs account for 113,945 usable HRNet annotations plus 535 official missing-skeleton exclusions, with readable, checksummed data and checkpoint inputs. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md. The amendment at https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/input-contract-amendment-draft.md remains a draft that has not been adopted. This gate remains pending until a documented result-blind amendment binds the usable count and aggregate-plus-missing-list verification contract; the novel test remains sealed.","waiverReason":"","decidedAt":null,"version":5},
         {"id":"w01-gate-03","weekId":"week-01","position":3,"criterion":"A representative GPU profile confirms a feasible physical batch size.","required":true,"state":"met","evidence":"Verified 2026-09-16: frozen MotionBERT completed the protocol-shaped physical batch 32 profile on a scheduler-assigned BU SCC A40, and all required device, CUDA, memory, runtime, scheduler, quota, and job-limit evidence was captured. Physical batch 32 is feasible and remains selected pending the Week 4 all-core-method batch-64 profile. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-gpu-profile.md.","waiverReason":"","decidedAt":"2026-09-16T12:41:15-04:00","version":2},
         {"id":"w01-gate-04","weekId":"week-01","position":4,"criterion":"Required BU governance determination is recorded.","required":true,"state":"pending","evidence":"A researcher-authored computational-scope statement is recorded at https://github.com/JJCAPPE/pose-embedding/blob/main/docs/compliance/computational-research-scope.md. It documents no recruitment, interaction, intervention, prospective collection, direct identifiers, re-identification, or animal work, but it is not a BU determination. Unresolved condition (verbatim): 'BU provides the applicable human-subjects/data-governance determination.'","waiverReason":"","decidedAt":null,"version":2}
       ]
@@ -164,7 +165,7 @@
         {"id":"w02-task-04","weekId":"week-02","position":4,"title":"Publish the manifest audit","details":"Record counts by class and split, checksum every manifest, and explain every query excluded from the primary set.","expectedOutput":"Human-readable manifest audit report.","required":true,"estimateMinutes":60,"state":"done","completionNote":"Published a source-safe manifest audit with per-class counts, all manifest digests, body-metadata coverage, invariant results, and one explicit explanation for each of the 40 synchronized-view exclusions. The required result-blind amendment is explicitly scoped to both the 114,480-versus-113,945 count and aggregate-aware source verification.","evidenceUrl":"https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md","completedAt":"2026-09-15T21:58:25-04:00","version":2}
       ],
       "gates": [
-        {"id":"w02-gate-01","weekId":"week-02","position":1,"criterion":"All seven manifests have frozen counts and checksums.","required":true,"state":"pending","evidence":"Seven release manifests are immutable and checksummed for the verified 113,945-sample usable aggregate. This gate remains pending until an advisor-approved, result-blind amendment binds both that usable count plus the official 535-record missing-skeleton list and aggregate-aware physical-source verification in place of 114,480 declared per-sample files. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md.","waiverReason":"","decidedAt":null,"version":2},
+        {"id":"w02-gate-01","weekId":"week-02","position":1,"criterion":"All seven manifests have frozen counts and checksums.","required":true,"state":"pending","evidence":"Seven release manifests are immutable and checksummed for the verified 113,945-sample usable aggregate. This gate remains pending until a documented, result-blind amendment binds both that usable count plus the official 535-record missing-skeleton list and aggregate-aware physical-source verification in place of 114,480 declared per-sample files. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md.","waiverReason":"","decidedAt":null,"version":3},
         {"id":"w02-gate-02","weekId":"week-02","position":2,"criterion":"Automated checks find zero forbidden overlap or duplicate identities.","required":true,"state":"met","evidence":"Verified 2026-09-15: automated construction-time and unit-test invariants found zero forbidden class, anchor/query, synchronized-performance, source-identity, or manifest-identity overlap; complete source coverage and byte-stable regeneration also passed. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md.","waiverReason":"","decidedAt":"2026-09-15T21:58:25-04:00","version":2},
         {"id":"w02-gate-03","weekId":"week-02","position":3,"criterion":"Every synchronized-view exclusion is reproducible from the manifest audit.","required":true,"state":"met","evidence":"Verified 2026-09-15: the audit enumerates all 40 primary-query exclusions and derives each one as a synchronized camera mate sharing the anchor setup, performer, repetition, and action. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md.","waiverReason":"","decidedAt":"2026-09-15T21:58:25-04:00","version":2}
       ]
@@ -263,13 +264,13 @@
       "tasks": [
         {"id":"w05-task-01","weekId":"week-05","position":1,"title":"Implement scale-normalized jitter","details":"Apply deterministic Gaussian xy noise at 1%, 2.5%, and 5% of each clean sequence's median torso scale.","expectedOutput":"Jitter operator with deterministic hashes and geometry tests.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
         {"id":"w05-task-02","weekId":"week-05","position":2,"title":"Implement joint and frame masking","details":"Mask 3, 6, or 8 connected limb-first joint trajectories, or a consecutive 10, 25, or 40-frame block. Set coordinates and confidence to zero without resampling.","expectedOutput":"Joint and frame operators with exact affected-count tests.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
-        {"id":"w05-task-03","weekId":"week-05","position":3,"title":"Inspect representative corruptions","details":"Render fixed examples for every family and level. Check visibility, action-label preservation, temporal placement, and monotonic geometric severity.","expectedOutput":"Advisor-readable corruption contact sheet and audit notes.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w05-task-03","weekId":"week-05","position":3,"title":"Inspect representative corruptions","details":"Render fixed examples for every family and level. Check visibility, action-label preservation, temporal placement, and monotonic geometric severity.","expectedOutput":"Reviewable corruption contact sheet and audit notes.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":2},
         {"id":"w05-task-04","weekId":"week-05","position":4,"title":"Freeze corruptions-v1","details":"Verify byte-identical severity zero, query-only application, unchanged tensor shape, and sample-derived seeds. Document any geometry-driven amendment.","expectedOutput":"Frozen corruption config with hash and amendment record.","required":true,"estimateMinutes":60,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
       ],
       "gates": [
         {"id":"w05-gate-01","weekId":"week-05","position":1,"criterion":"Severity zero is byte-identical and no gallery tensor changes.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
         {"id":"w05-gate-02","weekId":"week-05","position":2,"criterion":"Affected proportions, temporal placement, and deterministic hashes pass.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
-        {"id":"w05-gate-03","weekId":"week-05","position":3,"criterion":"Corruptions-v1 is frozen with no amendment or an advisor-approved geometry-only amendment.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+        {"id":"w05-gate-03","weekId":"week-05","position":3,"criterion":"Corruptions-v1 is frozen with no amendment or a documented result-blind geometry-only amendment.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":2}
       ]
     },
     {
@@ -315,19 +316,19 @@
       "phase": "Lock",
       "title": "Validation II and protocol lock",
       "objective": "Confirm the top candidates across paired seeds and lock every decision before final training and novel evaluation.",
-      "deliverable": "Advisor-approved final configs, analysis plan, and protocol-lock hash.",
+      "deliverable": "Frozen final configs, analysis plan, and protocol-lock hash.",
       "risks": [
         "High seed variance may make the candidate choice unstable.",
         "Late changes can create unequal tuning or accidental test flexibility.",
         "Stretch planning can distract from unresolved core instability."
       ],
-      "advisorPrompt": "Do you approve these final hyperparameters, fixed epoch counts, paired seeds, analysis code, and the decision to keep or cancel the stretch method?",
+      "advisorPrompt": "Are the final hyperparameters, fixed epoch counts, paired seeds, analysis code, and decision to keep or cancel the stretch method documented and frozen?",
       "reflection": "",
       "plannedMinutes": 480,
       "actualMinutes": 0,
       "state": "planned",
       "closedAt": null,
-      "version": 1,
+      "version": 2,
       "tasks": [
         {"id":"w07-task-01","weekId":"week-07","position":1,"title":"Repeat candidates across seeds","details":"Run the best two clean-validation candidates for each method over all three paired seeds, reusing seed-specific initialization and batch order.","expectedOutput":"Complete multi-seed candidate matrix.","required":true,"estimateMinutes":240,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
         {"id":"w07-task-02","weekId":"week-07","position":2,"title":"Select final settings","details":"Choose learning rate, weight decay, and fixed epoch count by the preregistered mean clean-validation rule. Preserve all seed results.","expectedOutput":"One final config per core method with decision trace.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
@@ -336,7 +337,7 @@
       ],
       "gates": [
         {"id":"w07-gate-01","weekId":"week-07","position":1,"criterion":"Final core configs are stable across paired seeds and have complete decision traces.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
-        {"id":"w07-gate-02","weekId":"week-07","position":2,"criterion":"Advisor approves the final hashes, fairness audit, and analysis plan.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w07-gate-02","weekId":"week-07","position":2,"criterion":"Final hashes, fairness audit, and analysis plan are recorded before test opening.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":2},
         {"id":"w07-gate-03","weekId":"week-07","position":3,"criterion":"No unresolved instability remains and the novel-test loader is unused.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
       ]
     },
@@ -484,7 +485,7 @@
       "phase": "Reproduction",
       "title": "Reproduction and draft",
       "objective": "Prove the project can be reconstructed independently and turn the complete evidence into a full report draft.",
-      "deliverable": "A successful fresh-clone reproduction, regenerated results, and a full advisor draft.",
+      "deliverable": "A successful fresh-clone reproduction, regenerated results, and a full report draft.",
       "risks": [
         "The working machine may hide undeclared dependencies or paths.",
         "Large licensed artifacts cannot be bundled with the repository.",
@@ -496,17 +497,17 @@
       "actualMinutes": 0,
       "state": "planned",
       "closedAt": null,
-      "version": 1,
+      "version": 2,
       "tasks": [
         {"id":"w12-task-01","weekId":"week-12","position":1,"title":"Reconstruct from a fresh clone","details":"Install pinned dependencies, fetch exact upstream sources, configure external data roots, and verify manifests on a clean checkout.","expectedOutput":"Fresh-clone environment and dependency audit.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
         {"id":"w12-task-02","weekId":"week-12","position":2,"title":"Run the CPU debug pipeline","details":"Execute parsing, feature fixture, each loss, training, evaluation, and report generation through one documented debug command.","expectedOutput":"Passing end-to-end CPU smoke run.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
         {"id":"w12-task-03","weekId":"week-12","position":3,"title":"Regenerate results from archives","details":"Rebuild final tables and figures from explicit immutable run manifests and compare output checksums with the Week 10 release candidates.","expectedOutput":"Reproduction report with matching or explained hashes.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
-        {"id":"w12-task-04","weekId":"week-12","position":4,"title":"Write the full report draft","details":"Complete methods, results, limitations, compute, failure handling, deviations, and negative findings. Link every figure to its generating command.","expectedOutput":"Full report draft delivered to the advisor.","required":true,"estimateMinutes":150,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+        {"id":"w12-task-04","weekId":"week-12","position":4,"title":"Write the full report draft","details":"Complete methods, results, limitations, compute, failure handling, deviations, and negative findings. Link every figure to its generating command.","expectedOutput":"Complete report draft archived with its evidence.","required":true,"estimateMinutes":150,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":2}
       ],
       "gates": [
         {"id":"w12-gate-01","weekId":"week-12","position":1,"criterion":"A fresh clone installs and completes the documented CPU debug pipeline.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
         {"id":"w12-gate-02","weekId":"week-12","position":2,"criterion":"Final tables and figures regenerate from archived immutable outputs.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
-        {"id":"w12-gate-03","weekId":"week-12","position":3,"criterion":"A complete report draft has been sent to the advisor.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
+        {"id":"w12-gate-03","weekId":"week-12","position":3,"criterion":"A complete report draft is recorded and reviewed against the evidence.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":2}
       ]
     },
     {
@@ -517,8 +518,8 @@
       "endDate": "2026-12-13",
       "phase": "Communication",
       "title": "Final communication",
-      "objective": "Resolve advisor feedback and package the study so its question, evidence, limits, and reproduction path stand on their own.",
-      "deliverable": "Final report, poster or slides, abstract, captions, source ledger, and advisor-facing walkthrough.",
+      "objective": "Resolve documented review findings and package the study so its question, evidence, limits, and reproduction path stand on their own.",
+      "deliverable": "Final report, poster or slides, abstract, captions, source ledger, and reproducibility walkthrough.",
       "risks": [
         "Late feedback may expand beyond correction into a new analysis request.",
         "Visual summaries can overstate findings when space is tight.",
@@ -530,16 +531,16 @@
       "actualMinutes": 0,
       "state": "planned",
       "closedAt": null,
-      "version": 1,
+      "version": 2,
       "tasks": [
-        {"id":"w13-task-01","weekId":"week-13","position":1,"title":"Resolve advisor feedback","details":"Classify each comment as correction, clarification, limitation, or new analysis. Complete the first three and defer unplanned analysis to future work after December 10.","expectedOutput":"Resolved feedback log and final report text.","required":true,"estimateMinutes":180,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
-        {"id":"w13-task-02","weekId":"week-13","position":2,"title":"Finalize poster or slides","details":"Present the research question, controlled comparison, corruption design, primary effect, clean tradeoff, limitations, and reproduction path without selective results.","expectedOutput":"Final advisor-ready poster or slide deck.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
+        {"id":"w13-task-01","weekId":"week-13","position":1,"title":"Resolve documented review findings","details":"Classify each comment as correction, clarification, limitation, or new analysis. Complete the first three and defer unplanned analysis to future work after December 10.","expectedOutput":"Resolved feedback log and final report text.","required":true,"estimateMinutes":180,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":2},
+        {"id":"w13-task-02","weekId":"week-13","position":2,"title":"Finalize poster or slides","details":"Present the research question, controlled comparison, corruption design, primary effect, clean tradeoff, limitations, and reproduction path without selective results.","expectedOutput":"Final publication-ready poster or slide deck.","required":true,"estimateMinutes":120,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":2},
         {"id":"w13-task-03","weekId":"week-13","position":3,"title":"Complete the evidence package","details":"Finalize the abstract, captions, source ledger, third-party notices, artifact inventory, deviations, and commands behind every result.","expectedOutput":"Self-contained documented experiment package.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1},
-        {"id":"w13-task-04","weekId":"week-13","position":4,"title":"Run the advisor walkthrough","details":"Use the public tracker to walk through weeks, evidence, gates, conclusions, limitations, and remaining archive work. Record final corrections.","expectedOutput":"Completed walkthrough and bounded correction list.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":1}
+        {"id":"w13-task-04","weekId":"week-13","position":4,"title":"Run the evidence walkthrough","details":"Use the public tracker to walk through weeks, evidence, gates, conclusions, limitations, and remaining archive work. Record final corrections.","expectedOutput":"Completed walkthrough and bounded correction list.","required":true,"estimateMinutes":90,"state":"todo","completionNote":"","evidenceUrl":null,"completedAt":null,"version":2}
       ],
       "gates": [
         {"id":"w13-gate-01","weekId":"week-13","position":1,"criterion":"Final report and poster or slides are understandable without oral explanation.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
-        {"id":"w13-gate-02","weekId":"week-13","position":2,"criterion":"Advisor feedback is resolved or explicitly deferred as future work.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1},
+        {"id":"w13-gate-02","weekId":"week-13","position":2,"criterion":"Documented review findings are resolved or explicitly deferred as future work.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":2},
         {"id":"w13-gate-03","weekId":"week-13","position":3,"criterion":"No opportunistic post-test analysis was introduced after classes ended.","required":true,"state":"pending","evidence":"","waiverReason":"","decidedAt":null,"version":1}
       ]
     },

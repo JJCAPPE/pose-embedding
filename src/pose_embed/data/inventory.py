@@ -584,7 +584,7 @@ def _render_manifest_audit(summary: Mapping[str, object]) -> str:
         "",
         "Status: manifest construction is complete for the verified usable "
         "aggregate. Final novel evaluation remains sealed until the documented "
-        "result-blind protocol amendment is advisor-approved for both the usable "
+        "result-blind protocol amendment is documented and adopted for the usable "
         "source count and the aggregate-aware physical-source verification "
         "contract.",
         "",

@@ -1,8 +1,9 @@
 # Protocol v1: noisy one-shot pose retrieval
 
-Status: **advisor-approved and scientifically locked**. The public-safe
-approval record is `docs/protocol/protocol-v1-approval.md`; the machine-readable
-source of truth is `configs/protocol.v1.yaml`.
+Status: **documented under independent researcher control**. The public-safe
+governance record is `docs/protocol/independent-research.md`; the machine-readable
+source of truth is `configs/protocol.v1.yaml`. No advisor sign-off is required.
+Scientific choices remain hash-bound; the final-test lock is a later-stage gate.
 
 ## Question and outcome
 
@@ -22,7 +23,7 @@ negative result is a valid successful outcome.
   Retrain on all 100 auxiliary actions only after settings are frozen.
 - The prospectus's fixed-subset contingency is superseded for the confirmatory
   study. If training on all 100 auxiliary actions is infeasible, record a
-  blocker and obtain an advisor-approved protocol amendment before opening the
+  blocker and record a result-blind protocol amendment before opening the
   novel test; do not silently substitute a subset.
 - Evaluate the official 20 novel actions A1, A7, ..., A115 once. The primary
   query set excludes every synchronized camera view of the anchor performance;
@@ -113,7 +114,7 @@ accept a caller-selected ledger path. Before the test can be opened:
    finalization adds hashes; it does not permit selection using test data.
 4. Copy `configs/protocol-lock.template.json` to
    `$POSE_EMBED_ARTIFACT_ROOT/locks/protocol-lock.v1.json`; fill every plan,
-   manifest, run-set, protocol, and approval field. The lock timestamp must be
+   manifest, run-set, protocol, and researcher-record field. The lock timestamp must be
    at or after run-set finalization, and future timestamps are rejected.
 5. Run `pose-embed protocol verify --require-locked`. The command resolves all
    three files from the canonical artifact root and verifies their complete
@@ -209,13 +210,13 @@ Exploratory evaluation produces a separate 60-row matrix (one method, three
 paired seeds, ten conditions, two query definitions); it can never replace,
 alter, or be mixed into the confirmatory 180-row core report.
 
-## Required sign-offs
+## Required records
 
 Use `docs/protocol/week-1-evidence-template.md` to collect the public-safe
-approval, access, checksum, and GPU evidence without placing secrets or licensed
+decision, access, checksum, and GPU evidence without placing secrets or licensed
 inputs in the repository.
 
-- [x] Advisor approves the research question, primary estimand, action splits,
+- [x] Record the research question, primary estimand, action splits,
       query exclusion, corruption family/levels, test seal, and failed-run rule.
 - [ ] BU provides the applicable human-subjects/data-governance determination.
 - [ ] Dataset terms are accepted and authorized files are stored outside Git.
