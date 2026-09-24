@@ -1,9 +1,10 @@
 # Computational research scope and governance status
 
-Recorded: 2026-09-15
+Scope recorded: 2026-09-15. Governance confirmation recorded: 2026-09-24.
 
-Status: researcher-authored scope statement. This document is not a Boston
-University human-subjects or data-governance determination.
+Status: BU determination confirmed by the researcher; the tracker gate is met.
+This document records that confirmation and the research scope. It is not an
+institution-issued determination or an independently verified copy of one.
 
 ## Scope of the work
 
@@ -30,10 +31,16 @@ The scientific protocol is researcher-controlled under
 Advisor approval is not required. This does not replace an institutional
 determination.
 
-The unresolved institutional condition is recorded verbatim from protocol-v1:
+The institutional condition is recorded verbatim from protocol-v1:
 
 > BU provides the applicable human-subjects/data-governance determination.
 
-Until that determination is provided by the appropriate Boston University
-authority, this statement documents the researcher's understanding of the
-project scope but does not resolve or waive the institutional condition.
+On 2026-09-24, the researcher explicitly confirmed that BU has issued the
+applicable determination and requested completion without attaching proof.
+`w01-gate-04` is therefore marked met based on researcher confirmation, not a
+waiver or an inference from the computational scope. No attachment is required.
+No specific institutional classification, conditions, or original decision date
+are asserted here. The tracker timestamp records this confirmation.
+
+Actual Week 1 minutes and weekly closeout remain separate. This confirmation
+does not change dataset terms, scientific safeguards, or the novel-test seal.

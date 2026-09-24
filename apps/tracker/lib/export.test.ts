@@ -33,7 +33,7 @@ describe("public export", () => {
       label: "Governance",
       value: expect.stringContaining("No advisor approval is required."),
     });
-    expect(seedPlan.weeks[0].gates.find((gate) => gate.id === "w01-gate-04")?.state).toBe("pending");
+    expect(seedPlan.weeks[0].gates.find((gate) => gate.id === "w01-gate-04")?.state).toBe("met");
     expect(seedPlan.weeks[0].actualMinutes).toBe(0);
   });
 });

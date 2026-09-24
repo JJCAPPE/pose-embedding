@@ -73,12 +73,12 @@ describe("readiness and progress rules", () => {
     const progress = projectProgress(seedPlan);
     expect(progress.percent).toBe(15);
     expect(progress.completedRequiredTasks).toBe(8);
-    expect(progress.decidedRequiredGates).toBe(6);
+    expect(progress.decidedRequiredGates).toBe(7);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(2);
   });
 
-  it("reports four of five Week 1 tasks complete while the BU decision remains pending", () => {
+  it("keeps Week 1 open for actual time and closeout after the confirmed BU decision", () => {
     const week = seedPlan.weeks[0];
     expect(weekProgress(week)).toEqual({
       required: 5,
@@ -89,7 +89,14 @@ describe("readiness and progress rules", () => {
       week.gates
         .filter((gate) => gate.required && gate.state === "pending")
         .map((gate) => gate.id),
-    ).toEqual(["w01-gate-04"]);
+    ).toEqual([]);
+    expect(week.gates.find((gate) => gate.id === "w01-gate-04")).toMatchObject({
+      state: "met",
+      evidence: expect.stringContaining("researcher confirmation"),
+      waiverReason: "",
+      decidedAt: "2026-09-24T22:13:07Z",
+    });
+    expect(week.actualMinutes).toBe(0);
     expect(weekCanClose(week)).toBe(false);
     expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
   });
