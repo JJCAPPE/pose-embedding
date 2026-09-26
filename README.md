@@ -226,6 +226,17 @@ segments across scheduler allocations; `scripts/benchmark_v2_train.qsub` passes
 explicit training arguments with a ten-hour soft checkpoint boundary. Retain
 every segment and use the printed resume command for the next allocation.
 
+The [secondary studies](docs/protocol/secondary-studies-v2.md) add one-shot and
+query-corruption evaluation, loss-component ablations, training label noise,
+pose replacement and reduced training classes. They declare 276 development
+and 276 final training runs, with fixed inherited recipes. All **432 main and
+secondary final runs** must complete before novel-test opening.
+
+The [storage floor](docs/protocol/v2-resource-floor.md) exceeds the previously
+observed available SCC project space even before full auxiliary state and
+segments. Resolve storage and measured runtime before launching the complete
+campaign; the priority pair and bounded capacity profiles remain the next steps.
+
 Selection, final training and test-opening locks require the full 26 × 6 matrix,
 matched initialization/batches, verified inputs and the statistical analysis
 plan. Final evaluation uses all eligible held-out motions, excludes self and

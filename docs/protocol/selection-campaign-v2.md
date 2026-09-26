@@ -117,7 +117,7 @@ configuration output, and actual CPU training/profile paths. They do not certify
 GPU feasibility, completed SCC runs, or novel-test results.
 
 
-The completed priority pair uses an archived release. The campaign retains both
+Priority-pair evidence can come from an archived release. The campaign retains both
 its input fingerprint and the current profiles' fingerprint. One explicit
 compatibility declaration in `benchmark-campaign.v2.json` permits the exact old
 and new MotionBERT code digests caused by exposing the existing action head's raw
@@ -132,3 +132,8 @@ campaign binding checks are lightweight and do not recursively reopen all 468
 development checkpoints. Final evaluation and report commands retain full lock
 revalidation, so repeated commands incur additional validation I/O beyond the
 bounded inference profile. This cost is not part of the update-only forecast.
+
+The [architecture-derived storage floor](v2-resource-floor.md) already exceeds
+the previously observed available project space, before complete method state
+and immutable segments. Resolve storage and measured runtime before launching
+the full campaign; the declaration alone is not an affordability approval.

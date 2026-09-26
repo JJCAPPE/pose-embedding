@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-09-24T22:36:31Z",
+  "generatedAt": "2026-09-26T22:26:19Z",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -53,11 +53,11 @@
       },
       {
         "label": "Test seal",
-        "value": "All final method configurations, six paired seeds, selection decisions, training attempts and checkpoints must be complete and hash-bound before any novel-test evaluation. A partial two-method test opening is forbidden."
+        "value": "All 156 main and 276 secondary final method/seed runs, selection decisions, training attempts and checkpoints must be complete and hash-bound before any novel-test evaluation. A partial two-method opening is forbidden."
       },
       {
         "label": "Workload and calendar",
-        "value": "The 14 records through December 18 are a planning horizon. Measure all 26 methods, 468 development runs, 156 main final runs, separate supplementary matrices, validation, checkpoint segments and artifact storage before committing dates. Preserve all immutable attempts and resumable segments; record any extension before novel-test opening."
+        "value": "The 14 records through December 18 are a planning horizon. Forecast all 1,176 completed training runs, evaluations, validation, immutable segments, failures and researcher work. The theoretical completed encoder-checkpoint floor alone is 599.27 GB before heads and segments; the full campaign exceeds the previously observed available project storage. Resolve storage and measured runtime before full launch, preserving artifacts and the novel-test seal."
       },
       {
         "label": "Governance",
@@ -91,11 +91,11 @@
       },
       {
         "label": "Seed and final-run count",
-        "value": "Six paired seeds per declared configuration; 26 by 6 = 156 final runs before the test can open. Cross-dimension rankings are prohibited. Additional ablations have separate declared run counts."
+        "value": "Six paired seeds per declared main configuration: 26 by 6 = 156 main final runs. Separate predeclared studies add 276 secondary final runs; all 432 final runs must finish before novel opening. Including 468 main development and 276 secondary development runs, the plan contains 1,176 completed training runs before profiles and failures. Cross-dimension rankings are prohibited."
       },
       {
         "label": "Secondary tasks",
-        "value": "The official one-shot task, frozen-encoder pilot, corruption robustness and contextual ablations are supplementary analyses with separate labels and predeclared settings. One-shot mAP equals MRR; this equivalence does not hold for the new multi-positive primary task."
+        "value": "Official one-shot evaluates all 26 methods and six seeds. Query-only corruption evaluates Contextual and Contrastive under both official one-shot and the primary multi-positive task. A six-cell loss-component factorial and ten training robustness conditions (label noise, pose replacement and retained class fractions) require 276 development and 276 final runs, using fixed inherited recipes. The deduplicated secondary evaluation matrix has 660 cells. These are descriptive analyses; one-shot mAP equals MRR, while multi-positive mAP does not."
       }
     ],
     "corruptionPrinciple": "Retain v1 deterministic query-only corruption definitions as a secondary study. Do not spend the primary two-method phase on corruption experiments. Secondary runs require locked settings before novel outcomes are viewed.",
