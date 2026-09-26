@@ -6,6 +6,15 @@ import math
 
 import torch
 
+from pose_embed.benchmark.avsl import (
+    build_avsl_optimizer,
+)
+from pose_embed.benchmark.avsl import (
+    learning_rates as avsl_learning_rates,
+)
+from pose_embed.benchmark.avsl import (
+    optimizer_recipe as avsl_optimizer_recipe,
+)
 from pose_embed.benchmark.config import BenchmarkTraining
 from pose_embed.benchmark.drml import DRMLParameters
 from pose_embed.benchmark.hist import HISTParameters
@@ -47,6 +56,10 @@ def _resolve_recipe(
     """
     if num_records < 1:
         raise ValueError("training requires at least one record")
+    if method_id == "proxy_anchor_avsl":
+        return avsl_optimizer_recipe(
+            parameters, training, num_records, selection_num_records, profile=profile
+        )
     common = {
         "encoder_mode": training.encoder_mode,
         "warmup_steps": 0,
@@ -152,6 +165,8 @@ def build_optimizer(model, criterion, recipe: dict, phase: str):
     model.set_encoder_trainable(
         recipe["encoder_mode"] == "finetune" and phase == "main"
     )
+    if recipe.get("recipe") == "zhang2022_cub_motion_v1":
+        return build_avsl_optimizer(model, criterion, recipe)
     if recipe.get("recipe") == "ebrahimpour2022_printed_equations_motion_v1":
         from pose_embed.benchmark.mhgl import build_mhgl_optimizer
 
@@ -275,6 +290,10 @@ def hist_learning_rates(recipe, step):
 
 
 def set_step_learning_rates(optimizer, recipe, step):
+    if recipe.get("recipe") == "zhang2022_cub_motion_v1":
+        rates = avsl_learning_rates(recipe, step)
+        for group in optimizer.param_groups:
+            group["lr"] = rates[group["name"]]
     if recipe.get("recipe") == "lim2022_cub_motion":
         rates = hist_learning_rates(recipe, step)
         for group in optimizer.param_groups:

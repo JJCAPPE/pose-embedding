@@ -193,6 +193,7 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
         "proxy_anchor_metrix",
         "multi_similarity_metrix",
         "diml",
+        "proxy_anchor_avsl",
     }:
         input_dimension *= protocol.dataset.joints
     head_shapes = {
@@ -221,13 +222,35 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
             "head." + key: tuple(value.shape)
             for key, value in head.state_dict().items()
         }
+    if identity["method"] == "proxy_anchor_avsl":
+        from pose_embed.benchmark.avsl import AVSLHead
+
+        with torch.random.fork_rng(devices=[]):
+            head = AVSLHead(
+                reference["shapes"]["joints_embed.weight"][0],
+                input_dimension,
+                dimension,
+                identity["method_specification"]["parameters"],
+            )
+        head_shapes = {
+            "head." + key: tuple(value.shape)
+            for key, value in head.state_dict().items()
+        }
     return {
         **reference,
         "encoder_parameters": _reference_encoder_parameters(
             str(Path(data_root).resolve()), str(assets["checkpoint_sha256"])
         )
         if identity["method"]
-        in {"proxy_nca_pp", "hist", "drml", "proxy_nca_metrix", "s2sd", "mhgl"}
+        in {
+            "proxy_nca_pp",
+            "hist",
+            "drml",
+            "proxy_nca_metrix",
+            "s2sd",
+            "mhgl",
+            "proxy_anchor_avsl",
+        }
         else (),
         "model_shapes": {
             **{f"encoder.{key}": shape for key, shape in reference["shapes"].items()},
@@ -276,7 +299,8 @@ def _verify_training_recipe(identity: dict, config: BenchmarkConfig, num_records
 
     selection_records = num_records
     if (
-        identity["method"] in {"proxy_nca_pp", "hist", "proxy_nca_metrix"}
+        identity["method"]
+        in {"proxy_nca_pp", "hist", "proxy_nca_metrix", "proxy_anchor_avsl"}
         and identity["stage"] != "final"
     ):
         selection_records = len(
@@ -611,7 +635,12 @@ def verify_run(directory: str | Path) -> dict:
 
     if any(row.get("phase") != phase_for_step(recipe, row["step"]) for row in rows):
         raise ValueError("training history has an incorrect warmup phase")
-    if identity["method"] in {"proxy_nca_pp", "hist", "proxy_nca_metrix"}:
+    if identity["method"] in {
+        "proxy_nca_pp",
+        "hist",
+        "proxy_nca_metrix",
+        "proxy_anchor_avsl",
+    }:
         for row in rows:
             gradients = row.get("encoder_gradient_parameters")
             needs_encoder = identity["track"] == "finetune" and row["phase"] == "main"
@@ -660,6 +689,14 @@ def verify_run(directory: str | Path) -> dict:
         ):
             raise ValueError("checkpoint contains invalid parameters")
     _verify_checkpoint_state(directory, identity, config, checkpoint, num_classes)
+    if identity["method"] == "proxy_anchor_avsl":
+        from pose_embed.benchmark.avsl import verify_avsl_optimizer
+
+        verify_avsl_optimizer(
+            checkpoint,
+            recipe,
+            _expected_model_state(identity, config)["encoder_parameters"],
+        )
     if identity["method"] == "mhgl":
         from pose_embed.benchmark.mhgl import verify_mhgl_optimizer
 

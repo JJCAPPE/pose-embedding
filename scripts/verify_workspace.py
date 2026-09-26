@@ -16,6 +16,7 @@ SHA_PATTERN = re.compile(r"[0-9a-f]{40}\Z")
 EXPECTED_UPSTREAMS = {
     "DRML",
     "MotionBERT",
+    "AVSL",
     "S2SD",
     "MotionCLIP",
     "contextual-similarity",

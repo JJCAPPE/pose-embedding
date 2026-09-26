@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 24 implemented and 2 blocked**. A working priority pair is
+configurations: 25 implemented and 1 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -412,3 +412,12 @@ combines different baseline objectives across its three datasets; this
 variant is explicit in [the adaptation record](diml-motion-adaptation.md).
 Custom descriptors, scorer policy, exact CPU-float64 rank replay, storage
 and measured scoring/encoding time are separate from cosine retrieval.
+
+## AVSL implementation checkpoint
+
+AVSL now uses three actual MotionBERT depths, masked pooling/CAMs, persistent
+momentum relations, learned reliability and its hierarchical scorer. It has
+a separately documented CUB optimizer/warmup adaptation and exact licensed
+source component tests: [recipe and attribution](avsl-motion.md). Both online
+retrieval and replay use canonical CPU float64 scoring; its measured cost
+is included explicitly. No image-style cosine concatenation substitutes for AVSL.

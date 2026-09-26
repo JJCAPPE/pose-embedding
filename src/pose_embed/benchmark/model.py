@@ -6,6 +6,8 @@ import torch
 import torch.nn.functional as functional
 from torch import nn
 
+from pose_embed.benchmark.avsl import AVSLHead
+from pose_embed.benchmark.avsl import motionbert_levels as avsl_levels
 from pose_embed.benchmark.diml import DIMLHead
 from pose_embed.benchmark.drml import DRMLHead
 from pose_embed.benchmark.hist import HISTHead
@@ -17,6 +19,8 @@ from pose_embed.models.action_head import ActionHeadEmbed
 def head_recipe(method_id: str) -> str:
     if method_id == "diml":
         return "confidence_valid_mean_shared_time_anatomy_projection"
+    if method_id == "proxy_anchor_avsl":
+        return "motionbert_depth3_depth4_depth5_avsl_hierarchical"
     if method_id in {"multi_similarity_metrix", "proxy_anchor_metrix"}:
         return "confidence_valid_token_mean_plus_max"
     if method_id == "mhgl":
@@ -43,7 +47,16 @@ def supports_embedding_inference(method_id: str) -> bool:
         and (
             specification.family == "embedding_loss"
             or method_id
-            in {"proxy_nca_pp", "ibc", "hist", "drml", "s2sd", "mhgl", "diml"}
+            in {
+                "proxy_nca_pp",
+                "ibc",
+                "hist",
+                "drml",
+                "s2sd",
+                "mhgl",
+                "diml",
+                "proxy_anchor_avsl",
+            }
             or method_id in METRIX_METHODS
         )
     )
@@ -128,6 +141,13 @@ class MotionRetrievalModel(nn.Module):
             self.head = DIMLHead(
                 embedding_dimension, representation_dimension, method_parameters
             )
+        if method_id == "proxy_anchor_avsl":
+            self.head = AVSLHead(
+                encoder.dim_feat,
+                representation_dimension,
+                embedding_dimension,
+                method_parameters,
+            )
         self.set_encoder_trainable(train_encoder)
 
     def set_encoder_trainable(self, enabled: bool) -> None:
@@ -147,19 +167,16 @@ class MotionRetrievalModel(nn.Module):
     def forward(self, poses: torch.Tensor) -> torch.Tensor:
         return functional.normalize(self.forward_raw(poses), dim=-1)
 
-    def retrieval_descriptors(self, poses: torch.Tensor) -> dict[str, torch.Tensor]:
-        if self.method_id == "diml":
-            return self.head.forward_descriptors(
-                self.forward_features(poses), poses[..., 2] > 0
-            )
-        return {"embeddings": self(poses)}
-
     def forward_raw(self, poses: torch.Tensor) -> torch.Tensor:
         if self.method_id == "mhgl":
             levels = motionbert_levels(
                 self.encoder, poses, train_encoder=self.train_encoder
             )
             return self.head.forward_raw(levels, poses[..., 2] > 0)
+        if self.method_id == "proxy_anchor_avsl":
+            raise ValueError(
+                "AVSL retrieval requires descriptors and hierarchical scoring"
+            )
         represented = self.forward_features(poses)
         if getattr(self.head, "requires_valid_mask", False):
             if poses.shape[-1] != 3:
@@ -173,11 +190,23 @@ class MotionRetrievalModel(nn.Module):
         """Apply the declared retrieval head to an already computed token grid."""
         if self.method_id == "mhgl":
             raise ValueError("MHGL requires both feature depths, not one token grid")
+        if self.method_id == "proxy_anchor_avsl":
+            raise ValueError("AVSL projection requires all three encoder levels")
         if getattr(self.head, "requires_valid_mask", False):
             if valid_mask is None:
                 raise ValueError("this retrieval head requires a valid token mask")
             return self.head(features, valid_mask)
         return self.head(features)
+
+    def retrieval_descriptors(self, poses: torch.Tensor) -> dict[str, torch.Tensor]:
+        if self.method_id == "diml":
+            return self.head.forward_descriptors(
+                self.forward_features(poses), poses[..., 2] > 0
+            )
+        if self.method_id == "proxy_anchor_avsl":
+            levels = avsl_levels(self.encoder, poses, train_encoder=self.train_encoder)
+            return self.head.forward_descriptors(levels, poses[..., 2] > 0)
+        return {"embeddings": self(poses)}
 
     def forward_features(self, poses: torch.Tensor) -> torch.Tensor:
         """Expose the same encoder token grid without an additional encoder pass."""

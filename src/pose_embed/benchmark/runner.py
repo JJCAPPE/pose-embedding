@@ -108,6 +108,8 @@ def optimizer_step(
     parameters = [*model.parameters(), *criterion.parameters()]
     if any(p.grad is not None and not torch.isfinite(p.grad).all() for p in parameters):
         raise ValueError("training produced non-finite gradients")
+    if hasattr(criterion, "clip_gradients"):
+        criterion.clip_gradients(model)
     if gradient_clip_value is not None:
         torch.nn.utils.clip_grad_value_(model.parameters(), gradient_clip_value)
     optimizer.step()
@@ -211,7 +213,7 @@ def run_experiment(
     ]
     selection_num_records = (
         len(inputs.manifests["final-train.jsonl"])
-        if method in {"proxy_nca_pp", "proxy_nca_metrix", "hist"}
+        if method in {"proxy_nca_pp", "proxy_nca_metrix", "hist", "proxy_anchor_avsl"}
         and stage == "development"
         else len(train_rows)
     )

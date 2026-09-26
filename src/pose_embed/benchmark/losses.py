@@ -15,6 +15,7 @@ from pydantic import Field, model_validator
 from pytorch_metric_learning import distances, losses, miners
 from torch import nn
 
+from pose_embed.benchmark.avsl import AVSLLoss
 from pose_embed.benchmark.config import StrictModel, load_methods
 from pose_embed.benchmark.diml import DIMLParameters
 from pose_embed.benchmark.drml import DRMLLoss, DRMLParameters
@@ -54,6 +55,7 @@ SUPPORTED_METHODS = METRIX_METHODS | frozenset(
         "drml",
         "s2sd",
         "mhgl",
+        "proxy_anchor_avsl",
         "ibc",
         "hist",
         "diml",
@@ -341,6 +343,10 @@ def build_loss(
         if dimension is not None and dimension != 4 * config.branch_dimension:
             raise ValueError("DRML dimension differs from its four individual branches")
         return DRMLLoss(num_classes, config)
+    if method_id == "proxy_anchor_avsl":
+        if dimension is not None and dimension != 1536:
+            raise ValueError("the declared AVSL method requires 3 x 512 dimensions")
+        return AVSLLoss(parameters, num_classes, 1536)
     if method_id == "contrastive":
         config = ContrastiveParameters.model_validate(parameters)
         module = PairwiseContrastiveLoss(**config.model_dump())

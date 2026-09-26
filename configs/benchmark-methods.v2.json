@@ -435,10 +435,12 @@
       "family": "architecture",
       "embedding_dimension": 1536,
       "source_url": "https://arxiv.org/abs/2203.14932",
-      "implementation": "pending_proxy_anchor_avsl_hierarchical_motion_scorer",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; three motion feature levels, per-level losses, momentum relation state, reliability attribution, and hierarchical pairwise similarity inference are not implemented. Cosine over concatenated features is not AVSL.",
-      "parameters": {}
+      "implementation": "pose_embed.benchmark.avsl:AVSLLoss",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "zhang2022_cub_motion_v1"
+      }
     },
     {
       "method_id": "contextual_1536",
