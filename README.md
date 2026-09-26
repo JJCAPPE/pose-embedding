@@ -181,6 +181,7 @@ On SCC, from a clean committed checkout and the locked Linux environment:
 ```bash
 source ~/pose-embed-scc/environment.sh
 export POSE_EMBED_MANIFEST_SET="$POSE_EMBED_ARTIFACT_ROOT/manifests/ntu-input-v2-7721684/manifest-set.json"
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/verify_scc_setup.qsub
 qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/benchmark_v2.qsub \
   pilot configs/benchmark.v2.yaml 7
 qsub -l gpu_memory=80G -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
@@ -192,6 +193,9 @@ steps per method, trains Contrastive then Contextual, and writes the paired
 development comparison. All attempts, failures, batches, initializations,
 checkpoints, selected metrics and timings are immutable under
 `$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2`. Logs and licensed data stay outside Git.
+Use a separate locked environment for each active release. Complete its setup
+verification first; it regenerates the adopted manifest bundle and compares
+every file without replacing the existing bundle.
 
 All 26 method adapters are implemented. `benchmark coverage` reports their
 identities explicitly; implementation does not establish GPU feasibility or

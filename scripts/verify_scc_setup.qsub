@@ -5,13 +5,14 @@
 #$ -l h_rt=00:30:00
 #$ -pe omp 4
 #$ -l mem_per_core=4G
-#$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,UV_PYTHON_INSTALL_DIR
+#$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,POSE_EMBED_MANIFEST_SET,UV_PYTHON_INSTALL_DIR
 
 set -euo pipefail
 umask 077
 
 : "${POSE_EMBED_DATA_ROOT:?POSE_EMBED_DATA_ROOT must be set}"
 : "${POSE_EMBED_ARTIFACT_ROOT:?POSE_EMBED_ARTIFACT_ROOT must be set}"
+: "${POSE_EMBED_MANIFEST_SET:?Identify the adopted manifest-set.json explicitly}"
 : "${UV_PYTHON_INSTALL_DIR:?UV_PYTHON_INSTALL_DIR must be set}"
 : "${TMPDIR:?Grid Engine must provide node-local temporary storage}"
 : "${JOB_ID:?Run this verification through Grid Engine}"
@@ -37,7 +38,8 @@ env -u POSE_EMBED_DATA_ROOT -u POSE_EMBED_ARTIFACT_ROOT .venv/bin/pytest
   sha256sum --check SHA256SUMS
 )
 
-reference="$POSE_EMBED_ARTIFACT_ROOT/manifests/ntu120-v1-release-20260916"
+reference=$(dirname "$POSE_EMBED_MANIFEST_SET")
+test -f "$reference/manifest-set.json"
 generated="$POSE_EMBED_ARTIFACT_ROOT/manifests/scc-verification-${JOB_ID}"
 .venv/bin/pose-embed data generate --output-dir "$generated"
 for reference_file in "$reference"/*; do
@@ -47,6 +49,7 @@ printf 'All regenerated manifest files match the existing release byte-for-byte.
 sha256sum "$generated"/*
 
 test ! -e "$POSE_EMBED_ARTIFACT_ROOT/locks/test-opening.v1.json"
+.venv/bin/python -c 'from pose_embed.benchmark.runtime import require_unopened; require_unopened()'
 printf 'The novel-test opening ledger is absent.\n'
 git rev-parse HEAD
 .venv/bin/python --version
