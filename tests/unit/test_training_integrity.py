@@ -267,16 +267,34 @@ multi_similarity:
         stretch_gate_evidence_path=gate_evidence,
     )
     assert summary["objective"] == "multi_similarity_with_miner"
+    v2_ledger = tmp_path / "benchmark-v2/locks/test-opening.json"
+    v2_ledger.parent.mkdir(parents=True)
+    v2_ledger.write_text("{}")
+    with pytest.raises(ValueError, match="forbidden after"):
+        train_head(
+            config,
+            features,
+            tmp_path / "stretch-run-after-v2",
+            protocol_path=protocol_path,
+            manifest_path=manifest,
+            allow_fixture=True,
+            stretch_gate_evidence_path=gate_evidence,
+        )
 
 
+@pytest.mark.parametrize(
+    "ledger_name",
+    ["locks/test-opening.v1.json", "benchmark-v2/locks/test-opening.json"],
+)
 def test_training_stops_after_test_opening(
     protocol_path: Path,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    ledger_name: str,
 ) -> None:
     features, manifest = _write_training_features(tmp_path, protocol_path)
     config = tmp_path / "experiment.yaml"
-    ledger = tmp_path / "locks/test-opening.v1.json"
+    ledger = tmp_path / ledger_name
     _write_experiment(config)
     ledger.parent.mkdir(parents=True)
     ledger.write_text("{}", encoding="utf-8")

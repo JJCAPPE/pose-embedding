@@ -22,7 +22,7 @@ from pose_embed.artifacts import (
     sample_order_digest,
     sidecar_path_for,
 )
-from pose_embed.config import ProtocolConfig
+from pose_embed.config import ProtocolConfig, load_protocol
 from pose_embed.data.manifest import ManifestRecord, load_manifest
 from pose_embed.motionbert_inputs import (
     MOTIONBERT_CODE_PATHS,
@@ -145,6 +145,9 @@ def extract_motionbert_features(
         raise ValueError(
             "Week 3 MotionBERT extraction permits only clean auxiliary data"
         )
+    scientific = resolve_scientific_paths(load_protocol(protocol_path))
+    if (scientific.root / "benchmark-v2/locks/test-opening.json").exists():
+        raise ValueError("legacy extraction is forbidden after benchmark v2 opening")
     resolved_device = torch.device(device)
     if resolved_device.type not in {"cpu", "cuda"}:
         raise ValueError("MotionBERT supports explicit cpu or cuda devices")

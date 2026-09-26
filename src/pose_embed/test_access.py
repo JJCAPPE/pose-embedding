@@ -70,6 +70,8 @@ def open_final_test_once(
 ) -> TestOpeningLedger:
     """Verify the full inventory, then create or validate one opening event."""
     paths = resolve_scientific_paths(protocol)
+    if (paths.root / "benchmark-v2/locks/test-opening.json").exists():
+        raise ValueError("legacy test opening is forbidden after benchmark v2 opening")
     destination = paths.test_opening_ledger
     lock = load_protocol_lock(paths.protocol_lock)
     plan = load_evaluation_plan(paths.evaluation_plan)

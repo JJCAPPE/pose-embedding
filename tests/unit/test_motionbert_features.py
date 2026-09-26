@@ -83,3 +83,24 @@ def test_week3_refuses_novel_or_corrupted_extraction_before_loading(
             split=split,
         )
     assert not (tmp_path / "features.npz").exists()
+
+
+def test_legacy_extraction_rejects_v2_opening_before_input_loading(
+    tmp_path: Path, protocol_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    ledger = tmp_path / "benchmark-v2/locks/test-opening.json"
+    ledger.parent.mkdir(parents=True)
+    ledger.write_text("{}")
+    with pytest.raises(ValueError, match="forbidden after benchmark v2 opening"):
+        extract_motionbert_features(
+            tmp_path / "absent.pkl",
+            tmp_path / "features.npz",
+            protocol_path=protocol_path,
+            manifest_path=tmp_path / "absent.jsonl",
+            manifest_set_path=tmp_path / "absent.json",
+            parity_evidence_path=tmp_path / "parity.json",
+            role="training",
+            split="development_train",
+        )
+    assert not (tmp_path / "features.npz").exists()

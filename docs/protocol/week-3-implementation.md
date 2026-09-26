@@ -96,10 +96,11 @@ test while retaining exact runtime/CUDA binding. No scientific GPU job was run.
 | 3 — complete cache provenance | Pending | Validate all real final/development caches |
 | 4 — measured compute/storage | Pending | Slower-run time, memory and storage forecast |
 
-The [existing BU institutional determination](../compliance/computational-research-scope.md)
-is still recorded as pending. No assumption about Weeks 1–2 replaces that record,
-so scientific parity/extraction was not started. After it is supplied, validate
-the prerequisites, use a clean committed checkout and locked GPU environment,
+At the time of this implementation record, the BU determination was pending
+and scientific parity/extraction had not started. The researcher subsequently
+confirmed the [BU determination](../compliance/computational-research-scope.md)
+on September 24. The v2 scope amendment now prioritizes the paired development
+pilot. For any extraction, use a clean committed checkout and locked GPU environment,
 and submit the provided job with scheduler logs outside the repository as
 shown in the README. Keep every output and failure report outside Git.
 

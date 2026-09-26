@@ -26,6 +26,9 @@ def _parser() -> argparse.ArgumentParser:
         description="Protocol-locked one-shot pose-retrieval experiments",
     )
     commands = parser.add_subparsers(dest="area", required=True)
+    from pose_embed.benchmark.cli import add_parser
+
+    add_parser(commands)
 
     profile = commands.add_parser("profile", help="profile compute prerequisites")
     profile_commands = profile.add_subparsers(dest="operation", required=True)
@@ -213,6 +216,11 @@ def _print(payload: object) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        if args.area == "benchmark":
+            from pose_embed.benchmark.cli import run
+
+            _print(run(args))
+            return 0
         if args.area == "profile":
             _print(profile_motionbert_gpu(args.output))
             return 0

@@ -4,14 +4,19 @@ These rules apply to every automated or human change in this repository.
 
 ## Canonical intent
 
-- Read `plan/research-plan.v1.json`, the final tracked prospectus, and
-  `docs/protocol/protocol-v1.md` before changing scientific behavior.
+- Read `plan/research-plan.v2.json`, `configs/benchmark.v2.yaml`,
+  `configs/benchmark-methods.v2.json`, and `docs/protocol/protocol-v2.md` before
+  changing scientific behavior. Preserve the final tracked prospectus and v1
+  protocol as historical records; the v2 amendment supersedes their narrow scope.
 - This is independent research. `docs/protocol/independent-research.md`
   supersedes historical advisor sign-off requirements. Record researcher
   decisions and result-blind amendments; retain all scientific and licensing safeguards.
-- The core comparison is contrastive-only, supervised contrastive, and full
-  contextual-plus-contrastive with a frozen MotionBERT encoder. Multi-Similarity
-  plus its miner is gated stretch work only.
+- The priority phase is Contextual versus its exact contrastive component on
+  development data. The required benchmark contains all 26 declared method
+  configurations, including MS with and without mining, using a common
+  fine-tuned MotionBERT backbone and six paired seeds. Frozen-encoder work is
+  supplementary. Every final configuration must be selected and trained before
+  any novel test is opened; there is no v2 post-test stretch exception.
 - A null or negative contextual result is a successful scientific result. Never
   adjust a split, corruption, metric, or claim after seeing novel-test outcomes.
 

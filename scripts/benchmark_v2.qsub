@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#$ -cwd
+#$ -j y
+#$ -N pose_v2_pair
+#$ -l h_rt=12:00:00
+#$ -pe omp 4
+#$ -l gpus=1
+#$ -l gpu_c=7.0
+#$ -l gpu_memory=16G
+#$ -l mem_per_core=8G
+#$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,POSE_EMBED_MANIFEST_SET
+
+# Submit from a clean committed checkout with scheduler logs outside Git:
+# qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/benchmark_v2.qsub \
+#   pilot configs/benchmark.v2.yaml 7
+# Default mode is profile. Both configuration and seed must be explicit:
+# qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/benchmark_v2.qsub \
+#   profile configs/benchmark.finetune.v2.yaml 7
+# Request a larger GPU at submission for fine-tuning if its measured profile
+# requires it, e.g. qsub -l gpu_memory=40G ... . Never reduce the physical
+# batch after seeing retrieval outcomes; revise and hash the configuration.
+set -euo pipefail
+
+: "${JOB_ID:?Submit this script through Grid Engine; do not run on a login node}"
+: "${NSLOTS:?Grid Engine must provide the allocated CPU count}"
+: "${POSE_EMBED_DATA_ROOT:?POSE_EMBED_DATA_ROOT must be set}"
+: "${POSE_EMBED_ARTIFACT_ROOT:?POSE_EMBED_ARTIFACT_ROOT must be set}"
+: "${POSE_EMBED_MANIFEST_SET:?POSE_EMBED_MANIFEST_SET must identify the adopted bundle}"
+
+benchmark_mode="${1:-profile}"
+benchmark_config="${2:?Usage: benchmark_v2.qsub profile-or-pilot config-path paired-seed}"
+benchmark_seed="${3:?An explicit paired seed is required}"
+if [[ "$benchmark_mode" != profile && "$benchmark_mode" != pilot ]]; then
+  printf 'Mode must be profile or pilot.\n' >&2
+  exit 2
+fi
+export OMP_NUM_THREADS="$NSLOTS"
+export MKL_NUM_THREADS="$NSLOTS"
+export OPENBLAS_NUM_THREADS="$NSLOTS"
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+
+if [[ ! -x .venv/bin/pose-embed ]]; then
+  printf 'Create the locked Linux environment before submission.\n' >&2
+  exit 2
+fi
+if [[ -n "$(git status --porcelain)" ]]; then
+  printf 'A clean committed checkout is required.\n' >&2
+  exit 2
+fi
+.venv/bin/python scripts/verify_workspace.py
+.venv/bin/python scripts/fetch_upstreams.py --check --name MotionBERT
+.venv/bin/pose-embed protocol verify
+
+benchmark_timestamp=$(date -u +%Y%m%dT%H%M%SZ)
+benchmark_commit=$(git rev-parse --short=12 HEAD)
+benchmark_output="$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2/pilots/${benchmark_timestamp}-${JOB_ID}-${benchmark_commit}"
+mkdir -p "$benchmark_output"
+printf 'BENCHMARK_EVIDENCE=%s\n' "$benchmark_output"
+.venv/bin/pose-embed benchmark coverage --config "$benchmark_config" \
+  --output "$benchmark_output/coverage.json"
+
+# Read only declared priority methods; the CLI validates the explicit seed and
+# the config-bound training track again before each real optimizer-step run.
+readarray -t benchmark_methods < <(.venv/bin/python - "$benchmark_config" "$benchmark_seed" <<'PY'
+import sys
+from pose_embed.benchmark.config import load_benchmark
+config = load_benchmark(sys.argv[1])
+seed = int(sys.argv[2])
+if seed not in config.training.seeds:
+    raise SystemExit("Seed is outside the six declared paired seeds")
+print("\n".join(config.priority_methods))
+PY
+)
+if [[ ${#benchmark_methods[@]} -ne 2 ]]; then
+  printf 'A valid declared priority pair and seed are required.\n' >&2
+  exit 2
+fi
+nvidia-smi
+.venv/bin/pose-embed features parity \
+  --manifest-set "$POSE_EMBED_MANIFEST_SET" \
+  --output "$benchmark_output/parity.json" --device cuda
+
+for benchmark_method in "${benchmark_methods[@]}"; do
+  .venv/bin/pose-embed benchmark profile --config "$benchmark_config" \
+    --manifest-set "$POSE_EMBED_MANIFEST_SET" \
+    --parity-evidence "$benchmark_output/parity.json" \
+    --method "$benchmark_method" --seed "$benchmark_seed" --steps 3 --device cuda \
+    --output-dir "$benchmark_output/profile-${benchmark_method}-seed-${benchmark_seed}"
+done
+if [[ "$benchmark_mode" == pilot ]]; then
+  benchmark_runs=()
+  for benchmark_method in "${benchmark_methods[@]}"; do
+    benchmark_run="$benchmark_output/${benchmark_method}-seed-${benchmark_seed}"
+    .venv/bin/pose-embed benchmark train --config "$benchmark_config" \
+      --manifest-set "$POSE_EMBED_MANIFEST_SET" \
+      --parity-evidence "$benchmark_output/parity.json" \
+      --method "$benchmark_method" --seed "$benchmark_seed" \
+      --phase development --device cuda --output-dir "$benchmark_run"
+    benchmark_runs+=("$benchmark_run")
+  done
+  .venv/bin/pose-embed benchmark compare --runs "${benchmark_runs[@]}" \
+    --output "$benchmark_output/comparison.json"
+fi
+printf 'BENCHMARK_COMPLETED=%s\n' "$benchmark_output"

@@ -1,17 +1,19 @@
 # Pose Embed
 
-Pose Embed is a reproducible study of one-shot human-action retrieval from
-noisy pose sequences. It compares contrastive, supervised-contrastive, and
-contextual metric-learning objectives while holding the frozen MotionBERT
-encoder, data protocol, physical batches, tuning budget, and evaluator fixed.
+Pose Embed tests whether Contextual Similarity improves human-motion retrieval.
+The first experiment compares Contextual with its exact contrastive component
+on development classes. The full study requires all 26 configurations from the
+image-paper comparison and supplementary controls, with six paired seeds.
+Multi-Similarity is a comparator. Positive, null and negative results all count.
 
-The project runs from September 15 through December 18, 2026. Its companion
+The current planning horizon is September 15 through December 18, 2026;
+measured resources determine whether the full study requires an extension. Its companion
 tracker provides a public research view of all 14 weeks and an authenticated
 owner editor for tasks, evidence, reflections, and advancement gates.
 
 ## Repository map
 
-- `plan/` — immutable v1 schedule seed consumed by the tracker
+- `plan/` — current v2 schedule and preserved v1 history
 - `configs/` — validated research and experiment configurations
 - `src/pose_embed/` — data, model, loss, corruption, training, and evaluation code
 - `tests/` — unit, integration, and tiny CPU fixtures
@@ -30,7 +32,7 @@ upstream checkouts do not belong in Git.
 - Node.js 24, `pnpm`, and Corepack if required by the local Node installation
 - Docker and Supabase CLI 2.105 or newer for database integration tests
 - An authorized NTU RGB+D 120 dataset copy and MotionBERT checkpoint for real runs
-- An NVIDIA GPU with at least 16 GB VRAM for scheduled experiments
+- An NVIDIA GPU; profile the actual physical batch before choosing resources
 
 ## Local setup
 
@@ -90,6 +92,9 @@ and is reference-only.
 
 ## Week 3 feature extraction
 
+This is preserved v1 infrastructure. Follow the v2 sequence below for the
+current study; full frozen-cache extraction is supplementary.
+
 The [saved execution plan](plan/week-03-execution-plan.md) and
 [implementation record](docs/protocol/week-3-implementation.md) describe the
 clean frozen-encoder path. Its CLI entry points are:
@@ -147,3 +152,51 @@ This repository intentionally has no project-wide reuse license. Adding one
 requires an explicit researcher decision after rights review and applicable BU
 requirements. Third-party material retains its own license and
 attribution requirements.
+
+## V2: Contextual versus baseline first
+
+Read [protocol v2](docs/protocol/protocol-v2.md), the
+[scope amendment](docs/decisions/0003-motion-retrieval-v2.md), and the
+[method adaptation inventory](docs/protocol/remaining-method-adaptations.md).
+The main study fine-tunes MotionBERT with 512-dimensional embeddings, with a
+separate 1,536-dimensional matched group. The first frozen pilot verifies the
+plumbing and is supplementary to that study. Neither pilot opens the novel test.
+
+```bash
+uv run pose-embed benchmark coverage
+uv run pose-embed benchmark profile --help
+uv run pose-embed benchmark train --help
+uv run pose-embed benchmark compare --help
+```
+
+`configs/benchmark.v2.yaml` declares the frozen pilot;
+`configs/benchmark.finetune.v2.yaml` declares the trainable-backbone track.
+Both fix physical P=8, K=4, six seeds, 1,000 development steps and validation
+every 100 steps. These are development settings, not selected final recipes.
+Use a new result-blind configuration to change them; a CLI track override cannot
+change the hashed setting. A one-seed pilot does not establish superiority.
+
+On SCC, from a clean committed checkout and the locked Linux environment:
+
+```bash
+source ~/pose-embed-scc/environment.sh
+export POSE_EMBED_MANIFEST_SET="$POSE_EMBED_ARTIFACT_ROOT/manifests/ntu-input-v2-7721684/manifest-set.json"
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/benchmark_v2.qsub \
+  pilot configs/benchmark.v2.yaml 7
+qsub -l gpu_memory=40G -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
+  scripts/benchmark_v2.qsub profile configs/benchmark.finetune.v2.yaml 7
+```
+
+The pilot job verifies the upstream adapter, measures three real optimizer
+steps per method, trains Contrastive then Contextual, and writes the paired
+development comparison. All attempts, failures, batches, initializations,
+checkpoints, selected metrics and timings are immutable under
+`$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2`. Logs and licensed data stay outside Git.
+
+Complete the remaining method adaptations before the final selection campaign.
+`benchmark coverage` reports runnable and blocked identities explicitly.
+Selection, final training and test-opening locks require the full 26 × 6 matrix,
+matched initialization/batches, verified inputs and the statistical analysis
+plan. Final evaluation uses all eligible held-out motions, excludes self and
+synchronized camera views, and reports Recall@K, mAP, mAP@R and MRR. The v1
+one-shot evaluator and its old three-method lock do not authorize this study.
