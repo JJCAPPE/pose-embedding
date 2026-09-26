@@ -197,7 +197,7 @@ def test_selection_pairs_different_head_recipes_and_excludes_warmup(lock_context
     for directory in directories:
         manifest = read_json(directory / "run-manifest.json")
         identity = manifest["identity"]
-        if identity["method"] != "proxy_nca_pp":
+        if identity["method"] not in {"proxy_nca_pp", "proxy_nca_metrix"}:
             continue
         _change_json(
             directory,
