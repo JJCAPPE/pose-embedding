@@ -187,6 +187,7 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
     if identity["method"] not in {
         "proxy_nca_pp",
         "drml",
+        "mhgl",
         "hist",
         "proxy_nca_metrix",
         "proxy_anchor_metrix",
@@ -206,13 +207,26 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
             "head." + key: tuple(value.shape)
             for key, value in head.state_dict().items()
         }
+    if identity["method"] == "mhgl":
+        from pose_embed.benchmark.mhgl import MHGLHead
+
+        with torch.random.fork_rng(devices=[]):
+            head = MHGLHead(
+                local_dimension=reference["shapes"]["joints_embed.weight"][0],
+                global_dimension=input_dimension,
+                embedding_dimension=dimension,
+            )
+        head_shapes = {
+            "head." + key: tuple(value.shape)
+            for key, value in head.state_dict().items()
+        }
     return {
         **reference,
         "encoder_parameters": _reference_encoder_parameters(
             str(Path(data_root).resolve()), str(assets["checkpoint_sha256"])
         )
         if identity["method"]
-        in {"proxy_nca_pp", "hist", "drml", "proxy_nca_metrix", "s2sd"}
+        in {"proxy_nca_pp", "hist", "drml", "proxy_nca_metrix", "s2sd", "mhgl"}
         else (),
         "model_shapes": {
             **{f"encoder.{key}": shape for key, shape in reference["shapes"].items()},
@@ -645,6 +659,14 @@ def verify_run(directory: str | Path) -> dict:
         ):
             raise ValueError("checkpoint contains invalid parameters")
     _verify_checkpoint_state(directory, identity, config, checkpoint, num_classes)
+    if identity["method"] == "mhgl":
+        from pose_embed.benchmark.mhgl import verify_mhgl_optimizer
+
+        verify_mhgl_optimizer(
+            checkpoint,
+            recipe,
+            _expected_model_state(identity, config)["encoder_parameters"],
+        )
     if identity["method"] == "s2sd":
         from pose_embed.benchmark.s2sd import verify_s2sd_optimizer
 

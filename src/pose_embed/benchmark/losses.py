@@ -20,6 +20,7 @@ from pose_embed.benchmark.drml import DRMLLoss, DRMLParameters
 from pose_embed.benchmark.hist import HISTParameters, HypergraphSemanticTupletLoss
 from pose_embed.benchmark.ibc import IBCParameters, IntraBatchConnectionsLoss
 from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixLoss
+from pose_embed.benchmark.mhgl import MHGLLoss
 from pose_embed.benchmark.proxy_nca_plus import (
     ProxyNCAPlusLoss,
     ProxyNCAPlusParameters,
@@ -51,6 +52,7 @@ SUPPORTED_METHODS = METRIX_METHODS | frozenset(
         "supcon",
         "drml",
         "s2sd",
+        "mhgl",
         "ibc",
         "hist",
     }
@@ -323,6 +325,8 @@ def build_loss(
         parameters["embedding_dimension"] = dimension or 512
     if method_id in METRIX_METHODS:
         return MetrixLoss(method_id, parameters, num_classes, dimension or 512)
+    if method_id == "mhgl":
+        return MHGLLoss(parameters, num_classes, dimension or 512)
     if method_id == "s2sd":
         return S2SDLoss(
             S2SDParameters.model_validate(

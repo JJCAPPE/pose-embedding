@@ -9,12 +9,15 @@ from torch import nn
 from pose_embed.benchmark.drml import DRMLHead
 from pose_embed.benchmark.hist import HISTHead
 from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixMeanMaxHead
+from pose_embed.benchmark.mhgl import MHGLHead, motionbert_levels
 from pose_embed.models.action_head import ActionHeadEmbed
 
 
 def head_recipe(method_id: str) -> str:
     if method_id in {"multi_similarity_metrix", "proxy_anchor_metrix"}:
         return "confidence_valid_token_mean_plus_max"
+    if method_id == "mhgl":
+        return "motionbert_depth4_depth5_soa_mean_plus_max_concat"
     if method_id == "hist":
         return "confidence_valid_token_mean_plus_max_project_nonaffine_ln"
     if method_id == "drml":
@@ -36,7 +39,7 @@ def supports_embedding_inference(method_id: str) -> bool:
         and supports(method_id)
         and (
             specification.family == "embedding_loss"
-            or method_id in {"proxy_nca_pp", "ibc", "hist", "drml", "s2sd"}
+            or method_id in {"proxy_nca_pp", "ibc", "hist", "drml", "s2sd", "mhgl"}
             or method_id in METRIX_METHODS
         )
     )
@@ -110,6 +113,12 @@ class MotionRetrievalModel(nn.Module):
             self.head = HISTHead(embedding_dimension, representation_dimension)
         if method_id == "drml" and embedding_dimension % 4:
             raise ValueError("DRML embedding dimension must be divisible by four")
+        if method_id == "mhgl":
+            self.head = MHGLHead(
+                local_dimension=encoder.dim_feat,
+                global_dimension=representation_dimension,
+                embedding_dimension=embedding_dimension,
+            )
         self.set_encoder_trainable(train_encoder)
 
     def set_encoder_trainable(self, enabled: bool) -> None:
@@ -130,6 +139,11 @@ class MotionRetrievalModel(nn.Module):
         return functional.normalize(self.forward_raw(poses), dim=-1)
 
     def forward_raw(self, poses: torch.Tensor) -> torch.Tensor:
+        if self.method_id == "mhgl":
+            levels = motionbert_levels(
+                self.encoder, poses, train_encoder=self.train_encoder
+            )
+            return self.head.forward_raw(levels, poses[..., 2] > 0)
         represented = self.forward_features(poses)
         if getattr(self.head, "requires_valid_mask", False):
             if poses.shape[-1] != 3:
@@ -141,6 +155,8 @@ class MotionRetrievalModel(nn.Module):
         self, features: torch.Tensor, valid_mask: torch.Tensor | None = None
     ) -> torch.Tensor:
         """Apply the declared retrieval head to an already computed token grid."""
+        if self.method_id == "mhgl":
+            raise ValueError("MHGL requires both feature depths, not one token grid")
         if getattr(self.head, "requires_valid_mask", False):
             if valid_mask is None:
                 raise ValueError("this retrieval head requires a valid token mask")

@@ -410,10 +410,12 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2112.14327",
-      "implementation": "pending_mhgl_local_global_soa_motion_adaptation",
-      "status": "blocked",
-      "blocker": "Official implementation and reuse license have not been established; independent local/global feature heads, second-order attention, and the joint Multi-Similarity plus Proxy Anchor recipe are not implemented.",
-      "parameters": {}
+      "implementation": "pose_embed.benchmark.mhgl:MHGLLoss",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "ebrahimpour2022_printed_equations_motion_v1"
+      }
     },
     {
       "method_id": "proxy_anchor_avsl",

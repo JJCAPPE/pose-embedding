@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 22 implemented and 4 blocked**. A working priority pair is
+configurations: 23 implemented and 3 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -345,6 +345,12 @@ with state validation. See [the declared recipe and checks](hist-motion-adaptati
 GPU feasibility and scientific development runs remain required.
 
 ## 11. MHGL
+
+**Implemented motion adapter.** Actual depth-4 and depth-5 features feed separate
+second-order attention branches; named optimizer groups preserve the faster
+proxy learning rate. The negative exponent follows the printed equation, with
+its ambiguity explicitly recorded in [the motion recipe](mhgl-motion.md).
+GPU feasibility and scientific development evidence remain required.
 
 **Required recipe.** The method combines local and global feature levels,
 second-order attention, pooled/concatenated descriptors, and a hybrid

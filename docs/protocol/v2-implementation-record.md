@@ -1,8 +1,8 @@
 # V2 implementation and release record
 
 Recorded 2026-09-26. The required study is **not complete**: the software supports
-14 of 26 configurations, and no motion retrieval result is established by these
-local checks. Twelve full method adaptations remain required in
+23 of 26 configurations, and no motion retrieval result is established by these
+local checks. DIML, DiVA and AVSL adaptations remain in progress in
 [the completion map](remaining-method-adaptations.md).
 
 ## Changes delivered
@@ -62,8 +62,8 @@ comparison; novel evaluation remains behind complete final-suite locks.
 
 ## Outstanding scientific implementation
 
-The required twelve rows need architecture/optimizer/scorer adapters and faithful
-component tests, including AVSL's learned scorer. Equal tuning budgets and final
+DIML, DiVA and AVSL still need final integration and verification, including
+their custom scorers and training state. Equal tuning budgets and final
 training duration must be declared and measured before selection. Supporting
 ablations, training-noise experiments and supplementary motion corruptions also
 require their own locked run matrices. No generic loss wrapper, frozen pilot,
@@ -110,3 +110,16 @@ it runs Contrastive and then Contextual on an A100 allocation. No broader
 method GPU experiment is submitted before this priority comparison. Novel
 classes remain unopened. Running jobs retain their original release checkout
 while subsequent adapter implementation proceeds in separate local worktrees.
+
+## Adapter integration checkpoint
+
+The integration branch now includes IBC, ProxyNCA++, HIST, all three Metrix
+variants, DRML-PA, R-Margin+S2SD MSDFA and MHGL. Each has a source/variant
+record; synthetic implementation evidence is distinct from GPU feasibility
+and measured retrieval outcomes. DRML passed 136 integrated checks. The S2SD
+component/integration suite passed except four synthetic dimension-fixture
+errors, which were corrected; all eight subsequent S2SD runner checks passed,
+including optimizer corruption and active delayed-capacity profiling. MHGL
+passed 13 component/real-small-DSTformer checks, including frozen/fine-tuned
+updates and optimizer tamper rejection; 125 companion integration checks passed.
+The original local working tree and running SCC release remain preserved.

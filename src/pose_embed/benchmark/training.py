@@ -33,6 +33,12 @@ def resolve_recipe(
         "minimum_selected_step": 1,
         "profile_phase": "main_capacity" if profile else None,
     }
+    if method_id == "mhgl":
+        from pose_embed.benchmark.mhgl import optimizer_recipe
+
+        return optimizer_recipe(parameters, training, profile=profile) | {
+            "named_optimizer_state": True
+        }
     if method_id == "s2sd":
         from pose_embed.benchmark.s2sd import S2SDParameters
 
@@ -126,6 +132,10 @@ def build_optimizer(model, criterion, recipe: dict, phase: str):
     model.set_encoder_trainable(
         recipe["encoder_mode"] == "finetune" and phase == "main"
     )
+    if recipe.get("recipe") == "ebrahimpour2022_printed_equations_motion_v1":
+        from pose_embed.benchmark.mhgl import build_mhgl_optimizer
+
+        return build_mhgl_optimizer(model, criterion, recipe)
     if recipe.get("recipe") == "roth2021_rmargin_msdfa_cub_motion":
         from pose_embed.benchmark.s2sd import build_s2sd_optimizer
 
