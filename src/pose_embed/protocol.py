@@ -800,6 +800,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/benchmark/losses.py",
         "src/pose_embed/benchmark/ibc.py",
         "src/pose_embed/benchmark/hist.py",
+        "src/pose_embed/benchmark/metrix.py",
         "src/pose_embed/benchmark/proxy_nca_plus.py",
         "src/pose_embed/benchmark/training.py",
         "src/pose_embed/benchmark/model.py",

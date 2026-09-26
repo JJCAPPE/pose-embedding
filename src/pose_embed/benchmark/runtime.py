@@ -184,14 +184,20 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
     protocol = load_protocol(REPOSITORY / config.input_protocol)
     dimension = identity["method_specification"]["embedding_dimension"]
     input_dimension = protocol.encoder.representation_dimension
-    if identity["method"] not in {"proxy_nca_pp", "hist"}:
+    if identity["method"] not in {
+        "proxy_nca_pp",
+        "hist",
+        "proxy_nca_metrix",
+        "proxy_anchor_metrix",
+        "multi_similarity_metrix",
+    }:
         input_dimension *= protocol.dataset.joints
     return {
         **reference,
         "encoder_parameters": _reference_encoder_parameters(
             str(Path(data_root).resolve()), str(assets["checkpoint_sha256"])
         )
-        if identity["method"] in {"proxy_nca_pp", "hist"}
+        if identity["method"] in {"proxy_nca_pp", "hist", "proxy_nca_metrix"}
         else (),
         "model_shapes": {
             **{f"encoder.{key}": shape for key, shape in reference["shapes"].items()},
@@ -243,7 +249,10 @@ def _verify_training_recipe(identity: dict, config: BenchmarkConfig, num_records
     from pose_embed.benchmark.training import resolve_recipe
 
     selection_records = num_records
-    if identity["method"] in {"proxy_nca_pp", "hist"} and identity["stage"] != "final":
+    if (
+        identity["method"] in {"proxy_nca_pp", "hist", "proxy_nca_metrix"}
+        and identity["stage"] != "final"
+    ):
         selection_records = len(
             _verified_training_records(identity | {"stage": "final"}, config)
         )
@@ -570,7 +579,7 @@ def verify_run(directory: str | Path) -> dict:
 
     if any(row.get("phase") != phase_for_step(recipe, row["step"]) for row in rows):
         raise ValueError("training history has an incorrect warmup phase")
-    if identity["method"] in {"proxy_nca_pp", "hist"}:
+    if identity["method"] in {"proxy_nca_pp", "hist", "proxy_nca_metrix"}:
         for row in rows:
             gradients = row.get("encoder_gradient_parameters")
             needs_encoder = identity["track"] == "finetune" and row["phase"] == "main"
@@ -619,7 +628,7 @@ def verify_run(directory: str | Path) -> dict:
         ):
             raise ValueError("checkpoint contains invalid parameters")
     _verify_checkpoint_state(directory, identity, config, checkpoint, num_classes)
-    if identity["method"] in {"proxy_nca_pp", "hist"}:
+    if identity["method"] in {"proxy_nca_pp", "hist", "proxy_nca_metrix"}:
         _verify_proxy_optimizer(
             checkpoint,
             recipe,

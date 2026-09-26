@@ -18,6 +18,7 @@ from torch import nn
 from pose_embed.benchmark.config import StrictModel, load_methods
 from pose_embed.benchmark.hist import HISTParameters, HypergraphSemanticTupletLoss
 from pose_embed.benchmark.ibc import IBCParameters, IntraBatchConnectionsLoss
+from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixLoss
 from pose_embed.benchmark.proxy_nca_plus import (
     ProxyNCAPlusLoss,
     ProxyNCAPlusParameters,
@@ -29,7 +30,7 @@ from pose_embed.losses.pairwise import (
 )
 
 PML_VERSION = "2.9.0"
-SUPPORTED_METHODS = frozenset(
+SUPPORTED_METHODS = METRIX_METHODS | frozenset(
     {
         "contrastive",
         "contextual",
@@ -316,6 +317,8 @@ def build_loss(
         raise ValueError("embedding_dimension must be a positive integer")
     if method_id in {"proxy_anchor", "proxy_nca", "normalized_softmax", "ibc", "hist"}:
         parameters["embedding_dimension"] = dimension or 512
+    if method_id in METRIX_METHODS:
+        return MetrixLoss(method_id, parameters, num_classes, dimension or 512)
     if method_id == "contrastive":
         config = ContrastiveParameters.model_validate(parameters)
         module = PairwiseContrastiveLoss(**config.model_dump())

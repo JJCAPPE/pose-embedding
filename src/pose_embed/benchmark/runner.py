@@ -98,12 +98,15 @@ def optimizer_step(
     model, criterion, optimizer, poses, labels, gradient_clip_value=None
 ) -> float:
     optimizer.zero_grad(set_to_none=True)
-    embedded = (
-        model.forward_raw(poses)
-        if getattr(criterion, "requires_raw_embeddings", False)
-        else model(poses)
-    )
-    value = criterion(embedded, labels)
+    if getattr(criterion, "requires_feature_training", False):
+        value = criterion.training_loss(model, poses, labels)
+    else:
+        embedded = (
+            model.forward_raw(poses)
+            if getattr(criterion, "requires_raw_embeddings", False)
+            else model(poses)
+        )
+        value = criterion(embedded, labels)
     if value.ndim != 0 or not torch.isfinite(value):
         raise ValueError("objective must produce a finite scalar")
     value.backward()
@@ -213,7 +216,8 @@ def run_experiment(
     ]
     selection_num_records = (
         len(inputs.manifests["final-train.jsonl"])
-        if method in {"proxy_nca_pp", "hist"} and stage == "development"
+        if method in {"proxy_nca_pp", "proxy_nca_metrix", "hist"}
+        and stage == "development"
         else len(train_rows)
     )
     recipe = resolve_recipe(

@@ -7,15 +7,18 @@ import torch.nn.functional as functional
 from torch import nn
 
 from pose_embed.benchmark.hist import HISTHead
+from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixMeanMaxHead
 from pose_embed.models.action_head import ActionHeadEmbed
 
 
 def head_recipe(method_id: str) -> str:
+    if method_id in {"multi_similarity_metrix", "proxy_anchor_metrix"}:
+        return "confidence_valid_token_mean_plus_max"
     if method_id == "hist":
         return "confidence_valid_token_mean_plus_max_project_nonaffine_ln"
     return (
         "confidence_valid_token_max_nonaffine_ln"
-        if method_id == "proxy_nca_pp"
+        if method_id in {"proxy_nca_pp", "proxy_nca_metrix"}
         else "motionbert_action_head"
     )
 
@@ -31,6 +34,7 @@ def supports_embedding_inference(method_id: str) -> bool:
         and (
             specification.family == "embedding_loss"
             or method_id in {"proxy_nca_pp", "ibc", "hist"}
+            or method_id in METRIX_METHODS
         )
     )
 
@@ -88,13 +92,15 @@ class MotionRetrievalModel(nn.Module):
         self.method_id = method_id
         self.head = (
             MaskedMaxHead(embedding_dimension, representation_dimension)
-            if method_id == "proxy_nca_pp"
+            if method_id in {"proxy_nca_pp", "proxy_nca_metrix"}
             else ActionHeadEmbed(
                 embedding_dimension=embedding_dimension,
                 representation_dimension=representation_dimension,
                 joints=joints,
             )
         )
+        if method_id in {"multi_similarity_metrix", "proxy_anchor_metrix"}:
+            self.head = MetrixMeanMaxHead(embedding_dimension, representation_dimension)
         if method_id == "hist":
             self.head = HISTHead(embedding_dimension, representation_dimension)
         self.set_encoder_trainable(train_encoder)

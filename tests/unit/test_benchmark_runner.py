@@ -206,7 +206,16 @@ def experiment(tmp_path, monkeypatch):
                 },
                 "head.projection.weight": (
                     dimension,
-                    4 if identity["method"] in {"proxy_nca_pp", "hist"} else 8,
+                    4
+                    if identity["method"]
+                    in {
+                        "proxy_nca_pp",
+                        "hist",
+                        "proxy_nca_metrix",
+                        "proxy_anchor_metrix",
+                        "multi_similarity_metrix",
+                    }
+                    else 8,
                 ),
                 "head.projection.bias": (dimension,),
             },
@@ -507,4 +516,32 @@ def test_hist_full_runner_warmup_and_checkpoint_validation(
     torch.save(checkpoint, path / "checkpoint.pt")
     _rehash_output(path, "checkpoint.pt")
     with pytest.raises(ValueError, match="criterion"):
+        runtime.verify_run(path)
+
+
+@pytest.mark.parametrize(
+    "method", ["multi_similarity_metrix", "proxy_anchor_metrix", "proxy_nca_metrix"]
+)
+def test_metrix_factory_runner_and_checkpoint_roundtrip(experiment, tmp_path, method):
+    _proxy_config(experiment, steps=6)
+    path = tmp_path / "benchmark-v2/metrix"
+    runner.run_experiment(**experiment, method=method, output_dir=path)
+    manifest = runtime.verify_run(path)
+    checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
+    assert manifest["identity"]["method"] == method
+    assert checkpoint["model"]["head.projection.weight"].shape == (512, 4)
+    criterion = build_loss(
+        method, manifest["identity"]["method_specification"]["parameters"], 2
+    )
+    assert criterion.requires_feature_training
+    criterion.load_state_dict(checkpoint["criterion"], strict=True)
+    if method == "proxy_nca_metrix":
+        assert checkpoint["training_state"]["warmup_updates"] == 5
+        assert checkpoint["training_state"]["main_updates"] == 1
+        checkpoint["optimizer"]["param_groups"][2]["lr"] = 1
+    else:
+        checkpoint["model"]["head.projection.weight"] = torch.ones(512, 8)
+    torch.save(checkpoint, path / "checkpoint.pt")
+    _rehash_output(path, "checkpoint.pt")
+    with pytest.raises(ValueError, match="optimizer|shape"):
         runtime.verify_run(path)

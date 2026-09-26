@@ -52,12 +52,18 @@ def resolve_recipe(
             "profile_phase": "post_warmup_capacity" if profile else None,
             "profile_executes_warmup": False if profile else None,
         }
-    if method_id != "proxy_nca_pp":
+    if method_id not in {"proxy_nca_pp", "proxy_nca_metrix"}:
         return common | {
             "optimizer": "AdamW",
             "learning_rate": training.learning_rate,
             "weight_decay": training.weight_decay,
         }
+    if method_id == "proxy_nca_metrix":
+        from pose_embed.benchmark.metrix import MetrixNCAParameters
+
+        parameters = MetrixNCAParameters.model_validate(parameters).model_dump(
+            include=set(ProxyNCAPlusParameters.model_fields)
+        )
     config = ProxyNCAPlusParameters.model_validate(parameters)
     epoch_steps = math.ceil(num_records / training.physical_batch_size)
     selection_epoch_steps = math.ceil(

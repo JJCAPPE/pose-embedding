@@ -10,6 +10,7 @@ from pytorch_metric_learning import distances, losses
 
 from pose_embed.benchmark.config import load_methods
 from pose_embed.benchmark.losses import SUPPORTED_METHODS, build_loss, supports
+from pose_embed.benchmark.metrix import METRIX_METHODS
 
 
 def batch() -> tuple[torch.Tensor, torch.Tensor]:
@@ -24,7 +25,7 @@ def parameters(method: str) -> dict[str, object]:
     return dict(load_methods()[method].parameters) | {"embedding_dimension": 12}
 
 
-@pytest.mark.parametrize("method", sorted(SUPPORTED_METHODS))
+@pytest.mark.parametrize("method", sorted(SUPPORTED_METHODS - METRIX_METHODS))
 def test_supported_losses_have_finite_scalar_and_embedding_gradients(
     method: str,
 ) -> None:

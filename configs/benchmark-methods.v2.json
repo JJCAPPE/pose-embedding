@@ -283,10 +283,27 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2106.04990",
-      "implementation": "pending_proxyncapp_metrix_feature_motion_adaptation",
-      "status": "blocked",
-      "blocker": "The screenshot abbreviation resolves to ProxyNCA++ + Metrix/feature in the source table. MIT source candidate needs a pinned component audit; complete ProxyNCA++, intermediate feature mixing, and mixed binary pair targets are not implemented.",
-      "parameters": {}
+      "implementation": "independent_venkataramanan2022_feature_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "teh2020_cub_motion_v1",
+        "temperature": 0.1111111111111111,
+        "proxy_initial_std": 0.125,
+        "head_learning_rate": 0.004,
+        "proxy_learning_rate": 400.0,
+        "optimizer_epsilon": 1.0,
+        "warmup_epochs": 5,
+        "model_gradient_clip_value": 10.0,
+        "pooling": "confidence_valid_token_max",
+        "all_invalid_policy": "zero_pooled_feature",
+        "beta_shape": 2.0,
+        "mix_strength": 0.4,
+        "mixing_layer": "final_motionbert_tokens",
+        "mixed_mask": "intersection_with_exact_endpoints",
+        "feature_chunk_size": 2,
+        "pair_strategy": "mixed_anchor_all_cross_class_pairs"
+      }
     },
     {
       "method_id": "proxy_anchor_metrix",
@@ -294,10 +311,19 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2106.04990",
-      "implementation": "pending_proxy_anchor_metrix_feature_motion_adaptation",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; intermediate motion-feature mixing and mixed positive/negative Proxy Anchor contributions are not implemented.",
-      "parameters": {}
+      "implementation": "independent_venkataramanan2022_feature_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "beta_shape": 2.0,
+        "mix_strength": 0.4,
+        "mixing_layer": "final_motionbert_tokens",
+        "mixed_mask": "intersection_with_exact_endpoints",
+        "feature_chunk_size": 2,
+        "pair_strategy": "proxy_relative_positive_negative",
+        "alpha": 32.0,
+        "margin": 0.1
+      }
     },
     {
       "method_id": "multi_similarity_metrix",
@@ -305,10 +331,21 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2106.04990",
-      "implementation": "pending_multi_similarity_metrix_feature_motion_adaptation",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; intermediate motion-feature mixing and mixed positive/negative Multi-Similarity contributions are not implemented.",
-      "parameters": {}
+      "implementation": "independent_venkataramanan2022_feature_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "beta_shape": 2.0,
+        "mix_strength": 0.4,
+        "mixing_layer": "final_motionbert_tokens",
+        "mixed_mask": "intersection_with_exact_endpoints",
+        "feature_chunk_size": 2,
+        "pair_strategy": "uniform_positive_negative_or_anchor_negative",
+        "positive_scale": 18.0,
+        "negative_scale": 75.0,
+        "base": 0.77,
+        "miner_epsilon": 0.39
+      }
     },
     {
       "method_id": "hist",

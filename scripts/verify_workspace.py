@@ -19,6 +19,7 @@ EXPECTED_UPSTREAMS = {
     "contextual-similarity",
     "intra-batch",
     "HIST",
+    "Metrix",
     "proxynca-pp",
     "MMAction2",
     "st-gcn",

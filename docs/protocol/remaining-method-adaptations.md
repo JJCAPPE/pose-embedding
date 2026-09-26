@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 17 implemented and 9 blocked**. A working priority pair is
+configurations: 20 implemented and 6 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -228,6 +228,93 @@ mixing endpoints, deterministic choices, soft-target arithmetic and every
 branch's gradients. Keep synthesized representations in training only.
 Dependency: one shared feature-mixing mechanism plus three separately tested
 objectives, with the ProxyNCA++ row depending on section 1.
+
+### Metrix motion implementation record (2026-09-26)
+
+The independent implementation is `benchmark/metrix.py`, with fixtures in
+`tests/unit/test_metrix.py`. The reference source is now pinned through
+`third_party/upstreams.toml` and verified by `scripts/fetch_upstreams.py`:
+`billpsomas/metrix`, revision `b6797035fd82baf46ad89f8856721ae01afdf4f0`,
+MIT (copyright 2022 Bill Psomas). No source code was copied. The pinned release
+contains contrastive feature mixing, MS embedding mixing and baseline PA; its
+`main.py` does not implement the three requested feature variants. Its MS helper
+also combines clean and mixed contributions inside one logarithm, unlike the
+separate losses in paper Eq. 10. The local implementation follows Eqs. 7–10 and
+records these differences; it is not a numerical-parity claim against missing
+upstream paths.
+
+**Representation.** Section 4.1 and `net/feature_resnet.py` locate mixing after
+the final convolution and before pooling/projection. The motion analogue is
+`MotionBERT.get_representation`: the final `[people,time,joint,channel]` token
+grid before the retrieval head. Frames share the fixed input preprocessing grid,
+joints share anatomical indices and person slots retain their existing order;
+no outcome-driven temporal alignment or person reassignment is introduced.
+MS and PA use masked global average plus global maximum over person/time/joint,
+then a linear 512-dimensional projection and L2 normalization, preserving the
+paper's average-plus-max operation. ProxyNCA++ uses its declared masked global
+maximum, non-affine LayerNorm, linear projection and normalization. Both source
+maps contribute before these nonlinear operations; mixing normalized embeddings
+is rejected as a substitute.
+
+**Validity.** A source token is valid iff input confidence is positive. For
+`0 < lambda < 1`, a mixed token is eligible for pooling only where both source
+masks are valid. Exact endpoints use the selected source mask. An all-invalid
+example has zero pooled features, followed by the ordinary learned head. These
+are declared motion adaptations, not image-paper mask rules. Clean inference
+uses each original example's mask and never invokes mixing.
+
+**Pairs and targets.** A shared `Beta(2,2)` draw is used per update. Every ordered
+cross-class source pair is materialized once. For MS, each clean anchor receives
+either every positive-negative combination (excluding itself as the positive)
+or every anchor-negative pair, selected uniformly per update. The same mixed
+map may serve several anchors without recomputing its head. For PA, each clean proxy anchor receives exactly the source pairs whose left
+source belongs to its class, giving the paper's `U+(proxy) x U-(proxy)` set; the
+positive/negative weights are lambda and one minus lambda on that same set.
+Unrelated-class negative-negative mixtures are excluded from that proxy's mixed
+loss. For ProxyNCA++, every ordered cross-class source pair is a mixed anchor
+with soft positive proxy target `lambda*onehot(left) +
+(1-lambda)*onehot(right)`. Proxies remain clean learnable class representatives;
+they are not encoder feature maps. The ProxyNCA++ mixed-anchor construction is
+an explicit equation based extension where the released code does not supply a
+feature implementation; it is adopted as the motion recipe before any novel results.
+The paper provides no explicit feature-map realization for proxy-positive NCA;
+this extension cannot claim numerical identity with an unpublished image path. The PN/AN choice applies to MS; PA uses proxy-relative PN
+pairs, and ProxyNCA++ uses the declared mixed-anchor rule.
+
+**Objectives.** Total loss is clean loss plus `0.4 * mixed loss`. MS uses the
+paper's rounded scales 18 and 75 and margin/base 0.77; its clean loss uses the
+pinned release's MS miner epsilon 0.39. Mixed MS uses all declared pairs without
+additional mining. Positive and negative weights multiply exponentials before
+separate `log(1+sum(...))` reductions and before averaging over clean anchors.
+PA uses alpha 32 and margin 0.1; each eligible mixed sample contributes lambda
+to its proxy anchor's positive term and one minus lambda to its negative term.
+Positive reduction averages proxies present in the targets, while negative
+reduction averages all proxies. ProxyNCA++ uses temperature 1/9 and the full
+all-proxy denominator. Its mixed numerator is the weighted sum of positive
+proxy probabilities **inside** the negative logarithm; a convex combination of
+two cross-entropies is a different objective. Clean one-hot targets reduce to
+the independently implemented ProxyNCA++ objective, including zero embeddings.
+
+**Recipe and memory.** MS/PA retain the benchmark AdamW and step selection
+policy. ProxyNCA++ + Metrix resolves the complete declared ProxyNCA++ recipe,
+including fast proxies, Adam epsilon, warmup, clipping and optimizer transition;
+only mixup-specific fields are removed before base-recipe validation. The
+`head_recipe` identity groups MS/PA together and groups both ProxyNCA++ heads
+together. Pair feature maps are projected in checkpointed chunks of two by
+default. This changes temporary memory only: all pairs and one shared random
+draw are retained, and tests compare complete loss and gradients against an
+unchunked computation. There is one encoder forward per update. No claim of
+measured GPU feasibility is made by these CPU tests.
+
+**Integration boundary.** The three rows are callable through the feature runner,
+including method-specific heads, optimizer and checkpoint verification. The
+mixed-anchor ProxyNCA++ rule is an explicit motion adaptation, with the mixture
+inside the log probability; it is never represented as upstream code parity. CPU coverage includes hand-computed
+weighted objectives, all-proxy denominator, hard-pair mining, exhaustive pair
+counts, both MS modes, exact mixing endpoints, source masks, gradients to both
+source maps/backbone/head/proxies, chunk equivalence, frozen encoder behavior,
+training-only use, clean-only inference, and complete ProxyNCA++ recipe reuse.
+GPU profiling and development evidence remain separate pending gates.
 
 ## 10. HIST
 
