@@ -98,6 +98,7 @@ class BenchmarkTraining(StrictModel):
     optimizer: Literal["adamw"] = "adamw"
     encoder_mode: Literal["frozen", "finetune"] = "frozen"
     learning_rate: float = Field(gt=0)
+    learning_rate_scale: float = Field(default=1.0, gt=0)
     weight_decay: float = Field(ge=0)
     steps: StrictInt = Field(gt=0)
     validation_every: StrictInt = Field(gt=0)

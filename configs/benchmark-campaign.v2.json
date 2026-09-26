@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "protocol_id": "motion-retrieval-v2",
+  "candidates": [
+    {"candidate_id": "baseline", "learning_rate_scale": 1.0},
+    {"candidate_id": "half", "learning_rate_scale": 0.5},
+    {"candidate_id": "double", "learning_rate_scale": 2.0}
+  ],
+  "selection_rule": "maximum_six_seed_mean_development_r_at_1_then_candidate_order_then_earliest_step",
+  "budget_rule": "three_candidates_times_six_seeds_per_method_with_identical_update_and_validation_budgets",
+  "parameter_space": "scale_all_declared_method_learning_rates_together; all_other_recipe_parameters_fixed",
+  "pilot_policy": "disclose_all_prior_attempts_and_outcomes; engineering_pilots_are_ineligible_for_selection_and_do_not_expand_any_method_grid",
+  "retry_policy": "preserve_every_attempt; exactly_one_success_per_cell; every_failed_attempt_requires_an_immutable_operational_failure_review; numerical_instability_cannot_be_reclassified_as_operational"
+}

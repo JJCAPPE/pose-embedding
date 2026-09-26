@@ -20,6 +20,26 @@ def resolve_recipe(
     selection_num_records: int | None = None,
     profile: bool = False,
 ) -> dict:
+    """Scale the declared method's rates together, preserving their ratios."""
+    recipe = _resolve_recipe(
+        method_id, parameters, training, num_records, selection_num_records, profile
+    )
+    return {
+        key: value * training.learning_rate_scale
+        if key.endswith("learning_rate")
+        else value
+        for key, value in recipe.items()
+    } | {"learning_rate_scale": training.learning_rate_scale}
+
+
+def _resolve_recipe(
+    method_id: str,
+    parameters: dict,
+    training: BenchmarkTraining,
+    num_records: int,
+    selection_num_records: int | None = None,
+    profile: bool = False,
+) -> dict:
     """Bind recipe constants and data-dependent warmup before executing a run.
 
     The total update budget includes warmup. Selection excludes steps that would
