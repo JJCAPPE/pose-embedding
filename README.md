@@ -88,6 +88,32 @@ See `third_party/README.md` before using upstream code. In particular, the
 contextual-similarity repository has no visible license at the pinned revision
 and is reference-only.
 
+## Week 3 feature extraction
+
+The [saved execution plan](plan/week-03-execution-plan.md) and
+[implementation record](docs/protocol/week-3-implementation.md) describe the
+clean frozen-encoder path. Its CLI entry points are:
+
+```bash
+uv run pose-embed data development-episode --help
+uv run pose-embed features parity --help
+uv run pose-embed features extract --backend motionbert --help
+uv run pose-embed features verify-repeatability --help
+```
+
+After the documented prerequisites are resolved, use a clean committed checkout,
+the locked GPU environment, and `scripts/extract_motionbert_week3.qsub` to run
+the full gate. Inputs stay under `POSE_EMBED_DATA_ROOT`; caches and evidence stay
+under `POSE_EMBED_ARTIFACT_ROOT`. The job also requires
+`POSE_EMBED_MANIFEST_SET` pointing to the adopted `manifest-set.json`.
+Pre-head caches contain 8,704 values per sample, not trained retrieval embeddings.
+Submit from the repository root with scheduler logs outside the checkout:
+
+```bash
+mkdir -p "$POSE_EMBED_ARTIFACT_ROOT/logs"
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/extract_motionbert_week3.qsub
+```
+
 ## Scientific guardrails
 
 - The tracked final prospectus and `docs/protocol/protocol-v1.md` define scope;

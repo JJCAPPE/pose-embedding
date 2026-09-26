@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Reproducible one-shot pose-retrieval experiments under controlled corruptions"
 requires-python = ">=3.11,<3.12"
 dependencies = [
+  "easydict==1.13",
   "numpy>=1.26,<3",
   "pydantic>=2.6,<3",
   "pytorch-metric-learning==2.9.0",

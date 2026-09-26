@@ -46,11 +46,13 @@ def evaluate_one_shot(
     *,
     query_ids: Sequence[str] | None = None,
 ) -> RetrievalEvaluation:
-    """Evaluate one clean gallery example per class by cosine similarity."""
+    """Evaluate cosine ranks; exact ties retain the declared gallery order."""
     if gallery_embeddings.ndim != 2 or query_embeddings.ndim != 2:
         raise ValueError("gallery and query embeddings must be rank-2 tensors")
     if gallery_embeddings.shape[1] != query_embeddings.shape[1]:
         raise ValueError("gallery and query embedding dimensions differ")
+    if gallery_embeddings.shape[1] == 0:
+        raise ValueError("embedding dimension must be positive")
     if gallery_labels.shape != (gallery_embeddings.shape[0],):
         raise ValueError("gallery_labels must align with gallery embeddings")
     if query_labels.shape != (query_embeddings.shape[0],):
@@ -62,6 +64,11 @@ def evaluate_one_shot(
         or not torch.isfinite(query_embeddings).all()
     ):
         raise ValueError("gallery and query embeddings must contain only finite values")
+    if any(
+        (torch.linalg.vector_norm(embeddings, dim=1) == 0).any()
+        for embeddings in (gallery_embeddings, query_embeddings)
+    ):
+        raise ValueError("cosine retrieval rejects zero-norm embeddings")
     if torch.unique(gallery_labels).numel() != gallery_labels.numel():
         raise ValueError(
             "one-shot evaluation requires exactly one gallery item per label"
@@ -74,6 +81,8 @@ def evaluate_one_shot(
         query_ids = tuple(f"query-{index}" for index in range(len(query_labels)))
     if len(query_ids) != len(query_labels):
         raise ValueError("query_ids must have one value per query")
+    if len(set(query_ids)) != len(query_ids):
+        raise ValueError("query_ids must be unique")
 
     gallery = functional.normalize(gallery_embeddings, dim=1)
     queries = functional.normalize(query_embeddings, dim=1)

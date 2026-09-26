@@ -5,9 +5,11 @@ from __future__ import annotations
 import hashlib
 import importlib.metadata
 import json
+import os
 import platform
 import subprocess
 import sys
+import tempfile
 from collections.abc import Iterable
 from datetime import UTC, datetime
 from pathlib import Path
@@ -186,14 +188,23 @@ def capture_provenance(
 
 
 def write_immutable_json(path: str | Path, payload: object) -> None:
-    """Create a JSON artifact and refuse to overwrite prior evidence."""
+    """Atomically publish complete JSON and refuse to overwrite prior evidence."""
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, raw_temporary = tempfile.mkstemp(
+        prefix=f".{destination.name}.", dir=destination.parent
+    )
+    temporary = Path(raw_temporary)
     try:
-        with destination.open("x", encoding="utf-8") as stream:
-            json.dump(payload, stream, indent=2, sort_keys=True)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            json.dump(payload, stream, indent=2, sort_keys=True, allow_nan=False)
             stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(temporary, destination)
     except FileExistsError as exc:
         raise ValueError(
             f"refusing to overwrite immutable artifact: {destination}"
         ) from exc
+    finally:
+        temporary.unlink(missing_ok=True)

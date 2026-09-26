@@ -175,9 +175,11 @@ checkpoint-bound gallery or query embeddings accepted by evaluation.
 The included fixture extractor is deliberately synthetic and permanently marks
 its outputs `scientific_use_allowed: false`. It requires an explicit
 `--allow-fixture` switch for debug training/evaluation and can never produce a
-final scientific result. Real MotionBERT extraction remains blocked until the
-authorized checkpoint, adapter, upstream checkout, and numerical parity checks
-exist. The exact implementation and exit checks are listed in
+final scientific result. The real MotionBERT backend accepts only clean
+auxiliary caches whose verified source, pinned checkpoint/upstream, complete
+manifest bundle, clean code and passing numerical parity evidence match.
+Scientific GPU execution still requires the recorded institutional prerequisite;
+code completion is not GPU evidence. The implementation and exit checks are in
 `docs/protocol/motionbert-adapter-gate.md`.
 
 ## Failed runs and amendments

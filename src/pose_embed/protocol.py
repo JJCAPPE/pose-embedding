@@ -788,6 +788,12 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/losses/pairwise.py",
         "src/pose_embed/models/__init__.py",
         "src/pose_embed/models/action_head.py",
+        "src/pose_embed/models/motionbert.py",
+        "src/pose_embed/data/motionbert.py",
+        "src/pose_embed/motionbert_inputs.py",
+        "src/pose_embed/motionbert_parity.py",
+        "src/pose_embed/motionbert_features.py",
+        "src/pose_embed/motionbert_reproducibility.py",
     ),
     "evaluation": (
         "src/pose_embed/evaluation/__init__.py",
@@ -800,6 +806,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/data/inventory.py",
         "src/pose_embed/data/manifest.py",
         "src/pose_embed/data/ntu.py",
+        "src/pose_embed/data/development.py",
     ),
     "sampler": ("src/pose_embed/training/sampler.py",),
     "corruptions": (

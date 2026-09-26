@@ -71,9 +71,9 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(15);
-    expect(progress.completedRequiredTasks).toBe(8);
-    expect(progress.decidedRequiredGates).toBe(7);
+    expect(progress.percent).toBe(16);
+    expect(progress.completedRequiredTasks).toBe(9);
+    expect(progress.decidedRequiredGates).toBe(8);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(2);
   });
@@ -99,6 +99,15 @@ describe("readiness and progress rules", () => {
     expect(week.actualMinutes).toBe(0);
     expect(weekCanClose(week)).toBe(false);
     expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
+  });
+
+  it("keeps Week 3 open with only the fixture-tested metric gate met", () => {
+    const week = seedPlan.weeks[2];
+    expect(weekProgress(week)).toEqual({ required: 4, completed: 1, percent: 25 });
+    expect(week.gates.filter((gate) => gate.state === "met").map((gate) => gate.id))
+      .toEqual(["w03-gate-02"]);
+    expect(weekCanClose(week)).toBe(false);
+    expect(week.actualMinutes).toBe(0);
   });
 
   it("returns the newest completed tasks for the public dashboard", () => {
