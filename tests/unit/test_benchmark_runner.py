@@ -206,7 +206,7 @@ def experiment(tmp_path, monkeypatch):
                 },
                 "head.projection.weight": (
                     dimension,
-                    4 if identity["method"] == "proxy_nca_pp" else 8,
+                    4 if identity["method"] in {"proxy_nca_pp", "hist"} else 8,
                 ),
                 "head.projection.bias": (dimension,),
             },
@@ -429,7 +429,7 @@ def test_proxy_short_scientific_budget_is_rejected_before_model_load(
         "load_frozen_encoder",
         lambda *_: pytest.fail("must reject before loading GPU model"),
     )
-    with pytest.raises(ValueError, match="complete five-epoch warmup"):
+    with pytest.raises(ValueError, match="complete declared warmup"):
         runner.run_experiment(
             **experiment,
             method="proxy_nca_pp",
@@ -480,4 +480,31 @@ def test_proxy_checkpoint_auxiliary_state_cannot_be_rehashed_into_validity(
     torch.save(checkpoint, path / "checkpoint.pt")
     _rehash_output(path, "checkpoint.pt")
     with pytest.raises(ValueError, match="optimizer|warmup|shape"):
+        runtime.verify_run(path)
+
+
+@pytest.mark.parametrize("profile", [False, True])
+def test_hist_full_runner_warmup_and_checkpoint_validation(
+    experiment, tmp_path, profile
+):
+    _proxy_config(experiment, steps=3)
+    path = tmp_path / "benchmark-v2/hist"
+    runner.run_experiment(
+        **experiment,
+        method="hist",
+        output_dir=path,
+        profile_steps=2 if profile else None,
+    )
+    manifest = runtime.verify_run(path)
+    checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
+    assert checkpoint["training_state"]["warmup_updates"] == (0 if profile else 1)
+    assert checkpoint["training_state"]["main_updates"] > 0
+    assert (
+        manifest["identity"]["head_recipe"]
+        == "confidence_valid_token_mean_plus_max_project_nonaffine_ln"
+    )
+    checkpoint["criterion"].pop("loss.graph.normalization.running_mean")
+    torch.save(checkpoint, path / "checkpoint.pt")
+    _rehash_output(path, "checkpoint.pt")
+    with pytest.raises(ValueError, match="criterion"):
         runtime.verify_run(path)

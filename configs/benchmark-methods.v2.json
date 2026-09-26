@@ -316,10 +316,23 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://openaccess.thecvf.com/content/CVPR2022/html/Lim_Hypergraph-Induced_Semantic_Tuplet_Loss_for_Deep_Metric_Learning_CVPR_2022_paper.html",
-      "implementation": "pending_hist_hypergraph_motion_adaptation",
-      "status": "blocked",
-      "blocker": "Official code has no discovered reuse license; paper-equation verification, semantic hyperedge construction, hypergraph node classification, and optimizer groups for the motion adaptation are not implemented.",
-      "parameters": {}
+      "implementation": "independent_lim2022_equations_2_to_8_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "lim2022_cub_motion",
+        "hidden_dimension": 512,
+        "temperature_scale": 32.0,
+        "incidence_scale": 1.1,
+        "graph_weight": 1.0,
+        "head_learning_rate": 0.00012,
+        "distribution_learning_rate": 0.1,
+        "graph_learning_rate": 0.0006,
+        "weight_decay": 5e-05,
+        "warmup_epochs": 1,
+        "decay_epochs": 5,
+        "decay_factor": 0.5
+      }
     },
     {
       "method_id": "mhgl",

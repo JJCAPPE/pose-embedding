@@ -26,7 +26,7 @@ clipping at 10 on model parameters; proxy gradients are not clipped.
 The implementation was written independently from these equations and factual
 recipe settings. No upstream source was copied or vendored, so this change
 does not add an upstream checkout or imply a new repository license. The
-official source remains an MIT candidate for any later permitted reuse.
+official MIT source is pinned as a reference-only dependency in the upstream manifest.
 
 ## Declared motion choices
 

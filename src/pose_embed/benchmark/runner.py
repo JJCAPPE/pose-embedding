@@ -31,9 +31,11 @@ from pose_embed.benchmark.runtime import (
     verify_run,
 )
 from pose_embed.benchmark.training import (
+    advance_optimizer,
     build_optimizer,
     phase_for_step,
     resolve_recipe,
+    set_step_learning_rates,
 )
 from pose_embed.data.motionbert import preprocess_annotation
 from pose_embed.models.motionbert import (
@@ -211,7 +213,7 @@ def run_experiment(
     ]
     selection_num_records = (
         len(inputs.manifests["final-train.jsonl"])
-        if method == "proxy_nca_pp" and stage == "development"
+        if method in {"proxy_nca_pp", "hist"} and stage == "development"
         else len(train_rows)
     )
     recipe = resolve_recipe(
@@ -224,7 +226,7 @@ def run_experiment(
     )
     if profile_steps is None and steps < recipe["minimum_selected_step"]:
         raise ValueError(
-            "scientific step budget must exceed the complete five-epoch warmup "
+            "scientific step budget must exceed the complete declared warmup "
             "for both development and final training; use a declared longer budget"
         )
     identity = {
@@ -325,7 +327,10 @@ def run_experiment(
             requested_phase = phase_for_step(recipe, step)
             if requested_phase != phase:
                 phase = requested_phase
-                optimizer = build_optimizer(model, criterion, recipe, phase)
+                optimizer = advance_optimizer(
+                    model, criterion, optimizer, recipe, phase
+                )
+            set_step_learning_rates(optimizer, recipe, step)
             step_started = time.perf_counter()
             value = optimizer_step(
                 model,

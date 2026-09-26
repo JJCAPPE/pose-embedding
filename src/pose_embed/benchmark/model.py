@@ -6,10 +6,13 @@ import torch
 import torch.nn.functional as functional
 from torch import nn
 
+from pose_embed.benchmark.hist import HISTHead
 from pose_embed.models.action_head import ActionHeadEmbed
 
 
 def head_recipe(method_id: str) -> str:
+    if method_id == "hist":
+        return "confidence_valid_token_mean_plus_max_project_nonaffine_ln"
     return (
         "confidence_valid_token_max_nonaffine_ln"
         if method_id == "proxy_nca_pp"
@@ -27,7 +30,7 @@ def supports_embedding_inference(method_id: str) -> bool:
         and supports(method_id)
         and (
             specification.family == "embedding_loss"
-            or method_id in {"proxy_nca_pp", "ibc"}
+            or method_id in {"proxy_nca_pp", "ibc", "hist"}
         )
     )
 
@@ -92,6 +95,8 @@ class MotionRetrievalModel(nn.Module):
                 joints=joints,
             )
         )
+        if method_id == "hist":
+            self.head = HISTHead(embedding_dimension, representation_dimension)
         self.set_encoder_trainable(train_encoder)
 
     def set_encoder_trainable(self, enabled: bool) -> None:

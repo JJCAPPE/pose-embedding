@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 16 implemented and 10 blocked**. A working priority pair is
+configurations: 17 implemented and 9 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -238,13 +238,12 @@ also exposes separate learning-rate controls for the hypergraph component.
 [Lim et al., paper landing page](https://openaccess.thecvf.com/content/CVPR2022/html/Lim_Hypergraph-Induced_Semantic_Tuplet_Loss_for_Deep_Metric_Learning_CVPR_2022_paper.html),
 [official README](https://github.com/ljin0429/HIST/blob/e7d650c80460f464c55bcdc2262d785923c50dc4/README.md).
 
-**Motion work/tests.** Complete the equation-level paper/supplement audit
-before coding: the full PDF was inaccessible through the browsing fetch
-during this audit. Resolve incidence weights, normalization, trainable class
-state and exact inference path. Independently implement the method or obtain
-reuse permission. Test tiny hypergraphs, degrees/normalization, batch
-permutations, class mappings and all optimizer groups. Dependency: hypergraph
-training module and source-equation verification. No verified adapter exists.
+**Motion adapter implemented.** The main PDF and supplement were retrieved on
+September 26. `benchmark/hist.py` independently implements the learned diagonal
+class distributions, semantic incidence and two-layer HGNN. The masked motion
+head, optimizer groups, preserved-moment warmup and step schedule are integrated
+with state validation. See [the declared recipe and checks](hist-motion-adaptation.md).
+GPU feasibility and scientific development runs remain required.
 
 ## 11. MHGL
 

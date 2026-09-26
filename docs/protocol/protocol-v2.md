@@ -60,9 +60,12 @@ additional costs. Start from physical P=8, K=4 and measure a real backward pass
 for all methods before freezing a common batch per comparison group. Gradient
 accumulation does not create the neighborhood of a larger physical batch.
 
-Use six paired seeds. Pair backbone initialization, head initialization within
-each dimensionality group, training identities, physical batches and applicable
-augmentations. Auxiliary parameters use deterministic recorded initialization.
+Use six paired seeds. Pair backbone initialization, training identities,
+physical batches and applicable augmentations. Pair head initialization within
+each identical head recipe and dimensionality group. Architecture methods with
+different pooling, branches or parameter shapes have separate declared head
+recipes; equal dimensionality alone does not make their heads compatible.
+Auxiliary parameters use deterministic recorded initialization.
 Declare equal selection budgets and method-specific grids before comparing
 results. Checkpoint selection, stopping, ties and operational retry rules must
 be fixed on development data.

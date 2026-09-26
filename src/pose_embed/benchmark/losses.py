@@ -16,6 +16,7 @@ from pytorch_metric_learning import distances, losses, miners
 from torch import nn
 
 from pose_embed.benchmark.config import StrictModel, load_methods
+from pose_embed.benchmark.hist import HISTParameters, HypergraphSemanticTupletLoss
 from pose_embed.benchmark.ibc import IBCParameters, IntraBatchConnectionsLoss
 from pose_embed.benchmark.proxy_nca_plus import (
     ProxyNCAPlusLoss,
@@ -46,6 +47,7 @@ SUPPORTED_METHODS = frozenset(
         "normalized_softmax",
         "supcon",
         "ibc",
+        "hist",
     }
 )
 
@@ -312,7 +314,7 @@ def build_loss(
         isinstance(dimension, bool) or not isinstance(dimension, int) or dimension < 1
     ):
         raise ValueError("embedding_dimension must be a positive integer")
-    if method_id in {"proxy_anchor", "proxy_nca", "normalized_softmax", "ibc"}:
+    if method_id in {"proxy_anchor", "proxy_nca", "normalized_softmax", "ibc", "hist"}:
         parameters["embedding_dimension"] = dimension or 512
     if method_id == "contrastive":
         config = ContrastiveParameters.model_validate(parameters)
@@ -350,6 +352,10 @@ def build_loss(
         )
     elif method_id == "roadmap":
         module = RoadmapLoss(RoadmapParameters.model_validate(parameters))
+    elif method_id == "hist":
+        config = HISTParameters.model_validate(parameters)
+        dimension = config.embedding_dimension
+        module = HypergraphSemanticTupletLoss(config, num_classes)
     elif method_id == "ibc":
         config = IBCParameters.model_validate(parameters)
         dimension = config.embedding_dimension

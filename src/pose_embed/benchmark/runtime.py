@@ -184,14 +184,14 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
     protocol = load_protocol(REPOSITORY / config.input_protocol)
     dimension = identity["method_specification"]["embedding_dimension"]
     input_dimension = protocol.encoder.representation_dimension
-    if identity["method"] != "proxy_nca_pp":
+    if identity["method"] not in {"proxy_nca_pp", "hist"}:
         input_dimension *= protocol.dataset.joints
     return {
         **reference,
         "encoder_parameters": _reference_encoder_parameters(
             str(Path(data_root).resolve()), str(assets["checkpoint_sha256"])
         )
-        if identity["method"] == "proxy_nca_pp"
+        if identity["method"] in {"proxy_nca_pp", "hist"}
         else (),
         "model_shapes": {
             **{f"encoder.{key}": shape for key, shape in reference["shapes"].items()},
@@ -243,7 +243,7 @@ def _verify_training_recipe(identity: dict, config: BenchmarkConfig, num_records
     from pose_embed.benchmark.training import resolve_recipe
 
     selection_records = num_records
-    if identity["method"] == "proxy_nca_pp" and identity["stage"] != "final":
+    if identity["method"] in {"proxy_nca_pp", "hist"} and identity["stage"] != "final":
         selection_records = len(
             _verified_training_records(identity | {"stage": "final"}, config)
         )
@@ -273,7 +273,7 @@ def _verify_proxy_optimizer(
     checkpoint: dict, recipe: dict, encoder_parameters: tuple
 ) -> None:
     """Validate method-specific auxiliary state and named Adam moment shapes."""
-    from pose_embed.benchmark.training import phase_for_step
+    from pose_embed.benchmark.training import hist_learning_rates, phase_for_step
 
     step = checkpoint["selected_step"]
     phase = phase_for_step(recipe, step)
@@ -290,7 +290,18 @@ def _verify_proxy_optimizer(
     optimizer = checkpoint.get("optimizer", {})
     groups = optimizer.get("param_groups", [])
     states = optimizer.get("state", {})
-    if [group.get("name") for group in groups] != ["encoder", "head", "proxies"]:
+    hist = recipe.get("recipe") == "lim2022_cub_motion"
+    group_names = (
+        ["encoder", "head", "distributions", "graph"]
+        if hist
+        else ["encoder", "head", "proxies"]
+    )
+    prefixes = ["model.encoder.", "model.head."] + (
+        ["criterion.loss.distributions.", "criterion.loss.graph."]
+        if hist
+        else ["criterion."]
+    )
+    if [group.get("name") for group in groups] != group_names:
         raise ValueError("checkpoint optimizer groups are invalid")
     tensors = {
         **{"model." + name: value for name, value in checkpoint["model"].items()},
@@ -300,12 +311,12 @@ def _verify_proxy_optimizer(
         },
     }
     seen_ids, seen_names = set(), set()
-    for group, prefix in zip(
-        groups, ["model.encoder.", "model.head.", "criterion."], strict=True
-    ):
+    for group, prefix in zip(groups, prefixes, strict=True):
         names, indices = group.get("param_names", []), group.get("params", [])
         learning_rate = (
-            recipe["proxy_learning_rate"]
+            hist_learning_rates(recipe, step)[group["name"]]
+            if hist
+            else recipe["proxy_learning_rate"]
             if group["name"] == "proxies"
             else recipe["head_learning_rate"]
         )
@@ -316,7 +327,7 @@ def _verify_proxy_optimizer(
             or not names
             or group.get("lr") != learning_rate
             or group.get("eps") != recipe["optimizer_epsilon"]
-            or group.get("weight_decay") != 0
+            or group.get("weight_decay") != recipe["weight_decay"]
             or tuple(group.get("betas", [])) != (0.9, 0.999)
             or group.get("amsgrad") is not False
         ):
@@ -343,7 +354,9 @@ def _verify_proxy_optimizer(
                     )
                 continue
             updates = (
-                expected["main_updates"]
+                step
+                if hist and group["name"] != "encoder"
+                else expected["main_updates"]
                 if phase == "main"
                 else expected["warmup_updates"]
             )
@@ -370,6 +383,12 @@ def _verify_proxy_optimizer(
         for name in encoder_parameters
         if not name.startswith("head.")
     }
+    if hist:
+        # BatchNorm running statistics belong to the checkpoint, not Adam.
+        required -= {
+            "criterion.loss.graph.normalization." + key
+            for key in ("running_mean", "running_var", "num_batches_tracked")
+        }
     if required != seen_names or not set(states).issubset(seen_ids):
         raise ValueError("checkpoint optimizer has missing or unknown parameters")
 
@@ -551,7 +570,7 @@ def verify_run(directory: str | Path) -> dict:
 
     if any(row.get("phase") != phase_for_step(recipe, row["step"]) for row in rows):
         raise ValueError("training history has an incorrect warmup phase")
-    if identity["method"] == "proxy_nca_pp":
+    if identity["method"] in {"proxy_nca_pp", "hist"}:
         for row in rows:
             gradients = row.get("encoder_gradient_parameters")
             needs_encoder = identity["track"] == "finetune" and row["phase"] == "main"
@@ -600,7 +619,7 @@ def verify_run(directory: str | Path) -> dict:
         ):
             raise ValueError("checkpoint contains invalid parameters")
     _verify_checkpoint_state(directory, identity, config, checkpoint, num_classes)
-    if identity["method"] == "proxy_nca_pp":
+    if identity["method"] in {"proxy_nca_pp", "hist"}:
         _verify_proxy_optimizer(
             checkpoint,
             recipe,

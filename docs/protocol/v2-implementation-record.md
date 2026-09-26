@@ -82,3 +82,31 @@ symlink. The pattern is corrected to `.venv`, which covers both forms. The faile
 scheduler logs remain under the external artifact root; subsequent submissions
 must use new job IDs and output directories. This operational failure provides no
 retrieval, timing or memory result.
+
+## First allocated optimizer profiles
+
+All rows below use release `0ef858379c36`, seed 7, three optimizer steps,
+physical P=8/K=4, float32, fresh successful MotionBERT parity and development
+training inputs. These are capacity measurements, not retrieval comparisons.
+
+| SCC job | Track and method | GPU | Peak allocated bytes | Three-step seconds | Outcome |
+| --- | --- | --- | ---: | ---: | --- |
+| 7748366 | Frozen Contrastive | L40S | 2,875,836,928 | 3.086 | Passed |
+| 7748366 | Frozen Contextual | L40S | 2,875,836,928 | 2.239 | Passed |
+| 7748367 | Fine-tuned Contrastive | L40S, 44.42 GiB available capacity | — | — | CUDA out of memory |
+| 7748414 | Fine-tuned Contrastive | A100 80 GB PCIe | 62,739,530,240 | 8.604 | Passed |
+| 7748414 | Fine-tuned Contextual | A100 80 GB PCIe | 62,739,530,240 | 7.729 | Passed |
+
+Immutable evidence is under the SCC artifact root in
+`benchmark-v2/pilots/20260926T202750Z-7748366-0ef858379c36`, the sibling
+`7748367` directory, and `20260926T203556Z-7748414-0ef858379c36`.
+The unsuccessful fine-tuning attempt is retained; the successful retry changes
+only GPU capacity, without reducing the batch or precision. Three steps exclude
+setup and do not support a training-time or comparative-speed claim.
+
+Job `7748366` continues the frozen paired development pilot. After the larger
+GPU profiles passed, `7748592` was submitted for the fine-tuned paired pilot;
+it runs Contrastive and then Contextual on an A100 allocation. No broader
+method GPU experiment is submitted before this priority comparison. Novel
+classes remain unopened. Running jobs retain their original release checkout
+while subsequent adapter implementation proceeds in separate local worktrees.
