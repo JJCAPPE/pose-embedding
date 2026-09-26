@@ -845,6 +845,9 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/evaluation/analysis.py",
         "src/pose_embed/report.py",
         "src/pose_embed/benchmark/analysis.py",
+        "src/pose_embed/benchmark/secondary.py",
+        "src/pose_embed/benchmark/secondary_evaluation.py",
+        "configs/benchmark-secondary.v2.json",
     ),
 }
 

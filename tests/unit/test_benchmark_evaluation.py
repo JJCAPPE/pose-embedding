@@ -440,3 +440,142 @@ def test_modified_evaluation_output_is_rejected_by_recorded_hash(final_fixture):
     (f.output / "rank-metrics.json").write_text("{}")
     with pytest.raises(ValueError, match="output was changed"):
         evaluation._read_evaluation(f.output, f.final_runs, f.opening, f.config)
+
+
+def test_secondary_one_shot_opens_full_gate_before_real_forward(
+    final_fixture, monkeypatch
+):
+    from pose_embed.benchmark import secondary_evaluation as secondary_eval
+
+    f = final_fixture
+    for name in ("secondary-plan.json", "secondary-final.json"):
+        (f.root / "locks" / name).write_text("{}")
+    inputs = evaluation.load_motionbert_inputs()
+    rows = inputs.manifests["official-novel.jsonl"]
+    anchors = [
+        rows[i].model_copy(update={"split": "novel_anchor", "is_anchor": True})
+        for i in (0, 2)
+    ]
+    queries = [
+        rows[i].model_copy(update={"split": "novel_query_official", "is_anchor": False})
+        for i in (1, 3)
+    ]
+    inputs.manifests.update(
+        {"novel-anchor.jsonl": anchors, "novel-query-official.jsonl": queries}
+    )
+    for name in (
+        "load_benchmark",
+        "validate_final_runs",
+        "verify_run",
+        "code_digest",
+        "load_motionbert_inputs",
+        "verify_motionbert_assets",
+        "build_motionbert_bindings",
+        "validate_parity_report",
+        "load_frozen_encoder",
+        "MotionRetrievalModel",
+        "open_test",
+    ):
+        monkeypatch.setattr(secondary_eval, name, getattr(evaluation, name))
+    monkeypatch.setattr(
+        secondary_eval, "validate_secondary_runs", lambda **kwargs: f.final_runs
+    )
+    monkeypatch.setattr(
+        secondary_eval,
+        "PoseDataset",
+        lambda records, *args: TensorDataset(torch.eye(2), torch.tensor([0, 1])),
+    )
+    output = secondary_eval.evaluate_secondary(
+        run_dir=f.run,
+        config_path="fixture",
+        manifest_set_path="fixture",
+        parity_evidence_path=f.parity,
+        output_dir=f.output,
+        task="one_shot",
+        device="cpu",
+    )
+    assert f.events.index("open") < f.events.index("forward")
+    assert output["identity"]["classification"] == "secondary_descriptive"
+    result = json.loads((f.output / "rank-metrics.json").read_text())
+    assert result["map"] == result["mrr"] == result["top1"] == 1
+    with pytest.raises(FileExistsError):
+        secondary_eval.evaluate_secondary(
+            run_dir=f.run,
+            config_path="fixture",
+            manifest_set_path="fixture",
+            parity_evidence_path=f.parity,
+            output_dir=f.output,
+            task="one_shot",
+            device="cpu",
+        )
+
+
+def test_secondary_primary_corruption_keeps_full_clean_gallery_and_exclusions(
+    final_fixture, monkeypatch
+):
+    from pose_embed.benchmark import secondary_evaluation as secondary_eval
+
+    f = final_fixture
+    for name in ("secondary-plan.json", "secondary-final.json"):
+        (f.root / "locks" / name).write_text("{}")
+    inputs = evaluation.load_motionbert_inputs()
+    rows = inputs.manifests["official-novel.jsonl"]
+    rows.append(
+        rows[0].model_copy(
+            update={"sample_id": rows[0].sample_id.replace("C001", "C002")}
+        )
+    )
+    f.opening["novel_episode"]["sample_ids"] = [row.sample_id for row in rows]
+    for name in (
+        "load_benchmark",
+        "validate_final_runs",
+        "verify_run",
+        "code_digest",
+        "load_motionbert_inputs",
+        "verify_motionbert_assets",
+        "build_motionbert_bindings",
+        "validate_parity_report",
+        "load_frozen_encoder",
+        "MotionRetrievalModel",
+        "open_test",
+    ):
+        monkeypatch.setattr(secondary_eval, name, getattr(evaluation, name))
+    monkeypatch.setattr(
+        secondary_eval, "validate_secondary_runs", lambda **kwargs: f.final_runs
+    )
+    clean_vectors = torch.tensor(
+        [[1.0, 0.0], [1.0, 0.0], [0.0, 1.0], [0.0, 1.0], [1.0, 0.0]]
+    )
+    observed = []
+
+    def dataset(records, *args):
+        assert [r.sample_id for r in records] == [r.sample_id for r in rows]
+        corrupted = bool(args and isinstance(args[-1], str))
+        observed.append("corrupted_query" if corrupted else "clean_gallery")
+        vectors = clean_vectors.flip(1) if corrupted else clean_vectors
+        return TensorDataset(vectors, torch.zeros(len(records), dtype=torch.long))
+
+    monkeypatch.setattr(secondary_eval, "PoseDataset", dataset)
+    monkeypatch.setattr(secondary_eval, "CorruptedQueries", dataset)
+    manifest = secondary_eval.evaluate_secondary(
+        run_dir=f.run,
+        config_path="fixture",
+        manifest_set_path="fixture",
+        parity_evidence_path=f.parity,
+        output_dir=f.output,
+        task="query_corruption",
+        query_definition="primary",
+        condition="coordinate_jitter:0.01",
+        device="cpu",
+    )
+    assert observed == ["clean_gallery", "corrupted_query"]
+    assert f.events.index("open") < f.events.index("forward")
+    assert manifest["identity"]["gallery_sample_ids"] == [r.sample_id for r in rows]
+    result = json.loads((f.output / "rank-metrics.json").read_text())
+    assert result["metrics"]["r_at_1"] == 0
+    assert {"map", "map_at_r", "mrr"} <= result["metrics"].keys()
+    assert set(result["per_query"][0]["excluded_gallery_ids"]) == {
+        rows[0].sample_id,
+        rows[4].sample_id,
+    }
+    assert "one_clean_anchor" not in str(result["policy"])

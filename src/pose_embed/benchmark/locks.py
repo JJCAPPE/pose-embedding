@@ -24,6 +24,7 @@ from pose_embed.benchmark.runtime import (
     require_unopened,
     verify_run,
 )
+from pose_embed.benchmark.secondary import load_secondary_plan, secondary_plan_sha256
 from pose_embed.provenance import sha256_file, write_immutable_json
 
 
@@ -52,6 +53,7 @@ def _timestamp(value: Any) -> datetime:
 def _context(config_path):
     config = load_benchmark(config_path)
     load_analysis_plan(config)
+    load_secondary_plan(config)
     methods = load_methods()
     if config.training.encoder_mode != "finetune":
         raise ValueError("final selection requires the declared fine-tuning benchmark")
@@ -132,7 +134,8 @@ def _collect_runs(
             ):
                 raise ValueError("final run does not bind the selected campaign winner")
         if (
-            identity.get("stage") != stage
+            "secondary" in identity
+            or identity.get("stage") != stage
             or identity.get("track") != "finetune"
             or identity.get("scientific_use_allowed") is not True
             or identity.get("benchmark_sha256") != benchmark_digest(effective)
@@ -334,6 +337,7 @@ def _candidate_selection_content(run_dirs, config, methods) -> tuple[dict, datet
         "schema_version": 2,
         "kind": "final_selection",
         "analysis_plan_sha256": analysis_plan_sha256(),
+        "secondary_plan_sha256": secondary_plan_sha256(),
         "benchmark_sha256": benchmark_digest(config),
         "code_sha256": code_digest(),
         "methods": selected,
@@ -389,6 +393,7 @@ def _final_content(run_dirs, config, methods, selection) -> tuple[dict, datetime
         "schema_version": 2,
         "kind": "final_run_set",
         "analysis_plan_sha256": analysis_plan_sha256(),
+        "secondary_plan_sha256": secondary_plan_sha256(),
         "benchmark_sha256": benchmark_digest(config),
         "code_sha256": code_digest(),
         "selection_sha256": sha256_file(_path("selection.json")),
@@ -431,7 +436,10 @@ def validate_final_runs(*, config_path: str | Path | None = None) -> dict:
 
 
 def _opening_content(manifest_set_path, config_path) -> tuple[dict, datetime]:
+    from pose_embed.benchmark.secondary import validate_secondary_runs
+
     final_runs = validate_final_runs(config_path=config_path)
+    secondary_runs = validate_secondary_runs(config_path=config_path, stage="final")
     config = load_benchmark(config_path)
     episode = load_episode(manifest_set_path, "novel")
     metadata = episode["metadata"]
@@ -450,13 +458,18 @@ def _opening_content(manifest_set_path, config_path) -> tuple[dict, datetime]:
         "schema_version": 2,
         "kind": "test_opening",
         "analysis_plan_sha256": analysis_plan_sha256(),
+        "secondary_plan_sha256": secondary_plan_sha256(),
         "benchmark_sha256": benchmark_digest(config),
         "code_sha256": code_digest(),
         "selection_sha256": sha256_file(_path("selection.json")),
         "final_run_set_sha256": sha256_file(_path("final-runs.json")),
+        "secondary_lock_sha256": sha256_file(_path("secondary-plan.json")),
+        "secondary_final_sha256": sha256_file(_path("secondary-final.json")),
         "manifest_set_path": str(Path(manifest_set_path).resolve()),
         "novel_episode": metadata,
-    }, _timestamp(final_runs["created_at"])
+    }, max(
+        _timestamp(final_runs["created_at"]), _timestamp(secondary_runs["created_at"])
+    )
 
 
 def open_test(

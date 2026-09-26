@@ -112,7 +112,8 @@ def evaluate_final(
     identity = manifest["identity"]
     spec = load_methods()[reference["method"]]
     if (
-        identity["stage"] != "final"
+        "secondary" in identity
+        or identity["stage"] != "final"
         or identity["track"] != "finetune"
         or identity["scientific_use_allowed"] is not True
         or identity["method"] != reference["method"]

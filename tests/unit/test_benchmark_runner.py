@@ -995,3 +995,114 @@ def test_profile_measures_real_retrieval_and_rejects_rehashed_metadata(
     (directory / "run-manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="validation prefix"):
         runtime.verify_run(directory)
+
+
+@pytest.mark.parametrize(
+    "family,amount",
+    [("label_noise", 0.1), ("pose_replacement", 0.1), ("retained_actions", 0.25)],
+)
+@pytest.mark.parametrize("segmented", [False, True])
+def test_secondary_intervention_full_runner_and_fixed_checkpoint(
+    experiment, tmp_path, monkeypatch, family, amount, segmented
+):
+    import yaml
+
+    from pose_embed.benchmark import secondary
+
+    source = [
+        ManifestRecord(
+            sample_id=f"S001C001P{person:03d}R001A{action:03d}",
+            split="development_train",
+        )
+        for action in range(1, 81)
+        for person in range(1, 17)
+    ]
+    inputs = runner.load_motionbert_inputs()
+    inputs.manifests["development-train.jsonl"] = source
+    inputs.annotations.extend(
+        {"frame_dir": r.sample_id, "index": i} for i, r in enumerate(source)
+    )
+    monkeypatch.setattr(
+        runtime, "_verified_training_records", lambda identity, config: source
+    )
+    config = load_benchmark(experiment["config_path"])
+    config = config.model_copy(
+        update={
+            "training": config.training.model_copy(
+                update={"encoder_mode": "finetune", "classes_per_batch": 8}
+            )
+        }
+    )
+    experiment["config_path"].write_text(yaml.safe_dump(config.model_dump()))
+    key = f"robustness-context_only-{family}-{amount:g}"
+    cell = secondary.training_cells()[key]
+    effective = config.model_copy(
+        update={
+            "training": config.training.model_copy(
+                update={"classes_per_batch": 4, "samples_per_class": 8}
+            )
+        }
+    )
+    spec = runner.load_methods()["contextual"]
+    spec = spec.model_copy(
+        update={"parameters": spec.parameters | {"lam": 1.0, "gamma": 0.0, "k": 8}}
+    )
+    plan = {
+        "cells": {
+            key: cell
+            | {
+                "configuration": effective.model_dump(mode="json"),
+                "method_specification": spec.model_dump(mode="json"),
+                "selected_steps": 2,
+            }
+        },
+        "seeds": list(config.training.seeds),
+        "secondary_plan_sha256": secondary.secondary_plan_sha256(),
+        "main_configuration_path": str(experiment["config_path"].resolve()),
+    }
+    monkeypatch.setattr(secondary, "validate_secondary_plan", lambda **kwargs: plan)
+    lock = tmp_path / "benchmark-v2/locks"
+    lock.mkdir(parents=True)
+    (lock / "selection.json").write_text("{}")
+    (lock / "secondary-plan.json").write_text(json.dumps(plan))
+    path = tmp_path / "benchmark-v2/secondary-example"
+    arguments = dict(
+        **experiment, method="contextual", output_dir=path, secondary_cell=key
+    )
+    with pytest.raises(ValueError, match="inherit selection"):
+        runner.run_experiment(**arguments, candidate="half")
+    run = runner.run_experiment(
+        **arguments, **({"segment_steps": 1} if segmented else {})
+    )
+    if segmented:
+        from pose_embed.benchmark.segments import _equal_state
+
+        assert run["status"] == "resumable"
+        assert f"--secondary-cell {key}" in run["next_resume_command"]
+        assert "--candidate" not in run["next_resume_command"]
+        segment = runtime.read_json(run["segment_manifest"])
+        assert segment["best"] is None
+        data_hash = sha256_file(path / "secondary-data-plan.json")
+        assert segment["shared"]["secondary-data-plan.json"] == data_hash
+        runner.run_experiment(**arguments, resume_from=run["segment_manifest"])
+        assert sha256_file(path / "secondary-data-plan.json") == data_hash
+        reference = tmp_path / "benchmark-v2/secondary-uninterrupted"
+        runner.run_experiment(**(arguments | {"output_dir": reference}))
+        expected = torch.load(reference / "checkpoint.pt", weights_only=True)
+        actual = torch.load(path / "checkpoint.pt", weights_only=True)
+        assert _equal_state(expected, actual)
+    manifest = runtime.verify_run(path)
+    assert manifest["identity"]["secondary"]["cell_id"] == key
+    checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
+    assert checkpoint["selected_step"] == 2
+    data = runtime.read_json(path / "secondary-data-plan.json")
+    assert len(data["retained_actions"]) == (20 if family == "retained_actions" else 80)
+    assert all(
+        len(batch) == 32
+        for batch in runtime.read_json(path / "batch-plan.json")["steps"]
+    )
+    data["source_sample_ids"][0] = "S999C001P001R001A120"
+    (path / "secondary-data-plan.json").write_text(json.dumps(data))
+    _rehash_output(path, "secondary-data-plan.json")
+    with pytest.raises(ValueError, match="intervention|continuation shared evidence"):
+        runtime.verify_run(path)

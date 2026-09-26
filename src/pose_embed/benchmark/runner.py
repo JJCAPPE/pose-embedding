@@ -186,6 +186,7 @@ def run_experiment(
     segment_steps: int | None = None,
     max_segment_seconds: float | None = None,
     candidate: str | None = None,
+    secondary_cell: str | None = None,
 ) -> dict[str, Any]:
     """Run one declared method/seed. Profiling can never certify a final run."""
     attempt_started = time.perf_counter()
@@ -207,6 +208,10 @@ def run_experiment(
     base_config = config
     campaign_binding = {}
     if candidate is not None:
+        if secondary_cell is not None:
+            raise ValueError(
+                "secondary cells inherit selection and cannot choose a candidate"
+            )
         if stage != "development" or profile_steps is not None:
             raise ValueError(
                 "candidate is only explicit for scientific development runs"
@@ -234,7 +239,11 @@ def run_experiment(
         not 1 <= profile_steps <= 100 or stage != "development"
     ):
         raise ValueError("profiling requires 1–100 development steps")
-    if stage == "final":
+    if secondary_cell is not None and (
+        profile_steps is not None or track != "finetune"
+    ):
+        raise ValueError("secondary cells require scientific fine-tuning runs")
+    if stage == "final" and secondary_cell is None:
         from pose_embed.benchmark.locks import validate_selection
 
         selection = validate_selection(config_path=config_path)
@@ -259,14 +268,39 @@ def run_experiment(
     bindings = build_motionbert_bindings(inputs, assets)
     validate_parity_report(parity_evidence_path, bindings)
     spec = methods[method]
-    steps = profile_steps or (
-        selection["methods"][method]["selected_steps"]
-        if stage == "final"
-        else config.training.steps
+    secondary_binding = data_plan = None
+    if secondary_cell is not None:
+        from pose_embed.benchmark.secondary import (
+            resolve_training_cell,
+            validate_secondary_runs,
+        )
+
+        config, spec, cell, secondary_binding = resolve_training_cell(
+            secondary_cell, config_path=config_path, stage=stage, seed=seed
+        )
+        if spec.method_id != method:
+            raise ValueError("secondary cell method differs from requested method")
+        if stage == "final":
+            validate_secondary_runs(config_path=config_path, stage="development")
+    steps = (
+        cell["selected_steps"]
+        if secondary_cell is not None
+        else profile_steps
+        or (
+            selection["methods"][method]["selected_steps"]
+            if stage == "final"
+            else config.training.steps
+        )
     )
     train_rows = inputs.manifests[
         "final-train.jsonl" if stage == "final" else "development-train.jsonl"
     ]
+    if secondary_cell is not None:
+        from pose_embed.benchmark.secondary import prepared_records, training_data_plan
+
+        data_plan = training_data_plan(train_rows, stage=stage, seed=seed, cell=cell)
+        secondary_binding["data_plan_sha256"] = digest(data_plan)
+        train_rows = prepared_records(train_rows, data_plan)
     selection_num_records = (
         len(inputs.manifests["final-train.jsonl"])
         if method in {"proxy_nca_pp", "proxy_nca_metrix", "hist", "proxy_anchor_avsl"}
@@ -314,7 +348,7 @@ def run_experiment(
         },
         "parity_sha256": sha256_file(parity_evidence_path),
         "selection_sha256": sha256_file(artifact_root() / "locks/selection.json")
-        if stage == "final"
+        if stage == "final" or secondary_cell is not None
         else None,
         "optimizer": recipe["optimizer"],
         "training_recipe": recipe,
@@ -322,6 +356,8 @@ def run_experiment(
         "precision": "float32",
         "scientific_use_allowed": profile_steps is None,
     }
+    if secondary_binding is not None:
+        identity["secondary"] = secondary_binding
     destination = artifact_path(output_dir)
     parent = None
     continuation = None
@@ -357,6 +393,14 @@ def run_experiment(
         segment = begin_segment(destination, identity, parent)
         stop.__enter__()
     try:
+        if data_plan is not None:
+            data_plan_path = destination / "secondary-data-plan.json"
+            if continuation is None:
+                write_immutable_json(data_plan_path, data_plan)
+            elif read_json(data_plan_path) != data_plan:
+                raise ValueError(
+                    "continuation secondary data plan differs from the original"
+                )
         random.seed(seed)
         np.random.seed(seed)
         torch.manual_seed(seed)
@@ -370,6 +414,10 @@ def run_experiment(
         ).to(device)
         annotations = {a["frame_dir"]: a for a in inputs.annotations}
         dataset = PoseDataset(train_rows, annotations, inputs.protocol)
+        if data_plan is not None:
+            from pose_embed.benchmark.secondary import bind_dataset
+
+            bind_dataset(dataset, data_plan)
         criterion = build_loss(
             method,
             spec.parameters | {"embedding_dimension": spec.embedding_dimension},
@@ -582,7 +630,10 @@ def run_experiment(
                     "scoring_seconds": time.perf_counter() - scoring_started,
                 }
                 score = result["metrics"][config.selection_metric]
-                if step >= recipe["minimum_selected_step"] and score > best_score:
+                if step >= recipe["minimum_selected_step"] and (
+                    (secondary_cell is not None and step == steps)
+                    or (secondary_cell is None and score > best_score)
+                ):
                     best_score = score
                     selected_step = step
                     best_result = result
@@ -814,6 +865,8 @@ def run_experiment(
             if torch.device(device).type == "cuda":
                 peak_allocated = torch.cuda.max_memory_allocated(device)
                 peak_reserved = torch.cuda.max_memory_reserved(device)
+        if secondary_cell is not None:
+            output_names.append("secondary-data-plan.json")
         telemetry = {
             "elapsed_seconds": elapsed,
             "environment": environment,
@@ -887,7 +940,11 @@ def compare_development(run_dirs: list[str | Path], output: str | Path) -> dict:
         directory = artifact_path(directory)
         manifest = verify_run(directory)
         identity = manifest["identity"]
-        if identity["stage"] != "development" or not identity["scientific_use_allowed"]:
+        if (
+            "secondary" in identity
+            or identity["stage"] != "development"
+            or not identity["scientific_use_allowed"]
+        ):
             raise ValueError("comparison accepts completed development runs only")
         if config_hash is not None and identity["benchmark_sha256"] != config_hash:
             raise ValueError("comparison mixes benchmark configurations")

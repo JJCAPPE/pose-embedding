@@ -124,7 +124,12 @@ these metrics.
 The official one-shot protocol, frozen-encoder pilot, corruption curves and
 contextual ablations are supplementary. Their settings and run matrices must be
 declared before novel outcomes are viewed. One-shot mAP equals MRR; multi-positive
-mAP does not. Report each task separately.
+mAP does not. Report each task separately. The finite executable matrices,
+training-only noise adaptations and separate lock sequence are specified in
+[the secondary study protocol](secondary-studies-v2.md) and
+`configs/benchmark-secondary.v2.json`. They add 276 development and 276 final
+training runs; all secondary final training must precede novel opening while
+the main comparison denominator remains 26 by 6.
 
 ## Estimand and claims
 

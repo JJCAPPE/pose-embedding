@@ -64,6 +64,7 @@ def add_parser(subparsers: argparse._SubParsersAction) -> argparse.ArgumentParse
         if name == "profile":
             command.add_argument("--steps", type=_profile_steps, default=3)
         else:
+            command.add_argument("--secondary-cell", default=None)
             command.add_argument(
                 "--resume-from",
                 help="latest sealed segment manifest of this experiment",
@@ -135,6 +136,43 @@ def add_parser(subparsers: argparse._SubParsersAction) -> argparse.ArgumentParse
     report.add_argument("--config", default=DEFAULT_CONFIG)
     report.add_argument("--results", nargs="+", required=True)
     report.add_argument("--output-dir", required=True)
+    from pose_embed.benchmark.secondary import CONDITIONS
+
+    for name in ("secondary-coverage", "secondary-plan", "secondary-lock"):
+        command = commands.add_parser(
+            name, help="declare or lock the separate secondary studies"
+        )
+        command.add_argument("--config", default=DEFAULT_CONFIG)
+        if name == "secondary-lock":
+            command.add_argument(
+                "--phase", choices=("development", "final"), required=True
+            )
+            command.add_argument("--runs", nargs="+", required=True)
+    secondary_eval = commands.add_parser(
+        "secondary-evaluate", help="evaluate a sealed secondary study"
+    )
+    secondary_eval.add_argument("--config", default=DEFAULT_CONFIG)
+    secondary_eval.add_argument("--run", required=True)
+    secondary_eval.add_argument("--manifest-set", required=True)
+    secondary_eval.add_argument("--parity-evidence", required=True)
+    secondary_eval.add_argument("--output-dir", required=True)
+    secondary_eval.add_argument(
+        "--task",
+        choices=("one_shot", "query_corruption", "training_study"),
+        required=True,
+    )
+    secondary_eval.add_argument(
+        "--query-definition", choices=("official", "primary"), default="official"
+    )
+    secondary_eval.add_argument("--condition", choices=CONDITIONS, default="clean")
+    secondary_eval.add_argument("--device", default="cuda")
+    secondary_report = commands.add_parser(
+        "secondary-report", help="report the complete descriptive supplementary matrix"
+    )
+    secondary_report.add_argument("--config", default=DEFAULT_CONFIG)
+    secondary_report.add_argument("--manifest-set", required=True)
+    secondary_report.add_argument("--results", nargs="+", required=True)
+    secondary_report.add_argument("--output-dir", required=True)
     return parser
 
 
@@ -198,6 +236,43 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         from pose_embed.benchmark.campaign import review_failure
 
         return review_failure(args.run, category=args.category, reason=args.reason)
+    if operation.startswith("secondary-"):
+        from pose_embed.benchmark.secondary import (
+            forecast,
+            lock_secondary_plan,
+            lock_secondary_runs,
+        )
+        from pose_embed.benchmark.secondary_evaluation import (
+            evaluate_secondary,
+            report_secondary,
+        )
+
+        if operation == "secondary-coverage":
+            return forecast()
+        if operation == "secondary-plan":
+            return lock_secondary_plan(config_path=args.config)
+        if operation == "secondary-lock":
+            return lock_secondary_runs(
+                args.runs, config_path=args.config, stage=args.phase
+            )
+        if operation == "secondary-evaluate":
+            return evaluate_secondary(
+                run_dir=args.run,
+                config_path=args.config,
+                manifest_set_path=args.manifest_set,
+                parity_evidence_path=args.parity_evidence,
+                output_dir=args.output_dir,
+                task=args.task,
+                query_definition=args.query_definition,
+                condition=args.condition,
+                device=args.device,
+            )
+        return report_secondary(
+            args.results,
+            config_path=args.config,
+            manifest_set_path=args.manifest_set,
+            output_dir=args.output_dir,
+        )
     if operation in {"select", "lock-final"}:
         from pose_embed.benchmark.locks import create_selection, lock_final_runs
 
@@ -252,4 +327,5 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         segment_steps=getattr(args, "segment_steps", None),
         max_segment_seconds=getattr(args, "max_segment_seconds", None),
         candidate=getattr(args, "candidate", None),
+        secondary_cell=getattr(args, "secondary_cell", None),
     )

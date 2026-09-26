@@ -60,14 +60,16 @@ attempt remains immutable and retries use new directories. Never run model work
 on an SCC login node. All broader methods remain behind this first engineering
 comparison; novel evaluation remains behind complete final-suite locks.
 
-## Outstanding scientific implementation
+## Remaining experiments
 
-All 26 adapters are integrated with component/provenance checks. Equal tuning
-budgets, continuation controls, supplementary matrices and final
-training duration must be declared and measured before selection. Supporting
-ablations, training-noise experiments and supplementary motion corruptions also
-require their own locked run matrices. No generic loss wrapper, frozen pilot,
-one seed or image-paper number may fill these missing motion results.
+All 26 adapters, the equal-budget selection campaign, immutable continuation,
+supplementary matrices and final evaluation/report paths are implemented and
+locally verified. Allocated-GPU validation, full runtime/storage measurements,
+campaign declaration, training and scientific results remain outstanding.
+No generic loss wrapper, frozen pilot, one seed or image-paper number may fill
+these missing motion results. The [storage floor](v2-resource-floor.md) already
+exceeds the available project quota; full launch requires additional accessible
+storage and a complete measured resource forecast.
 
 ## Release observations
 
@@ -140,3 +142,30 @@ Its 1,000 updates used 4,120.33 seconds total, of which summed update timing was
 Peak allocated GPU memory was 2,893,729,792 bytes and its checkpoint was
 187,778,419 bytes. Contextual and the fine-tuned pair are still running at this
 recording. No paired retrieval result or novel-test outcome is asserted.
+
+## Completed local integration checks
+
+The complete integrated Python suite passed **791 tests** on September 26.
+Ruff lint/format (120 Python files), workspace policy, Git diff checks and all
+four affected scheduler scripts' Bash syntax passed. The updated tracker passed
+lint, TypeScript, **15 unit tests** and a production build. These current checks
+supplement the earlier foundation-release database and browser evidence.
+
+Continuation fixtures prove exact split-versus-uninterrupted state for common
+training, warmup, Metrix random mixing, delayed S2SD, DiVA memory/EMA, campaign
+candidate/final runs and secondary interventions. Audits checked all 26 optimizer
+parameter sets, compatible paired initialization, structural descriptor replay,
+secondary exclusions and selection/continuation provenance. The exact archived
+action-head code bridge is supported by bitwise output, gradient and RNG checks.
+
+The final workload is 468 main development runs, 156 main final runs and 552
+secondary training runs. Opening requires all 432 final checkpoints. Separate
+main and descriptive secondary reports require their complete declared result
+matrices. Full profiles now exercise real post-warmup optimizer paths and a fixed
+128-item retrieval prefix; metadata-only verification of the actual development
+prefix found 128 items, 10 actions and at least 11 eligible positives per query.
+No additional motion inference or retrieval score is implied by that check.
+
+The current priority jobs retain release `0ef858379c36`. Publish subsequent
+implementation through a separate release and environment; a full-profile job
+must verify their completed fine-tuned comparison before broader GPU work.

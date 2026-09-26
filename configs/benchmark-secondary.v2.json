@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "protocol_id": "motion-retrieval-v2",
+  "status": "specified",
+  "classification": "secondary_descriptive",
+  "seeds": [
+    7,
+    17,
+    29,
+    43,
+    59,
+    71
+  ],
+  "one_shot": {
+    "methods": "all_main_methods",
+    "query_definition": "official",
+    "condition": "clean"
+  },
+  "query_corruption": {
+    "methods": [
+      "contrastive",
+      "contextual"
+    ],
+    "query_definitions": [
+      "official",
+      "primary"
+    ],
+    "conditions": [
+      "clean",
+      "coordinate_jitter:0.01",
+      "coordinate_jitter:0.025",
+      "coordinate_jitter:0.05",
+      "joint_mask:3",
+      "joint_mask:6",
+      "joint_mask:8",
+      "frame_mask:10",
+      "frame_mask:25",
+      "frame_mask:40"
+    ],
+    "implementation": "v1_query_only_stable_sample_seed",
+    "gallery": {
+      "official": "clean_official_20_anchors",
+      "primary": "clean_full_novel_pool"
+    },
+    "query_policy": {
+      "official": "official_one_shot_retains_synchronized_anchor_views",
+      "primary": "full_novel_pool_self_and_synchronized_performance_excluded"
+    }
+  },
+  "components": {
+    "lambda": [
+      0,
+      "selected_contextual",
+      1
+    ],
+    "gamma": [
+      0,
+      "selected_contextual"
+    ],
+    "classes_per_batch": 8,
+    "samples_per_class": 4
+  },
+  "robustness": {
+    "methods": [
+      "context_only",
+      "contrastive",
+      "multi_similarity",
+      "multi_similarity_miner"
+    ],
+    "label_noise": [
+      0.05,
+      0.1,
+      0.2
+    ],
+    "pose_replacement": [
+      0.05,
+      0.1,
+      0.2
+    ],
+    "retained_action_fraction": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "classes_per_batch": 4,
+    "samples_per_class": 8,
+    "label_noise_policy": "fixed_sample_subset_uniform_other_training_action",
+    "replacement_policy": "fixed_sample_subset_other_training_action_and_performance",
+    "action_subset_policy": "seeded_nested_training_action_prefix",
+    "clean_control": true
+  },
+  "training": {
+    "track": "finetune",
+    "embedding_dimension": 512,
+    "stages": [
+      "development",
+      "final"
+    ],
+    "recipe": "inherit_selected_main_learning_rate_scale_and_step_budget",
+    "checkpoint": "fixed_last_step_no_secondary_selection",
+    "reuse": "disabled_all_cells_have_independent_immutable_evidence",
+    "require_development_before_final": true,
+    "require_all_final_before_novel": true
+  },
+  "analysis": {
+    "metrics": [
+      "r_at_1",
+      "r_at_2",
+      "r_at_4",
+      "r_at_8",
+      "map",
+      "map_at_r",
+      "mrr"
+    ],
+    "one_shot_metrics": [
+      "top1",
+      "mrr",
+      "r_at_5",
+      "map"
+    ],
+    "aggregation": "query_weighted_mean_then_equal_seed_mean",
+    "uncertainty": "sample_standard_deviation_and_all_six_seed_values",
+    "comparative_claims": "descriptive_only_no_confirmatory_claims"
+  }
+}

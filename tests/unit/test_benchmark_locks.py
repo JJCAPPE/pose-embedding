@@ -66,6 +66,20 @@ def lock_context(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         return content, timestamp
 
     monkeypatch.setattr(campaign, "selection_content", select_fixture)
+    # The separate secondary matrix has complete-coverage tests of its own.
+    from pose_embed.benchmark import secondary
+
+    lock_dir = artifact_root() / "locks"
+    lock_dir.mkdir(parents=True)
+    for name in ("secondary-plan.json", "secondary-final.json"):
+        (lock_dir / name).write_text("{}")
+    monkeypatch.setattr(
+        secondary,
+        "validate_secondary_runs",
+        lambda **kwargs: {
+            "created_at": (datetime.now(UTC) - timedelta(hours=2)).isoformat()
+        },
+    )
     return config, methods
 
 
@@ -386,3 +400,13 @@ def test_future_selection_timestamp_and_legacy_opening_are_rejected(
     write_immutable_json(legacy, {})
     with pytest.raises(ValueError, match="forbidden after test opening"):
         locks.create_selection(directories)
+
+
+def test_changed_secondary_specification_invalidates_primary_selection(
+    lock_context, monkeypatch
+):
+    selection = locks.create_selection(_runs(lock_context, "development"))
+    assert selection["secondary_plan_sha256"] == locks.secondary_plan_sha256()
+    monkeypatch.setattr(locks, "secondary_plan_sha256", lambda: "0" * 64)
+    with pytest.raises(ValueError, match="differs"):
+        locks.validate_selection()

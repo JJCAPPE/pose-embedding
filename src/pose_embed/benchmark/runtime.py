@@ -112,7 +112,18 @@ def _verified_training_records(identity: dict, config: BenchmarkConfig):
     supplied_config = BenchmarkConfig.model_validate(
         yaml.safe_load(Path(paths["configuration"]).read_text())
     )
-    if supplied_config != config:
+    if "secondary" in identity:
+        from pose_embed.benchmark.config import load_benchmark
+        from pose_embed.benchmark.secondary import validate_run_binding
+
+        effective, _, _ = validate_run_binding(identity)
+        if (
+            supplied_config
+            != load_benchmark(identity["secondary"]["main_configuration_path"])
+            or effective != config
+        ):
+            raise ValueError("secondary source/effective configuration differs")
+    elif supplied_config != config:
         raise ValueError("run configuration file differs from its bound configuration")
     bundle = Path(paths["manifest_set"]).resolve()
     raw_root = os.environ.get("POSE_EMBED_ARTIFACT_ROOT")
@@ -306,6 +317,12 @@ def _verify_batches(
     from pose_embed.training.sampler import BalancedBatchSampler
 
     records = _verified_training_records(identity, config)
+    data_plan = None
+    if "secondary" in identity:
+        from pose_embed.benchmark.secondary import prepared_records, verify_data_plan
+
+        data_plan = verify_data_plan(directory, identity, records)
+        records = prepared_records(records, data_plan)
     sample_ids = [row.sample_id for row in records]
     batch = read_json(directory / "batch-plan.json")
     actions = sorted({row.ntu.action for row in records})
@@ -315,7 +332,11 @@ def _verify_batches(
             "batch identities or action mapping differ "
             "from the exact training partition"
         )
-    labels = [mapping[str(row.ntu.action)] for row in records]
+    labels = (
+        data_plan["labels"]
+        if data_plan is not None
+        else [mapping[str(row.ntu.action)] for row in records]
+    )
     expected = list(
         BalancedBatchSampler(
             labels,
@@ -770,10 +791,15 @@ def verify_run(directory: str | Path) -> dict:
     config = BenchmarkConfig.model_validate(identity.get("configuration", {}))
     if benchmark_digest(config) != identity.get("benchmark_sha256"):
         raise ValueError("benchmark configuration hash mismatch")
-    from pose_embed.benchmark.campaign import validate_run_binding
+    if "secondary" not in identity:
+        from pose_embed.benchmark.campaign import validate_run_binding
 
-    validate_run_binding(identity, config, directory)
+        validate_run_binding(identity, config, directory)
     method = load_methods().get(identity.get("method"))
+    if "secondary" in identity:
+        from pose_embed.benchmark.secondary import validate_run_binding
+
+        config, method, _ = validate_run_binding(identity)
     if (
         method is None
         or method.status != "implemented"
@@ -811,6 +837,8 @@ def verify_run(directory: str | Path) -> dict:
         required.add("development-result.json")
     if identity["method"] == "diva":
         required.update({"memory-plan.json", "memory-initialization.json"})
+    if "secondary" in identity:
+        required.add("secondary-data-plan.json")
     if not required.issubset(manifest.get("outputs", {})):
         raise ValueError("run is missing required evidence")
     for name, expected in manifest["outputs"].items():
@@ -843,6 +871,8 @@ def verify_run(directory: str | Path) -> dict:
         1, steps + 1
     ):
         raise ValueError("checkpoint selection differs from training history")
+    if "secondary" in identity and selected != steps:
+        raise ValueError("secondary checkpoint must be the fixed last inherited step")
     num_classes, num_records = _verify_batches(directory, identity, config)
     recipe = _verify_training_recipe(identity, config, num_records)
     from pose_embed.benchmark.training import phase_for_step
@@ -895,7 +925,11 @@ def verify_run(directory: str | Path) -> dict:
         ]
         if not eligible:
             raise ValueError("no development checkpoint completed the full warmup")
-        best = max(eligible, key=lambda row: row["validation"]["r_at_1"])
+        best = (
+            eligible[-1]
+            if "secondary" in identity
+            else max(eligible, key=lambda row: row["validation"]["r_at_1"])
+        )
         result = read_json(directory / "development-result.json")
         if (
             result.get("identity") != identity
