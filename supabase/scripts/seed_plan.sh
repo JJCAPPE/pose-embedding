@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
-plan_path="${1:-${repo_root}/plan/research-plan.v1.json}"
+plan_path="${1:-${repo_root}/plan/research-plan.v2.json}"
 import_path="${repo_root}/supabase/scripts/import_plan.sql"
 
 : "${POSE_EMBED_DB_URL:?Set POSE_EMBED_DB_URL to the target Postgres connection URL.}"

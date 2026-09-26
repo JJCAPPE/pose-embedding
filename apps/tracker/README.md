@@ -1,7 +1,7 @@
 # Pose Embed tracker
 
 The tracker is a public, static-first Next.js application. It always builds from
-`plan/research-plan.v1.json`; when Supabase is configured, public reads use the live
+`plan/research-plan.v2.json`; when Supabase is configured, public reads use the live
 database and fall back to that checked-in seed on failure.
 
 ## Local development

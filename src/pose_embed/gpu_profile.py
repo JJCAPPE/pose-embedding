@@ -3,30 +3,23 @@
 from __future__ import annotations
 
 import gc
-import inspect
-import json
 import os
-import re
 import shutil
 import socket
 import statistics
 import subprocess
-import sys
-import tomllib
 from datetime import UTC, datetime
-from functools import partial
 from pathlib import Path
 from typing import Any
 
 import torch
-import yaml
 from torch import nn
 
+from pose_embed.models.motionbert import load_frozen_encoder
 from pose_embed.protocol import verify_protocol
 from pose_embed.provenance import (
     capture_provenance,
     require_path_within,
-    sha256_file,
     write_immutable_json,
 )
 
@@ -119,111 +112,7 @@ def _profile_contract() -> dict[str, object]:
 
 
 def _load_frozen_encoder(data_root: Path) -> tuple[nn.Module, dict[str, object]]:
-    with _UPSTREAM_MANIFEST.open("rb") as stream:
-        upstream_document = tomllib.load(stream)
-    entries = {entry["name"]: entry for entry in upstream_document.get("upstream", [])}
-    motionbert = entries.get("MotionBERT")
-    if motionbert is None or motionbert.get("reference_only"):
-        raise ValueError("MotionBERT is not an approved inference upstream")
-
-    upstream_root = (
-        _REPOSITORY / upstream_document["cache_directory"] / "MotionBERT"
-    ).resolve()
-    commit_result = _command("git", "-C", str(upstream_root), "rev-parse", "HEAD")
-    if (
-        commit_result.get("returncode") != 0
-        or commit_result.get("stdout") != motionbert["commit"]
-    ):
-        raise ValueError("the pinned MotionBERT checkout is missing or changed")
-    status_result = _command(
-        "git",
-        "-C",
-        str(upstream_root),
-        "status",
-        "--short",
-        "--untracked-files=no",
-    )
-    if status_result.get("returncode") != 0 or status_result.get("stdout"):
-        raise ValueError("the pinned MotionBERT checkout has tracked changes")
-    for license_file in motionbert["license_files"]:
-        if not (upstream_root / license_file).is_file():
-            raise ValueError(f"MotionBERT license file is missing: {license_file}")
-
-    with _CHECKPOINT_MANIFEST.open(encoding="utf-8") as stream:
-        checkpoint_manifest = json.load(stream)
-    checkpoint_path = (data_root / checkpoint_manifest["filename"]).resolve()
-    if not checkpoint_path.is_file():
-        raise ValueError("the verified MotionBERT checkpoint is missing")
-    if checkpoint_path.stat().st_size != checkpoint_manifest["bytes"]:
-        raise ValueError("MotionBERT checkpoint byte size differs from its manifest")
-    if sha256_file(checkpoint_path) != checkpoint_manifest["sha256"]:
-        raise ValueError("MotionBERT checkpoint SHA-256 differs from its manifest")
-
-    config_path = upstream_root / "configs" / "pretrain" / "MB_pretrain.yaml"
-    config_match = re.search(
-        r"sha256:\s*([0-9a-f]{64})",
-        checkpoint_manifest["architecture_config_id"],
-    )
-    if config_match is None or sha256_file(config_path) != config_match.group(1):
-        raise ValueError("MotionBERT architecture config differs from its manifest")
-    with config_path.open(encoding="utf-8") as stream:
-        config = yaml.safe_load(stream)
-
-    sys.path.insert(0, str(upstream_root))
-    try:
-        from lib.model.DSTformer import DSTformer
-    finally:
-        sys.path.remove(str(upstream_root))
-    implementation_path = Path(inspect.getfile(DSTformer)).resolve()
-    expected_implementation_path = upstream_root / "lib" / "model" / "DSTformer.py"
-    if implementation_path != expected_implementation_path:
-        raise ValueError("MotionBERT imported from outside the pinned checkout")
-
-    encoder = DSTformer(
-        dim_in=_CHANNELS,
-        dim_out=3,
-        dim_feat=config["dim_feat"],
-        dim_rep=config["dim_rep"],
-        depth=config["depth"],
-        num_heads=config["num_heads"],
-        mlp_ratio=config["mlp_ratio"],
-        num_joints=config["num_joints"],
-        maxlen=config["maxlen"],
-        norm_layer=partial(nn.LayerNorm, eps=1e-6),
-        att_fuse=config["att_fuse"],
-    )
-    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
-    state_dict = checkpoint.get("model_pos")
-    if not isinstance(state_dict, dict):
-        raise ValueError("MotionBERT checkpoint has no model_pos state dictionary")
-    normalized: dict[str, torch.Tensor] = {}
-    for key, value in state_dict.items():
-        normalized_key = key.removeprefix("module.")
-        if normalized_key in normalized:
-            raise ValueError("MotionBERT checkpoint has duplicate normalized keys")
-        normalized[normalized_key] = value
-    encoder.load_state_dict(normalized, strict=True)
-    encoder.requires_grad_(False).eval()
-    if encoder.training or any(
-        parameter.requires_grad for parameter in encoder.parameters()
-    ):
-        raise RuntimeError(
-            "MotionBERT encoder did not remain frozen in evaluation mode"
-        )
-    return encoder, {
-        "upstream_root": str(upstream_root),
-        "upstream_commit": motionbert["commit"],
-        "implementation_path": str(implementation_path),
-        "implementation_sha256": sha256_file(implementation_path),
-        "config_path": str(config_path),
-        "config_sha256": sha256_file(config_path),
-        "checkpoint_path": str(checkpoint_path),
-        "checkpoint_bytes": checkpoint_path.stat().st_size,
-        "checkpoint_sha256": checkpoint_manifest["sha256"],
-        "state_dict_entries": len(normalized),
-        "parameter_count": sum(parameter.numel() for parameter in encoder.parameters()),
-        "trainable_parameter_count": 0,
-    }
+    return load_frozen_encoder(data_root)
 
 
 def _profile_batch(encoder: nn.Module, batch_size: int) -> dict[str, object]:

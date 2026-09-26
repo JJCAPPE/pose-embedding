@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from pose_embed.config import ProtocolConfig
 from pose_embed.data.manifest import ManifestRecord, build_manifest_records
@@ -104,6 +104,9 @@ class NTUAggregateInventory(BaseModel):
     missing_list_sha256: str
     nominal_capture_count: int
     expected_source_sample_count: int
+    annotations: list[dict[str, Any]] | None = Field(
+        default=None, exclude=True, repr=False
+    )
 
 
 SPLIT_MANIFEST_FILENAMES = (
@@ -187,6 +190,7 @@ def inspect_ntu_aggregate_sources(
     missing_sample_count: int,
     usable_annotation_count: int,
     nominal_capture_count: int,
+    retain_annotations: bool = False,
 ) -> NTUAggregateInventory:
     """Reinspect an aggregate from fields bound by a locked evaluation plan."""
     metadata = {
@@ -205,13 +209,17 @@ def inspect_ntu_aggregate_sources(
             "usable_annotation_count": usable_annotation_count,
         },
     }
-    return _inspect_ntu_aggregate_metadata(data_root, metadata, protocol)
+    return _inspect_ntu_aggregate_metadata(
+        data_root, metadata, protocol, retain_annotations=retain_annotations
+    )
 
 
 def _inspect_ntu_aggregate_metadata(
     data_root: str | Path,
     metadata: Mapping[str, Any],
     protocol: ProtocolConfig,
+    *,
+    retain_annotations: bool = False,
 ) -> NTUAggregateInventory:
     root = Path(data_root).resolve()
     aggregate_path = _resolve_below(root, metadata["filename"])
@@ -332,6 +340,7 @@ def _inspect_ntu_aggregate_metadata(
         missing_list_sha256=missing_metadata["sha256"],
         nominal_capture_count=nominal_count,
         expected_source_sample_count=protocol.dataset.expected_source_sample_count,
+        annotations=annotations if retain_annotations else None,
     )
 
 

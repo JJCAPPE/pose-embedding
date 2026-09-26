@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+#$ -cwd
+#$ -j y
+#$ -N pose_week3
+#$ -l h_rt=12:00:00
+#$ -pe omp 4
+#$ -l gpus=1
+#$ -l gpu_c=7.0
+#$ -l gpu_memory=16G
+#$ -l mem_per_core=8G
+#$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,POSE_EMBED_MANIFEST_SET
+
+# Submit only after the recorded Week 1 prerequisites are complete, including
+# the applicable BU determination. This job does not grant that authorization.
+# Create an external log directory and submit with:
+# qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/extract_motionbert_week3.qsub
+# Otherwise scheduler stdout dirties the checkout before its clean-code check.
+set -euo pipefail
+: "${POSE_EMBED_DATA_ROOT:?POSE_EMBED_DATA_ROOT must be set}"
+: "${POSE_EMBED_ARTIFACT_ROOT:?POSE_EMBED_ARTIFACT_ROOT must be set}"
+: "${POSE_EMBED_MANIFEST_SET:?POSE_EMBED_MANIFEST_SET must identify the adopted bundle}"
+: "${JOB_ID:?Submit this script through Grid Engine}"
+export OMP_NUM_THREADS="$NSLOTS"
+export MKL_NUM_THREADS="$NSLOTS"
+export OPENBLAS_NUM_THREADS="$NSLOTS"
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  printf 'A clean committed checkout is required.\n' >&2
+  exit 2
+fi
+.venv/bin/python scripts/verify_workspace.py
+.venv/bin/python scripts/fetch_upstreams.py --check --name MotionBERT
+.venv/bin/pose-embed protocol verify
+
+week3_timestamp=$(date -u +%Y%m%dT%H%M%SZ)
+week3_commit=$(git rev-parse --short=12 HEAD)
+week3_run="$POSE_EMBED_ARTIFACT_ROOT/evidence/week-03/${week3_timestamp}-${JOB_ID}-${week3_commit}"
+week3_bundle=$(dirname "$POSE_EMBED_MANIFEST_SET")
+mkdir -p "$week3_run"
+printf 'WEEK3_EVIDENCE=%s\n' "$week3_run"
+nvidia-smi
+
+.venv/bin/pose-embed data development-episode \
+  --manifest "$week3_bundle/development-validation.jsonl" \
+  --output-dir "$week3_run/development"
+.venv/bin/pose-embed features parity \
+  --manifest-set "$POSE_EMBED_MANIFEST_SET" \
+  --output "$week3_run/parity.json" --device cuda
+
+for week3_repeat in first second; do
+  .venv/bin/pose-embed features extract --backend motionbert \
+    --input "$POSE_EMBED_DATA_ROOT/ntu120_hrnet.pkl" \
+    --manifest-set "$POSE_EMBED_MANIFEST_SET" \
+    --manifest "$week3_bundle/final-train.jsonl" \
+    --parity-evidence "$week3_run/parity.json" \
+    --role training --split final_train --device cuda \
+    --output "$week3_run/final-train-${week3_repeat}.npz"
+done
+.venv/bin/pose-embed features verify-repeatability \
+  --first "$week3_run/final-train-first.npz" \
+  --second "$week3_run/final-train-second.npz" \
+  --manifest "$week3_bundle/final-train.jsonl" \
+  --output "$week3_run/repeatability.json"
+
+.venv/bin/pose-embed features extract --backend motionbert \
+  --input "$POSE_EMBED_DATA_ROOT/ntu120_hrnet.pkl" \
+  --manifest-set "$POSE_EMBED_MANIFEST_SET" \
+  --manifest "$week3_bundle/development-train.jsonl" \
+  --parity-evidence "$week3_run/parity.json" \
+  --role training --split development_train --device cuda \
+  --output "$week3_run/development-train.npz"
+for week3_partition in gallery queries; do
+  week3_role=gallery_clean
+  if [[ "$week3_partition" == queries ]]; then week3_role=query_clean; fi
+  .venv/bin/pose-embed features extract --backend motionbert \
+    --input "$POSE_EMBED_DATA_ROOT/ntu120_hrnet.pkl" \
+    --manifest-set "$POSE_EMBED_MANIFEST_SET" \
+    --manifest "$week3_run/development/development-${week3_partition}.jsonl" \
+    --development-episode "$week3_run/development/development-episode.json" \
+    --parity-evidence "$week3_run/parity.json" \
+    --role "$week3_role" --split development_validation --device cuda \
+    --output "$week3_run/development-${week3_partition}.npz"
+done
+printf 'WEEK3_EXTRACTION_COMPLETED=%s\n' "$week3_run"

@@ -18,17 +18,104 @@ from pose_embed.evaluation.metrics import evaluate_one_shot
 
 
 def test_one_shot_metrics_match_hand_calculated_ranks() -> None:
-    gallery = torch.eye(3)
-    gallery_labels = torch.tensor([10, 20, 30])
-    queries = torch.tensor([[1.0, 0.0, 0.0], [0.2, 1.0, 0.0], [0.0, 0.5, 1.0]])
-    query_labels = torch.tensor([10, 10, 20])
+    gallery = torch.eye(6)
+    gallery_labels = torch.tensor([10, 20, 30, 40, 50, 60])
+    queries = torch.tensor(
+        [[6.0, 5, 4, 3, 2, 1], [5.0, 6, 4, 3, 2, 1], [1.0, 6, 5, 4, 3, 2]]
+    )
+    query_labels = torch.tensor([10, 10, 10])
 
     result = evaluate_one_shot(gallery, gallery_labels, queries, query_labels)
 
     assert result.top1 == pytest.approx(1 / 3)
-    assert result.mrr == pytest.approx(2 / 3)
-    assert result.r_at_5 == 1.0
-    assert [row.rank for row in result.per_query] == [1, 2, 2]
+    assert result.mrr == pytest.approx(5 / 9)
+    assert result.r_at_5 == pytest.approx(2 / 3)
+    assert [row.rank for row in result.per_query] == [1, 2, 6]
+    assert [row.predicted_label for row in result.per_query] == [10, 20, 20]
+
+
+def test_cosine_ties_preserve_gallery_order_and_ignore_vector_scale() -> None:
+    result = evaluate_one_shot(
+        torch.tensor([[2.0, 0], [8.0, 0], [0.0, 1]]),
+        torch.tensor([20, 10, 30]),
+        torch.tensor([[3.0, 0], [0.0, 4]]),
+        torch.tensor([10, 30]),
+        query_ids=("tied-query", "independent-query"),
+    )
+
+    assert [row.rank for row in result.per_query] == [2, 1]
+    assert result.per_query[0].predicted_label == 20
+    assert result.per_query[0].sample_id == "tied-query"
+
+
+@pytest.mark.parametrize("side", ["gallery", "query"])
+def test_one_shot_rejects_zero_norm_embeddings(side: str) -> None:
+    gallery, queries = torch.eye(2), torch.eye(2)
+    (gallery if side == "gallery" else queries)[0].zero_()
+    with pytest.raises(ValueError, match="zero-norm"):
+        evaluate_one_shot(gallery, torch.arange(2), queries, torch.arange(2))
+
+
+@pytest.mark.parametrize("query_ids", [("one",), ("duplicate", "duplicate")])
+def test_one_shot_rejects_misaligned_or_duplicate_query_ids(
+    query_ids: tuple[str, ...],
+) -> None:
+    with pytest.raises(ValueError, match="query_ids"):
+        evaluate_one_shot(
+            torch.eye(2),
+            torch.arange(2),
+            torch.eye(2),
+            torch.arange(2),
+            query_ids=query_ids,
+        )
+
+
+def test_one_shot_rejects_missing_relevant_gallery_item() -> None:
+    with pytest.raises(ValueError, match="absent from the gallery"):
+        evaluate_one_shot(
+            torch.eye(2), torch.tensor([1, 2]), torch.ones(1, 2), torch.tensor([3])
+        )
+
+
+@pytest.mark.parametrize(
+    ("gallery", "gallery_labels", "queries", "query_labels", "message"),
+    [
+        (torch.empty(0, 2), torch.empty(0), torch.eye(2), torch.arange(2), "non-empty"),
+        (torch.eye(2), torch.arange(2), torch.empty(0, 2), torch.empty(0), "non-empty"),
+        (
+            torch.empty(2, 0),
+            torch.arange(2),
+            torch.empty(2, 0),
+            torch.arange(2),
+            "positive",
+        ),
+        (
+            torch.eye(2),
+            torch.arange(1),
+            torch.eye(2),
+            torch.arange(2),
+            "gallery_labels",
+        ),
+        (torch.eye(2), torch.arange(2), torch.eye(2), torch.arange(1), "query_labels"),
+        (
+            torch.eye(2),
+            torch.arange(2),
+            torch.ones(2, 3),
+            torch.arange(2),
+            "dimensions",
+        ),
+        (torch.ones(2), torch.arange(2), torch.eye(2), torch.arange(2), "rank-2"),
+    ],
+)
+def test_one_shot_rejects_empty_or_misaligned_inputs(
+    gallery: torch.Tensor,
+    gallery_labels: torch.Tensor,
+    queries: torch.Tensor,
+    query_labels: torch.Tensor,
+    message: str,
+) -> None:
+    with pytest.raises(ValueError, match=message):
+        evaluate_one_shot(gallery, gallery_labels, queries, query_labels)
 
 
 def test_one_shot_rejects_more_than_one_gallery_example_per_class() -> None:
@@ -42,10 +129,11 @@ def test_one_shot_rejects_more_than_one_gallery_example_per_class() -> None:
 
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
-def test_one_shot_rejects_nonfinite_embeddings(value: float) -> None:
+@pytest.mark.parametrize("side", ["gallery", "query"])
+def test_one_shot_rejects_nonfinite_embeddings(value: float, side: str) -> None:
     gallery = torch.eye(2)
     queries = torch.eye(2)
-    queries[0, 0] = value
+    (gallery if side == "gallery" else queries)[0, 0] = value
 
     with pytest.raises(ValueError, match="finite"):
         evaluate_one_shot(

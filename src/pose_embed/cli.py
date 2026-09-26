@@ -26,6 +26,9 @@ def _parser() -> argparse.ArgumentParser:
         description="Protocol-locked one-shot pose-retrieval experiments",
     )
     commands = parser.add_subparsers(dest="area", required=True)
+    from pose_embed.benchmark.cli import add_parser
+
+    add_parser(commands)
 
     profile = commands.add_parser("profile", help="profile compute prerequisites")
     profile_commands = profile.add_subparsers(dest="operation", required=True)
@@ -74,6 +77,12 @@ def _parser() -> argparse.ArgumentParser:
         default="data/manifests/ntu120-hrnet.v1.json",
     )
     data_generate.add_argument("--config", default=DEFAULT_PROTOCOL)
+    data_episode = data_commands.add_parser(
+        "development-episode", help="freeze the clean development gallery/query split"
+    )
+    data_episode.add_argument("--manifest", required=True)
+    data_episode.add_argument("--output-dir", required=True)
+    data_episode.add_argument("--config", default=DEFAULT_PROTOCOL)
 
     features = commands.add_parser("features", help="extract cached representations")
     feature_commands = features.add_subparsers(dest="operation", required=True)
@@ -101,7 +110,13 @@ def _parser() -> argparse.ArgumentParser:
         ],
         required=True,
     )
-    feature_extract.add_argument("--backend", choices=["fixture"], default="fixture")
+    feature_extract.add_argument(
+        "--backend", choices=["fixture", "motionbert"], default="fixture"
+    )
+    feature_extract.add_argument("--manifest-set")
+    feature_extract.add_argument("--parity-evidence")
+    feature_extract.add_argument("--development-episode")
+    feature_extract.add_argument("--device", default="cuda")
     feature_extract.add_argument("--embedding-dimension", type=int, default=32)
     feature_extract.add_argument("--seed", type=int, default=0)
     feature_extract.add_argument(
@@ -109,6 +124,21 @@ def _parser() -> argparse.ArgumentParser:
         choices=["coordinate_jitter", "joint_mask", "frame_mask"],
     )
     feature_extract.add_argument("--corruption-severity", type=float, default=0)
+    feature_parity = feature_commands.add_parser(
+        "parity", help="verify the pinned MotionBERT path on the fixed auxiliary panel"
+    )
+    feature_parity.add_argument("--protocol-config", default=DEFAULT_PROTOCOL)
+    feature_parity.add_argument("--manifest-set", required=True)
+    feature_parity.add_argument("--output", required=True)
+    feature_parity.add_argument("--device", default="cuda")
+    feature_repeat = feature_commands.add_parser(
+        "verify-repeatability", help="verify two complete auxiliary GPU extractions"
+    )
+    feature_repeat.add_argument("--first", required=True)
+    feature_repeat.add_argument("--second", required=True)
+    feature_repeat.add_argument("--manifest", required=True)
+    feature_repeat.add_argument("--output", required=True)
+    feature_repeat.add_argument("--protocol-config", default=DEFAULT_PROTOCOL)
     feature_apply_head = feature_commands.add_parser(
         "apply-head", help="apply a trained retrieval head to base features"
     )
@@ -186,6 +216,11 @@ def _print(payload: object) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        if args.area == "benchmark":
+            from pose_embed.benchmark.cli import run
+
+            _print(run(args))
+            return 0
         if args.area == "profile":
             _print(profile_motionbert_gpu(args.output))
             return 0
@@ -209,6 +244,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
         if args.area == "data":
             protocol, _ = verify_protocol(args.config)
+            if args.operation == "development-episode":
+                from pose_embed.data.development import generate_development_episode
+
+                _print(
+                    generate_development_episode(
+                        args.manifest, args.output_dir, args.config
+                    )
+                )
+                return 0
             if args.operation == "generate":
                 data_root = args.data_root or os.environ.get("POSE_EMBED_DATA_ROOT")
                 if not data_root:
@@ -237,7 +281,57 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             return 0
         if args.area == "features":
-            if args.operation == "extract":
+            if args.operation == "verify-repeatability":
+                from pose_embed.motionbert_reproducibility import verify_repeatability
+
+                _print(
+                    verify_repeatability(
+                        args.first,
+                        args.second,
+                        protocol_path=args.protocol_config,
+                        manifest_path=args.manifest,
+                        output_path=args.output,
+                    )
+                )
+            elif args.operation == "parity":
+                from pose_embed.motionbert_parity import run_motionbert_parity
+
+                _print(
+                    run_motionbert_parity(
+                        protocol_path=args.protocol_config,
+                        manifest_set_path=args.manifest_set,
+                        output_path=args.output,
+                        device=args.device,
+                    )
+                )
+            elif args.operation == "extract" and args.backend == "motionbert":
+                from pose_embed.motionbert_features import extract_motionbert_features
+
+                if not args.manifest_set or not args.parity_evidence:
+                    raise ValueError(
+                        "MotionBERT requires --manifest-set and --parity-evidence"
+                    )
+                if args.corruption_family is not None or args.corruption_severity != 0:
+                    raise ValueError("Week 3 MotionBERT extraction is clean-only")
+                if args.embedding_dimension != 32 or args.seed != 0:
+                    raise ValueError(
+                        "--embedding-dimension and --seed are fixture-only"
+                    )
+                _print(
+                    extract_motionbert_features(
+                        args.input,
+                        args.output,
+                        protocol_path=args.protocol_config,
+                        manifest_path=args.manifest,
+                        manifest_set_path=args.manifest_set,
+                        parity_evidence_path=args.parity_evidence,
+                        role=args.role,
+                        split=args.split,
+                        device=args.device,
+                        episode_path=args.development_episode,
+                    )
+                )
+            elif args.operation == "extract":
                 _print(
                     extract_fixture_features(
                         args.input,

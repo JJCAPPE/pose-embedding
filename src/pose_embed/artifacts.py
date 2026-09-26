@@ -15,8 +15,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from pose_embed.config import ExperimentConfig, ProtocolConfig
 from pose_embed.data.manifest import Split, load_manifest
-from pose_embed.protocol import protocol_digest
-from pose_embed.provenance import sha256_file
+from pose_embed.protocol import protocol_digest, resolve_scientific_paths
+from pose_embed.provenance import require_path_within, sha256_file
 
 FeatureRole = Literal["training", "gallery_clean", "query_clean", "query_corrupted"]
 FeatureBackend = Literal["fixture", "motionbert"]
@@ -270,6 +270,12 @@ def validate_feature_artifact(
     if not artifact.is_file():
         raise ValueError(f"feature artifact does not exist: {artifact}")
     sidecar = load_feature_sidecar(artifact)
+    if sidecar.backend == "motionbert":
+        artifact_root = resolve_scientific_paths(protocol).root
+        require_path_within(artifact, artifact_root, label="MotionBERT artifact")
+        require_path_within(
+            sidecar_path_for(artifact), artifact_root, label="MotionBERT sidecar"
+        )
     if sidecar.protocol_sha256 != protocol_digest(protocol):
         raise ValueError("feature protocol hash does not match the active protocol")
     if sidecar.preprocessing_sha256 != preprocessing_digest(protocol):
@@ -295,11 +301,10 @@ def validate_feature_artifact(
             raise ValueError("fixture implementation hash does not match the sidecar")
         if not allow_fixture:
             raise ValueError("feature cache is not approved for scientific use")
-    else:
-        raise ValueError(
-            "real MotionBERT feature validation is blocked until its adapter, "
-            "checkpoint, and upstream parity checks are implemented"
-        )
+    elif sidecar.method == "frozen_encoder_cache":
+        from pose_embed.motionbert_features import validate_motionbert_cache
+
+        validate_motionbert_cache(sidecar, protocol, manifest_path)
     artifact_array = _validate_archive(artifact, sidecar)
     if sidecar.head_checkpoint_sha256 is not None:
         provenance_inputs = sidecar.provenance.get("inputs")
@@ -347,6 +352,8 @@ def validate_feature_artifact(
         )
         if (
             base_sidecar.method not in {"fixture_projection", "frozen_encoder_cache"}
+            or base_sidecar.backend != sidecar.backend
+            or base_sidecar.scientific_use_allowed != sidecar.scientific_use_allowed
             or base_sidecar.encoder_checkpoint_sha256
             != sidecar.encoder_checkpoint_sha256
             or base_sidecar.upstream_sha256 != sidecar.upstream_sha256

@@ -788,6 +788,19 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/losses/pairwise.py",
         "src/pose_embed/models/__init__.py",
         "src/pose_embed/models/action_head.py",
+        "src/pose_embed/models/motionbert.py",
+        "src/pose_embed/data/motionbert.py",
+        "src/pose_embed/motionbert_inputs.py",
+        "src/pose_embed/motionbert_parity.py",
+        "src/pose_embed/motionbert_features.py",
+        "src/pose_embed/motionbert_reproducibility.py",
+        "src/pose_embed/benchmark/__init__.py",
+        "src/pose_embed/benchmark/cli.py",
+        "src/pose_embed/benchmark/config.py",
+        "src/pose_embed/benchmark/losses.py",
+        "src/pose_embed/benchmark/model.py",
+        "src/pose_embed/benchmark/runner.py",
+        "src/pose_embed/benchmark/runtime.py",
     ),
     "evaluation": (
         "src/pose_embed/evaluation/__init__.py",
@@ -800,6 +813,11 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/data/inventory.py",
         "src/pose_embed/data/manifest.py",
         "src/pose_embed/data/ntu.py",
+        "src/pose_embed/data/development.py",
+        "src/pose_embed/benchmark/episodes.py",
+        "src/pose_embed/benchmark/retrieval.py",
+        "src/pose_embed/benchmark/locks.py",
+        "src/pose_embed/benchmark/evaluation.py",
     ),
     "sampler": ("src/pose_embed/training/sampler.py",),
     "corruptions": (
@@ -809,6 +827,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
     "analysis": (
         "src/pose_embed/evaluation/analysis.py",
         "src/pose_embed/report.py",
+        "src/pose_embed/benchmark/analysis.py",
     ),
 }
 

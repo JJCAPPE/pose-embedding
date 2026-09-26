@@ -12,7 +12,7 @@ import {
 import { seedPlan } from "@/lib/seed";
 
 describe("weekly schedule", () => {
-  it("contains exactly 14 contiguous weekly records across the locked dates", () => {
+  it("contains exactly 14 contiguous weekly records across the provisional planning horizon", () => {
     expect(seedPlan.weeks).toHaveLength(14);
     expect(seedPlan.weeks[0].startDate).toBe("2026-09-15");
     expect(seedPlan.weeks[13].endDate).toBe("2026-12-18");
@@ -23,7 +23,7 @@ describe("weekly schedule", () => {
       expect((currentStart.getTime() - previousEnd.getTime()) / 86_400_000).toBe(1);
     }
     expect(seedPlan.sources.every((source) => source.version === 1)).toBe(true);
-    expect(seedPlan.weekSources.every((link) => link.version === 1)).toBe(true);
+    expect(seedPlan.weekSources.every((link) => link.version >= 1)).toBe(true);
   });
 
   it("uses New York calendar dates at week boundaries", () => {
@@ -71,11 +71,11 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(15);
-    expect(progress.completedRequiredTasks).toBe(8);
-    expect(progress.decidedRequiredGates).toBe(7);
+    expect(progress.percent).toBe(16);
+    expect(progress.completedRequiredTasks).toBe(9);
+    expect(progress.decidedRequiredGates).toBe(8);
     expect(progress.requiredTasks).toBeGreaterThan(50);
-    expect(progress.optionalTasks).toBe(2);
+    expect(progress.optionalTasks).toBe(0);
   });
 
   it("keeps Week 1 open for actual time and closeout after the confirmed BU decision", () => {
@@ -94,11 +94,20 @@ describe("readiness and progress rules", () => {
       state: "met",
       evidence: expect.stringContaining("researcher confirmation"),
       waiverReason: "",
-      decidedAt: "2026-09-24T22:13:07Z",
+      decidedAt: "2026-09-24T22:13:07+00:00",
     });
     expect(week.actualMinutes).toBe(0);
     expect(weekCanClose(week)).toBe(false);
     expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
+  });
+
+  it("keeps Week 3 open with only the fixture-tested metric gate met", () => {
+    const week = seedPlan.weeks[2];
+    expect(weekProgress(week)).toEqual({ required: 5, completed: 1, percent: 20 });
+    expect(week.gates.filter((gate) => gate.state === "met").map((gate) => gate.id))
+      .toEqual(["w03-gate-02"]);
+    expect(weekCanClose(week)).toBe(false);
+    expect(week.actualMinutes).toBe(0);
   });
 
   it("returns the newest completed tasks for the public dashboard", () => {

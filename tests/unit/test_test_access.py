@@ -15,6 +15,19 @@ from pose_embed.test_access import open_final_test_once
 from tests.scientific_fixtures import materialize_final_run_set, write_lock_bundle
 
 
+def test_legacy_test_opening_rejects_v2_opening_before_reading_novel_inputs(
+    protocol_path: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    protocol = load_protocol(protocol_path)
+    monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    ledger = tmp_path / "benchmark-v2/locks/test-opening.json"
+    ledger.parent.mkdir(parents=True)
+    ledger.write_text("{}")
+    with pytest.raises(ValueError, match="forbidden after benchmark v2 opening"):
+        open_final_test_once(protocol, protocol_sha256=protocol_digest(protocol))
+    assert not (tmp_path / "locks/test-opening.v1.json").exists()
+
+
 def test_test_opening_is_atomic_immutable_and_bound_to_lock_and_plan(
     protocol_path: Path,
     tmp_path: Path,

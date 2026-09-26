@@ -139,13 +139,21 @@ def _validate_identities(
 ) -> None:
     gallery_records = load_manifest(gallery_manifest_path)
     query_records = load_manifest(query_manifest_path)
-    verify_manifests([*gallery_records, *query_records], protocol)
+    verify_manifests(gallery_records, protocol)
+    verify_manifests(query_records, protocol)
     gallery_ids = {record.sample_id for record in gallery_records}
     query_ids = {record.sample_id for record in query_records}
     if gallery_ids & query_ids:
         raise ValueError("gallery and query sample identities must be disjoint")
     if mode == "development":
+        gallery_performances = {record.ntu.performance_id for record in gallery_records}
+        if any(
+            record.ntu.performance_id in gallery_performances
+            for record in query_records
+        ):
+            raise ValueError("development queries share a gallery performance")
         return
+    verify_manifests([*gallery_records, *query_records], protocol)
     novel_actions = set(protocol.dataset.novel_actions)
     anchor_counts = Counter(record.ntu.action for record in gallery_records)
     if set(anchor_counts) != novel_actions or set(anchor_counts.values()) != {1}:

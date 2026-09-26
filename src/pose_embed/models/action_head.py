@@ -15,6 +15,17 @@ class RepresentationEncoder(Protocol):
     def get_representation(self, poses: torch.Tensor) -> torch.Tensor: ...
 
 
+def pool_action_features(features: torch.Tensor) -> torch.Tensor:
+    """Pool MotionBERT `[N,M,T,J,C]` features to unnormalized `[N,J*C]`."""
+    if features.ndim != 5 or any(size == 0 for size in features.shape):
+        raise ValueError(
+            "features must be nonempty [batch, people, frames, joints, channels]"
+        )
+    batch, people = features.shape[:2]
+    pooled = features.permute(0, 1, 3, 4, 2).mean(dim=-1)
+    return pooled.reshape(batch, people, -1).mean(dim=1)
+
+
 class ActionHeadEmbed(nn.Module):
     """Pool `[N,M,T,J,C]` features and return normalized action embeddings.
 
@@ -45,14 +56,13 @@ class ActionHeadEmbed(nn.Module):
             raise ValueError(
                 "features must have shape [batch, people, frames, joints, channels]"
             )
-        batch, people, _, joints, channels = features.shape
+        _, _, _, joints, channels = features.shape
         if joints != self.joints or channels != self.representation_dimension:
             raise ValueError(
                 f"expected J={self.joints}, C={self.representation_dimension}; "
                 f"got J={joints}, C={channels}"
             )
-        pooled = self.dropout(features).permute(0, 1, 3, 4, 2).mean(dim=-1)
-        pooled = pooled.reshape(batch, people, -1).mean(dim=1)
+        pooled = pool_action_features(self.dropout(features))
         return functional.normalize(self.projection(pooled), dim=-1)
 
 

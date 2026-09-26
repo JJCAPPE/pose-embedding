@@ -153,10 +153,12 @@ def train_head(
             scientific_paths.root,
             label="scientific run output",
         )
-    if (
-        scientific_paths is not None
-        and scientific_paths.test_opening_ledger.exists()
-        and config.objective != "multi_similarity_with_miner"
+    if scientific_paths is not None and (
+        (scientific_paths.root / "benchmark-v2/locks/test-opening.json").exists()
+        or (
+            scientific_paths.test_opening_ledger.exists()
+            and config.objective != "multi_similarity_with_miner"
+        )
     ):
         raise ValueError("training is forbidden after the final-test opening")
     if config.objective == "multi_similarity_with_miner":

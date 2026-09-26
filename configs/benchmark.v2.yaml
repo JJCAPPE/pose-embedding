@@ -1,0 +1,48 @@
+schema_version: 2
+protocol_id: motion-retrieval-v2
+phase: development
+input_protocol: configs/protocol.v1.yaml
+input_protocol_sha256: c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f
+methods_sha256: b0542da0b315b1f0831d3c867264740e18080e62005728fb60ea6d1f6f1925dd
+priority_methods: [contrastive, contextual]
+final_methods:
+  - contrastive
+  - contextual
+  - triplet
+  - multi_similarity
+  - multi_similarity_miner
+  - proxy_anchor
+  - proxy_nca
+  - roadmap
+  - nt_xent
+  - fast_ap
+  - smooth_ap
+  - normalized_softmax
+  - proxy_nca_pp
+  - supcon
+  - drml
+  - diml
+  - diva
+  - ibc
+  - s2sd
+  - proxy_nca_metrix
+  - proxy_anchor_metrix
+  - multi_similarity_metrix
+  - hist
+  - mhgl
+  - proxy_anchor_avsl
+  - contextual_1536
+training:
+  seeds: [7, 17, 29, 43, 59, 71]
+  classes_per_batch: 8
+  samples_per_class: 4
+  embedding_dimension: 512
+  optimizer: adamw
+  encoder_mode: frozen
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  steps: 1000
+  validation_every: 100
+metrics:
+  recall_k: [1, 2, 4, 5, 8, 10, 16, 32, 100, 1000]
+selection_metric: r_at_1

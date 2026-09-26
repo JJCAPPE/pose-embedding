@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "protocol_id": "motion-retrieval-v2",
+  "status": "specified",
+  "primary_metric": "r_at_1",
+  "primary_comparison": {
+    "focal": "contextual",
+    "comparator": "contrastive"
+  },
+  "novel_actions": [
+    1,
+    7,
+    13,
+    19,
+    25,
+    31,
+    37,
+    43,
+    49,
+    55,
+    61,
+    67,
+    73,
+    79,
+    85,
+    91,
+    97,
+    103,
+    109,
+    115
+  ],
+  "seeds": [
+    7,
+    17,
+    29,
+    43,
+    59,
+    71
+  ],
+  "aggregation": "unweighted_mean_over_queries_then_equal_mean_over_seeds",
+  "bootstrap": {
+    "replicates": 20000,
+    "random_seed": 20260924,
+    "seed_sampling": "six_paired_training_seeds_with_replacement",
+    "query_sampling": "performance_clusters_with_replacement_within_each_fixed_action",
+    "cluster_fields": [
+      "setup",
+      "performer",
+      "repetition",
+      "action"
+    ],
+    "synchronized_views": "retained_together_with_original_query_weights",
+    "shared_resamples": "all_methods_seeds_and_dimension_groups",
+    "class_sampling": "none_fixed_twenty_actions",
+    "gallery_sampling": "none_fixed_eligible_gallery",
+    "query_denominator": "number_of_queries_in_sampled_clusters",
+    "quantile_method": "linear"
+  },
+  "confidence": 0.95,
+  "multiplicity": {
+    "method": "bonferroni",
+    "family_size": 24,
+    "claim_rule": "simultaneous_interval_lower_bound_strictly_greater_than_zero",
+    "raw_intervals": "descriptive_only"
+  },
+  "comparisons": [
+    {
+      "focal": "contextual",
+      "comparator": "contrastive",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "triplet",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "multi_similarity",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "multi_similarity_miner",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "proxy_anchor",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "proxy_nca",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "roadmap",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "nt_xent",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "fast_ap",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "smooth_ap",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "normalized_softmax",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "proxy_nca_pp",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "supcon",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "drml",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "diml",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "diva",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "ibc",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "s2sd",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "proxy_nca_metrix",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "proxy_anchor_metrix",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "multi_similarity_metrix",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "hist",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual",
+      "comparator": "mhgl",
+      "embedding_dimension": 512
+    },
+    {
+      "focal": "contextual_1536",
+      "comparator": "proxy_anchor_avsl",
+      "embedding_dimension": 1536
+    }
+  ],
+  "secondary_metrics": "means_sample_standard_deviation_and_each_seed_no_confirmatory_claims"
+}

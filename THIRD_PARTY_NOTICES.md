@@ -36,6 +36,23 @@ Paper: https://openaccess.thecvf.com/content/ICCV2023/html/Zhu_MotionBERT_A_Unif
 
 Upstream repository: https://github.com/Walter0807/MotionBERT
 
-No MotionBERT checkpoint or NTU RGB+D sample is redistributed here. Before any
-third-party source is copied or released, inspect and preserve its exact license
-and attribution terms.
+The deterministic preprocessing in `src/pose_embed/data/motionbert.py` also
+adapts `lib/data/dataset_action.py` and `lib/utils/utils_data.py` from the pinned
+MotionBERT commit `705d3a95354db8bdb696b3492e47a3b5537174ff`.
+Those upstream files contain no individual copyright header. The original
+Apache-2.0 license is retained in
+`third_party/licenses/MotionBERT-Apache-2.0.txt`. The local module documents its
+changes: deterministic sampling, confidence tracking and joint conversion,
+validation, and intermediate parity stages. The encoder is imported from the
+verified upstream checkout; no encoder source is copied.
+
+No MotionBERT checkpoint or NTU RGB+D sample is redistributed here.
+
+## EasyDict
+
+`easydict==1.13` is an installed runtime dependency needed to import the pinned
+MotionBERT preprocessing oracle. Its published distribution identifies
+LGPL-3.0 and includes its original `LICENSE`. EasyDict source is not copied or
+vendored into this repository.
+
+Upstream repository: https://github.com/makinacorpus/easydict
