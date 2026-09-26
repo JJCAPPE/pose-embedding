@@ -7,8 +7,9 @@ from pathlib import Path
 import pytest
 import torch
 
-from pose_embed.benchmark import locks
+from pose_embed.benchmark import campaign, locks
 from pose_embed.benchmark.config import benchmark_digest, load_benchmark, load_methods
+from pose_embed.benchmark.retrieval import method_retrieval_policy
 from pose_embed.benchmark.runtime import (
     artifact_root,
     code_digest,
@@ -54,6 +55,31 @@ def lock_context(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         return manifest
 
     monkeypatch.setattr(locks, "verify_run", verify_fixture)
+
+    # These legacy tests isolate single-candidate locks. The campaign suite
+    # exercises the full three-candidate wrapper without this fixture shortcut.
+    def select_fixture(run_dirs, config, methods, select_candidate):
+        content, timestamp = select_candidate(run_dirs, config, methods)
+        content["campaign_sha256"] = "fixture-campaign"
+        for chosen in content["methods"].values():
+            chosen.update(candidate="baseline", learning_rate_scale=1.0)
+        return content, timestamp
+
+    monkeypatch.setattr(campaign, "selection_content", select_fixture)
+    # The separate secondary matrix has complete-coverage tests of its own.
+    from pose_embed.benchmark import secondary
+
+    lock_dir = artifact_root() / "locks"
+    lock_dir.mkdir(parents=True)
+    for name in ("secondary-plan.json", "secondary-final.json"):
+        (lock_dir / name).write_text("{}")
+    monkeypatch.setattr(
+        secondary,
+        "validate_secondary_runs",
+        lambda **kwargs: {
+            "created_at": (datetime.now(UTC) - timedelta(hours=2)).isoformat()
+        },
+    )
     return config, methods
 
 
@@ -95,6 +121,10 @@ def _runs(lock_context, stage: str, *, selection=None) -> list[Path]:
                 else sha256_file(artifact_root() / "locks/selection.json"),
                 "inputs": shared_inputs,
             }
+            if stage == "final":
+                identity.update(
+                    candidate="baseline", campaign_sha256=selection["campaign_sha256"]
+                )
             write_immutable_json(
                 directory / "attempt.json",
                 {"identity": identity, "started_at": timestamp},
@@ -153,9 +183,9 @@ def _runs(lock_context, stage: str, *, selection=None) -> list[Path]:
                         "query_order_sha256": "c" * 64,
                         "gallery_order_sha256": "c" * 64,
                         "exclusion_sha256": "d" * 64,
-                        "policy": {
-                            "exclusion": "self_and_all_synchronized_performance_views"
-                        },
+                        "policy": method_retrieval_policy(
+                            method, methods[method].parameters
+                        ),
                     },
                 )
                 names.append("development-result.json")
@@ -190,6 +220,36 @@ def test_complete_selection_uses_six_seed_means_and_earliest_tie(lock_context) -
     assert selection["methods"]["contextual"]["selected_steps"] == 1
     assert selection["methods"]["contextual_1536"]["embedding_dimension"] == 1536
     assert locks.validate_selection() == selection
+
+
+def test_selection_pairs_different_head_recipes_and_excludes_warmup(lock_context):
+    directories = _runs(lock_context, "development")
+    for directory in directories:
+        manifest = read_json(directory / "run-manifest.json")
+        identity = manifest["identity"]
+        if identity["method"] not in {"proxy_nca_pp", "proxy_nca_metrix"}:
+            continue
+        _change_json(
+            directory,
+            "initialization.json",
+            lambda value, identity=identity: value.update(
+                head=digest(["maxpool-head", identity["seed"]])
+            ),
+        )
+        identity["training_recipe"] = {"minimum_selected_step": 2}
+        _change_json(
+            directory,
+            "development-result.json",
+            lambda value, identity=identity: value.update(identity=identity),
+        )
+        _change_json(
+            directory,
+            "run-manifest.json",
+            lambda value, identity=identity: value.update(identity=identity),
+        )
+    selection = locks.create_selection(directories)
+    assert selection["methods"]["proxy_nca_pp"]["selected_steps"] == 2
+    assert selection["methods"]["contextual"]["selected_steps"] == 1
     with pytest.raises(ValueError, match="overwrite"):
         locks.create_selection(directories)
 
@@ -340,3 +400,13 @@ def test_future_selection_timestamp_and_legacy_opening_are_rejected(
     write_immutable_json(legacy, {})
     with pytest.raises(ValueError, match="forbidden after test opening"):
         locks.create_selection(directories)
+
+
+def test_changed_secondary_specification_invalidates_primary_selection(
+    lock_context, monkeypatch
+):
+    selection = locks.create_selection(_runs(lock_context, "development"))
+    assert selection["secondary_plan_sha256"] == locks.secondary_plan_sha256()
+    monkeypatch.setattr(locks, "secondary_plan_sha256", lambda: "0" * 64)
+    with pytest.raises(ValueError, match="differs"):
+        locks.validate_selection()

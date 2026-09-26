@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-09-24T22:36:31Z",
+  "generatedAt": "2026-09-26T22:26:19Z",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -53,11 +53,11 @@
       },
       {
         "label": "Test seal",
-        "value": "All final method configurations, six paired seeds, selection decisions, training attempts and checkpoints must be complete and hash-bound before any novel-test evaluation. A partial two-method test opening is forbidden."
+        "value": "All 156 main and 276 secondary final method/seed runs, selection decisions, training attempts and checkpoints must be complete and hash-bound before any novel-test evaluation. A partial two-method opening is forbidden."
       },
       {
         "label": "Workload and calendar",
-        "value": "The 14 records through December 18 are a planning horizon, not a promised full-survey completion date. Measure human work, GPU time, memory and storage before committing dates; record any extension before novel-test opening."
+        "value": "The 14 records through December 18 are a planning horizon. Forecast all 1,176 completed training runs, evaluations, validation, immutable segments, failures and researcher work. The theoretical completed encoder-checkpoint floor alone is 599.27 GB before heads and segments; the full campaign exceeds the previously observed available project storage. Resolve storage and measured runtime before full launch, preserving artifacts and the novel-test seal."
       },
       {
         "label": "Governance",
@@ -79,7 +79,7 @@
       },
       {
         "label": "Fairness",
-        "value": "Pair six seeds, common backbone initialization, shared head initialization within each dimension group, data augmentation and physical P by K batch/sample plans. Loss-only methods share the same head. Architecture changes must be explicitly documented and paired wherever compatible."
+        "value": "Pair six seeds, common backbone initialization, shared head initialization within compatible head recipes and dimensions, applicable data augmentation, and physical P by K batch/sample plans. Architecture methods retain their required distinct heads and scorers, whose costs are reported. Equal embedding dimensions alone do not make head initialization compatible."
       },
       {
         "label": "Physical batches",
@@ -87,15 +87,15 @@
       },
       {
         "label": "Tuning",
-        "value": "Declare equal development-selection budgets and method-specific parameter spaces before comparisons. Record every trial and failure. The first two-method engineering pilot never receives extra undisclosed selection trials in the final benchmark."
+        "value": "Three predeclared candidates multiply every method-specific learning rate together by 1, 0.5 or 2, preserving rate ratios and all other settings. Six paired seeds per candidate yield 468 development runs. Mean development R@1 chooses candidate and eligible checkpoint; exact ties prefer 1, then 0.5, then 2, and the earliest eligible step. The provisional budget is 50,000 total updates including warmup. Disclose engineering pilots separately; they cannot select final recipes."
       },
       {
         "label": "Seed and final-run count",
-        "value": "Six paired seeds per declared configuration; 26 by 6 = 156 final runs before the test can open. Cross-dimension rankings are prohibited. Additional ablations have separate declared run counts."
+        "value": "Six paired seeds per declared main configuration: 26 by 6 = 156 main final runs. Separate predeclared studies add 276 secondary final runs; all 432 final runs must finish before novel opening. Including 468 main development and 276 secondary development runs, the plan contains 1,176 completed training runs before profiles and failures. Cross-dimension rankings are prohibited."
       },
       {
         "label": "Secondary tasks",
-        "value": "The official one-shot task, frozen-encoder pilot, corruption robustness and contextual ablations are supplementary analyses with separate labels and predeclared settings. One-shot mAP equals MRR; this equivalence does not hold for the new multi-positive primary task."
+        "value": "Official one-shot evaluates all 26 methods and six seeds. Query-only corruption evaluates Contextual and Contrastive under both official one-shot and the primary multi-positive task. A six-cell loss-component factorial and ten training robustness conditions (label noise, pose replacement and retained class fractions) require 276 development and 276 final runs, using fixed inherited recipes. The deduplicated secondary evaluation matrix has 660 cells. These are descriptive analyses; one-shot mAP equals MRR, while multi-positive mAP does not."
       }
     ],
     "corruptionPrinciple": "Retain v1 deterministic query-only corruption definitions as a secondary study. Do not spend the primary two-method phase on corruption experiments. Secondary runs require locked settings before novel outcomes are viewed.",

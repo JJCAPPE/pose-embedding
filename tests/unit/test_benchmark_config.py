@@ -29,7 +29,8 @@ def test_complete_suite_and_dimension_matched_rows() -> None:
     assert config.training.physical_batch_size == 32
     assert methods["contextual_1536"].embedding_dimension == 1536
     assert methods["proxy_anchor_avsl"].embedding_dimension == 1536
-    assert methods["proxy_nca_pp"].status == "blocked"
+    assert methods["proxy_nca_pp"].status == "implemented"
+    assert methods["proxy_nca_pp"].parameters["warmup_epochs"] == 5
 
 
 @pytest.mark.parametrize(
@@ -79,7 +80,8 @@ def test_registry_cannot_omit_or_duplicate_a_required_method() -> None:
 def test_blocked_method_requires_an_explanation() -> None:
     path = REPOSITORY_ROOT / "configs/benchmark-methods.v2.json"
     values = json.loads(path.read_text())
-    blocked = next(row for row in values["methods"] if row["status"] == "blocked")
+    blocked = values["methods"][-1]
+    blocked["status"] = "blocked"
     blocked["blocker"] = None
     with pytest.raises(ValidationError, match="require a blocker"):
         MethodRegistry.model_validate(values)

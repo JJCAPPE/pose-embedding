@@ -181,9 +181,10 @@ On SCC, from a clean committed checkout and the locked Linux environment:
 ```bash
 source ~/pose-embed-scc/environment.sh
 export POSE_EMBED_MANIFEST_SET="$POSE_EMBED_ARTIFACT_ROOT/manifests/ntu-input-v2-7721684/manifest-set.json"
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/verify_scc_setup.qsub
 qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/benchmark_v2.qsub \
   pilot configs/benchmark.v2.yaml 7
-qsub -l gpu_memory=40G -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
+qsub -l gpu_memory=80G -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
   scripts/benchmark_v2.qsub profile configs/benchmark.finetune.v2.yaml 7
 ```
 
@@ -192,9 +193,50 @@ steps per method, trains Contrastive then Contextual, and writes the paired
 development comparison. All attempts, failures, batches, initializations,
 checkpoints, selected metrics and timings are immutable under
 `$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2`. Logs and licensed data stay outside Git.
+Use a separate locked environment for each active release. Complete its setup
+verification first; it regenerates the adopted manifest bundle and compares
+every file without replacing the existing bundle.
 
-Complete the remaining method adaptations before the final selection campaign.
-`benchmark coverage` reports runnable and blocked identities explicitly.
+All 26 method adapters are implemented. `benchmark coverage` reports their
+identities explicitly; implementation does not establish GPU feasibility or
+retrieval performance. The physical fine-tuning batch failed on an L40S and
+passed on an A100 80 GB for the priority pair. Every other method still requires
+its own allocated-GPU profile.
+
+After the fine-tuned priority comparison succeeds, profile the complete roster:
+
+```bash
+qsub -hold_jid PRIORITY_JOB -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
+  scripts/benchmark_v2_profiles.qsub configs/benchmark.selection.v2.yaml 7 \
+  "$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2/pilots/PRIORITY_RUN/comparison.json"
+```
+
+Replace the two capitalized placeholders with the actual job and artifact
+directory. The wrapper verifies successful paired evidence as well as the job
+dependency. Each method runs three real optimizer steps and a fixed, bounded
+development retrieval profile. A failed profile remains recorded; other methods
+are still attempted. No profile is eligible for scientific selection.
+
+The [selection campaign](docs/protocol/selection-campaign-v2.md) declares three
+learning-rate candidates and six paired seeds for each method: **468 development
+runs**, followed by **156 selected final runs**. The provisional 50,000-update
+budget requires a complete time/storage forecast before launch. The
+[continuation protocol](docs/protocol/checkpoint-segments.md) supports immutable
+segments across scheduler allocations; `scripts/benchmark_v2_train.qsub` passes
+explicit training arguments with a ten-hour soft checkpoint boundary. Retain
+every segment and use the printed resume command for the next allocation.
+
+The [secondary studies](docs/protocol/secondary-studies-v2.md) add one-shot and
+query-corruption evaluation, loss-component ablations, training label noise,
+pose replacement and reduced training classes. They declare 276 development
+and 276 final training runs, with fixed inherited recipes. All **432 main and
+secondary final runs** must complete before novel-test opening.
+
+The [storage floor](docs/protocol/v2-resource-floor.md) exceeds the previously
+observed available SCC project space even before full auxiliary state and
+segments. Resolve storage and measured runtime before launching the complete
+campaign; the priority pair and bounded capacity profiles remain the next steps.
+
 Selection, final training and test-opening locks require the full 26 × 6 matrix,
 matched initialization/batches, verified inputs and the statistical analysis
 plan. Final evaluation uses all eligible held-out motions, excludes self and

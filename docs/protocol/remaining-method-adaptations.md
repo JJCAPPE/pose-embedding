@@ -1,9 +1,9 @@
-# Required remaining motion method adaptations
+# Motion method adaptations and validation requirements
 
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 14 implemented and 12 blocked**. A working priority pair is
+configurations: 26 implemented and 0 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -15,7 +15,7 @@ dimensions except the matched AVSL/Contextual 1536 comparison.
 
 ## Shared completion requirements
 
-For each blocked row, completion requires:
+Every row remains subject to these completion requirements:
 
 1. Record the exact paper variant, component equations, source revision,
    licenses and dependency audit. Any reused source must go through
@@ -50,10 +50,11 @@ representing those methods with an unrelated scalar loss under their names.
 
 ## Source and license inventory
 
-These are observed revision candidates, **not yet approved/pinned dependencies**.
-MIT entries require a component and transitive-source audit; a top-level MIT
-file does not establish the rights of every bundled dependency. No source was
-copied as part of this audit.
+These are the source revisions reviewed for the adapters. Exact adopted pins
+and reuse boundaries are recorded in `third_party/upstreams.toml` and each
+adapter document. A top-level MIT file does not establish rights to every
+bundled dependency. The minimal AVSL adaptation retains its MIT notice; all
+unlicensed repositories remain reference-only.
 
 | Required ID(s) | Official source candidate and observed revision | Observed reuse status |
 | --- | --- | --- |
@@ -69,6 +70,11 @@ copied as part of this audit.
 | `proxy_anchor_avsl` | [zbr17/AVSL](https://github.com/zbr17/AVSL/tree/fd2686e4f94a93da3c97c1b2067df9601f2803a0), `fd2686e4f94a93da3c97c1b2067df9601f2803a0` | [MIT](https://github.com/zbr17/AVSL/blob/fd2686e4f94a93da3c97c1b2067df9601f2803a0/LICENSE) |
 
 ## 1. ProxyNCA++ — first implementation priority
+
+The independent motion adapter is now callable and CPU-tested; see
+[its recipe and evidence boundary](proxy-nca-plus-motion.md). The requirements
+below remain its source audit record. Allocated-GPU validation and scientific
+runs remain outstanding.
 
 **Required recipe.** The six enhancements are all-proxy assignment probability,
 temperature scaling, class-balanced sampling, global max pooling, non-affine
@@ -102,7 +108,13 @@ retrieval scorer. This also supplies the base of `proxy_nca_metrix`.
 
 ## 2. DRML with Proxy Anchor
 
-**Required recipe.** The screenshot's DRML result is the Proxy Anchor variant.
+The independent DRML-PA motion adapter is callable and CPU-tested; see
+[its equation mapping and motion choices](drml-motion-adaptation.md).
+Allocated-GPU validation and scientific runs remain outstanding. The CUB/Cars
+image rows use DRML-PA, whereas the screenshot's SOP row uses DRML-MDW; this
+configuration explicitly selects the former.
+
+**Required recipe.** The screenshot's CUB/Cars DRML results use the Proxy Anchor variant.
 DRML learns four 128-dimensional individual branches, eight meta-relation
 branches, reconstruction-based assignment to individual branches, and a graph
 updater producing the concatenated 512-dimensional retrieval embedding.
@@ -156,6 +168,11 @@ multi-head training and deterministic motion augmentation/state handling.
 
 ## 5. IBC
 
+**Implementation status.** The independently implemented CUB-recipe motion
+adapter is callable as `ibc`; see [the source and adaptation record](ibc-motion-adaptation.md).
+Synthetic component and training-path checks cover both classification
+branches and the graph. Actual paired development/GPU profiling remains pending.
+
 **Required recipe.** The screenshot's 70.3/88.1/81.4 scores correspond to learned
 intra-batch message passing, cross-entropy on refined features, and auxiliary
 cross-entropy on the backbone embedding. Retrieval uses backbone embeddings.
@@ -171,6 +188,12 @@ batch composition. Dependency: a training-only contextual module and global
 class-ID classifier mapping; no new inference scorer for the main row.
 
 ## 6. S2SD with R-Margin
+
+**Implemented motion adapter.** Four MSDFA teachers, R-Margin sampling, delayed
+feature distillation, beta parameter groups and checkpointed sampling/optimizer
+state are implemented. See [the declared recipe](s2sd-motion-adaptation.md).
+Capacity profiles explicitly activate the delayed term; dataset feasibility
+and the complete development campaign remain required.
 
 **Required recipe.** The screenshot's 70.1/89.5/80.0 row is **R-Margin + S2SD**,
 not default Multi-Similarity + S2SD. The SOTA table uses MSDFA for CUB/Cars
@@ -219,6 +242,93 @@ branch's gradients. Keep synthesized representations in training only.
 Dependency: one shared feature-mixing mechanism plus three separately tested
 objectives, with the ProxyNCA++ row depending on section 1.
 
+### Metrix motion implementation record (2026-09-26)
+
+The independent implementation is `benchmark/metrix.py`, with fixtures in
+`tests/unit/test_metrix.py`. The reference source is now pinned through
+`third_party/upstreams.toml` and verified by `scripts/fetch_upstreams.py`:
+`billpsomas/metrix`, revision `b6797035fd82baf46ad89f8856721ae01afdf4f0`,
+MIT (copyright 2022 Bill Psomas). No source code was copied. The pinned release
+contains contrastive feature mixing, MS embedding mixing and baseline PA; its
+`main.py` does not implement the three requested feature variants. Its MS helper
+also combines clean and mixed contributions inside one logarithm, unlike the
+separate losses in paper Eq. 10. The local implementation follows Eqs. 7–10 and
+records these differences; it is not a numerical-parity claim against missing
+upstream paths.
+
+**Representation.** Section 4.1 and `net/feature_resnet.py` locate mixing after
+the final convolution and before pooling/projection. The motion analogue is
+`MotionBERT.get_representation`: the final `[people,time,joint,channel]` token
+grid before the retrieval head. Frames share the fixed input preprocessing grid,
+joints share anatomical indices and person slots retain their existing order;
+no outcome-driven temporal alignment or person reassignment is introduced.
+MS and PA use masked global average plus global maximum over person/time/joint,
+then a linear 512-dimensional projection and L2 normalization, preserving the
+paper's average-plus-max operation. ProxyNCA++ uses its declared masked global
+maximum, non-affine LayerNorm, linear projection and normalization. Both source
+maps contribute before these nonlinear operations; mixing normalized embeddings
+is rejected as a substitute.
+
+**Validity.** A source token is valid iff input confidence is positive. For
+`0 < lambda < 1`, a mixed token is eligible for pooling only where both source
+masks are valid. Exact endpoints use the selected source mask. An all-invalid
+example has zero pooled features, followed by the ordinary learned head. These
+are declared motion adaptations, not image-paper mask rules. Clean inference
+uses each original example's mask and never invokes mixing.
+
+**Pairs and targets.** A shared `Beta(2,2)` draw is used per update. Every ordered
+cross-class source pair is materialized once. For MS, each clean anchor receives
+either every positive-negative combination (excluding itself as the positive)
+or every anchor-negative pair, selected uniformly per update. The same mixed
+map may serve several anchors without recomputing its head. For PA, each clean proxy anchor receives exactly the source pairs whose left
+source belongs to its class, giving the paper's `U+(proxy) x U-(proxy)` set; the
+positive/negative weights are lambda and one minus lambda on that same set.
+Unrelated-class negative-negative mixtures are excluded from that proxy's mixed
+loss. For ProxyNCA++, every ordered cross-class source pair is a mixed anchor
+with soft positive proxy target `lambda*onehot(left) +
+(1-lambda)*onehot(right)`. Proxies remain clean learnable class representatives;
+they are not encoder feature maps. The ProxyNCA++ mixed-anchor construction is
+an explicit equation based extension where the released code does not supply a
+feature implementation; it is adopted as the motion recipe before any novel results.
+The paper provides no explicit feature-map realization for proxy-positive NCA;
+this extension cannot claim numerical identity with an unpublished image path. The PN/AN choice applies to MS; PA uses proxy-relative PN
+pairs, and ProxyNCA++ uses the declared mixed-anchor rule.
+
+**Objectives.** Total loss is clean loss plus `0.4 * mixed loss`. MS uses the
+paper's rounded scales 18 and 75 and margin/base 0.77; its clean loss uses the
+pinned release's MS miner epsilon 0.39. Mixed MS uses all declared pairs without
+additional mining. Positive and negative weights multiply exponentials before
+separate `log(1+sum(...))` reductions and before averaging over clean anchors.
+PA uses alpha 32 and margin 0.1; each eligible mixed sample contributes lambda
+to its proxy anchor's positive term and one minus lambda to its negative term.
+Positive reduction averages proxies present in the targets, while negative
+reduction averages all proxies. ProxyNCA++ uses temperature 1/9 and the full
+all-proxy denominator. Its mixed numerator is the weighted sum of positive
+proxy probabilities **inside** the negative logarithm; a convex combination of
+two cross-entropies is a different objective. Clean one-hot targets reduce to
+the independently implemented ProxyNCA++ objective, including zero embeddings.
+
+**Recipe and memory.** MS/PA retain the benchmark AdamW and step selection
+policy. ProxyNCA++ + Metrix resolves the complete declared ProxyNCA++ recipe,
+including fast proxies, Adam epsilon, warmup, clipping and optimizer transition;
+only mixup-specific fields are removed before base-recipe validation. The
+`head_recipe` identity groups MS/PA together and groups both ProxyNCA++ heads
+together. Pair feature maps are projected in checkpointed chunks of two by
+default. This changes temporary memory only: all pairs and one shared random
+draw are retained, and tests compare complete loss and gradients against an
+unchunked computation. There is one encoder forward per update. No claim of
+measured GPU feasibility is made by these CPU tests.
+
+**Integration boundary.** The three rows are callable through the feature runner,
+including method-specific heads, optimizer and checkpoint verification. The
+mixed-anchor ProxyNCA++ rule is an explicit motion adaptation, with the mixture
+inside the log probability; it is never represented as upstream code parity. CPU coverage includes hand-computed
+weighted objectives, all-proxy denominator, hard-pair mining, exhaustive pair
+counts, both MS modes, exact mixing endpoints, source masks, gradients to both
+source maps/backbone/head/proxies, chunk equivalence, frozen encoder behavior,
+training-only use, clean-only inference, and complete ProxyNCA++ recipe reuse.
+GPU profiling and development evidence remain separate pending gates.
+
 ## 10. HIST
 
 **Required recipe.** HIST treats batch samples as hypergraph nodes and
@@ -228,15 +338,20 @@ also exposes separate learning-rate controls for the hypergraph component.
 [Lim et al., paper landing page](https://openaccess.thecvf.com/content/CVPR2022/html/Lim_Hypergraph-Induced_Semantic_Tuplet_Loss_for_Deep_Metric_Learning_CVPR_2022_paper.html),
 [official README](https://github.com/ljin0429/HIST/blob/e7d650c80460f464c55bcdc2262d785923c50dc4/README.md).
 
-**Motion work/tests.** Complete the equation-level paper/supplement audit
-before coding: the full PDF was inaccessible through the browsing fetch
-during this audit. Resolve incidence weights, normalization, trainable class
-state and exact inference path. Independently implement the method or obtain
-reuse permission. Test tiny hypergraphs, degrees/normalization, batch
-permutations, class mappings and all optimizer groups. Dependency: hypergraph
-training module and source-equation verification. No verified adapter exists.
+**Motion adapter implemented.** The main PDF and supplement were retrieved on
+September 26. `benchmark/hist.py` independently implements the learned diagonal
+class distributions, semantic incidence and two-layer HGNN. The masked motion
+head, optimizer groups, preserved-moment warmup and step schedule are integrated
+with state validation. See [the declared recipe and checks](hist-motion-adaptation.md).
+GPU feasibility and scientific development runs remain required.
 
 ## 11. MHGL
+
+**Implemented motion adapter.** Actual depth-4 and depth-5 features feed separate
+second-order attention branches; named optimizer groups preserve the faster
+proxy learning rate. The negative exponent follows the printed equation, with
+its ambiguity explicitly recorded in [the motion recipe](mhgl-motion.md).
+GPU feasibility and scientific development evidence remain required.
 
 **Required recipe.** The method combines local and global feature levels,
 second-order attention, pooled/concatenated descriptors, and a hybrid
@@ -289,3 +404,31 @@ source/license audit, component tests, development run, GPU profile and exact
 adapter/configuration hashes. Record the unresolved decisions above as
 blockers until resolved. Do not claim paper replication, complete comparison,
 or superiority while required adapters or final evaluations remain missing.
+
+## DIML implementation checkpoint
+
+DIML uses the declared MS+miner motion variant, 4×4 time/anatomy local
+descriptors and top-100 global+optimal-transport reranking. The source table
+combines different baseline objectives across its three datasets; this
+variant is explicit in [the adaptation record](diml-motion-adaptation.md).
+Custom descriptors, scorer policy, exact CPU-float64 rank replay, storage
+and measured scoring/encoding time are separate from cosine retrieval.
+
+## AVSL implementation checkpoint
+
+AVSL now uses three actual MotionBERT depths, masked pooling/CAMs, persistent
+momentum relations, learned reliability and its hierarchical scorer. It has
+a separately documented CUB optimizer/warmup adaptation and exact licensed
+source component tests: [recipe and attribution](avsl-motion.md). Both online
+retrieval and replay use canonical CPU float64 scoring; its measured cost
+is included explicitly. No image-style cosine concatenation substitutes for AVSL.
+
+## DiVA implementation checkpoint
+
+The four published tasks, learned margin boundaries, gradient-reversal
+decorrelation and corrected-author DaNCE weighting have a declared motion
+adaptation. Training-only bootstrap, full momentum encoder/queue state and
+private RNG streams are checkpointed and verified against training identities.
+See [the recipe and source distinctions](diva-motion-adaptation.md). All 26
+method configurations now have callable adapters; this does not certify their
+GPU feasibility or complete the required motion comparison.

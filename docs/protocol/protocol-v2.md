@@ -1,7 +1,8 @@
 # Protocol v2: metric learning for human-motion retrieval
 
-Status: **researcher-directed scope revision; implementation and final lock are
-pending**. The machine-readable design and method identities are in
+Status: **all 26 method adapters implemented; allocated-GPU validation,
+selection, final training and final lock remain pending**. The machine-readable
+design and method identities are in
 `configs/benchmark.v2.yaml` and `configs/benchmark-methods.v2.json`. This document
 and `docs/decisions/0003-motion-retrieval-v2.md` supersede the v1 three-method
 robustness question. The original prospectus, v1 protocol, input amendments,
@@ -60,12 +61,34 @@ additional costs. Start from physical P=8, K=4 and measure a real backward pass
 for all methods before freezing a common batch per comparison group. Gradient
 accumulation does not create the neighborhood of a larger physical batch.
 
-Use six paired seeds. Pair backbone initialization, head initialization within
-each dimensionality group, training identities, physical batches and applicable
-augmentations. Auxiliary parameters use deterministic recorded initialization.
+Use six paired seeds. Pair backbone initialization, training identities,
+physical batches and applicable augmentations. Pair head initialization within
+each identical head recipe and dimensionality group. Architecture methods with
+different pooling, branches or parameter shapes have separate declared head
+recipes; equal dimensionality alone does not make their heads compatible.
+Auxiliary parameters use deterministic recorded initialization.
 Declare equal selection budgets and method-specific grids before comparing
 results. Checkpoint selection, stopping, ties and operational retry rules must
 be fixed on development data.
+
+The result-blind grid in `configs/benchmark-campaign.v2.json` uses three common
+multipliers (1, 0.5, 2) on each method's published learning-rate recipe, retaining
+all method-specific rate ratios and other parameters. The complete development
+matrix is 26 methods × 3 candidates × 6 seeds = **468 runs**. Select the candidate
+and eligible checkpoint by mean development R@1 across seeds; exact ties prefer
+the baseline multiplier, then half, then double, and the earliest eligible
+checkpoint within that candidate. Engineering pilots are disclosed separately
+and cannot select final recipes. This bounded grid does not claim globally
+optimal hyperparameters for every method. See
+[the campaign specification](selection-campaign-v2.md) for declaration, failed
+attempts, profiling and resource accounting.
+
+The provisional selection budget is 50,000 total updates, including warmup;
+validation occurs every 1,000 updates. Declare affordability only after actual
+backward and retrieval measurements. Training can continue across allocations
+using [immutable checkpoint segments](checkpoint-segments.md), preserving model,
+optimizer, method state, all random generators and the exact batch cursor.
+Partial segments cannot count as completed scientific runs.
 
 Preserve the verified usable NTU input inventory of 113,945 HRNet annotations
 plus 535 official missing-skeleton exclusions and all adopted source/checkpoint
@@ -101,7 +124,12 @@ these metrics.
 The official one-shot protocol, frozen-encoder pilot, corruption curves and
 contextual ablations are supplementary. Their settings and run matrices must be
 declared before novel outcomes are viewed. One-shot mAP equals MRR; multi-positive
-mAP does not. Report each task separately.
+mAP does not. Report each task separately. The finite executable matrices,
+training-only noise adaptations and separate lock sequence are specified in
+[the secondary study protocol](secondary-studies-v2.md) and
+`configs/benchmark-secondary.v2.json`. They add 276 development and 276 final
+training runs; all secondary final training must precede novel opening while
+the main comparison denominator remains 26 by 6.
 
 ## Estimand and claims
 
@@ -140,9 +168,10 @@ changed hashes or an unsealed statistical plan must fail closed.
 
 Use a new v2 artifact namespace under `POSE_EMBED_ARTIFACT_ROOT`. Never overwrite
 v1 locks, caches or results. Existing v1 commands and the historical 180-row
-robustness matrix do not certify v2. Until the complete v2 final validator and
-runner exist, final v2 evaluation remains unavailable. The development-only
-priority runner cannot accept novel classes or bypass this gate.
+robustness matrix do not certify v2. The implemented final validator keeps v2
+evaluation unavailable until every required lock and training record passes.
+The development-only priority runner cannot accept novel classes or bypass
+this gate.
 
 Archive attempts before execution and outcomes afterward. Retry documented
 operational failures only in a new directory with the same scientific settings;

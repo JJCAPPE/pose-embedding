@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+#$ -cwd
+#$ -j y
+#$ -N pose_v2_profiles
+#$ -l h_rt=12:00:00
+#$ -pe omp 4
+#$ -l gpus=1
+#$ -l gpu_c=7.0
+#$ -l gpu_memory=80G
+#$ -l mem_per_core=16G
+#$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,POSE_EMBED_MANIFEST_SET
+
+# qsub -hold_jid PRIORITY_JOB -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
+#   scripts/benchmark_v2_profiles.qsub configs/benchmark.selection.v2.yaml 7 \
+#   "$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2/pilots/PRIORITY_RUN/comparison.json"
+# A scheduler dependency alone does not establish that the priority pair passed.
+# The immutable comparison is verified before any broader GPU work begins.
+set -euo pipefail
+: "${JOB_ID:?Submit through Grid Engine; never run model work on a login node}"
+: "${NSLOTS:?Grid Engine must provide the allocated CPU count}"
+: "${POSE_EMBED_DATA_ROOT:?Licensed input root is required}"
+: "${POSE_EMBED_ARTIFACT_ROOT:?External artifact root is required}"
+: "${POSE_EMBED_MANIFEST_SET:?Adopted manifest bundle is required}"
+
+profile_config="${1:?Provide the campaign base configuration}"
+profile_seed="${2:?Provide one declared paired seed}"
+priority_comparison="${3:?Provide the completed fine-tuned priority comparison}"
+export OMP_NUM_THREADS="$NSLOTS" MKL_NUM_THREADS="$NSLOTS" OPENBLAS_NUM_THREADS="$NSLOTS"
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+if [[ ! -x .venv/bin/pose-embed || -n "$(git status --porcelain)" ]]; then
+  printf 'A clean committed checkout and its locked environment are required.\n' >&2
+  exit 2
+fi
+.venv/bin/python scripts/verify_workspace.py
+.venv/bin/python scripts/fetch_upstreams.py --check --name MotionBERT
+.venv/bin/pose-embed protocol verify
+
+profile_stamp=$(date -u +%Y%m%dT%H%M%SZ)
+profile_commit=$(git rev-parse --short=12 HEAD)
+profile_output="$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2/profiles/${profile_stamp}-${JOB_ID}-${profile_commit}"
+mkdir -p "$profile_output"
+printf 'PROFILE_EVIDENCE=%s\n' "$profile_output"
+.venv/bin/python - "$priority_comparison" "$profile_output/priority-evidence.json" <<'PY'
+import sys
+from pose_embed.benchmark.campaign import verify_priority_comparison
+from pose_embed.provenance import write_immutable_json
+write_immutable_json(sys.argv[2], verify_priority_comparison(sys.argv[1]))
+PY
+
+readarray -t profile_methods < <(.venv/bin/python - "$profile_config" "$profile_seed" <<'PY'
+import sys
+from pose_embed.benchmark.config import load_benchmark, load_methods
+config = load_benchmark(sys.argv[1])
+methods = load_methods()
+if config.training.encoder_mode != "finetune" or config.training.learning_rate_scale != 1.0:
+    raise SystemExit("Full-roster profiles require the unscaled fine-tuning base")
+if int(sys.argv[2]) not in config.training.seeds:
+    raise SystemExit("Seed is outside the six declared paired seeds")
+if any(methods[name].status != "implemented" for name in config.final_methods):
+    raise SystemExit("All declared adapters must be implemented")
+print("\n".join(config.final_methods))
+PY
+)
+if [[ ${#profile_methods[@]} -ne 26 ]]; then
+  printf 'The full declared roster of 26 methods is required.\n' >&2
+  exit 2
+fi
+nvidia-smi
+.venv/bin/pose-embed features parity --manifest-set "$POSE_EMBED_MANIFEST_SET" \
+  --output "$profile_output/parity.json" --device cuda
+
+profile_failures=0
+for profile_method in "${profile_methods[@]}"; do
+  if ! .venv/bin/pose-embed benchmark profile --config "$profile_config" \
+    --manifest-set "$POSE_EMBED_MANIFEST_SET" \
+    --parity-evidence "$profile_output/parity.json" \
+    --method "$profile_method" --seed "$profile_seed" --steps 3 --device cuda \
+    --output-dir "$profile_output/$profile_method"; then
+    profile_failures=$((profile_failures + 1))
+    printf 'PROFILE_FAILED=%s\n' "$profile_method" >&2
+  fi
+done
+printf 'PROFILE_FAILURE_COUNT=%s\n' "$profile_failures"
+if [[ "$profile_failures" -ne 0 ]]; then exit 1; fi
+printf 'PROFILE_COMPLETED=%s\n' "$profile_output"

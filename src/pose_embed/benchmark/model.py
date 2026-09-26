@@ -2,10 +2,107 @@
 
 from __future__ import annotations
 
+import copy
+
 import torch
+import torch.nn.functional as functional
 from torch import nn
 
-from pose_embed.models.action_head import ActionHeadEmbed
+from pose_embed.benchmark.avsl import AVSLHead
+from pose_embed.benchmark.avsl import motionbert_levels as avsl_levels
+from pose_embed.benchmark.diml import DIMLHead
+from pose_embed.benchmark.diva import DiVAHead
+from pose_embed.benchmark.drml import DRMLHead
+from pose_embed.benchmark.hist import HISTHead
+from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixMeanMaxHead
+from pose_embed.benchmark.mhgl import MHGLHead, motionbert_levels
+from pose_embed.models.action_head import ActionHeadEmbed, pool_action_features
+
+
+def head_recipe(method_id: str) -> str:
+    if method_id == "diml":
+        return "confidence_valid_mean_shared_time_anatomy_projection"
+    if method_id == "proxy_anchor_avsl":
+        return "motionbert_depth3_depth4_depth5_avsl_hierarchical"
+    if method_id == "diva":
+        return "diva_four_task_mean_pool_weighted_concatenation"
+    if method_id in {"multi_similarity_metrix", "proxy_anchor_metrix"}:
+        return "confidence_valid_token_mean_plus_max"
+    if method_id == "mhgl":
+        return "motionbert_depth4_depth5_soa_mean_plus_max_concat"
+    if method_id == "hist":
+        return "confidence_valid_token_mean_plus_max_project_nonaffine_ln"
+    if method_id == "drml":
+        return "drml_four_branch_directed_relations_mean_tokens"
+    return (
+        "confidence_valid_token_max_nonaffine_ln"
+        if method_id in {"proxy_nca_pp", "proxy_nca_metrix"}
+        else "motionbert_action_head"
+    )
+
+
+def supports_embedding_inference(method_id: str) -> bool:
+    from pose_embed.benchmark.config import load_methods
+    from pose_embed.benchmark.losses import supports
+
+    specification = load_methods().get(method_id)
+    return bool(
+        specification
+        and supports(method_id)
+        and (
+            specification.family == "embedding_loss"
+            or method_id
+            in {
+                "proxy_nca_pp",
+                "ibc",
+                "hist",
+                "drml",
+                "s2sd",
+                "mhgl",
+                "diml",
+                "diva",
+                "proxy_anchor_avsl",
+            }
+            or method_id in METRIX_METHODS
+        )
+    )
+
+
+class MaskedMaxHead(nn.Module):
+    """Max over valid person/time/joint tokens, LayerNorm, linear, unit length."""
+
+    requires_valid_mask = True
+
+    def __init__(self, embedding_dimension: int, representation_dimension: int):
+        super().__init__()
+        self.representation_dimension = representation_dimension
+        self.normalization = nn.LayerNorm(
+            representation_dimension, elementwise_affine=False
+        )
+        self.projection = nn.Linear(representation_dimension, embedding_dimension)
+
+    def forward(self, features: torch.Tensor, valid_mask: torch.Tensor) -> torch.Tensor:
+        return functional.normalize(self.forward_raw(features, valid_mask), dim=-1)
+
+    def forward_raw(
+        self, features: torch.Tensor, valid_mask: torch.Tensor
+    ) -> torch.Tensor:
+        if (
+            features.ndim != 5
+            or any(size == 0 for size in features.shape)
+            or features.shape[-1] != self.representation_dimension
+            or valid_mask.shape != features.shape[:-1]
+            or valid_mask.dtype != torch.bool
+            or valid_mask.device != features.device
+        ):
+            raise ValueError(
+                "max pooling requires aligned feature tokens and bool mask"
+            )
+        masked = features.masked_fill(~valid_mask.unsqueeze(-1), -torch.inf)
+        pooled = masked.amax(dim=(1, 2, 3))
+        has_valid = valid_mask.any(dim=(1, 2, 3)).unsqueeze(-1)
+        pooled = torch.where(has_valid, pooled, torch.zeros_like(pooled))
+        return self.projection(self.normalization(pooled))
 
 
 class MotionRetrievalModel(nn.Module):
@@ -17,28 +114,118 @@ class MotionRetrievalModel(nn.Module):
         train_encoder: bool = True,
         representation_dimension: int = 512,
         joints: int = 17,
+        method_id: str = "contrastive",
+        method_parameters: dict | None = None,
     ) -> None:
         super().__init__()
         self.encoder = encoder
-        self.train_encoder = train_encoder
-        self.encoder.requires_grad_(train_encoder)
+        self.method_id = method_id
+        self.head = (
+            DRMLHead(representation_dimension, embedding_dimension // 4)
+            if method_id == "drml"
+            else MaskedMaxHead(embedding_dimension, representation_dimension)
+            if method_id in {"proxy_nca_pp", "proxy_nca_metrix"}
+            else ActionHeadEmbed(
+                embedding_dimension=embedding_dimension,
+                representation_dimension=representation_dimension,
+                joints=joints,
+            )
+        )
+        if method_id in {"multi_similarity_metrix", "proxy_anchor_metrix"}:
+            self.head = MetrixMeanMaxHead(embedding_dimension, representation_dimension)
+        if method_id == "hist":
+            self.head = HISTHead(embedding_dimension, representation_dimension)
+        if method_id == "drml" and embedding_dimension % 4:
+            raise ValueError("DRML embedding dimension must be divisible by four")
+        if method_id == "mhgl":
+            self.head = MHGLHead(
+                local_dimension=encoder.dim_feat,
+                global_dimension=representation_dimension,
+                embedding_dimension=embedding_dimension,
+            )
+        if method_id == "diml":
+            self.head = DIMLHead(
+                embedding_dimension, representation_dimension, method_parameters
+            )
+        if method_id == "proxy_anchor_avsl":
+            self.head = AVSLHead(
+                encoder.dim_feat,
+                representation_dimension,
+                embedding_dimension,
+                method_parameters,
+            )
+        if method_id == "diva":
+            self.head = DiVAHead(embedding_dimension, representation_dimension, joints)
+            self.momentum_encoder = copy.deepcopy(self.encoder).requires_grad_(False)
+            self.momentum_projection = copy.deepcopy(
+                self.head.projections["sample"]
+            ).requires_grad_(False)
+            self.register_buffer("momentum_updates", torch.zeros((), dtype=torch.long))
+        self.set_encoder_trainable(train_encoder)
+
+    def set_encoder_trainable(self, enabled: bool) -> None:
+        self.train_encoder = enabled
+        self.encoder.requires_grad_(enabled)
         # get_representation bypasses the pretrained pose-regression output head.
         if hasattr(self.encoder, "head"):
             self.encoder.head.requires_grad_(False)
-        self.head = ActionHeadEmbed(
-            embedding_dimension=embedding_dimension,
-            representation_dimension=representation_dimension,
-            joints=joints,
-        )
-        self.train()
+        self.train(self.training)
 
     def train(self, mode: bool = True) -> MotionRetrievalModel:
         super().train(mode)
         if not self.train_encoder:
             self.encoder.eval()
+        if self.method_id == "diva":
+            self.momentum_encoder.eval()
+            self.momentum_projection.eval()
         return self
 
     def forward(self, poses: torch.Tensor) -> torch.Tensor:
+        return functional.normalize(self.forward_raw(poses), dim=-1)
+
+    def forward_raw(self, poses: torch.Tensor) -> torch.Tensor:
+        if self.method_id == "mhgl":
+            levels = motionbert_levels(
+                self.encoder, poses, train_encoder=self.train_encoder
+            )
+            return self.head.forward_raw(levels, poses[..., 2] > 0)
+        if self.method_id == "proxy_anchor_avsl":
+            raise ValueError(
+                "AVSL retrieval requires descriptors and hierarchical scoring"
+            )
+        represented = self.forward_features(poses)
+        if getattr(self.head, "requires_valid_mask", False):
+            if poses.shape[-1] != 3:
+                raise ValueError("confidence masking requires x, y, confidence inputs")
+            return self.head.forward_raw(represented, poses[..., 2] > 0)
+        return self.head.forward_raw(represented)
+
+    def project_features(
+        self, features: torch.Tensor, valid_mask: torch.Tensor | None = None
+    ) -> torch.Tensor:
+        """Apply the declared retrieval head to an already computed token grid."""
+        if self.method_id == "mhgl":
+            raise ValueError("MHGL requires both feature depths, not one token grid")
+        if self.method_id == "proxy_anchor_avsl":
+            raise ValueError("AVSL projection requires all three encoder levels")
+        if getattr(self.head, "requires_valid_mask", False):
+            if valid_mask is None:
+                raise ValueError("this retrieval head requires a valid token mask")
+            return self.head(features, valid_mask)
+        return self.head(features)
+
+    def retrieval_descriptors(self, poses: torch.Tensor) -> dict[str, torch.Tensor]:
+        if self.method_id == "diml":
+            return self.head.forward_descriptors(
+                self.forward_features(poses), poses[..., 2] > 0
+            )
+        if self.method_id == "proxy_anchor_avsl":
+            levels = avsl_levels(self.encoder, poses, train_encoder=self.train_encoder)
+            return self.head.forward_descriptors(levels, poses[..., 2] > 0)
+        return {"embeddings": self(poses)}
+
+    def forward_features(self, poses: torch.Tensor) -> torch.Tensor:
+        """Expose the same encoder token grid without an additional encoder pass."""
         if poses.ndim != 5 or any(size == 0 for size in poses.shape):
             raise ValueError(
                 "poses must be nonempty [batch,people,frames,joints,channels]"
@@ -50,4 +237,42 @@ class MotionRetrievalModel(nn.Module):
         else:
             with torch.no_grad():
                 represented = self.encoder.get_representation(flattened)
-        return self.head(represented.reshape(batch, people, frames, joints, -1))
+        return represented.reshape(batch, people, frames, joints, -1)
+
+    @torch.no_grad()
+    def momentum_embedding(self, poses: torch.Tensor) -> torch.Tensor:
+        if self.method_id != "diva":
+            raise ValueError("momentum embeddings require the DiVA model")
+        batch, people, frames, joints, channels = poses.shape
+        represented = self.momentum_encoder.get_representation(
+            poses.reshape(batch * people, frames, joints, channels)
+        ).reshape(batch, people, frames, joints, -1)
+        return functional.normalize(
+            self.momentum_projection(pool_action_features(represented)), dim=-1
+        )
+
+    @torch.no_grad()
+    def update_momentum(self, decay: float) -> None:
+        if self.method_id != "diva" or not self.training or not 0 <= decay < 1:
+            raise ValueError(
+                "DiVA EMA updates require a training model and valid decay"
+            )
+        if self.train_encoder:
+            for target, online in zip(
+                self.momentum_encoder.parameters(),
+                self.encoder.parameters(),
+                strict=True,
+            ):
+                if online.requires_grad:
+                    target.lerp_(online, 1 - decay)
+            for target, online in zip(
+                self.momentum_encoder.buffers(), self.encoder.buffers(), strict=True
+            ):
+                target.copy_(online)
+        for target, online in zip(
+            self.momentum_projection.parameters(),
+            self.head.projections["sample"].parameters(),
+            strict=True,
+        ):
+            target.lerp_(online, 1 - decay)
+        self.momentum_updates.add_(1)

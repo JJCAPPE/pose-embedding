@@ -172,3 +172,36 @@ def test_canonical_identity_required_and_camera_is_not_performance_identity() ->
     left = parse_ntu_sample_id(_record(1, 1)["sample_id"])
     mate = parse_ntu_sample_id(_record(1, 1, 2)["sample_id"])
     assert left.performance_id == mate.performance_id
+
+
+@pytest.mark.parametrize("failure", ["shape", "nan", "integer", "policy"])
+def test_custom_callback_must_supply_declared_finite_scores(failure):
+    from pose_embed.benchmark.retrieval import method_retrieval_policy
+
+    records = [_record(1, 1), _record(1, 2)]
+    observed = []
+
+    def callback(query_indices, gallery_indices, exclusions):
+        observed.append((query_indices, gallery_indices, exclusions))
+        if failure == "shape":
+            return np.zeros((2, 1))
+        if failure == "nan":
+            return np.full((2, 2), np.nan)
+        if failure == "integer":
+            return np.zeros((2, 2), dtype=int)
+        return np.zeros((2, 2))
+
+    policy = method_retrieval_policy("diml", {})
+    if failure == "policy":
+        policy["exclusion"] = "none"
+    with pytest.raises(ValueError, match="custom"):
+        evaluate_retrieval(
+            np.zeros((2, 2)),
+            np.zeros((2, 2)),
+            records,
+            records,
+            score_rows=callback,
+            scoring_policy=policy,
+        )
+    if failure != "policy":
+        assert observed == [([0, 1], [0, 1], [[0], [1]])]

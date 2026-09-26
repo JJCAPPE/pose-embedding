@@ -3,19 +3,29 @@
 from __future__ import annotations
 
 import copy
+import json
+import math
 import random
+import shlex
+import sys
 import time
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, Subset
 
 from pose_embed.benchmark.config import benchmark_digest, load_benchmark, load_methods
+from pose_embed.benchmark.descriptors import (
+    descriptor_summary,
+    encode_retrieval,
+    make_score_rows,
+)
 from pose_embed.benchmark.losses import build_loss, supports
-from pose_embed.benchmark.model import MotionRetrievalModel
-from pose_embed.benchmark.retrieval import evaluate_retrieval
+from pose_embed.benchmark.model import MotionRetrievalModel, head_recipe
+from pose_embed.benchmark.profiling import PROFILE_RETRIEVAL, measure_retrieval
+from pose_embed.benchmark.retrieval import evaluate_retrieval, method_retrieval_policy
 from pose_embed.benchmark.runtime import (
     REPOSITORY,
     artifact_path,
@@ -29,6 +39,26 @@ from pose_embed.benchmark.runtime import (
     save_checkpoint,
     state_digest,
     verify_run,
+)
+from pose_embed.benchmark.segments import (
+    StopAtBoundary,
+    begin_segment,
+    capture_rng,
+    load_continuation,
+    optimizer_layout,
+    restore_module,
+    restore_optimizer,
+    restore_rng,
+    seal_segment,
+    verify_chain,
+    verify_environment,
+)
+from pose_embed.benchmark.training import (
+    advance_optimizer,
+    build_optimizer,
+    phase_for_step,
+    resolve_recipe,
+    set_step_learning_rates,
 )
 from pose_embed.data.motionbert import preprocess_annotation
 from pose_embed.models.motionbert import (
@@ -72,34 +102,72 @@ class PoseDataset(Dataset):
 
 
 def encode(model, dataset, device, batch_size: int) -> np.ndarray:
-    was_training = model.training
-    model.eval()
-    chunks = []
-    try:
-        with torch.inference_mode():
-            for poses, _ in DataLoader(dataset, batch_size=batch_size, shuffle=False):
-                embedded = model(poses.to(device))
-                if not torch.isfinite(embedded).all():
-                    raise ValueError("model produced non-finite retrieval embeddings")
-                chunks.append(embedded.cpu().numpy())
-    finally:
-        model.train(was_training)
-    return np.concatenate(chunks)
+    return encode_retrieval(model, dataset, device, batch_size)["embeddings"]
 
 
-def optimizer_step(model, criterion, optimizer, poses, labels) -> float:
+def optimizer_step(
+    model, criterion, optimizer, poses, labels, gradient_clip_value=None
+) -> float:
     optimizer.zero_grad(set_to_none=True)
-    value = criterion(model(poses), labels)
+    if getattr(criterion, "requires_feature_training", False):
+        value = criterion.training_loss(model, poses, labels)
+    else:
+        embedded = (
+            model.forward_raw(poses)
+            if getattr(criterion, "requires_raw_embeddings", False)
+            else model(poses)
+        )
+        value = criterion(embedded, labels)
     if value.ndim != 0 or not torch.isfinite(value):
         raise ValueError("objective must produce a finite scalar")
     value.backward()
+    if hasattr(criterion, "after_backward"):
+        criterion.after_backward(model)
     parameters = [*model.parameters(), *criterion.parameters()]
     if any(p.grad is not None and not torch.isfinite(p.grad).all() for p in parameters):
         raise ValueError("training produced non-finite gradients")
+    if hasattr(criterion, "clip_gradients"):
+        criterion.clip_gradients(model)
+    if gradient_clip_value is not None:
+        torch.nn.utils.clip_grad_value_(model.parameters(), gradient_clip_value)
     optimizer.step()
     if any(not torch.isfinite(p).all() for p in parameters):
         raise ValueError("training produced non-finite parameters")
+    if hasattr(criterion, "after_optimizer_step"):
+        criterion.after_optimizer_step(model)
     return float(value.detach().cpu())
+
+
+def _cpu_snapshot(value):
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().clone()
+    if isinstance(value, dict):
+        return {key: _cpu_snapshot(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_cpu_snapshot(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_cpu_snapshot(item) for item in value)
+    return copy.deepcopy(value)
+
+
+def _checkpoint_state(model, criterion, optimizer, recipe, step, phase):
+    state = {
+        "model": _cpu_snapshot(model.state_dict()),
+        "criterion": _cpu_snapshot(criterion.state_dict()),
+    }
+    if optimizer is not None:
+        profiling = recipe["profile_phase"] is not None
+        state["optimizer"] = _cpu_snapshot(optimizer.state_dict())
+        state["training_state"] = {
+            "phase": phase,
+            "step": step,
+            "warmup_updates": 0 if profiling else min(step, recipe["warmup_steps"]),
+            "main_updates": step
+            if profiling
+            else max(0, step - recipe["warmup_steps"]),
+            "encoder_trainable": model.train_encoder,
+        }
+    return state
 
 
 def run_experiment(
@@ -114,10 +182,43 @@ def run_experiment(
     device: str = "cuda",
     stage: str = "development",
     profile_steps: int | None = None,
+    resume_from: str | Path | None = None,
+    segment_steps: int | None = None,
+    max_segment_seconds: float | None = None,
+    candidate: str | None = None,
+    secondary_cell: str | None = None,
 ) -> dict[str, Any]:
     """Run one declared method/seed. Profiling can never certify a final run."""
+    attempt_started = time.perf_counter()
     require_unopened()
+    segmented = any(
+        value is not None for value in (resume_from, segment_steps, max_segment_seconds)
+    )
+    if segmented and profile_steps is not None:
+        raise ValueError("capacity profiles cannot be segmented or resumed")
+    if segment_steps is not None and (
+        type(segment_steps) is not int or segment_steps < 1
+    ):
+        raise ValueError("segment_steps must be a positive integer")
+    if max_segment_seconds is not None and (
+        not math.isfinite(max_segment_seconds) or max_segment_seconds <= 0
+    ):
+        raise ValueError("max_segment_seconds must be positive and finite")
     config = load_benchmark(config_path)
+    base_config = config
+    campaign_binding = {}
+    if candidate is not None:
+        if secondary_cell is not None:
+            raise ValueError(
+                "secondary cells inherit selection and cannot choose a candidate"
+            )
+        if stage != "development" or profile_steps is not None:
+            raise ValueError(
+                "candidate is only explicit for scientific development runs"
+            )
+        from pose_embed.benchmark.campaign import training_binding
+
+        config, campaign_binding = training_binding(config, candidate, output_dir)
     track = track or config.training.encoder_mode
     if track != config.training.encoder_mode:
         raise ValueError(
@@ -138,12 +239,24 @@ def run_experiment(
         not 1 <= profile_steps <= 100 or stage != "development"
     ):
         raise ValueError("profiling requires 1–100 development steps")
-    if stage == "final":
+    if secondary_cell is not None and (
+        profile_steps is not None or track != "finetune"
+    ):
+        raise ValueError("secondary cells require scientific fine-tuning runs")
+    if stage == "final" and secondary_cell is None:
         from pose_embed.benchmark.locks import validate_selection
 
         selection = validate_selection(config_path=config_path)
         if method not in selection.get("methods", {}) or track != "finetune":
             raise ValueError("final method/track was not selected")
+        from pose_embed.benchmark.campaign import selected_config
+
+        config = selected_config(base_config, selection, method)
+        campaign_binding = {
+            "candidate": selection["methods"][method]["candidate"],
+            "campaign_sha256": selection["campaign_sha256"],
+            "campaign_base_config_path": selection["campaign_base_config_path"],
+        }
     configure_deterministic_inference()
     protocol_path = REPOSITORY / config.input_protocol
     inputs = load_motionbert_inputs(protocol_path, manifest_set_path)
@@ -155,12 +268,66 @@ def run_experiment(
     bindings = build_motionbert_bindings(inputs, assets)
     validate_parity_report(parity_evidence_path, bindings)
     spec = methods[method]
-    steps = profile_steps or (
-        selection["methods"][method]["selected_steps"]
-        if stage == "final"
-        else config.training.steps
+    secondary_binding = data_plan = None
+    if secondary_cell is not None:
+        from pose_embed.benchmark.secondary import (
+            resolve_training_cell,
+            validate_secondary_runs,
+        )
+
+        config, spec, cell, secondary_binding = resolve_training_cell(
+            secondary_cell, config_path=config_path, stage=stage, seed=seed
+        )
+        if spec.method_id != method:
+            raise ValueError("secondary cell method differs from requested method")
+        if stage == "final":
+            validate_secondary_runs(config_path=config_path, stage="development")
+    steps = (
+        cell["selected_steps"]
+        if secondary_cell is not None
+        else profile_steps
+        or (
+            selection["methods"][method]["selected_steps"]
+            if stage == "final"
+            else config.training.steps
+        )
     )
+    train_rows = inputs.manifests[
+        "final-train.jsonl" if stage == "final" else "development-train.jsonl"
+    ]
+    if secondary_cell is not None:
+        from pose_embed.benchmark.secondary import prepared_records, training_data_plan
+
+        data_plan = training_data_plan(train_rows, stage=stage, seed=seed, cell=cell)
+        secondary_binding["data_plan_sha256"] = digest(data_plan)
+        train_rows = prepared_records(train_rows, data_plan)
+    selection_num_records = (
+        len(inputs.manifests["final-train.jsonl"])
+        if method in {"proxy_nca_pp", "proxy_nca_metrix", "hist", "proxy_anchor_avsl"}
+        and stage == "development"
+        else len(train_rows)
+    )
+    recipe = resolve_recipe(
+        method,
+        spec.parameters,
+        config.training,
+        len(train_rows),
+        selection_num_records=selection_num_records,
+        profile=profile_steps is not None,
+    )
+    if profile_steps is None and steps < recipe["minimum_selected_step"]:
+        raise ValueError(
+            "scientific step budget must exceed the complete declared warmup "
+            "for both development and final training; use a declared longer budget"
+        )
+    effective_path = artifact_path(output_dir) / "effective-configuration.json"
     identity = {
+        **campaign_binding,
+        **(
+            {"profile_retrieval": PROFILE_RETRIEVAL}
+            if profile_steps is not None
+            else {}
+        ),
         "benchmark_sha256": benchmark_digest(config),
         "configuration": config.model_dump(mode="json"),
         "method": method,
@@ -175,22 +342,65 @@ def run_experiment(
             "manifest_set": str(Path(manifest_set_path).resolve()),
             "parity_evidence": str(Path(parity_evidence_path).resolve()),
             "protocol": str(protocol_path.resolve()),
-            "configuration": str(Path(config_path).resolve()),
+            "configuration": str(
+                effective_path if campaign_binding else Path(config_path).resolve()
+            ),
         },
         "parity_sha256": sha256_file(parity_evidence_path),
         "selection_sha256": sha256_file(artifact_root() / "locks/selection.json")
-        if stage == "final"
+        if stage == "final" or secondary_cell is not None
         else None,
-        "optimizer": "AdamW",
+        "optimizer": recipe["optimizer"],
+        "training_recipe": recipe,
+        "head_recipe": head_recipe(method),
         "precision": "float32",
         "scientific_use_allowed": profile_steps is None,
     }
+    if secondary_binding is not None:
+        identity["secondary"] = secondary_binding
     destination = artifact_path(output_dir)
-    destination.mkdir(parents=True, exist_ok=False)
-    write_immutable_json(
-        destination / "attempt.json", {"identity": identity, "started_at": now()}
-    )
+    parent = None
+    continuation = None
+    prior_best = None
+    segment = None
+    stop = StopAtBoundary()
+    if resume_from is None:
+        destination.mkdir(parents=True, exist_ok=False)
+        if campaign_binding:
+            write_immutable_json(effective_path, config.model_dump(mode="json"))
+        write_immutable_json(
+            destination / "attempt.json", {"identity": identity, "started_at": now()}
+        )
+    else:
+        if campaign_binding and read_json(effective_path) != config.model_dump(
+            mode="json"
+        ):
+            raise ValueError(
+                "resume effective configuration differs from the selected candidate"
+            )
+        if read_json(destination / "attempt.json").get("identity") != identity:
+            raise ValueError(
+                "resume requires the identical code, inputs and experiment identity"
+            )
+        parent = verify_chain(destination, resume_from, identity)
+        verify_environment(
+            parent["manifest"]["telemetry"]["environment"],
+            inference_environment(device)
+            | {"batch_size": config.training.physical_batch_size},
+        )
+        continuation, prior_best = load_continuation(destination, parent, identity)
+    if segmented:
+        segment = begin_segment(destination, identity, parent)
+        stop.__enter__()
     try:
+        if data_plan is not None:
+            data_plan_path = destination / "secondary-data-plan.json"
+            if continuation is None:
+                write_immutable_json(data_plan_path, data_plan)
+            elif read_json(data_plan_path) != data_plan:
+                raise ValueError(
+                    "continuation secondary data plan differs from the original"
+                )
         random.seed(seed)
         np.random.seed(seed)
         torch.manual_seed(seed)
@@ -199,32 +409,36 @@ def run_experiment(
             encoder,
             embedding_dimension=spec.embedding_dimension,
             train_encoder=track == "finetune",
+            method_id=method,
+            method_parameters=spec.parameters,
         ).to(device)
-        train_rows = inputs.manifests[
-            "final-train.jsonl" if stage == "final" else "development-train.jsonl"
-        ]
         annotations = {a["frame_dir"]: a for a in inputs.annotations}
         dataset = PoseDataset(train_rows, annotations, inputs.protocol)
+        if data_plan is not None:
+            from pose_embed.benchmark.secondary import bind_dataset
+
+            bind_dataset(dataset, data_plan)
         criterion = build_loss(
             method,
             spec.parameters | {"embedding_dimension": spec.embedding_dimension},
             len(set(dataset.labels)),
         ).to(device)
-        trainable = [
-            p for p in [*model.parameters(), *criterion.parameters()] if p.requires_grad
-        ]
-        optimizer = torch.optim.AdamW(
-            trainable,
-            lr=config.training.learning_rate,
-            weight_decay=config.training.weight_decay,
-        )
+        if method == "s2sd":
+            criterion.completed_steps.fill_(recipe["profile_counter_offset"])
+        phase = phase_for_step(recipe, 1)
+        optimizer = build_optimizer(model, criterion, recipe, phase)
         initial = {
             "model": state_digest(model),
             "encoder": state_digest(model.encoder),
             "head": state_digest(model.head),
             "criterion": state_digest(criterion),
         }
-        write_immutable_json(destination / "initialization.json", initial)
+        if continuation is None:
+            write_immutable_json(destination / "initialization.json", initial)
+        elif read_json(destination / "initialization.json") != initial:
+            raise ValueError(
+                "continuation fresh initialization differs from the original"
+            )
         # A proxy's random initialization must not shift the shared model RNG stream.
         torch.manual_seed(seed)
         batches = list(
@@ -236,34 +450,146 @@ def run_experiment(
                 batches_per_epoch=steps,
             )
         )
-        write_immutable_json(
-            destination / "batch-plan.json",
-            {
-                "sample_ids": [r.sample_id for r in train_rows],
-                "label_mapping": dataset.label_mapping,
-                "steps": batches,
+        batch_plan = {
+            "sample_ids": [r.sample_id for r in train_rows],
+            "label_mapping": {
+                str(key): value for key, value in dataset.label_mapping.items()
             },
-        )
+            "steps": batches,
+        }
+        if continuation is None:
+            write_immutable_json(destination / "batch-plan.json", batch_plan)
+        elif digest(read_json(destination / "batch-plan.json")) != digest(batch_plan):
+            raise ValueError(
+                "continuation batch plan differs from the original experiment"
+            )
+        memory_bootstrap_seconds = 0.0
+        memory_bootstrap_peak_allocated_bytes = 0
+        if method == "diva" and continuation is None:
+            criterion.configure_training(train_rows, dataset.labels, stage)
+            memory_batches = list(
+                BalancedBatchSampler(
+                    dataset.labels,
+                    classes_per_batch=config.training.classes_per_batch,
+                    samples_per_class=config.training.samples_per_class,
+                    seed=seed,
+                    batches_per_epoch=recipe["queue_batches"],
+                )
+            )
+            write_immutable_json(
+                destination / "memory-plan.json",
+                {
+                    "schema_version": 1,
+                    "policy": recipe["memory_bootstrap"],
+                    "partition": "final_train"
+                    if stage == "final"
+                    else "development_train",
+                    "batch_plan_sha256": sha256_file(destination / "batch-plan.json"),
+                    "steps": memory_batches,
+                },
+            )
+            memory_started = time.perf_counter()
+            for indices, (poses, _) in zip(
+                memory_batches,
+                DataLoader(
+                    dataset,
+                    batch_sampler=memory_batches,
+                    generator=torch.Generator().manual_seed(seed),
+                ),
+                strict=True,
+            ):
+                criterion.bootstrap(model, poses.to(device), indices)
+            if torch.device(device).type == "cuda":
+                torch.cuda.synchronize(device)
+            memory_bootstrap_seconds = time.perf_counter() - memory_started
+            memory_bootstrap_peak_allocated_bytes = (
+                torch.cuda.max_memory_allocated(device)
+                if torch.device(device).type == "cuda"
+                else 0
+            )
+            write_immutable_json(
+                destination / "memory-initialization.json",
+                {
+                    "criterion_sha256": state_digest(criterion),
+                    "memory_plan_sha256": sha256_file(destination / "memory-plan.json"),
+                    "completed_steps": 0,
+                    "queue_count": criterion.config.queue_size,
+                    "momentum_updates": 0,
+                },
+            )
         validation_rows = inputs.manifests["development-validation.jsonl"]
         validation = PoseDataset(validation_rows, annotations, inputs.protocol)
         batch_size = (
             config.training.classes_per_batch * config.training.samples_per_class
         )
-        loader = DataLoader(dataset, batch_sampler=batches)
+        completed_steps = continuation["step"] if continuation else 0
+        loader = iter(DataLoader(dataset, batch_sampler=batches[completed_steps:]))
         best_score = -1.0
         best_state = None
         best_result = None
         selected_step = steps
-        history = []
+        history = list(parent["rows"]) if parent else []
+        if continuation:
+            restore_module(model, continuation["model"])
+            restore_module(criterion, continuation["criterion"])
+            if hasattr(criterion, "configure_training"):
+                criterion.configure_training(train_rows, dataset.labels, stage)
+            if method == "diva":
+                memory_bootstrap_seconds = continuation["bootstrap_telemetry"][
+                    "seconds"
+                ]
+                memory_bootstrap_peak_allocated_bytes = continuation[
+                    "bootstrap_telemetry"
+                ]["peak_allocated_bytes"]
+            phase = phase_for_step(recipe, completed_steps)
+            optimizer = build_optimizer(model, criterion, recipe, phase)
+            set_step_learning_rates(optimizer, recipe, completed_steps)
+            restore_optimizer(
+                model,
+                criterion,
+                optimizer,
+                continuation["optimizer"],
+                continuation["optimizer_layout"],
+            )
+            if hasattr(criterion, "validate_checkpoint_state"):
+                criterion.validate_checkpoint_state(
+                    continuation["criterion"], completed_steps
+                )
+            if prior_best:
+                best_state = {
+                    key: value
+                    for key, value in prior_best.items()
+                    if key not in {"identity", "selected_step", "result"}
+                }
+                selected_step = prior_best["selected_step"]
+                best_result = prior_best["result"]
+                best_score = parent["manifest"]["best"]["score"]
+            # DataLoader iterator creation consumes a Torch base seed. Restore after it.
+            restore_rng(continuation["rng"])
+            del continuation, prior_best
         if torch.device(device).type == "cuda":
             torch.cuda.reset_peak_memory_stats(device)
         started = time.perf_counter()
         model.train()
         criterion.train()
-        for step, (poses, labels) in enumerate(loader, start=1):
+        for step, (poses, labels) in enumerate(loader, start=completed_steps + 1):
+            requested_phase = phase_for_step(recipe, step)
+            if requested_phase != phase:
+                phase = requested_phase
+                optimizer = advance_optimizer(
+                    model, criterion, optimizer, recipe, phase
+                )
+            set_step_learning_rates(optimizer, recipe, step)
             step_started = time.perf_counter()
+            if hasattr(criterion, "set_training_batch"):
+                criterion.set_training_batch(batches[step - 1])
             value = optimizer_step(
-                model, criterion, optimizer, poses.to(device), labels.to(device)
+                model,
+                criterion,
+                optimizer,
+                poses.to(device),
+                labels.to(device),
+                recipe.get("model_gradient_clip_value"),
             )
             if torch.device(device).type == "cuda":
                 torch.cuda.synchronize(device)
@@ -271,43 +597,225 @@ def run_experiment(
                 "step": step,
                 "loss": value,
                 "seconds": time.perf_counter() - step_started,
+                "phase": phase,
+                "encoder_gradient_parameters": sum(
+                    p.grad is not None for p in model.encoder.parameters()
+                ),
             }
+            if method == "drml":
+                row["drml_assignment_counts"] = list(criterion.assignment_counts)
             if (
                 stage == "development"
                 and profile_steps is None
                 and (step % config.training.validation_every == 0 or step == steps)
             ):
-                embedded = encode(model, validation, device, batch_size)
+                encoding_started = time.perf_counter()
+                descriptors = encode_retrieval(model, validation, device, batch_size)
+                encoding_seconds = time.perf_counter() - encoding_started
+                scoring_started = time.perf_counter()
+                embedded = descriptors["embeddings"]
                 result = evaluate_retrieval(
                     embedded,
                     embedded,
                     validation_rows,
                     validation_rows,
                     recall_k=config.metrics.recall_k,
+                    score_rows=make_score_rows(model, descriptors, descriptors),
+                    scoring_policy=method_retrieval_policy(method, spec.parameters),
                 )
                 row["validation"] = result["metrics"]
+                row["descriptor_storage"] = descriptor_summary(descriptors)
+                row["retrieval_timing"] = {
+                    "encoding_seconds": encoding_seconds,
+                    "scoring_seconds": time.perf_counter() - scoring_started,
+                }
                 score = result["metrics"][config.selection_metric]
-                if score > best_score:
+                if step >= recipe["minimum_selected_step"] and (
+                    (secondary_cell is not None and step == steps)
+                    or (secondary_cell is None and score > best_score)
+                ):
                     best_score = score
                     selected_step = step
                     best_result = result
-                    best_state = {
-                        "model": {
-                            k: v.detach().cpu().clone()
-                            for k, v in model.state_dict().items()
-                        },
-                        "criterion": {
-                            k: v.detach().cpu().clone()
-                            for k, v in criterion.state_dict().items()
-                        },
-                    }
+                    best_state = _checkpoint_state(
+                        model, criterion, optimizer, recipe, step, phase
+                    )
+                print(
+                    json.dumps(
+                        {
+                            "event": "development_validation",
+                            "method": method,
+                            "seed": seed,
+                            "step": step,
+                            "planned_steps": steps,
+                            "r_at_1": score,
+                            "selected_step": selected_step
+                            if best_state is not None
+                            else None,
+                            "attempt_elapsed_seconds": time.perf_counter()
+                            - attempt_started,
+                        }
+                    ),
+                    file=sys.stderr,
+                    flush=True,
+                )
             history.append(row)
+            if segmented and step < steps:
+                elapsed_now = time.perf_counter() - attempt_started
+                if (
+                    stop.reason
+                    or (
+                        segment_steps is not None
+                        and step - completed_steps >= segment_steps
+                    )
+                    or (
+                        max_segment_seconds is not None
+                        and elapsed_now >= max_segment_seconds
+                    )
+                ):
+                    break
         elapsed = time.perf_counter() - started
-        if best_state is None:
-            best_state = {
-                "model": copy.deepcopy(model.cpu().state_dict()),
-                "criterion": copy.deepcopy(criterion.cpu().state_dict()),
-            }
+        if best_state is None and step == steps:
+            best_state = _checkpoint_state(
+                model, criterion, optimizer, recipe, steps, phase
+            )
+        environment = inference_environment(device) | {"batch_size": batch_size}
+        peak_allocated = (
+            torch.cuda.max_memory_allocated(device)
+            if torch.device(device).type == "cuda"
+            else 0
+        )
+        peak_reserved = (
+            torch.cuda.max_memory_reserved(device)
+            if torch.device(device).type == "cuda"
+            else 0
+        )
+        if segmented:
+            if any(
+                getattr(criterion, name, None) is not None
+                for name in ("_pending", "_batch_indices")
+            ):
+                raise ValueError(
+                    "criterion has an unfinished update at the continuation boundary"
+                )
+            latest = _checkpoint_state(model, criterion, optimizer, recipe, step, phase)
+            latest.update(
+                {
+                    "step": step,
+                    "rng": capture_rng(),
+                    "optimizer_layout": optimizer_layout(model, criterion, optimizer),
+                }
+            )
+            if method == "diva":
+                latest["bootstrap_telemetry"] = {
+                    "seconds": memory_bootstrap_seconds,
+                    "peak_allocated_bytes": memory_bootstrap_peak_allocated_bytes,
+                }
+            seal_segment(
+                destination,
+                segment,
+                identity,
+                parent,
+                latest,
+                best_state,
+                best_result,
+                selected_step,
+                best_score,
+                history,
+                batches,
+                time.perf_counter() - attempt_started,
+                environment,
+                peak_allocated,
+                peak_reserved,
+                stop.reason or ("completed" if step == steps else "segment_limit"),
+            )
+            chain = verify_chain(destination, segment, identity)
+            elapsed = chain["elapsed_seconds"]
+            peak_allocated = chain["peak_allocated_bytes"]
+            peak_reserved = chain["peak_reserved_bytes"]
+            if step < steps:
+                arguments = [
+                    "uv",
+                    "run",
+                    "pose-embed",
+                    "benchmark",
+                    "train",
+                    "--config",
+                    str(
+                        Path(
+                            identity.get("campaign_base_config_path", config_path)
+                        ).resolve()
+                    ),
+                    "--manifest-set",
+                    str(Path(manifest_set_path).resolve()),
+                    "--parity-evidence",
+                    str(Path(parity_evidence_path).resolve()),
+                    "--method",
+                    method,
+                    "--seed",
+                    str(seed),
+                    "--output-dir",
+                    str(destination),
+                    "--device",
+                    device,
+                    "--phase",
+                    stage,
+                    "--resume-from",
+                    str(segment / "segment-manifest.json"),
+                ]
+                if segment_steps is not None:
+                    arguments.extend(["--segment-steps", str(segment_steps)])
+                if max_segment_seconds is not None:
+                    arguments.extend(
+                        ["--max-segment-seconds", str(max_segment_seconds)]
+                    )
+                if "secondary" in identity:
+                    arguments.extend(
+                        ["--secondary-cell", identity["secondary"]["cell_id"]]
+                    )
+                if stage == "development" and identity.get("candidate") is not None:
+                    arguments.extend(["--candidate", identity["candidate"]])
+                return {
+                    "status": "resumable",
+                    "scientific_use_allowed": False,
+                    "completed_steps": step,
+                    "planned_steps": steps,
+                    "segment_manifest": str(segment / "segment-manifest.json"),
+                    "segment_manifest_sha256": sha256_file(
+                        segment / "segment-manifest.json"
+                    ),
+                    "next_resume_command": shlex.join(arguments),
+                    "retained_artifact_bytes": sum(
+                        path.stat().st_size
+                        for path in destination.rglob("*")
+                        if path.is_file()
+                    ),
+                    "checkpoint_bytes": (segment / "checkpoint.pt").stat().st_size,
+                    "storage_scenario": {
+                        "planned_segments": math.ceil(steps / segment_steps),
+                        "checkpoint_archive_bytes": (
+                            2 * math.ceil(steps / segment_steps) + 1
+                        )
+                        * (segment / "checkpoint.pt").stat().st_size,
+                        "assumption": (
+                            "unchanged segment step limit and checkpoint size; "
+                            "excludes history/descriptor overhead"
+                        ),
+                    }
+                    if segment_steps
+                    else None,
+                }
+            write_immutable_json(
+                destination / "segments.json",
+                {
+                    "schema_version": 1,
+                    "leaf": str(
+                        (segment / "segment-manifest.json").relative_to(destination)
+                    ),
+                    "leaf_sha256": sha256_file(segment / "segment-manifest.json"),
+                    "chain": chain["chain"],
+                },
+            )
         save_checkpoint(
             destination / "checkpoint.pt",
             {"identity": identity, "selected_step": selected_step, **best_state},
@@ -329,42 +837,97 @@ def run_experiment(
             "initialization.json",
             "telemetry.json",
         ]
+        if segmented:
+            output_names.append("segments.json")
+        if method == "diva":
+            output_names.extend(["memory-plan.json", "memory-initialization.json"])
         if best_result is not None:
             write_immutable_json(
                 destination / "development-result.json",
                 {"identity": identity, "selected_step": selected_step, **best_result},
             )
             output_names.append("development-result.json")
+        if method == "diva":
+            output_names.extend(["memory-plan.json", "memory-initialization.json"])
+
+        retrieval_profile = None
+        if profile_steps is not None:
+            prefix = validation_rows[: PROFILE_RETRIEVAL["prefix_size"]]
+            retrieval_profile = measure_retrieval(
+                model,
+                Subset(validation, range(len(prefix))),
+                prefix,
+                device,
+                batch_size,
+                method,
+                spec.parameters,
+            )
+            if torch.device(device).type == "cuda":
+                peak_allocated = torch.cuda.max_memory_allocated(device)
+                peak_reserved = torch.cuda.max_memory_reserved(device)
+        if secondary_cell is not None:
+            output_names.append("secondary-data-plan.json")
         telemetry = {
             "elapsed_seconds": elapsed,
-            "environment": inference_environment(device) | {"batch_size": batch_size},
-            "peak_allocated_bytes": torch.cuda.max_memory_allocated(device)
-            if torch.device(device).type == "cuda"
-            else 0,
-            "peak_reserved_bytes": torch.cuda.max_memory_reserved(device)
-            if torch.device(device).type == "cuda"
-            else 0,
+            "environment": environment,
+            "peak_allocated_bytes": peak_allocated,
+            "peak_reserved_bytes": peak_reserved,
             "checkpoint_bytes": (destination / "checkpoint.pt").stat().st_size,
             "training_steps": steps,
-            "trainable_parameters": sum(p.numel() for p in trainable),
+            "trainable_parameters": sum(
+                p.numel()
+                for p in [*model.parameters(), *criterion.parameters()]
+                if p.requires_grad
+            ),
+            "profile_phase": recipe["profile_phase"],
+            "encoder_backward_steps": sum(
+                row["encoder_gradient_parameters"] > 0 for row in history
+            ),
+            "segment_artifact_bytes": sum(
+                path.stat().st_size
+                for path in (destination / "segments").rglob("*")
+                if path.is_file()
+            )
+            if segmented
+            else 0,
         }
+        if method == "diva":
+            telemetry.update(
+                memory_bootstrap_seconds=memory_bootstrap_seconds,
+                memory_bootstrap_peak_allocated_bytes=memory_bootstrap_peak_allocated_bytes,
+                memory_items=criterion.config.queue_size,
+                momentum_parameters=sum(
+                    p.numel() for p in model.momentum_encoder.parameters()
+                )
+                + sum(p.numel() for p in model.momentum_projection.parameters()),
+            )
+
+        if retrieval_profile is not None:
+            telemetry["retrieval_profile"] = retrieval_profile
         write_immutable_json(destination / "telemetry.json", telemetry)
         write_immutable_json(
             destination / "outcome.json", {"status": "succeeded", "completed_at": now()}
         )
+        if campaign_binding:
+            output_names.append("effective-configuration.json")
         return publish_manifest(destination, identity, output_names)
     except BaseException as exc:
-        if not (destination / "outcome.json").exists():
+        failure_dir = segment if segmented and segment is not None else destination
+        if not (failure_dir / "outcome.json").exists():
             write_immutable_json(
-                destination / "outcome.json",
+                failure_dir / "outcome.json",
                 {
                     "status": "failed",
                     "error_type": type(exc).__name__,
                     "error": str(exc),
+                    "elapsed_seconds": time.perf_counter() - attempt_started,
                     "completed_at": now(),
                 },
             )
         raise
+    finally:
+        if segmented:
+            stop.__exit__()
 
 
 def compare_development(run_dirs: list[str | Path], output: str | Path) -> dict:
@@ -372,11 +935,16 @@ def compare_development(run_dirs: list[str | Path], output: str | Path) -> dict:
     runs = {}
     config_hash = None
     pairing = {}
+    heads = {}
     for directory in run_dirs:
         directory = artifact_path(directory)
         manifest = verify_run(directory)
         identity = manifest["identity"]
-        if identity["stage"] != "development" or not identity["scientific_use_allowed"]:
+        if (
+            "secondary" in identity
+            or identity["stage"] != "development"
+            or not identity["scientific_use_allowed"]
+        ):
             raise ValueError("comparison accepts completed development runs only")
         if config_hash is not None and identity["benchmark_sha256"] != config_hash:
             raise ValueError("comparison mixes benchmark configurations")
@@ -387,7 +955,6 @@ def compare_development(run_dirs: list[str | Path], output: str | Path) -> dict:
         result = read_json(directory / "development-result.json")
         initialization = read_json(directory / "initialization.json")
         pair = {
-            "head": initialization["head"],
             "encoder": initialization["encoder"],
             "batch_plan": manifest["outputs"]["batch-plan.json"],
             "query_order": result["query_order_sha256"],
@@ -401,6 +968,13 @@ def compare_development(run_dirs: list[str | Path], output: str | Path) -> dict:
                 "paired initialization, batches or query conditions differ"
             )
         pairing[seed] = pair
+        head_key = (
+            seed,
+            identity["method_specification"]["embedding_dimension"],
+            head_recipe(identity["method"]),
+        )
+        if heads.setdefault(head_key, initialization["head"]) != initialization["head"]:
+            raise ValueError("paired initialization differs within a head recipe")
         runs[key] = {
             "method": key[0],
             "seed": key[1],

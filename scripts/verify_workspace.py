@@ -14,9 +14,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SHA_PATTERN = re.compile(r"[0-9a-f]{40}\Z")
 EXPECTED_UPSTREAMS = {
+    "DRML",
     "MotionBERT",
+    "AVSL",
+    "S2SD",
+    "DiVA",
     "MotionCLIP",
     "contextual-similarity",
+    "intra-batch",
+    "HIST",
+    "DIML",
+    "Metrix",
+    "proxynca-pp",
     "MMAction2",
     "st-gcn",
     "text-to-motion-retrieval",

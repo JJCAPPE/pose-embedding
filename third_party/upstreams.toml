@@ -2,6 +2,24 @@ schema_version = 1
 cache_directory = ".cache/upstreams"
 
 [[upstream]]
+name = "DiVA"
+repository = "https://github.com/Confusezius/ECCV2020_DiVA_MultiFeature_DML.git"
+commit = "e5713049fa446d3180b4ca122963697ee16ee9f9"
+license = "UNSPECIFIED"
+license_files = []
+reference_only = true
+purpose = "Published DiVA recipe audit only; source has no discovered license and must not be copied, adapted, imported or redistributed. Independent published mathematics only."
+
+[[upstream]]
+name = "intra-batch"
+repository = "https://github.com/dvl-tum/intra_batch.git"
+commit = "a1ae3de8bf1ccedefb89258f24295beeec7e81a3"
+license = "MIT"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "IBC paper-recipe audit only; motion adapter independently implements published message-passing equations."
+
+[[upstream]]
 name = "MotionBERT"
 repository = "https://github.com/Walter0807/MotionBERT.git"
 commit = "705d3a95354db8bdb696b3492e47a3b5537174ff"
@@ -54,3 +72,66 @@ license = "MIT"
 license_files = ["LICENSE"]
 reference_only = true
 purpose = "Retrieval literature reference; outside the locked core experiment."
+
+[[upstream]]
+name = "proxynca-pp"
+repository = "https://github.com/euwern/proxynca_pp.git"
+commit = "217233d29a89a89766658396a598b896d17a5814"
+license = "MIT"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "Published ProxyNCA++ recipe audit; independently implemented motion head, objective and optimization."
+
+[[upstream]]
+name = "HIST"
+repository = "https://github.com/ljin0429/HIST.git"
+commit = "e7d650c80460f464c55bcdc2262d785923c50dc4"
+license = "UNSPECIFIED"
+license_files = []
+reference_only = true
+purpose = "Published HIST recipe audit only; no source copying or adaptation. Independent equations and explicit motion conventions."
+
+[[upstream]]
+name = "Metrix"
+repository = "https://github.com/billpsomas/metrix.git"
+commit = "b6797035fd82baf46ad89f8856721ae01afdf4f0"
+license = "MIT"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "Metrix paper and feature recipe audit; independent motion equations, no upstream source reuse."
+
+[[upstream]]
+name = "DRML"
+repository = "https://github.com/zbr17/DRML.git"
+commit = "55afbdc1144c06bcb1e81d76490217b239247556"
+license = "UNSPECIFIED"
+license_files = []
+reference_only = true
+purpose = "DRML paper provenance only; independently implement published equations. No unlicensed code may be copied or adapted."
+
+[[upstream]]
+name = "S2SD"
+repository = "https://github.com/MLforHealth/S2SD.git"
+commit = "1ef26e4e273019575f3b5dfbb789fa4952eb9646"
+license = "MIT"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "Published R-Margin/MSDFA recipe audit; independent motion implementation without redistributed upstream code."
+
+[[upstream]]
+name = "DIML"
+repository = "https://github.com/wl-zhao/DIML.git"
+commit = "c15dbea696f68ddf889dcacfcaacd315d16a34ac"
+license = "UNSPECIFIED"
+license_files = []
+reference_only = true
+purpose = "DIML paper/README identity audit only; independent published equations, no upstream source reuse."
+
+[[upstream]]
+name = "AVSL"
+repository = "https://github.com/zbr17/AVSL.git"
+commit = "fd2686e4f94a93da3c97c1b2067df9601f2803a0"
+license = "MIT"
+license_files = ["LICENSE"]
+reference_only = false
+purpose = "Licensed oracle and minimal adaptation of AVSL attribution, momentum relations and hierarchical similarity inference."

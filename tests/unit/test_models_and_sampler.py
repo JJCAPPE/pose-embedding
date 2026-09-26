@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from collections import Counter
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -30,6 +31,43 @@ def test_action_head_matches_locked_pooling_equation() -> None:
     expected = functional.normalize(candidate.projection(pooled), dim=-1)
 
     torch.testing.assert_close(candidate(features), expected)
+
+
+@pytest.mark.parametrize("dropout", [0.0, 0.4])
+@pytest.mark.parametrize("training", [False, True])
+def test_raw_projection_extension_preserves_original_pilot_forward(
+    dropout: float, training: bool
+) -> None:
+    """Certify the sole input-code difference from archival release 0ef8583."""
+    candidate = ActionHeadEmbed(
+        dropout_ratio=dropout,
+        representation_dimension=4,
+        joints=17,
+        embedding_dimension=8,
+    ).train(training)
+    reference = deepcopy(candidate)
+    features = torch.randn(3, 2, 7, 17, 4, requires_grad=True)
+    reference_features = features.detach().clone().requires_grad_(True)
+    weights = torch.randn(3, 8)
+    rng = torch.get_rng_state()
+    actual = candidate(features)
+    (actual * weights).sum().backward()
+    after = torch.get_rng_state()
+
+    torch.set_rng_state(rng)
+    dropped = reference.dropout(reference_features)
+    pooled = dropped.permute(0, 1, 3, 4, 2).mean(dim=-1)
+    pooled = pooled.reshape(3, 2, -1).mean(dim=1)
+    expected = functional.normalize(reference.projection(pooled), dim=-1)
+    (expected * weights).sum().backward()
+
+    assert torch.equal(actual, expected)
+    assert torch.equal(features.grad, reference_features.grad)
+    assert torch.equal(after, torch.get_rng_state())
+    for actual_parameter, expected_parameter in zip(
+        candidate.parameters(), reference.parameters(), strict=True
+    ):
+        assert torch.equal(actual_parameter.grad, expected_parameter.grad)
 
 
 def test_action_head_optionally_matches_fetched_motionbert_checkout(

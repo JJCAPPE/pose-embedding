@@ -15,7 +15,20 @@ from pydantic import Field, model_validator
 from pytorch_metric_learning import distances, losses, miners
 from torch import nn
 
+from pose_embed.benchmark.avsl import AVSLLoss
 from pose_embed.benchmark.config import StrictModel, load_methods
+from pose_embed.benchmark.diml import DIMLParameters
+from pose_embed.benchmark.diva import DiVALoss, DiVAParameters
+from pose_embed.benchmark.drml import DRMLLoss, DRMLParameters
+from pose_embed.benchmark.hist import HISTParameters, HypergraphSemanticTupletLoss
+from pose_embed.benchmark.ibc import IBCParameters, IntraBatchConnectionsLoss
+from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixLoss
+from pose_embed.benchmark.mhgl import MHGLLoss
+from pose_embed.benchmark.proxy_nca_plus import (
+    ProxyNCAPlusLoss,
+    ProxyNCAPlusParameters,
+)
+from pose_embed.benchmark.s2sd import S2SDLoss, S2SDParameters
 from pose_embed.losses.contextual import ContextualLossConfig, ContextualMetricLoss
 from pose_embed.losses.pairwise import (
     PairwiseContrastiveLoss,
@@ -23,7 +36,7 @@ from pose_embed.losses.pairwise import (
 )
 
 PML_VERSION = "2.9.0"
-SUPPORTED_METHODS = frozenset(
+SUPPORTED_METHODS = METRIX_METHODS | frozenset(
     {
         "contrastive",
         "contextual",
@@ -33,12 +46,21 @@ SUPPORTED_METHODS = frozenset(
         "multi_similarity_miner",
         "proxy_anchor",
         "proxy_nca",
+        "proxy_nca_pp",
         "roadmap",
         "nt_xent",
         "fast_ap",
         "smooth_ap",
         "normalized_softmax",
         "supcon",
+        "drml",
+        "s2sd",
+        "mhgl",
+        "proxy_anchor_avsl",
+        "diva",
+        "ibc",
+        "hist",
+        "diml",
     }
 )
 
@@ -239,6 +261,7 @@ class _CheckedLoss(nn.Module):
         self.loss = loss
         self.num_classes = num_classes
         self.embedding_dimension = embedding_dimension
+        self.requires_raw_embeddings = getattr(loss, "requires_raw_embeddings", False)
 
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         if embeddings.ndim != 2 or labels.shape != (len(embeddings),):
@@ -298,14 +321,36 @@ def build_loss(
         raise ValueError("num_classes must be an integer >= 2")
     if importlib.metadata.version("pytorch-metric-learning") != PML_VERSION:
         raise RuntimeError("benchmark requires pytorch-metric-learning==2.9.0")
+    if method_id == "diva":
+        return DiVALoss(DiVAParameters.model_validate(parameters), num_classes)
     parameters = dict(parameters)
     dimension = parameters.pop("embedding_dimension", None)
     if dimension is not None and (
         isinstance(dimension, bool) or not isinstance(dimension, int) or dimension < 1
     ):
         raise ValueError("embedding_dimension must be a positive integer")
-    if method_id in {"proxy_anchor", "proxy_nca", "normalized_softmax"}:
+    if method_id in {"proxy_anchor", "proxy_nca", "normalized_softmax", "ibc", "hist"}:
         parameters["embedding_dimension"] = dimension or 512
+    if method_id in METRIX_METHODS:
+        return MetrixLoss(method_id, parameters, num_classes, dimension or 512)
+    if method_id == "mhgl":
+        return MHGLLoss(parameters, num_classes, dimension or 512)
+    if method_id == "s2sd":
+        return S2SDLoss(
+            S2SDParameters.model_validate(
+                parameters | {"embedding_dimension": dimension or 512}
+            ),
+            num_classes,
+        )
+    if method_id == "drml":
+        config = DRMLParameters.model_validate(parameters)
+        if dimension is not None and dimension != 4 * config.branch_dimension:
+            raise ValueError("DRML dimension differs from its four individual branches")
+        return DRMLLoss(num_classes, config)
+    if method_id == "proxy_anchor_avsl":
+        if dimension is not None and dimension != 1536:
+            raise ValueError("the declared AVSL method requires 3 x 512 dimensions")
+        return AVSLLoss(parameters, num_classes, 1536)
     if method_id == "contrastive":
         config = ContrastiveParameters.model_validate(parameters)
         module = PairwiseContrastiveLoss(**config.model_dump())
@@ -325,6 +370,13 @@ def build_loss(
         module = losses.MultiSimilarityLoss(
             **config.model_dump(), distance=distances.CosineSimilarity()
         )
+    elif method_id == "diml":
+        config = DIMLParameters.model_validate(parameters)
+        module = _MinedLoss(
+            MinedMultiSimilarityParameters.model_validate(
+                config.model_dump(include={"alpha", "beta", "base", "miner_epsilon"})
+            )
+        )
     elif method_id == "multi_similarity_miner":
         module = _MinedLoss(MinedMultiSimilarityParameters.model_validate(parameters))
     elif method_id in {"nt_xent", "supcon", "smooth_ap"}:
@@ -342,6 +394,14 @@ def build_loss(
         )
     elif method_id == "roadmap":
         module = RoadmapLoss(RoadmapParameters.model_validate(parameters))
+    elif method_id == "hist":
+        config = HISTParameters.model_validate(parameters)
+        dimension = config.embedding_dimension
+        module = HypergraphSemanticTupletLoss(config, num_classes)
+    elif method_id == "ibc":
+        config = IBCParameters.model_validate(parameters)
+        dimension = config.embedding_dimension
+        module = IntraBatchConnectionsLoss(config, num_classes)
     elif method_id == "proxy_anchor":
         config = ProxyAnchorParameters.model_validate(parameters)
         dimension = config.embedding_dimension
@@ -360,6 +420,12 @@ def build_loss(
             embedding_size=dimension,
             softmax_scale=config.softmax_scale,
             distance=distances.LpDistance(p=2, power=2),
+        )
+    elif method_id == "proxy_nca_pp":
+        config = ProxyNCAPlusParameters.model_validate(parameters)
+        dimension = dimension or 512
+        module = ProxyNCAPlusLoss(
+            dimension, num_classes, config.temperature, config.proxy_initial_std
         )
     else:
         config = SoftmaxParameters.model_validate(parameters)

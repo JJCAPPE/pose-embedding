@@ -17,8 +17,10 @@ modify an existing checkout whose remote or HEAD differs from the manifest.
 
 ## License boundary
 
-- MotionBERT is Apache-2.0 and is the only upstream expected to inform a small,
-  attributed compatibility port for the frozen encoder.
+- MotionBERT is Apache-2.0 and informs the attributed encoder compatibility port.
+- AVSL is MIT licensed. Its pinned embedder/collector inform the attributed
+  motion adaptation in `benchmark/avsl.py`; its notice is retained in
+  `licenses/AVSL-MIT.txt`. Unrelated upstream trainer dependencies are not vendored.
 - MotionCLIP and text-to-motion-retrieval are MIT licensed; MMAction2 is
   Apache-2.0; st-gcn is BSD-3-Clause. They remain reference-only because they
   are outside the locked experiment.

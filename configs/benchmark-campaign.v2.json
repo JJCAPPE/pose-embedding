@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "protocol_id": "motion-retrieval-v2",
+  "candidates": [
+    {
+      "candidate_id": "baseline",
+      "learning_rate_scale": 1.0
+    },
+    {
+      "candidate_id": "half",
+      "learning_rate_scale": 0.5
+    },
+    {
+      "candidate_id": "double",
+      "learning_rate_scale": 2.0
+    }
+  ],
+  "selection_rule": "maximum_six_seed_mean_development_r_at_1_then_candidate_order_then_earliest_step",
+  "budget_rule": "three_candidates_times_six_seeds_per_method_with_identical_update_and_validation_budgets",
+  "parameter_space": "scale_all_declared_method_learning_rates_together; all_other_recipe_parameters_fixed",
+  "pilot_policy": "disclose_all_prior_attempts_and_outcomes; engineering_pilots_are_ineligible_for_selection_and_do_not_expand_any_method_grid",
+  "retry_policy": "preserve_every_attempt; exactly_one_success_per_cell; every_failed_attempt_requires_an_immutable_operational_failure_review; numerical_instability_cannot_be_reclassified_as_operational",
+  "profile_retrieval": {
+    "partition": "development-validation.jsonl",
+    "prefix_size": 128,
+    "order": "manifest_order",
+    "selection_eligible": false
+  },
+  "archival_input_compatibility": [
+    {
+      "prior_motionbert_code_sha256": "9e5a09e83d60776e53de268aaac47b9826a076bff8facd9214f03bea53c45a05",
+      "profile_motionbert_code_sha256": "a218a28c93083efabced0a47d9b969189094f8771a875ebcfe96e40011ae8b90",
+      "changed_path": "src/pose_embed/models/action_head.py",
+      "reason": "The archived priority release and current release differ only by exposing ActionHeadEmbed.forward_raw; normalized forward retains the same pooling, projection, dropout, normalization, parameter state and gradients. All other input bindings must match exactly."
+    }
+  ]
+}

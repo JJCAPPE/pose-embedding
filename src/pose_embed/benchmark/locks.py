@@ -24,6 +24,7 @@ from pose_embed.benchmark.runtime import (
     require_unopened,
     verify_run,
 )
+from pose_embed.benchmark.secondary import load_secondary_plan, secondary_plan_sha256
 from pose_embed.provenance import sha256_file, write_immutable_json
 
 
@@ -52,6 +53,7 @@ def _timestamp(value: Any) -> datetime:
 def _context(config_path):
     config = load_benchmark(config_path)
     load_analysis_plan(config)
+    load_secondary_plan(config)
     methods = load_methods()
     if config.training.encoder_mode != "finetune":
         raise ValueError("final selection requires the declared fine-tuning benchmark")
@@ -106,7 +108,6 @@ def _collect_runs(
     run_dirs: Sequence[str | Path], config, methods, stage: str, selection=None
 ) -> dict:
     runs = {}
-    config_hash = benchmark_digest(config)
     selection_hash = (
         sha256_file(_path("selection.json")) if selection is not None else None
     )
@@ -122,12 +123,23 @@ def _collect_runs(
             raise ValueError("duplicate locked method/seed run")
         if key[0] not in config.final_methods or key[1] not in config.training.seeds:
             raise ValueError("run method/seed is outside the complete benchmark")
+        effective = config
+        if selection is not None:
+            from pose_embed.benchmark.campaign import selected_config
+
+            effective = selected_config(config, selection, key[0])
+            if (
+                identity.get("candidate") != selection["methods"][key[0]]["candidate"]
+                or identity.get("campaign_sha256") != selection["campaign_sha256"]
+            ):
+                raise ValueError("final run does not bind the selected campaign winner")
         if (
-            identity.get("stage") != stage
+            "secondary" in identity
+            or identity.get("stage") != stage
             or identity.get("track") != "finetune"
             or identity.get("scientific_use_allowed") is not True
-            or identity.get("benchmark_sha256") != config_hash
-            or identity.get("configuration") != config.model_dump(mode="json")
+            or identity.get("benchmark_sha256") != benchmark_digest(effective)
+            or identity.get("configuration") != effective.model_dump(mode="json")
             or identity.get("method_specification")
             != methods[key[0]].model_dump(mode="json")
         ):
@@ -185,11 +197,13 @@ def _collect_runs(
             raise ValueError(
                 "paired encoder, input provenance or sample identities differ"
             )
-        dimension = methods[key[0]].embedding_dimension
+        from pose_embed.benchmark.model import head_recipe
+
+        head_group = (methods[key[0]].embedding_dimension, head_recipe(key[0]))
         head = initialization.get("head")
-        if not head or seed_pair["heads"].setdefault(dimension, head) != head:
+        if not head or seed_pair["heads"].setdefault(head_group, head) != head:
             raise ValueError(
-                "paired head initialization differs within an embedding dimension"
+                "paired head initialization differs within a head recipe/dimension"
             )
         for other in seed_pair["batches"]:
             shared = min(len(other), len(batch["steps"]))
@@ -207,7 +221,7 @@ def _collect_runs(
     return runs
 
 
-def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
+def _candidate_selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
     runs = _collect_runs(run_dirs, config, methods, "development")
     selected = {}
     episode = None
@@ -216,6 +230,7 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
     )
     for method in config.final_methods:
         histories = []
+        minimum_selected_step = 1
         for seed in config.training.seeds:
             directory, manifest = runs[(method, seed)]
             if "development-result.json" not in manifest["outputs"]:
@@ -225,6 +240,18 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
             result = read_json(directory / "development-result.json")
             if result.get("identity") != manifest["identity"]:
                 raise ValueError("development result identity differs from its run")
+            from pose_embed.benchmark.retrieval import (
+                common_retrieval_policy,
+                method_retrieval_policy,
+            )
+
+            expected_policy = method_retrieval_policy(
+                method, methods[method].parameters
+            )
+            if result.get("policy") != expected_policy:
+                raise ValueError(
+                    "development scorer policy differs from the bound method"
+                )
             condition = {
                 key: result.get(key)
                 for key in (
@@ -234,6 +261,7 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
                     "policy",
                 )
             }
+            condition["policy"] = common_retrieval_policy(expected_policy)
             if not all(condition.values()):
                 raise ValueError(
                     "development retrieval identity and exclusions are missing"
@@ -245,6 +273,12 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
                 )
             episode = condition
             rows = read_json(directory / "history.json").get("steps", [])
+            minimum_selected_step = max(
+                minimum_selected_step,
+                manifest["identity"]
+                .get("training_recipe", {})
+                .get("minimum_selected_step", 1),
+            )
             scores = {}
             for row in rows:
                 if "validation" not in row:
@@ -281,7 +315,12 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
             step: sum(history[step] for history in histories) / len(histories)
             for step in histories[0]
         }
-        selected_step = max(means, key=lambda step: (means[step], -step))
+        eligible = [step for step in means if step >= minimum_selected_step]
+        if not eligible:
+            raise ValueError(
+                "selection requires a checkpoint after the full final warmup"
+            )
+        selected_step = max(eligible, key=lambda step: (means[step], -step))
         selected[method] = {
             "selected_steps": selected_step,
             "configuration_sha256": digest(config.model_dump(mode="json")),
@@ -298,6 +337,7 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
         "schema_version": 2,
         "kind": "final_selection",
         "analysis_plan_sha256": analysis_plan_sha256(),
+        "secondary_plan_sha256": secondary_plan_sha256(),
         "benchmark_sha256": benchmark_digest(config),
         "code_sha256": code_digest(),
         "methods": selected,
@@ -307,6 +347,12 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
         "inputs": next(iter(runs.values()))[1]["identity"]["inputs"],
         "runs": _references(runs),
     }, completed_at
+
+
+def _selection_content(run_dirs, config, methods):
+    from pose_embed.benchmark.campaign import selection_content
+
+    return selection_content(run_dirs, config, methods, _candidate_selection_content)
 
 
 def create_selection(
@@ -347,6 +393,7 @@ def _final_content(run_dirs, config, methods, selection) -> tuple[dict, datetime
         "schema_version": 2,
         "kind": "final_run_set",
         "analysis_plan_sha256": analysis_plan_sha256(),
+        "secondary_plan_sha256": secondary_plan_sha256(),
         "benchmark_sha256": benchmark_digest(config),
         "code_sha256": code_digest(),
         "selection_sha256": sha256_file(_path("selection.json")),
@@ -389,7 +436,10 @@ def validate_final_runs(*, config_path: str | Path | None = None) -> dict:
 
 
 def _opening_content(manifest_set_path, config_path) -> tuple[dict, datetime]:
+    from pose_embed.benchmark.secondary import validate_secondary_runs
+
     final_runs = validate_final_runs(config_path=config_path)
+    secondary_runs = validate_secondary_runs(config_path=config_path, stage="final")
     config = load_benchmark(config_path)
     episode = load_episode(manifest_set_path, "novel")
     metadata = episode["metadata"]
@@ -408,13 +458,18 @@ def _opening_content(manifest_set_path, config_path) -> tuple[dict, datetime]:
         "schema_version": 2,
         "kind": "test_opening",
         "analysis_plan_sha256": analysis_plan_sha256(),
+        "secondary_plan_sha256": secondary_plan_sha256(),
         "benchmark_sha256": benchmark_digest(config),
         "code_sha256": code_digest(),
         "selection_sha256": sha256_file(_path("selection.json")),
         "final_run_set_sha256": sha256_file(_path("final-runs.json")),
+        "secondary_lock_sha256": sha256_file(_path("secondary-plan.json")),
+        "secondary_final_sha256": sha256_file(_path("secondary-final.json")),
         "manifest_set_path": str(Path(manifest_set_path).resolve()),
         "novel_episode": metadata,
-    }, _timestamp(final_runs["created_at"])
+    }, max(
+        _timestamp(final_runs["created_at"]), _timestamp(secondary_runs["created_at"])
+    )
 
 
 def open_test(
@@ -425,21 +480,17 @@ def open_test(
     This function verifies metadata and run evidence. The final evaluator must
     verify its physical pose/model inputs before invoking this opening event.
     """
-    expected, _ = _opening_content(manifest_set_path, config_path)
+    expected, finalized_at = _opening_content(manifest_set_path, config_path)
     path = _path("test-opening.json")
     if path.exists():
-        return validate_opening(
-            manifest_set_path=manifest_set_path, config_path=config_path
-        )
+        return _validate_opening_payload(read_json(path), expected, finalized_at)
     payload = {**expected, "created_at": now()}
     try:
         write_immutable_json(path, payload)
     except ValueError:
         if not path.exists():
             raise
-        return validate_opening(
-            manifest_set_path=manifest_set_path, config_path=config_path
-        )
+        return _validate_opening_payload(read_json(path), expected, finalized_at)
     return payload
 
 
@@ -449,6 +500,10 @@ def validate_opening(
     """Require the existing ledger to bind both still-valid locks and the pool."""
     payload = read_json(_path("test-opening.json"))
     expected, finalized_at = _opening_content(manifest_set_path, config_path)
+    return _validate_opening_payload(payload, expected, finalized_at)
+
+
+def _validate_opening_payload(payload, expected, finalized_at):
     if {
         key: value for key, value in payload.items() if key != "created_at"
     } != expected:

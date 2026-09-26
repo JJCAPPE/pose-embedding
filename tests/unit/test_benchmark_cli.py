@@ -39,8 +39,8 @@ def experiment_arguments(operation: str) -> list[str]:
 def test_coverage_exposes_all_methods_without_granting_test_access() -> None:
     result = cli.run(parse("coverage"))
     assert result["required_method_count"] == len(result["methods"]) == 26
-    assert result["implemented_method_count"] == 14
-    assert result["blocked_method_count"] == 12
+    assert result["implemented_method_count"] == 26
+    assert result["blocked_method_count"] == 0
     assert result["required_final_run_count"] == 156
     assert result["priority_methods"] == ["contrastive", "contextual"]
     assert result["paired_seeds"] == [7, 17, 29, 43, 59, 71]
@@ -121,7 +121,12 @@ def test_blocked_methods_invalid_seeds_and_track_mismatch_never_start_a_run(
         cli, "run_experiment", lambda **arguments: calls.append(arguments) or {}
     )
     arguments = parse(*experiment_arguments("train"))
-    arguments.method = "drml"
+    methods = cli.load_methods()
+    methods["diml"] = methods["diml"].model_copy(
+        update={"status": "blocked", "blocker": "synthetic adapter unavailable"}
+    )
+    monkeypatch.setattr(cli, "load_methods", lambda: methods)
+    arguments.method = "diml"
     with pytest.raises(ValueError, match="blocked"):
         cli.run(arguments)
     arguments.method = "contextual"
@@ -178,6 +183,13 @@ def test_final_cli_cannot_seal_a_partial_implementation(
     operation, tmp_path, monkeypatch
 ):
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    from pose_embed.benchmark import locks
+
+    methods = cli.load_methods()
+    methods["diva"] = methods["diva"].model_copy(
+        update={"status": "blocked", "blocker": "synthetic missing adapter"}
+    )
+    monkeypatch.setattr(locks, "load_methods", lambda: methods)
     config = REPOSITORY_ROOT / "configs/benchmark.finetune.v2.yaml"
     with pytest.raises(ValueError, match="not implemented"):
         cli.run(parse(operation, "--config", str(config), "--runs", "/does/not/exist"))
@@ -188,6 +200,13 @@ def test_evaluate_cli_runs_the_complete_suite_gate_before_loading_data(
     tmp_path, monkeypatch
 ):
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    from pose_embed.benchmark import locks
+
+    methods = cli.load_methods()
+    methods["diva"] = methods["diva"].model_copy(
+        update={"status": "blocked", "blocker": "synthetic missing adapter"}
+    )
+    monkeypatch.setattr(locks, "load_methods", lambda: methods)
     config = REPOSITORY_ROOT / "configs/benchmark.finetune.v2.yaml"
     with pytest.raises(ValueError, match="not implemented"):
         cli.run(
@@ -206,3 +225,46 @@ def test_evaluate_cli_runs_the_complete_suite_gate_before_loading_data(
             )
         )
     assert not (tmp_path / "benchmark-v2/locks").exists()
+
+
+def test_campaign_declaration_and_failure_review_dispatch(monkeypatch):
+    from pose_embed.benchmark import campaign
+
+    seen = []
+    monkeypatch.setattr(
+        campaign,
+        "declare_campaign",
+        lambda **kwargs: seen.append(kwargs) or {"ok": True},
+    )
+    args = parse(
+        "declare-campaign",
+        "--run-root",
+        "main-grid",
+        "--profiles",
+        "profile-a",
+        "profile-b",
+        "--prior-trial-roots",
+        "old-pilots",
+        "--priority-comparison",
+        "pair.json",
+    )
+    assert cli.run(args) == {"ok": True}
+    assert seen[0]["profiles"] == ["profile-a", "profile-b"]
+    assert seen[0]["priority_comparison"] == "pair.json"
+    monkeypatch.setattr(
+        campaign,
+        "review_failure",
+        lambda directory, **kwargs: {"directory": directory, **kwargs},
+    )
+    args = parse(
+        "review-failure",
+        "--run",
+        "failed-cell",
+        "--category",
+        "preemption",
+        "--reason",
+        "The scheduler preempted this job before its next step.",
+    )
+    assert cli.run(args)["category"] == "preemption"
+    args = parse(*experiment_arguments("train"), "--candidate", "half")
+    assert args.candidate == "half"

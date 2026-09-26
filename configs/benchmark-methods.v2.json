@@ -184,10 +184,21 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2004.01113",
-      "implementation": "pending_proxyncapp_full_recipe_motion_adaptation",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; all-proxy assignment with temperature 1/9, max pooling, non-affine pooled-feature LayerNorm, and fast proxy optimizer groups are not adapted or verified for MotionBERT.",
-      "parameters": {}
+      "implementation": "independent_teh2020_cub_motion_v1",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "teh2020_cub_motion_v1",
+        "temperature": 0.1111111111111111,
+        "proxy_initial_std": 0.125,
+        "head_learning_rate": 0.004,
+        "proxy_learning_rate": 400.0,
+        "optimizer_epsilon": 1.0,
+        "warmup_epochs": 5,
+        "model_gradient_clip_value": 10.0,
+        "pooling": "confidence_valid_token_max",
+        "all_invalid_policy": "zero_pooled_feature"
+      }
     },
     {
       "method_id": "supcon",
@@ -208,32 +219,79 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2108.10026",
-      "implementation": "pending_drml_proxy_anchor_motion_adaptation",
-      "status": "blocked",
-      "blocker": "Official code has no discovered reuse license; independent four-branch adaptive ensemble, reconstruction assignment, relation graph, and Proxy Anchor training are not implemented.",
-      "parameters": {}
+      "implementation": "independent_zheng2021_pa_motion_v1",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "zheng2021_pa_motion_v1",
+        "branches": 4,
+        "branch_dimension": 128,
+        "reconstruction_weight": 0.1,
+        "embedding_weight": 10.0,
+        "alpha": 32.0,
+        "margin": 0.1,
+        "encoder_learning_rate": 1e-05,
+        "head_learning_rate": 0.0001,
+        "proxy_learning_rate": 0.0001,
+        "pooling": "confidence_valid_token_mean",
+        "all_invalid_policy": "zero_pooled_feature",
+        "assignment_tie": "lowest_branch_index",
+        "score_normalization": "linear_divided_by_incoming_sum"
+      }
     },
     {
       "method_id": "diml",
-      "name": "DIML",
+      "name": "DIML (motion MS + miner, 512-D)",
       "family": "architecture",
       "embedding_dimension": 512,
-      "source_url": "https://arxiv.org/abs/2108.05889",
-      "implementation": "pending_diml_structural_similarity_motion_adaptation",
-      "status": "blocked",
-      "blocker": "Official code has no discovered reuse license; exact published baseline recipe, spatiotemporal local-feature optimal transport, cross-correlation marginals, and multiscale retrieval scorer remain unresolved or unimplemented.",
-      "parameters": {}
+      "source_url": "https://openaccess.thecvf.com/content/ICCV2021/papers/Zhao_Towards_Interpretable_Deep_Metric_Learning_With_Structural_Matching_ICCV_2021_paper.pdf",
+      "implementation": "independent_diml_ms_motion_v2",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "motion_ms_miner_512_time_anatomy_v1",
+        "alpha": 2.0,
+        "beta": 50.0,
+        "base": 0.5,
+        "miner_epsilon": 0.1,
+        "entropy": 0.05,
+        "shortlist": 100,
+        "temporal_bins": 4,
+        "sinkhorn_tolerance": 1e-07,
+        "sinkhorn_iterations": 10000,
+        "pair_chunk_size": 64
+      }
     },
     {
       "method_id": "diva",
-      "name": "DiVA",
+      "name": "DiVA (Margin, corrected DaNCE motion recipe)",
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2004.13458",
-      "implementation": "pending_diva_four_task_motion_adaptation",
-      "status": "blocked",
-      "blocker": "Official code has no discovered reuse license; four 128-dimensional task branches, DaNCE memory and momentum state, task samplers, and gradient-reversal decorrelation are not implemented.",
-      "parameters": {}
+      "implementation": "independent_diva_four_task_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "milbich2020_cub_motion_corrected2021",
+        "feature_dimension": 8704,
+        "physical_batch_size": 32,
+        "queue_batches": 30,
+        "temperature": 0.1,
+        "momentum": 0.9,
+        "margin": 0.2,
+        "beta_initial": 1.2,
+        "beta_learning_rate": 0.0005,
+        "learning_rate": 1e-05,
+        "weight_decay": 0.0005,
+        "auxiliary_weight": 0.3,
+        "decorrelation_weight": 1500.0,
+        "decorrelation_hidden": 512,
+        "distance_floor": 0.5,
+        "distance_upper": 1.4,
+        "rotation_degrees": 5.0,
+        "scale_delta": 0.1,
+        "translation": 0.05
+      }
     },
     {
       "method_id": "ibc",
@@ -241,21 +299,48 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://proceedings.mlr.press/v139/seidenschwarz21a.html",
-      "implementation": "pending_ibc_mpn_and_auxiliary_cross_entropy",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; learned intra-batch message passing, refined-feature and auxiliary backbone cross-entropy, and backbone-only inference are not implemented.",
-      "parameters": {}
+      "implementation": "independent_ibc_cub_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "seidenschwarz2021_cub_motion",
+        "attention_heads": 2,
+        "message_steps": 1,
+        "dropout": 0.1,
+        "temperature": 0.2,
+        "label_smoothing": 0.1,
+        "auxiliary_weight": 1.0,
+        "refined_weight": 1.0
+      }
     },
     {
       "method_id": "s2sd",
-      "name": "S2SD (R-Margin + MSDF[A])",
+      "name": "S2SD (R-Margin + MSDFA, CUB motion recipe)",
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://proceedings.mlr.press/v139/roth21a.html",
-      "implementation": "pending_r_margin_s2sd_msdf_motion_adaptation",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; the screenshot uses R-Margin with MSDFA on CUB/Cars and MSDF on SOP. Distance-weighted sampling, positive/negative switching, trainable margins, distillation branches, and a declared motion variant are not implemented.",
-      "parameters": {}
+      "implementation": "independent_rmargin_msdfa_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "roth2021_rmargin_msdfa_cub_motion",
+        "feature_dimension": 8704,
+        "target_dimensions": [
+          512,
+          1024,
+          1536,
+          2048
+        ],
+        "temperature": 1.0,
+        "distillation_weight": 50.0,
+        "feature_weight": 50.0,
+        "feature_delay": 1000,
+        "margin": 0.2,
+        "beta_initial": 1.2,
+        "beta_learning_rate": 0.0005,
+        "switch_probability": 0.4,
+        "distance_floor": 0.5
+      }
     },
     {
       "method_id": "proxy_nca_metrix",
@@ -263,10 +348,27 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2106.04990",
-      "implementation": "pending_proxyncapp_metrix_feature_motion_adaptation",
-      "status": "blocked",
-      "blocker": "The screenshot abbreviation resolves to ProxyNCA++ + Metrix/feature in the source table. MIT source candidate needs a pinned component audit; complete ProxyNCA++, intermediate feature mixing, and mixed binary pair targets are not implemented.",
-      "parameters": {}
+      "implementation": "independent_venkataramanan2022_feature_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "teh2020_cub_motion_v1",
+        "temperature": 0.1111111111111111,
+        "proxy_initial_std": 0.125,
+        "head_learning_rate": 0.004,
+        "proxy_learning_rate": 400.0,
+        "optimizer_epsilon": 1.0,
+        "warmup_epochs": 5,
+        "model_gradient_clip_value": 10.0,
+        "pooling": "confidence_valid_token_max",
+        "all_invalid_policy": "zero_pooled_feature",
+        "beta_shape": 2.0,
+        "mix_strength": 0.4,
+        "mixing_layer": "final_motionbert_tokens",
+        "mixed_mask": "intersection_with_exact_endpoints",
+        "feature_chunk_size": 2,
+        "pair_strategy": "mixed_anchor_all_cross_class_pairs"
+      }
     },
     {
       "method_id": "proxy_anchor_metrix",
@@ -274,10 +376,19 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2106.04990",
-      "implementation": "pending_proxy_anchor_metrix_feature_motion_adaptation",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; intermediate motion-feature mixing and mixed positive/negative Proxy Anchor contributions are not implemented.",
-      "parameters": {}
+      "implementation": "independent_venkataramanan2022_feature_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "beta_shape": 2.0,
+        "mix_strength": 0.4,
+        "mixing_layer": "final_motionbert_tokens",
+        "mixed_mask": "intersection_with_exact_endpoints",
+        "feature_chunk_size": 2,
+        "pair_strategy": "proxy_relative_positive_negative",
+        "alpha": 32.0,
+        "margin": 0.1
+      }
     },
     {
       "method_id": "multi_similarity_metrix",
@@ -285,10 +396,21 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2106.04990",
-      "implementation": "pending_multi_similarity_metrix_feature_motion_adaptation",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; intermediate motion-feature mixing and mixed positive/negative Multi-Similarity contributions are not implemented.",
-      "parameters": {}
+      "implementation": "independent_venkataramanan2022_feature_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "beta_shape": 2.0,
+        "mix_strength": 0.4,
+        "mixing_layer": "final_motionbert_tokens",
+        "mixed_mask": "intersection_with_exact_endpoints",
+        "feature_chunk_size": 2,
+        "pair_strategy": "uniform_positive_negative_or_anchor_negative",
+        "positive_scale": 18.0,
+        "negative_scale": 75.0,
+        "base": 0.77,
+        "miner_epsilon": 0.39
+      }
     },
     {
       "method_id": "hist",
@@ -296,10 +418,23 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://openaccess.thecvf.com/content/CVPR2022/html/Lim_Hypergraph-Induced_Semantic_Tuplet_Loss_for_Deep_Metric_Learning_CVPR_2022_paper.html",
-      "implementation": "pending_hist_hypergraph_motion_adaptation",
-      "status": "blocked",
-      "blocker": "Official code has no discovered reuse license; paper-equation verification, semantic hyperedge construction, hypergraph node classification, and optimizer groups for the motion adaptation are not implemented.",
-      "parameters": {}
+      "implementation": "independent_lim2022_equations_2_to_8_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "lim2022_cub_motion",
+        "hidden_dimension": 512,
+        "temperature_scale": 32.0,
+        "incidence_scale": 1.1,
+        "graph_weight": 1.0,
+        "head_learning_rate": 0.00012,
+        "distribution_learning_rate": 0.1,
+        "graph_learning_rate": 0.0006,
+        "weight_decay": 5e-05,
+        "warmup_epochs": 1,
+        "decay_epochs": 5,
+        "decay_factor": 0.5
+      }
     },
     {
       "method_id": "mhgl",
@@ -307,10 +442,12 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2112.14327",
-      "implementation": "pending_mhgl_local_global_soa_motion_adaptation",
-      "status": "blocked",
-      "blocker": "Official implementation and reuse license have not been established; independent local/global feature heads, second-order attention, and the joint Multi-Similarity plus Proxy Anchor recipe are not implemented.",
-      "parameters": {}
+      "implementation": "pose_embed.benchmark.mhgl:MHGLLoss",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "ebrahimpour2022_printed_equations_motion_v1"
+      }
     },
     {
       "method_id": "proxy_anchor_avsl",
@@ -318,10 +455,12 @@
       "family": "architecture",
       "embedding_dimension": 1536,
       "source_url": "https://arxiv.org/abs/2203.14932",
-      "implementation": "pending_proxy_anchor_avsl_hierarchical_motion_scorer",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; three motion feature levels, per-level losses, momentum relation state, reliability attribution, and hierarchical pairwise similarity inference are not implemented. Cosine over concatenated features is not AVSL.",
-      "parameters": {}
+      "implementation": "pose_embed.benchmark.avsl:AVSLLoss",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "zhang2022_cub_motion_v1"
+      }
     },
     {
       "method_id": "contextual_1536",
