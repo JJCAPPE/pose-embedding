@@ -89,7 +89,12 @@ def encode(model, dataset, device, batch_size: int) -> np.ndarray:
 
 def optimizer_step(model, criterion, optimizer, poses, labels) -> float:
     optimizer.zero_grad(set_to_none=True)
-    value = criterion(model(poses), labels)
+    embeddings = (
+        model.forward_raw(poses)
+        if getattr(criterion, "requires_raw_embeddings", False)
+        else model(poses)
+    )
+    value = criterion(embeddings, labels)
     if value.ndim != 0 or not torch.isfinite(value):
         raise ValueError("objective must produce a finite scalar")
     value.backward()

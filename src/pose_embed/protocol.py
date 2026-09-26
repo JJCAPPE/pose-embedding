@@ -798,6 +798,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/benchmark/cli.py",
         "src/pose_embed/benchmark/config.py",
         "src/pose_embed/benchmark/losses.py",
+        "src/pose_embed/benchmark/ibc.py",
         "src/pose_embed/benchmark/model.py",
         "src/pose_embed/benchmark/runner.py",
         "src/pose_embed/benchmark/runtime.py",

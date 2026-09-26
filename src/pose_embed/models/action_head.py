@@ -52,6 +52,10 @@ class ActionHeadEmbed(nn.Module):
         )
 
     def forward(self, features: torch.Tensor) -> torch.Tensor:
+        return functional.normalize(self.forward_raw(features), dim=-1)
+
+    def forward_raw(self, features: torch.Tensor) -> torch.Tensor:
+        """Expose the same projection before L2 normalization for auxiliary CE."""
         if features.ndim != 5:
             raise ValueError(
                 "features must have shape [batch, people, frames, joints, channels]"
@@ -63,7 +67,7 @@ class ActionHeadEmbed(nn.Module):
                 f"got J={joints}, C={channels}"
             )
         pooled = pool_action_features(self.dropout(features))
-        return functional.normalize(self.projection(pooled), dim=-1)
+        return self.projection(pooled)
 
 
 class FrozenEncoderAdapter(nn.Module):

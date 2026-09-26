@@ -98,7 +98,7 @@ def evaluate_final(
         or identity["method_specification"] != spec.model_dump(mode="json")
     ):
         raise ValueError("evaluation requires the exact selected scientific final run")
-    if spec.family != "embedding_loss":
+    if spec.family != "embedding_loss" and spec.method_id != "ibc":
         raise ValueError("architecture-specific evaluation model is not implemented")
 
     configure_deterministic_inference()

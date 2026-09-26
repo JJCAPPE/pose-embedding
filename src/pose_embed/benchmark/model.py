@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import torch
+import torch.nn.functional as functional
 from torch import nn
 
 from pose_embed.models.action_head import ActionHeadEmbed
@@ -39,6 +40,10 @@ class MotionRetrievalModel(nn.Module):
         return self
 
     def forward(self, poses: torch.Tensor) -> torch.Tensor:
+        return functional.normalize(self.forward_raw(poses), dim=-1)
+
+    def forward_raw(self, poses: torch.Tensor) -> torch.Tensor:
+        """Compute one encoder pass and expose its unnormalized retrieval head."""
         if poses.ndim != 5 or any(size == 0 for size in poses.shape):
             raise ValueError(
                 "poses must be nonempty [batch,people,frames,joints,channels]"
@@ -50,4 +55,6 @@ class MotionRetrievalModel(nn.Module):
         else:
             with torch.no_grad():
                 represented = self.encoder.get_representation(flattened)
-        return self.head(represented.reshape(batch, people, frames, joints, -1))
+        return self.head.forward_raw(
+            represented.reshape(batch, people, frames, joints, -1)
+        )

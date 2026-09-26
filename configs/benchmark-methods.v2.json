@@ -241,10 +241,19 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://proceedings.mlr.press/v139/seidenschwarz21a.html",
-      "implementation": "pending_ibc_mpn_and_auxiliary_cross_entropy",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; learned intra-batch message passing, refined-feature and auxiliary backbone cross-entropy, and backbone-only inference are not implemented.",
-      "parameters": {}
+      "implementation": "independent_ibc_cub_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "seidenschwarz2021_cub_motion",
+        "attention_heads": 2,
+        "message_steps": 1,
+        "dropout": 0.1,
+        "temperature": 0.2,
+        "label_smoothing": 0.1,
+        "auxiliary_weight": 1.0,
+        "refined_weight": 1.0
+      }
     },
     {
       "method_id": "s2sd",

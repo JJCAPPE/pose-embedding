@@ -17,6 +17,7 @@ EXPECTED_UPSTREAMS = {
     "MotionBERT",
     "MotionCLIP",
     "contextual-similarity",
+    "intra-batch",
     "MMAction2",
     "st-gcn",
     "text-to-motion-retrieval",

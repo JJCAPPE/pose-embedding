@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 14 implemented and 12 blocked**. A working priority pair is
+configurations: 15 implemented and 11 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -155,6 +155,11 @@ and 512-dimensional concatenation. Dependency: independent implementation,
 multi-head training and deterministic motion augmentation/state handling.
 
 ## 5. IBC
+
+**Implementation status.** The independently implemented CUB-recipe motion
+adapter is callable as `ibc`; see [the source and adaptation record](ibc-motion-adaptation.md).
+Synthetic component and training-path checks cover both classification
+branches and the graph. Actual paired development/GPU profiling remains pending.
 
 **Required recipe.** The screenshot's 70.3/88.1/81.4 scores correspond to learned
 intra-batch message passing, cross-entropy on refined features, and auxiliary

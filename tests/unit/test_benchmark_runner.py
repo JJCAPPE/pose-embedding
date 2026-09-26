@@ -11,6 +11,7 @@ from torch import nn
 
 from pose_embed.benchmark import runner, runtime
 from pose_embed.benchmark.config import load_benchmark
+from pose_embed.benchmark.losses import build_loss
 from pose_embed.benchmark.model import MotionRetrievalModel
 from pose_embed.data.manifest import ManifestRecord
 from pose_embed.provenance import sha256_file
@@ -25,6 +26,57 @@ class TinyEncoder(nn.Module):
 
     def get_representation(self, poses):
         return self.dropout(self.linear(poses))
+
+
+@pytest.mark.parametrize("train_encoder", [True, False])
+def test_ibc_uses_one_raw_forward_updates_all_paths_and_retrieves_without_graph(
+    train_encoder,
+):
+    torch.manual_seed(7)
+    encoder = TinyEncoder()
+    encoder.dropout.p = 0
+    model = MotionRetrievalModel(
+        encoder,
+        representation_dimension=4,
+        joints=2,
+        embedding_dimension=8,
+        train_encoder=train_encoder,
+    )
+    criterion = build_loss("ibc", {"embedding_dimension": 8, "dropout": 0.0}, 2)
+    before = copy.deepcopy(model.state_dict())
+    poses, labels = torch.randn(8, 2, 3, 2, 3), torch.arange(2).repeat_interleave(4)
+    optimizer = torch.optim.AdamW(
+        [*model.parameters(), *criterion.parameters()], lr=0.01
+    )
+    observed = []
+    hook = criterion.loss.auxiliary_classifier.register_forward_pre_hook(
+        lambda module, args: observed.append(args[0].detach().clone())
+    )
+    expected_raw = model.forward_raw(poses).detach().clone()
+    encoder_calls = []
+    encoder_hook = encoder.linear.register_forward_hook(
+        lambda module, args, output: encoder_calls.append(True)
+    )
+    runner.optimizer_step(model, criterion, optimizer, poses, labels)
+    hook.remove()
+    encoder_hook.remove()
+    assert len(encoder_calls) == 1
+    assert len(observed) == 1
+    torch.testing.assert_close(observed[0], expected_raw)
+    assert not torch.equal(
+        before["head.projection.weight"], model.head.projection.weight
+    )
+    assert (
+        torch.equal(before["encoder.linear.weight"], encoder.linear.weight)
+        != train_encoder
+    )
+    model.eval()
+    embeddings = model(poses)
+    torch.testing.assert_close(
+        embeddings, torch.nn.functional.normalize(model.forward_raw(poses), dim=-1)
+    )
+    # Retrieval does not use criterion BatchNorm or messages from companion clips.
+    torch.testing.assert_close(embeddings[:1], model(poses[:1]), atol=1e-6, rtol=1e-5)
 
 
 @pytest.mark.parametrize("train_encoder", [True, False])
@@ -259,10 +311,10 @@ def test_rehashed_noncanonical_batches_are_rejected(experiment, tmp_path, change
         runtime.verify_run(path)
 
 
-@pytest.mark.parametrize("change", ["head_shape", "encoder", "proxy"])
+@pytest.mark.parametrize("change", ["head_shape", "encoder", "proxy", "ibc"])
 def test_rehashed_invalid_checkpoint_state_is_rejected(experiment, tmp_path, change):
     path = tmp_path / "benchmark-v2/state"
-    method = "proxy_anchor" if change == "proxy" else "contrastive"
+    method = {"proxy": "proxy_anchor", "ibc": "ibc"}.get(change, "contrastive")
     runner.run_experiment(**experiment, method=method, output_dir=path)
     checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
     if change == "head_shape":

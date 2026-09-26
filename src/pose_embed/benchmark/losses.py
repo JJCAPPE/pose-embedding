@@ -16,6 +16,7 @@ from pytorch_metric_learning import distances, losses, miners
 from torch import nn
 
 from pose_embed.benchmark.config import StrictModel, load_methods
+from pose_embed.benchmark.ibc import IBCParameters, IntraBatchConnectionsLoss
 from pose_embed.losses.contextual import ContextualLossConfig, ContextualMetricLoss
 from pose_embed.losses.pairwise import (
     PairwiseContrastiveLoss,
@@ -39,6 +40,7 @@ SUPPORTED_METHODS = frozenset(
         "smooth_ap",
         "normalized_softmax",
         "supcon",
+        "ibc",
     }
 )
 
@@ -239,6 +241,7 @@ class _CheckedLoss(nn.Module):
         self.loss = loss
         self.num_classes = num_classes
         self.embedding_dimension = embedding_dimension
+        self.requires_raw_embeddings = getattr(loss, "requires_raw_embeddings", False)
 
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         if embeddings.ndim != 2 or labels.shape != (len(embeddings),):
@@ -304,7 +307,7 @@ def build_loss(
         isinstance(dimension, bool) or not isinstance(dimension, int) or dimension < 1
     ):
         raise ValueError("embedding_dimension must be a positive integer")
-    if method_id in {"proxy_anchor", "proxy_nca", "normalized_softmax"}:
+    if method_id in {"proxy_anchor", "proxy_nca", "normalized_softmax", "ibc"}:
         parameters["embedding_dimension"] = dimension or 512
     if method_id == "contrastive":
         config = ContrastiveParameters.model_validate(parameters)
@@ -342,6 +345,10 @@ def build_loss(
         )
     elif method_id == "roadmap":
         module = RoadmapLoss(RoadmapParameters.model_validate(parameters))
+    elif method_id == "ibc":
+        config = IBCParameters.model_validate(parameters)
+        dimension = config.embedding_dimension
+        module = IntraBatchConnectionsLoss(config, num_classes)
     elif method_id == "proxy_anchor":
         config = ProxyAnchorParameters.model_validate(parameters)
         dimension = config.embedding_dimension
