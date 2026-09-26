@@ -68,3 +68,17 @@ training duration must be declared and measured before selection. Supporting
 ablations, training-noise experiments and supplementary motion corruptions also
 require their own locked run matrices. No generic loss wrapper, frozen pilot,
 one seed or image-paper number may fill these missing motion results.
+
+## Release observations
+
+PR #22 merged as `b5431f0de0c545a069aa27be8106f73615242ea7` after all three
+required CI jobs passed. Hosted migration `20260924223631` was applied. The live
+health endpoint confirms that build, Supabase reads, project version 3 and editing
+enabled; the public export contains the v2 research question and all fourteen weeks.
+
+Initial SCC jobs `7748336` and `7748337` exited before model/data execution because
+Git's directory-only `.venv/` ignore pattern did not cover the external environment
+symlink. The pattern is corrected to `.venv`, which covers both forms. The failed
+scheduler logs remain under the external artifact root; subsequent submissions
+must use new job IDs and output directories. This operational failure provides no
+retrieval, timing or memory result.
