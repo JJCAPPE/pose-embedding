@@ -135,6 +135,16 @@ def _verified_training_records(identity: dict, config: BenchmarkConfig):
     return manifests[filename]
 
 
+def _verified_profile_records(identity, config):
+    from pose_embed.benchmark.episodes import load_episode
+
+    return load_episode(
+        identity["input_paths"]["manifest_set"],
+        "development_validation",
+        protocol_path=REPOSITORY / config.input_protocol,
+    )["records"]
+
+
 @lru_cache(maxsize=2)
 def _reference_encoder_state(checkpoint_path: str, checkpoint_sha256: str) -> dict:
     """Read shapes once from an already hash-verified immutable pretrained file."""
@@ -760,6 +770,9 @@ def verify_run(directory: str | Path) -> dict:
     config = BenchmarkConfig.model_validate(identity.get("configuration", {}))
     if benchmark_digest(config) != identity.get("benchmark_sha256"):
         raise ValueError("benchmark configuration hash mismatch")
+    from pose_embed.benchmark.campaign import validate_run_binding
+
+    validate_run_binding(identity, config, directory)
     method = load_methods().get(identity.get("method"))
     if (
         method is None
@@ -792,6 +805,8 @@ def verify_run(directory: str | Path) -> dict:
         "initialization.json",
         "telemetry.json",
     }
+    if "candidate" in identity:
+        required.add("effective-configuration.json")
     if stage == "development":
         required.add("development-result.json")
     if identity["method"] == "diva":
@@ -852,6 +867,15 @@ def verify_run(directory: str | Path) -> dict:
                 raise ValueError(
                     "training history lacks the required encoder backward evidence"
                 )
+    if stage == "profile":
+        from pose_embed.benchmark.profiling import validate_retrieval_profile
+
+        validate_retrieval_profile(
+            read_json(directory / "telemetry.json").get("retrieval_profile"),
+            identity,
+            method,
+            _verified_profile_records(identity, config),
+        )
     if stage == "development":
         validation = [row for row in rows if "validation" in row]
         expected = [

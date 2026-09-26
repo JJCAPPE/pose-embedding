@@ -14,7 +14,7 @@ from typing import Any
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, Subset
 
 from pose_embed.benchmark.config import benchmark_digest, load_benchmark, load_methods
 from pose_embed.benchmark.descriptors import (
@@ -24,6 +24,7 @@ from pose_embed.benchmark.descriptors import (
 )
 from pose_embed.benchmark.losses import build_loss, supports
 from pose_embed.benchmark.model import MotionRetrievalModel, head_recipe
+from pose_embed.benchmark.profiling import PROFILE_RETRIEVAL, measure_retrieval
 from pose_embed.benchmark.retrieval import evaluate_retrieval, method_retrieval_policy
 from pose_embed.benchmark.runtime import (
     REPOSITORY,
@@ -184,6 +185,7 @@ def run_experiment(
     resume_from: str | Path | None = None,
     segment_steps: int | None = None,
     max_segment_seconds: float | None = None,
+    candidate: str | None = None,
 ) -> dict[str, Any]:
     """Run one declared method/seed. Profiling can never certify a final run."""
     attempt_started = time.perf_counter()
@@ -202,6 +204,16 @@ def run_experiment(
     ):
         raise ValueError("max_segment_seconds must be positive and finite")
     config = load_benchmark(config_path)
+    base_config = config
+    campaign_binding = {}
+    if candidate is not None:
+        if stage != "development" or profile_steps is not None:
+            raise ValueError(
+                "candidate is only explicit for scientific development runs"
+            )
+        from pose_embed.benchmark.campaign import training_binding
+
+        config, campaign_binding = training_binding(config, candidate, output_dir)
     track = track or config.training.encoder_mode
     if track != config.training.encoder_mode:
         raise ValueError(
@@ -228,6 +240,14 @@ def run_experiment(
         selection = validate_selection(config_path=config_path)
         if method not in selection.get("methods", {}) or track != "finetune":
             raise ValueError("final method/track was not selected")
+        from pose_embed.benchmark.campaign import selected_config
+
+        config = selected_config(base_config, selection, method)
+        campaign_binding = {
+            "candidate": selection["methods"][method]["candidate"],
+            "campaign_sha256": selection["campaign_sha256"],
+            "campaign_base_config_path": selection["campaign_base_config_path"],
+        }
     configure_deterministic_inference()
     protocol_path = REPOSITORY / config.input_protocol
     inputs = load_motionbert_inputs(protocol_path, manifest_set_path)
@@ -266,7 +286,14 @@ def run_experiment(
             "scientific step budget must exceed the complete declared warmup "
             "for both development and final training; use a declared longer budget"
         )
+    effective_path = artifact_path(output_dir) / "effective-configuration.json"
     identity = {
+        **campaign_binding,
+        **(
+            {"profile_retrieval": PROFILE_RETRIEVAL}
+            if profile_steps is not None
+            else {}
+        ),
         "benchmark_sha256": benchmark_digest(config),
         "configuration": config.model_dump(mode="json"),
         "method": method,
@@ -281,7 +308,9 @@ def run_experiment(
             "manifest_set": str(Path(manifest_set_path).resolve()),
             "parity_evidence": str(Path(parity_evidence_path).resolve()),
             "protocol": str(protocol_path.resolve()),
-            "configuration": str(Path(config_path).resolve()),
+            "configuration": str(
+                effective_path if campaign_binding else Path(config_path).resolve()
+            ),
         },
         "parity_sha256": sha256_file(parity_evidence_path),
         "selection_sha256": sha256_file(artifact_root() / "locks/selection.json")
@@ -301,10 +330,18 @@ def run_experiment(
     stop = StopAtBoundary()
     if resume_from is None:
         destination.mkdir(parents=True, exist_ok=False)
+        if campaign_binding:
+            write_immutable_json(effective_path, config.model_dump(mode="json"))
         write_immutable_json(
             destination / "attempt.json", {"identity": identity, "started_at": now()}
         )
     else:
+        if campaign_binding and read_json(effective_path) != config.model_dump(
+            mode="json"
+        ):
+            raise ValueError(
+                "resume effective configuration differs from the selected candidate"
+            )
         if read_json(destination / "attempt.json").get("identity") != identity:
             raise ValueError(
                 "resume requires the identical code, inputs and experiment identity"
@@ -761,6 +798,22 @@ def run_experiment(
             output_names.append("development-result.json")
         if method == "diva":
             output_names.extend(["memory-plan.json", "memory-initialization.json"])
+
+        retrieval_profile = None
+        if profile_steps is not None:
+            prefix = validation_rows[: PROFILE_RETRIEVAL["prefix_size"]]
+            retrieval_profile = measure_retrieval(
+                model,
+                Subset(validation, range(len(prefix))),
+                prefix,
+                device,
+                batch_size,
+                method,
+                spec.parameters,
+            )
+            if torch.device(device).type == "cuda":
+                peak_allocated = torch.cuda.max_memory_allocated(device)
+                peak_reserved = torch.cuda.max_memory_reserved(device)
         telemetry = {
             "elapsed_seconds": elapsed,
             "environment": environment,
@@ -795,10 +848,15 @@ def run_experiment(
                 )
                 + sum(p.numel() for p in model.momentum_projection.parameters()),
             )
+
+        if retrieval_profile is not None:
+            telemetry["retrieval_profile"] = retrieval_profile
         write_immutable_json(destination / "telemetry.json", telemetry)
         write_immutable_json(
             destination / "outcome.json", {"status": "succeeded", "completed_at": now()}
         )
+        if campaign_binding:
+            output_names.append("effective-configuration.json")
         return publish_manifest(destination, identity, output_names)
     except BaseException as exc:
         failure_dir = segment if segmented and segment is not None else destination

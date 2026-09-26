@@ -267,6 +267,9 @@ def experiment(tmp_path, monkeypatch, request):
             },
         }
 
+    monkeypatch.setattr(
+        runtime, "_verified_profile_records", lambda identity, config: records
+    )
     monkeypatch.setattr(runtime, "_expected_model_state", fixture_model_state)
     real_model = MotionRetrievalModel
     monkeypatch.setattr(
@@ -875,3 +878,120 @@ def test_diva_runner_memory_state_and_tamper_rejection(
     _rehash_output(path, "memory-plan.json")
     with pytest.raises(ValueError, match="memory plan"):
         runtime.verify_run(path)
+
+
+@pytest.mark.parametrize("segmented", [False, True])
+def test_candidate_runner_persists_effective_config_and_final_adopts_winner(
+    experiment, tmp_path, monkeypatch, segmented
+):
+    import yaml
+
+    from pose_embed.benchmark import campaign, locks
+    from pose_embed.benchmark.config import benchmark_digest
+
+    path = experiment["config_path"]
+    values = yaml.safe_load(path.read_text())
+    values["training"]["encoder_mode"] = "finetune"
+    path.write_text(yaml.safe_dump(values))
+    base = load_benchmark(path)
+    half = campaign.candidate_config(base, "half")
+    binding = {
+        "candidate": "half",
+        "campaign_sha256": "fixture-campaign",
+        "campaign_base_config_path": str(path),
+    }
+    # Complete campaign eligibility is exercised by the 468-cell integration
+    # tests; this fixture tests actual optimization and effective-config I/O.
+    monkeypatch.setattr(campaign, "training_binding", lambda *_: (half, binding))
+    observed = []
+
+    def validate(identity, config, directory):
+        assert identity["candidate"] == "half"
+        assert config == half
+        assert runtime.read_json(
+            directory / "effective-configuration.json"
+        ) == half.model_dump(mode="json")
+        observed.append(identity["stage"])
+
+    monkeypatch.setattr(campaign, "validate_run_binding", validate)
+    development = tmp_path / "benchmark-v2/candidate-half"
+    arguments = dict(
+        **experiment, method="contrastive", candidate="half", output_dir=development
+    )
+    run = runner.run_experiment(
+        **arguments, **({"segment_steps": 1} if segmented else {})
+    )
+    if segmented:
+        assert run["status"] == "resumable"
+        command = run["next_resume_command"]
+        assert "--candidate half" in command and str(path) in command
+        assert "effective-configuration.json" not in command
+        saved_config = sha256_file(development / "effective-configuration.json")
+        run = runner.run_experiment(**arguments, resume_from=run["segment_manifest"])
+        assert saved_config == sha256_file(development / "effective-configuration.json")
+    assert run["identity"]["benchmark_sha256"] == benchmark_digest(half)
+    assert (
+        run["identity"]["training_recipe"]["learning_rate"]
+        == base.training.learning_rate * 0.5
+    )
+    assert "effective-configuration.json" in run["outputs"]
+    selection = {
+        "campaign_sha256": binding["campaign_sha256"],
+        "campaign_base_config_path": str(path),
+        "methods": {
+            "contrastive": {
+                "candidate": "half",
+                "configuration_sha256": runtime.digest(half.model_dump(mode="json")),
+                "selected_steps": 2,
+            }
+        },
+    }
+    lock_path = tmp_path / "benchmark-v2/locks/selection.json"
+    lock_path.parent.mkdir(parents=True)
+    lock_path.write_text(json.dumps(selection))
+    monkeypatch.setattr(locks, "validate_selection", lambda **_: selection)
+    final_arguments = dict(
+        **experiment,
+        method="contrastive",
+        stage="final",
+        output_dir=tmp_path / "benchmark-v2/selected-final",
+    )
+    final = runner.run_experiment(
+        **final_arguments, **({"segment_steps": 1} if segmented else {})
+    )
+    if segmented:
+        assert final["status"] == "resumable"
+        command = final["next_resume_command"]
+        assert "--candidate" not in command and str(path) in command
+        assert "--phase final" in command
+        final = runner.run_experiment(
+            **final_arguments, resume_from=final["segment_manifest"]
+        )
+    assert final["identity"]["candidate"] == "half"
+    assert final["identity"]["configuration"] == half.model_dump(mode="json")
+    assert final["identity"]["steps"] == 2
+    runtime.verify_run(development)
+    runtime.verify_run(tmp_path / "benchmark-v2/selected-final")
+    assert {"development", "final"} <= set(observed)
+
+
+def test_profile_measures_real_retrieval_and_rejects_rehashed_metadata(
+    experiment, tmp_path
+):
+    directory = tmp_path / "benchmark-v2/retrieval-profile"
+    manifest = runner.run_experiment(
+        **experiment, method="contextual", profile_steps=3, output_dir=directory
+    )
+    profile = runtime.read_json(directory / "telemetry.json")["retrieval_profile"]
+    assert profile["sample_count"] == 8
+    assert profile["descriptor_storage"]["bytes_per_sample"] == 512 * 4
+    assert profile["encoding_seconds"] > 0 and profile["scoring_seconds"] > 0
+    assert "metrics" not in profile and "per_query" not in profile
+    assert manifest["identity"]["profile_retrieval"]["prefix_size"] == 128
+    telemetry = runtime.read_json(directory / "telemetry.json")
+    telemetry["retrieval_profile"]["sample_ids"] = list(reversed(profile["sample_ids"]))
+    (directory / "telemetry.json").write_text(json.dumps(telemetry))
+    manifest["outputs"]["telemetry.json"] = sha256_file(directory / "telemetry.json")
+    (directory / "run-manifest.json").write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="validation prefix"):
+        runtime.verify_run(directory)

@@ -106,7 +106,6 @@ def _collect_runs(
     run_dirs: Sequence[str | Path], config, methods, stage: str, selection=None
 ) -> dict:
     runs = {}
-    config_hash = benchmark_digest(config)
     selection_hash = (
         sha256_file(_path("selection.json")) if selection is not None else None
     )
@@ -122,12 +121,22 @@ def _collect_runs(
             raise ValueError("duplicate locked method/seed run")
         if key[0] not in config.final_methods or key[1] not in config.training.seeds:
             raise ValueError("run method/seed is outside the complete benchmark")
+        effective = config
+        if selection is not None:
+            from pose_embed.benchmark.campaign import selected_config
+
+            effective = selected_config(config, selection, key[0])
+            if (
+                identity.get("candidate") != selection["methods"][key[0]]["candidate"]
+                or identity.get("campaign_sha256") != selection["campaign_sha256"]
+            ):
+                raise ValueError("final run does not bind the selected campaign winner")
         if (
             identity.get("stage") != stage
             or identity.get("track") != "finetune"
             or identity.get("scientific_use_allowed") is not True
-            or identity.get("benchmark_sha256") != config_hash
-            or identity.get("configuration") != config.model_dump(mode="json")
+            or identity.get("benchmark_sha256") != benchmark_digest(effective)
+            or identity.get("configuration") != effective.model_dump(mode="json")
             or identity.get("method_specification")
             != methods[key[0]].model_dump(mode="json")
         ):
@@ -209,7 +218,7 @@ def _collect_runs(
     return runs
 
 
-def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
+def _candidate_selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
     runs = _collect_runs(run_dirs, config, methods, "development")
     selected = {}
     episode = None
@@ -336,6 +345,12 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
     }, completed_at
 
 
+def _selection_content(run_dirs, config, methods):
+    from pose_embed.benchmark.campaign import selection_content
+
+    return selection_content(run_dirs, config, methods, _candidate_selection_content)
+
+
 def create_selection(
     run_dirs: Sequence[str | Path], *, config_path: str | Path | None = None
 ) -> dict:
@@ -452,21 +467,17 @@ def open_test(
     This function verifies metadata and run evidence. The final evaluator must
     verify its physical pose/model inputs before invoking this opening event.
     """
-    expected, _ = _opening_content(manifest_set_path, config_path)
+    expected, finalized_at = _opening_content(manifest_set_path, config_path)
     path = _path("test-opening.json")
     if path.exists():
-        return validate_opening(
-            manifest_set_path=manifest_set_path, config_path=config_path
-        )
+        return _validate_opening_payload(read_json(path), expected, finalized_at)
     payload = {**expected, "created_at": now()}
     try:
         write_immutable_json(path, payload)
     except ValueError:
         if not path.exists():
             raise
-        return validate_opening(
-            manifest_set_path=manifest_set_path, config_path=config_path
-        )
+        return _validate_opening_payload(read_json(path), expected, finalized_at)
     return payload
 
 
@@ -476,6 +487,10 @@ def validate_opening(
     """Require the existing ledger to bind both still-valid locks and the pool."""
     payload = read_json(_path("test-opening.json"))
     expected, finalized_at = _opening_content(manifest_set_path, config_path)
+    return _validate_opening_payload(payload, expected, finalized_at)
+
+
+def _validate_opening_payload(payload, expected, finalized_at):
     if {
         key: value for key, value in payload.items() if key != "created_at"
     } != expected:

@@ -802,6 +802,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/benchmark/diml.py",
         "src/pose_embed/benchmark/descriptors.py",
         "src/pose_embed/benchmark/campaign.py",
+        "src/pose_embed/benchmark/profiling.py",
         "configs/benchmark-campaign.v2.json",
         "src/pose_embed/benchmark/losses.py",
         "src/pose_embed/benchmark/ibc.py",

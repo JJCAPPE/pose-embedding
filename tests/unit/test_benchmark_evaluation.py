@@ -49,6 +49,9 @@ def final_fixture(tmp_path, monkeypatch):
         }
     )
     monkeypatch.setattr(evaluation, "load_benchmark", lambda _: config)
+    monkeypatch.setattr(
+        evaluation, "_effective_final_config", lambda config, identity: config
+    )
     parity = tmp_path / "parity.json"
     parity.write_text("{}")
     bindings = {"verified_fixture_binding": "unit-test-only"}

@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import torch
 
-from pose_embed.benchmark import locks
+from pose_embed.benchmark import campaign, locks
 from pose_embed.benchmark.config import benchmark_digest, load_benchmark, load_methods
 from pose_embed.benchmark.retrieval import method_retrieval_policy
 from pose_embed.benchmark.runtime import (
@@ -55,6 +55,17 @@ def lock_context(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         return manifest
 
     monkeypatch.setattr(locks, "verify_run", verify_fixture)
+
+    # These legacy tests isolate single-candidate locks. The campaign suite
+    # exercises the full three-candidate wrapper without this fixture shortcut.
+    def select_fixture(run_dirs, config, methods, select_candidate):
+        content, timestamp = select_candidate(run_dirs, config, methods)
+        content["campaign_sha256"] = "fixture-campaign"
+        for chosen in content["methods"].values():
+            chosen.update(candidate="baseline", learning_rate_scale=1.0)
+        return content, timestamp
+
+    monkeypatch.setattr(campaign, "selection_content", select_fixture)
     return config, methods
 
 
@@ -96,6 +107,10 @@ def _runs(lock_context, stage: str, *, selection=None) -> list[Path]:
                 else sha256_file(artifact_root() / "locks/selection.json"),
                 "inputs": shared_inputs,
             }
+            if stage == "final":
+                identity.update(
+                    candidate="baseline", campaign_sha256=selection["campaign_sha256"]
+                )
             write_immutable_json(
                 directory / "attempt.json",
                 {"identity": identity, "started_at": timestamp},

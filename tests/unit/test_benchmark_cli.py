@@ -225,3 +225,46 @@ def test_evaluate_cli_runs_the_complete_suite_gate_before_loading_data(
             )
         )
     assert not (tmp_path / "benchmark-v2/locks").exists()
+
+
+def test_campaign_declaration_and_failure_review_dispatch(monkeypatch):
+    from pose_embed.benchmark import campaign
+
+    seen = []
+    monkeypatch.setattr(
+        campaign,
+        "declare_campaign",
+        lambda **kwargs: seen.append(kwargs) or {"ok": True},
+    )
+    args = parse(
+        "declare-campaign",
+        "--run-root",
+        "main-grid",
+        "--profiles",
+        "profile-a",
+        "profile-b",
+        "--prior-trial-roots",
+        "old-pilots",
+        "--priority-comparison",
+        "pair.json",
+    )
+    assert cli.run(args) == {"ok": True}
+    assert seen[0]["profiles"] == ["profile-a", "profile-b"]
+    assert seen[0]["priority_comparison"] == "pair.json"
+    monkeypatch.setattr(
+        campaign,
+        "review_failure",
+        lambda directory, **kwargs: {"directory": directory, **kwargs},
+    )
+    args = parse(
+        "review-failure",
+        "--run",
+        "failed-cell",
+        "--category",
+        "preemption",
+        "--reason",
+        "The scheduler preempted this job before its next step.",
+    )
+    assert cli.run(args)["category"] == "preemption"
+    args = parse(*experiment_arguments("train"), "--candidate", "half")
+    assert args.candidate == "half"

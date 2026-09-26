@@ -85,6 +85,13 @@ def _lock_hashes() -> dict[str, str]:
     }
 
 
+def _effective_final_config(config, identity):
+    from pose_embed.benchmark.campaign import candidate_config
+
+    # validate_final_runs has already checked the selected winner for this cell.
+    return candidate_config(config, identity["candidate"])
+
+
 def evaluate_final(
     run_dir: str | Path,
     config_path: str | Path,
@@ -110,7 +117,8 @@ def evaluate_final(
         or identity["scientific_use_allowed"] is not True
         or identity["method"] != reference["method"]
         or identity["seed"] != reference["seed"]
-        or identity["benchmark_sha256"] != benchmark_digest(config)
+        or identity["benchmark_sha256"]
+        != benchmark_digest(_effective_final_config(config, identity))
         or identity["method_specification"] != spec.model_dump(mode="json")
     ):
         raise ValueError("evaluation requires the exact selected scientific final run")
