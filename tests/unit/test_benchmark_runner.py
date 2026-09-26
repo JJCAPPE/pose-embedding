@@ -10,7 +10,7 @@ import torch
 from torch import nn
 
 from pose_embed.benchmark import runner, runtime
-from pose_embed.benchmark.config import load_benchmark
+from pose_embed.benchmark.config import load_benchmark, load_methods
 from pose_embed.benchmark.losses import build_loss
 from pose_embed.benchmark.model import MotionRetrievalModel
 from pose_embed.data.manifest import ManifestRecord
@@ -650,3 +650,96 @@ def test_drml_profile_measures_real_finetuning_step(experiment, tmp_path):
     runtime.verify_run(path)
     assert manifest["identity"]["scientific_use_allowed"] is False
     assert runtime.read_json(path / "telemetry.json")["encoder_backward_steps"] == 2
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "counter",
+        "rng",
+        "teacher",
+        "boundary",
+        "optimizer_missing",
+        "optimizer_mapping",
+        "optimizer_step",
+    ],
+)
+def test_s2sd_run_rejects_rehashed_training_state(
+    experiment, tmp_path, monkeypatch, fault
+):
+    methods = load_methods()
+    original = methods["s2sd"]
+    # All dimensions here are deliberately synthetic; production registry stays fixed.
+    methods["s2sd"] = original.model_copy(
+        update={
+            "embedding_dimension": 8,
+            "parameters": original.parameters
+            | {
+                "embedding_dimension": 8,
+                "feature_dimension": 8,
+                "target_dimensions": [8, 12, 16, 20],
+                "feature_delay": 1,
+            },
+        }
+    )
+    monkeypatch.setattr(runner, "load_methods", lambda: methods)
+    monkeypatch.setattr(runtime, "load_methods", lambda: methods)
+    path = tmp_path / "benchmark-v2/s2sd"
+    runner.run_experiment(**experiment, method="s2sd", output_dir=path)
+    assert runtime.verify_run(path)["identity"]["method"] == "s2sd"
+    checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
+    assert checkpoint["selected_step"] == 2
+    assert checkpoint["criterion"]["completed_steps"].item() == 2
+    if fault == "counter":
+        checkpoint["criterion"]["completed_steps"].fill_(1)
+    elif fault == "rng":
+        checkpoint["criterion"]["student_objective.rng_state"].fill_(0)
+    elif fault == "teacher":
+        del checkpoint["criterion"]["teachers.0.0.weight"]
+    elif fault == "boundary":
+        checkpoint["criterion"]["teacher_objectives.0.beta"] = torch.ones(1)
+    elif fault == "optimizer_missing":
+        del checkpoint["optimizer"]
+    elif fault == "optimizer_mapping":
+        checkpoint["optimizer"]["param_groups"][2]["param_names"].pop()
+    else:
+        next(iter(checkpoint["optimizer"]["state"].values()))["step"].add_(1)
+    torch.save(checkpoint, path / "checkpoint.pt")
+    _rehash_output(path, "checkpoint.pt")
+    with pytest.raises(
+        ValueError, match="counter|sampling state|criterion/proxy|optimizer"
+    ):
+        runtime.verify_run(path)
+
+
+def test_s2sd_profiles_active_delayed_path_and_rejects_short_scientific_run(
+    experiment, tmp_path, monkeypatch
+):
+    methods = load_methods()
+    methods["s2sd"] = methods["s2sd"].model_copy(
+        update={
+            "embedding_dimension": 8,
+            "parameters": methods["s2sd"].parameters
+            | {
+                "embedding_dimension": 8,
+                "feature_dimension": 8,
+                "target_dimensions": [8, 12, 16, 20],
+                "feature_delay": 2,
+            },
+        }
+    )
+    monkeypatch.setattr(runner, "load_methods", lambda: methods)
+    monkeypatch.setattr(runtime, "load_methods", lambda: methods)
+    path = tmp_path / "benchmark-v2/s2sd-profile"
+    runner.run_experiment(**experiment, method="s2sd", output_dir=path, profile_steps=1)
+    manifest = runtime.verify_run(path)
+    recipe = manifest["identity"]["training_recipe"]
+    assert recipe["profile_phase"] == "post_feature_delay_capacity"
+    assert recipe["profile_counter_offset"] == 2
+    state = torch.load(path / "checkpoint.pt", weights_only=True)
+    assert state["criterion"]["completed_steps"].item() == 3
+    assert state["selected_step"] == 1
+    with pytest.raises(ValueError, match="scientific step budget"):
+        runner.run_experiment(
+            **experiment, method="s2sd", output_dir=tmp_path / "short"
+        )

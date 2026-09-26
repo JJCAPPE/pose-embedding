@@ -283,14 +283,32 @@
     },
     {
       "method_id": "s2sd",
-      "name": "S2SD (R-Margin + MSDF[A])",
+      "name": "S2SD (R-Margin + MSDFA, CUB motion recipe)",
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://proceedings.mlr.press/v139/roth21a.html",
-      "implementation": "pending_r_margin_s2sd_msdf_motion_adaptation",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; the screenshot uses R-Margin with MSDFA on CUB/Cars and MSDF on SOP. Distance-weighted sampling, positive/negative switching, trainable margins, distillation branches, and a declared motion variant are not implemented.",
-      "parameters": {}
+      "implementation": "independent_rmargin_msdfa_motion",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "roth2021_rmargin_msdfa_cub_motion",
+        "feature_dimension": 8704,
+        "target_dimensions": [
+          512,
+          1024,
+          1536,
+          2048
+        ],
+        "temperature": 1.0,
+        "distillation_weight": 50.0,
+        "feature_weight": 50.0,
+        "feature_delay": 1000,
+        "margin": 0.2,
+        "beta_initial": 1.2,
+        "beta_learning_rate": 0.0005,
+        "switch_probability": 0.4,
+        "distance_floor": 0.5
+      }
     },
     {
       "method_id": "proxy_nca_metrix",

@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 21 implemented and 5 blocked**. A working priority pair is
+configurations: 22 implemented and 4 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -187,6 +187,12 @@ batch composition. Dependency: a training-only contextual module and global
 class-ID classifier mapping; no new inference scorer for the main row.
 
 ## 6. S2SD with R-Margin
+
+**Implemented motion adapter.** Four MSDFA teachers, R-Margin sampling, delayed
+feature distillation, beta parameter groups and checkpointed sampling/optimizer
+state are implemented. See [the declared recipe](s2sd-motion-adaptation.md).
+Capacity profiles explicitly activate the delayed term; dataset feasibility
+and the complete development campaign remain required.
 
 **Required recipe.** The screenshot's 70.1/89.5/80.0 row is **R-Margin + S2SD**,
 not default Multi-Similarity + S2SD. The SOTA table uses MSDFA for CUB/Cars

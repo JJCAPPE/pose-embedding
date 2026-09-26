@@ -33,6 +33,21 @@ def resolve_recipe(
         "minimum_selected_step": 1,
         "profile_phase": "main_capacity" if profile else None,
     }
+    if method_id == "s2sd":
+        from pose_embed.benchmark.s2sd import S2SDParameters
+
+        config = S2SDParameters.model_validate(parameters)
+        return common | {
+            **config.model_dump(mode="json"),
+            "optimizer": "AdamW",
+            "optimizer_epsilon": 1e-8,
+            "learning_rate": training.learning_rate,
+            "weight_decay": training.weight_decay,
+            "named_optimizer_state": True,
+            "minimum_selected_step": config.feature_delay + 1,
+            "profile_phase": "post_feature_delay_capacity" if profile else None,
+            "profile_counter_offset": config.feature_delay if profile else 0,
+        }
     if method_id == "hist":
         config = HISTParameters.model_validate(parameters)
         epoch_steps = math.ceil(num_records / training.physical_batch_size)
@@ -111,6 +126,10 @@ def build_optimizer(model, criterion, recipe: dict, phase: str):
     model.set_encoder_trainable(
         recipe["encoder_mode"] == "finetune" and phase == "main"
     )
+    if recipe.get("recipe") == "roth2021_rmargin_msdfa_cub_motion":
+        from pose_embed.benchmark.s2sd import build_s2sd_optimizer
+
+        return build_s2sd_optimizer(model, criterion, recipe)
     if recipe["optimizer"] == "AdamW" and not recipe.get("named_optimizer_state"):
         parameters = [
             p for p in [*model.parameters(), *criterion.parameters()] if p.requires_grad

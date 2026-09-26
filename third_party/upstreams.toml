@@ -99,3 +99,12 @@ license = "UNSPECIFIED"
 license_files = []
 reference_only = true
 purpose = "DRML paper provenance only; independently implement published equations. No unlicensed code may be copied or adapted."
+
+[[upstream]]
+name = "S2SD"
+repository = "https://github.com/MLforHealth/S2SD.git"
+commit = "1ef26e4e273019575f3b5dfbb789fa4952eb9646"
+license = "MIT"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "Published R-Margin/MSDFA recipe audit; independent motion implementation without redistributed upstream code."

@@ -36,7 +36,7 @@ def supports_embedding_inference(method_id: str) -> bool:
         and supports(method_id)
         and (
             specification.family == "embedding_loss"
-            or method_id in {"proxy_nca_pp", "ibc", "hist", "drml"}
+            or method_id in {"proxy_nca_pp", "ibc", "hist", "drml", "s2sd"}
             or method_id in METRIX_METHODS
         )
     )

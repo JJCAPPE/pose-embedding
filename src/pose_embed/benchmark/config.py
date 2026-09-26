@@ -57,7 +57,7 @@ class MethodSpec(StrictModel):
     implementation: str = Field(min_length=1)
     status: Literal["implemented", "blocked"]
     blocker: str | None
-    parameters: dict[str, str | float | int | bool]
+    parameters: dict[str, str | float | int | bool | list[StrictInt]]
 
     @model_validator(mode="after")
     def status_has_evidence(self) -> MethodSpec:

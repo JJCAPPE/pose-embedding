@@ -285,6 +285,8 @@ def run_experiment(
             spec.parameters | {"embedding_dimension": spec.embedding_dimension},
             len(set(dataset.labels)),
         ).to(device)
+        if method == "s2sd":
+            criterion.completed_steps.fill_(recipe["profile_counter_offset"])
         phase = phase_for_step(recipe, 1)
         optimizer = build_optimizer(model, criterion, recipe, phase)
         initial = {

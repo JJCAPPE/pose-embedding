@@ -211,7 +211,8 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
         "encoder_parameters": _reference_encoder_parameters(
             str(Path(data_root).resolve()), str(assets["checkpoint_sha256"])
         )
-        if identity["method"] in {"proxy_nca_pp", "hist", "drml", "proxy_nca_metrix"}
+        if identity["method"]
+        in {"proxy_nca_pp", "hist", "drml", "proxy_nca_metrix", "s2sd"}
         else (),
         "model_shapes": {
             **{f"encoder.{key}": shape for key, shape in reference["shapes"].items()},
@@ -483,6 +484,12 @@ def _verify_checkpoint_state(
         for key, value in expected_criterion.items()
     ):
         raise ValueError("checkpoint criterion/proxy state keys or shapes are invalid")
+    if hasattr(criterion, "validate_checkpoint_state"):
+        criterion.validate_checkpoint_state(
+            checkpoint["criterion"],
+            checkpoint["selected_step"]
+            + identity["training_recipe"].get("profile_counter_offset", 0),
+        )
 
 
 def save_checkpoint(path: Path, payload: dict[str, Any]) -> None:
@@ -638,6 +645,14 @@ def verify_run(directory: str | Path) -> dict:
         ):
             raise ValueError("checkpoint contains invalid parameters")
     _verify_checkpoint_state(directory, identity, config, checkpoint, num_classes)
+    if identity["method"] == "s2sd":
+        from pose_embed.benchmark.s2sd import verify_s2sd_optimizer
+
+        verify_s2sd_optimizer(
+            checkpoint,
+            recipe,
+            _expected_model_state(identity, config)["encoder_parameters"],
+        )
     if identity["method"] == "drml":
         from pose_embed.benchmark.drml import verify_drml_optimizer
 
