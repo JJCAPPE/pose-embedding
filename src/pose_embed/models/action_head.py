@@ -55,7 +55,7 @@ class ActionHeadEmbed(nn.Module):
         return functional.normalize(self.forward_raw(features), dim=-1)
 
     def forward_raw(self, features: torch.Tensor) -> torch.Tensor:
-        """Expose the same projection before L2 normalization for auxiliary CE."""
+        """Return the projection before retrieval normalization."""
         if features.ndim != 5:
             raise ValueError(
                 "features must have shape [batch, people, frames, joints, channels]"

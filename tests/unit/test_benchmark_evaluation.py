@@ -200,6 +200,66 @@ def test_checkpoint_shape_mismatch_cannot_open_test(final_fixture):
     assert "open" not in f.events and "forward" not in f.events
 
 
+@pytest.mark.parametrize("corrupt_head", [False, True])
+def test_proxy_evaluation_reconstructs_masked_head_before_opening(
+    final_fixture, monkeypatch, corrupt_head
+):
+    from pose_embed.benchmark.model import MotionRetrievalModel
+
+    f = final_fixture
+
+    class Encoder(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.linear = torch.nn.Linear(3, 4)
+
+        def get_representation(self, poses):
+            assert (f.root / "locks/test-opening.json").exists()
+            return self.linear(poses)
+
+    spec = load_methods()["proxy_nca_pp"]
+    f.identity.update(
+        method="proxy_nca_pp", method_specification=spec.model_dump(mode="json")
+    )
+    reference = f.final_runs["runs"][0]
+    reference["method"] = "proxy_nca_pp"
+    state = MotionRetrievalModel(
+        Encoder(),
+        method_id="proxy_nca_pp",
+        representation_dimension=4,
+        joints=2,
+        embedding_dimension=512,
+    ).state_dict()
+    if corrupt_head:
+        state["head.projection.weight"] = torch.ones(512, 8)
+    torch.save({"model": state}, f.run / "checkpoint.pt")
+    reference["checkpoint_sha256"] = sha256_file(f.run / "checkpoint.pt")
+    (f.run / "run-manifest.json").write_text(json.dumps({"identity": f.identity}))
+    reference["run_manifest_sha256"] = sha256_file(f.run / "run-manifest.json")
+    monkeypatch.setattr(evaluation, "load_frozen_encoder", lambda *_: (Encoder(), {}))
+    monkeypatch.setattr(
+        evaluation,
+        "MotionRetrievalModel",
+        lambda encoder, **kwargs: MotionRetrievalModel(
+            encoder, representation_dimension=4, joints=2, **kwargs
+        ),
+    )
+    poses = torch.randn(4, 2, 3, 2, 3, generator=torch.Generator().manual_seed(17))
+    poses[..., 2] = 1
+    monkeypatch.setattr(
+        evaluation,
+        "PoseDataset",
+        lambda *_: TensorDataset(poses, torch.tensor([0, 0, 1, 1])),
+    )
+    if corrupt_head:
+        with pytest.raises(RuntimeError, match="size mismatch"):
+            _evaluate(f)
+        assert "open" not in f.events
+    else:
+        result = _evaluate(f)
+        assert result["identity"]["run"]["method"] == "proxy_nca_pp"
+
+
 def test_wrong_physical_bindings_cannot_open_test(final_fixture, monkeypatch):
     monkeypatch.setattr(
         evaluation, "build_motionbert_bindings", lambda *_: {"changed": True}

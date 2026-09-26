@@ -41,8 +41,8 @@ training:
   encoder_mode: finetune
   learning_rate: 0.0001
   weight_decay: 0.0001
-  steps: 1000
-  validation_every: 100
+  steps: 50000
+  validation_every: 1000
 metrics:
   recall_k: [1, 2, 4, 5, 8, 10, 16, 32, 100, 1000]
 selection_metric: r_at_1

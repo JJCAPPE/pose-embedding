@@ -39,9 +39,9 @@ def experiment_arguments(operation: str) -> list[str]:
 def test_coverage_exposes_all_methods_without_granting_test_access() -> None:
     result = cli.run(parse("coverage"))
     assert result["required_method_count"] == len(result["methods"]) == 26
-    assert result["implemented_method_count"] == 14
-    assert result["blocked_method_count"] == 12
-    assert result["required_final_run_count"] == 156
+    assert result["implemented_method_count"] == 16
+    assert result["blocked_method_count"] == 10
+    assert result["required_final_run_count"] == 166
     assert result["priority_methods"] == ["contrastive", "contextual"]
     assert result["paired_seeds"] == [7, 17, 29, 43, 59, 71]
     assert result["final_test_authorized"] is False

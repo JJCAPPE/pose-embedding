@@ -184,10 +184,21 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2004.01113",
-      "implementation": "pending_proxyncapp_full_recipe_motion_adaptation",
-      "status": "blocked",
-      "blocker": "MIT source candidate needs a pinned component audit; all-proxy assignment with temperature 1/9, max pooling, non-affine pooled-feature LayerNorm, and fast proxy optimizer groups are not adapted or verified for MotionBERT.",
-      "parameters": {}
+      "implementation": "independent_teh2020_cub_motion_v1",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "teh2020_cub_motion_v1",
+        "temperature": 0.1111111111111111,
+        "proxy_initial_std": 0.125,
+        "head_learning_rate": 0.004,
+        "proxy_learning_rate": 400.0,
+        "optimizer_epsilon": 1.0,
+        "warmup_epochs": 5,
+        "model_gradient_clip_value": 10.0,
+        "pooling": "confidence_valid_token_max",
+        "all_invalid_policy": "zero_pooled_feature"
+      }
     },
     {
       "method_id": "supcon",

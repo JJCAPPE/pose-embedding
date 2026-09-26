@@ -185,11 +185,13 @@ def _collect_runs(
             raise ValueError(
                 "paired encoder, input provenance or sample identities differ"
             )
-        dimension = methods[key[0]].embedding_dimension
+        from pose_embed.benchmark.model import head_recipe
+
+        head_group = (methods[key[0]].embedding_dimension, head_recipe(key[0]))
         head = initialization.get("head")
-        if not head or seed_pair["heads"].setdefault(dimension, head) != head:
+        if not head or seed_pair["heads"].setdefault(head_group, head) != head:
             raise ValueError(
-                "paired head initialization differs within an embedding dimension"
+                "paired head initialization differs within a head recipe/dimension"
             )
         for other in seed_pair["batches"]:
             shared = min(len(other), len(batch["steps"]))
@@ -216,6 +218,7 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
     )
     for method in config.final_methods:
         histories = []
+        minimum_selected_step = 1
         for seed in config.training.seeds:
             directory, manifest = runs[(method, seed)]
             if "development-result.json" not in manifest["outputs"]:
@@ -245,6 +248,12 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
                 )
             episode = condition
             rows = read_json(directory / "history.json").get("steps", [])
+            minimum_selected_step = max(
+                minimum_selected_step,
+                manifest["identity"]
+                .get("training_recipe", {})
+                .get("minimum_selected_step", 1),
+            )
             scores = {}
             for row in rows:
                 if "validation" not in row:
@@ -281,7 +290,12 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
             step: sum(history[step] for history in histories) / len(histories)
             for step in histories[0]
         }
-        selected_step = max(means, key=lambda step: (means[step], -step))
+        eligible = [step for step in means if step >= minimum_selected_step]
+        if not eligible:
+            raise ValueError(
+                "selection requires a checkpoint after the full final warmup"
+            )
+        selected_step = max(eligible, key=lambda step: (means[step], -step))
         selected[method] = {
             "selected_steps": selected_step,
             "configuration_sha256": digest(config.model_dump(mode="json")),

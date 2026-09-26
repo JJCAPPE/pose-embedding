@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 15 implemented and 11 blocked**. A working priority pair is
+configurations: 16 implemented and 10 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -69,6 +69,11 @@ copied as part of this audit.
 | `proxy_anchor_avsl` | [zbr17/AVSL](https://github.com/zbr17/AVSL/tree/fd2686e4f94a93da3c97c1b2067df9601f2803a0), `fd2686e4f94a93da3c97c1b2067df9601f2803a0` | [MIT](https://github.com/zbr17/AVSL/blob/fd2686e4f94a93da3c97c1b2067df9601f2803a0/LICENSE) |
 
 ## 1. ProxyNCA++ — first implementation priority
+
+The independent motion adapter is now callable and CPU-tested; see
+[its recipe and evidence boundary](proxy-nca-plus-motion.md). The requirements
+below remain its source audit record. Allocated-GPU validation and scientific
+runs remain outstanding.
 
 **Required recipe.** The six enhancements are all-proxy assignment probability,
 temperature scaling, class-balanced sampling, global max pooling, non-affine

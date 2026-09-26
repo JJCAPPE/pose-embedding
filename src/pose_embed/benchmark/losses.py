@@ -17,6 +17,10 @@ from torch import nn
 
 from pose_embed.benchmark.config import StrictModel, load_methods
 from pose_embed.benchmark.ibc import IBCParameters, IntraBatchConnectionsLoss
+from pose_embed.benchmark.proxy_nca_plus import (
+    ProxyNCAPlusLoss,
+    ProxyNCAPlusParameters,
+)
 from pose_embed.losses.contextual import ContextualLossConfig, ContextualMetricLoss
 from pose_embed.losses.pairwise import (
     PairwiseContrastiveLoss,
@@ -34,6 +38,7 @@ SUPPORTED_METHODS = frozenset(
         "multi_similarity_miner",
         "proxy_anchor",
         "proxy_nca",
+        "proxy_nca_pp",
         "roadmap",
         "nt_xent",
         "fast_ap",
@@ -367,6 +372,12 @@ def build_loss(
             embedding_size=dimension,
             softmax_scale=config.softmax_scale,
             distance=distances.LpDistance(p=2, power=2),
+        )
+    elif method_id == "proxy_nca_pp":
+        config = ProxyNCAPlusParameters.model_validate(parameters)
+        dimension = dimension or 512
+        module = ProxyNCAPlusLoss(
+            dimension, num_classes, config.temperature, config.proxy_initial_std
         )
     else:
         config = SoftmaxParameters.model_validate(parameters)

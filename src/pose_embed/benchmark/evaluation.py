@@ -13,7 +13,10 @@ import torch
 from pose_embed.benchmark.analysis import analysis_plan_sha256, paired_intervals
 from pose_embed.benchmark.config import benchmark_digest, load_benchmark, load_methods
 from pose_embed.benchmark.locks import open_test, validate_final_runs, validate_opening
-from pose_embed.benchmark.model import MotionRetrievalModel
+from pose_embed.benchmark.model import (
+    MotionRetrievalModel,
+    supports_embedding_inference,
+)
 from pose_embed.benchmark.retrieval import RETRIEVAL_POLICY, evaluate_retrieval
 from pose_embed.benchmark.runner import PoseDataset, encode
 from pose_embed.benchmark.runtime import (
@@ -98,7 +101,7 @@ def evaluate_final(
         or identity["method_specification"] != spec.model_dump(mode="json")
     ):
         raise ValueError("evaluation requires the exact selected scientific final run")
-    if spec.family != "embedding_loss" and spec.method_id != "ibc":
+    if not supports_embedding_inference(spec.method_id):
         raise ValueError("architecture-specific evaluation model is not implemented")
 
     configure_deterministic_inference()
@@ -114,7 +117,10 @@ def evaluate_final(
         raise ValueError("evaluation parity evidence differs from training")
     encoder, _ = load_frozen_encoder(inputs.data_root, device)
     model = MotionRetrievalModel(
-        encoder, embedding_dimension=spec.embedding_dimension, train_encoder=True
+        encoder,
+        embedding_dimension=spec.embedding_dimension,
+        train_encoder=True,
+        method_id=spec.method_id,
     ).to(device)
     checkpoint = torch.load(
         directory / "checkpoint.pt", map_location="cpu", weights_only=True

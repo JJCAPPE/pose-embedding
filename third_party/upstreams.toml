@@ -63,3 +63,12 @@ license = "MIT"
 license_files = ["LICENSE"]
 reference_only = true
 purpose = "Retrieval literature reference; outside the locked core experiment."
+
+[[upstream]]
+name = "proxynca-pp"
+repository = "https://github.com/euwern/proxynca_pp.git"
+commit = "217233d29a89a89766658396a598b896d17a5814"
+license = "MIT"
+license_files = ["LICENSE"]
+reference_only = true
+purpose = "Published ProxyNCA++ recipe audit; independently implemented motion head, objective and optimization."

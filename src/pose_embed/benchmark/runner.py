@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader, Dataset
 
 from pose_embed.benchmark.config import benchmark_digest, load_benchmark, load_methods
 from pose_embed.benchmark.losses import build_loss, supports
-from pose_embed.benchmark.model import MotionRetrievalModel
+from pose_embed.benchmark.model import MotionRetrievalModel, head_recipe
 from pose_embed.benchmark.retrieval import evaluate_retrieval
 from pose_embed.benchmark.runtime import (
     REPOSITORY,
@@ -29,6 +29,11 @@ from pose_embed.benchmark.runtime import (
     save_checkpoint,
     state_digest,
     verify_run,
+)
+from pose_embed.benchmark.training import (
+    build_optimizer,
+    phase_for_step,
+    resolve_recipe,
 )
 from pose_embed.data.motionbert import preprocess_annotation
 from pose_embed.models.motionbert import (
@@ -87,24 +92,60 @@ def encode(model, dataset, device, batch_size: int) -> np.ndarray:
     return np.concatenate(chunks)
 
 
-def optimizer_step(model, criterion, optimizer, poses, labels) -> float:
+def optimizer_step(
+    model, criterion, optimizer, poses, labels, gradient_clip_value=None
+) -> float:
     optimizer.zero_grad(set_to_none=True)
-    embeddings = (
+    embedded = (
         model.forward_raw(poses)
         if getattr(criterion, "requires_raw_embeddings", False)
         else model(poses)
     )
-    value = criterion(embeddings, labels)
+    value = criterion(embedded, labels)
     if value.ndim != 0 or not torch.isfinite(value):
         raise ValueError("objective must produce a finite scalar")
     value.backward()
     parameters = [*model.parameters(), *criterion.parameters()]
     if any(p.grad is not None and not torch.isfinite(p.grad).all() for p in parameters):
         raise ValueError("training produced non-finite gradients")
+    if gradient_clip_value is not None:
+        torch.nn.utils.clip_grad_value_(model.parameters(), gradient_clip_value)
     optimizer.step()
     if any(not torch.isfinite(p).all() for p in parameters):
         raise ValueError("training produced non-finite parameters")
     return float(value.detach().cpu())
+
+
+def _cpu_snapshot(value):
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().clone()
+    if isinstance(value, dict):
+        return {key: _cpu_snapshot(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_cpu_snapshot(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_cpu_snapshot(item) for item in value)
+    return copy.deepcopy(value)
+
+
+def _checkpoint_state(model, criterion, optimizer, recipe, step, phase):
+    state = {
+        "model": _cpu_snapshot(model.state_dict()),
+        "criterion": _cpu_snapshot(criterion.state_dict()),
+    }
+    if recipe["optimizer"] == "Adam":
+        profiling = recipe["profile_phase"] is not None
+        state["optimizer"] = _cpu_snapshot(optimizer.state_dict())
+        state["training_state"] = {
+            "phase": phase,
+            "step": step,
+            "warmup_updates": 0 if profiling else min(step, recipe["warmup_steps"]),
+            "main_updates": step
+            if profiling
+            else max(0, step - recipe["warmup_steps"]),
+            "encoder_trainable": model.train_encoder,
+        }
+    return state
 
 
 def run_experiment(
@@ -165,6 +206,27 @@ def run_experiment(
         if stage == "final"
         else config.training.steps
     )
+    train_rows = inputs.manifests[
+        "final-train.jsonl" if stage == "final" else "development-train.jsonl"
+    ]
+    selection_num_records = (
+        len(inputs.manifests["final-train.jsonl"])
+        if method == "proxy_nca_pp" and stage == "development"
+        else len(train_rows)
+    )
+    recipe = resolve_recipe(
+        method,
+        spec.parameters,
+        config.training,
+        len(train_rows),
+        selection_num_records=selection_num_records,
+        profile=profile_steps is not None,
+    )
+    if profile_steps is None and steps < recipe["minimum_selected_step"]:
+        raise ValueError(
+            "scientific step budget must exceed the complete five-epoch warmup "
+            "for both development and final training; use a declared longer budget"
+        )
     identity = {
         "benchmark_sha256": benchmark_digest(config),
         "configuration": config.model_dump(mode="json"),
@@ -186,7 +248,9 @@ def run_experiment(
         "selection_sha256": sha256_file(artifact_root() / "locks/selection.json")
         if stage == "final"
         else None,
-        "optimizer": "AdamW",
+        "optimizer": recipe["optimizer"],
+        "training_recipe": recipe,
+        "head_recipe": head_recipe(method),
         "precision": "float32",
         "scientific_use_allowed": profile_steps is None,
     }
@@ -204,10 +268,8 @@ def run_experiment(
             encoder,
             embedding_dimension=spec.embedding_dimension,
             train_encoder=track == "finetune",
+            method_id=method,
         ).to(device)
-        train_rows = inputs.manifests[
-            "final-train.jsonl" if stage == "final" else "development-train.jsonl"
-        ]
         annotations = {a["frame_dir"]: a for a in inputs.annotations}
         dataset = PoseDataset(train_rows, annotations, inputs.protocol)
         criterion = build_loss(
@@ -215,14 +277,8 @@ def run_experiment(
             spec.parameters | {"embedding_dimension": spec.embedding_dimension},
             len(set(dataset.labels)),
         ).to(device)
-        trainable = [
-            p for p in [*model.parameters(), *criterion.parameters()] if p.requires_grad
-        ]
-        optimizer = torch.optim.AdamW(
-            trainable,
-            lr=config.training.learning_rate,
-            weight_decay=config.training.weight_decay,
-        )
+        phase = phase_for_step(recipe, 1)
+        optimizer = build_optimizer(model, criterion, recipe, phase)
         initial = {
             "model": state_digest(model),
             "encoder": state_digest(model.encoder),
@@ -266,9 +322,18 @@ def run_experiment(
         model.train()
         criterion.train()
         for step, (poses, labels) in enumerate(loader, start=1):
+            requested_phase = phase_for_step(recipe, step)
+            if requested_phase != phase:
+                phase = requested_phase
+                optimizer = build_optimizer(model, criterion, recipe, phase)
             step_started = time.perf_counter()
             value = optimizer_step(
-                model, criterion, optimizer, poses.to(device), labels.to(device)
+                model,
+                criterion,
+                optimizer,
+                poses.to(device),
+                labels.to(device),
+                recipe.get("model_gradient_clip_value"),
             )
             if torch.device(device).type == "cuda":
                 torch.cuda.synchronize(device)
@@ -276,6 +341,10 @@ def run_experiment(
                 "step": step,
                 "loss": value,
                 "seconds": time.perf_counter() - step_started,
+                "phase": phase,
+                "encoder_gradient_parameters": sum(
+                    p.grad is not None for p in model.encoder.parameters()
+                ),
             }
             if (
                 stage == "development"
@@ -292,27 +361,19 @@ def run_experiment(
                 )
                 row["validation"] = result["metrics"]
                 score = result["metrics"][config.selection_metric]
-                if score > best_score:
+                if step >= recipe["minimum_selected_step"] and score > best_score:
                     best_score = score
                     selected_step = step
                     best_result = result
-                    best_state = {
-                        "model": {
-                            k: v.detach().cpu().clone()
-                            for k, v in model.state_dict().items()
-                        },
-                        "criterion": {
-                            k: v.detach().cpu().clone()
-                            for k, v in criterion.state_dict().items()
-                        },
-                    }
+                    best_state = _checkpoint_state(
+                        model, criterion, optimizer, recipe, step, phase
+                    )
             history.append(row)
         elapsed = time.perf_counter() - started
         if best_state is None:
-            best_state = {
-                "model": copy.deepcopy(model.cpu().state_dict()),
-                "criterion": copy.deepcopy(criterion.cpu().state_dict()),
-            }
+            best_state = _checkpoint_state(
+                model, criterion, optimizer, recipe, steps, phase
+            )
         save_checkpoint(
             destination / "checkpoint.pt",
             {"identity": identity, "selected_step": selected_step, **best_state},
@@ -351,7 +412,15 @@ def run_experiment(
             else 0,
             "checkpoint_bytes": (destination / "checkpoint.pt").stat().st_size,
             "training_steps": steps,
-            "trainable_parameters": sum(p.numel() for p in trainable),
+            "trainable_parameters": sum(
+                p.numel()
+                for p in [*model.parameters(), *criterion.parameters()]
+                if p.requires_grad
+            ),
+            "profile_phase": recipe["profile_phase"],
+            "encoder_backward_steps": sum(
+                row["encoder_gradient_parameters"] > 0 for row in history
+            ),
         }
         write_immutable_json(destination / "telemetry.json", telemetry)
         write_immutable_json(
@@ -377,6 +446,7 @@ def compare_development(run_dirs: list[str | Path], output: str | Path) -> dict:
     runs = {}
     config_hash = None
     pairing = {}
+    heads = {}
     for directory in run_dirs:
         directory = artifact_path(directory)
         manifest = verify_run(directory)
@@ -392,7 +462,6 @@ def compare_development(run_dirs: list[str | Path], output: str | Path) -> dict:
         result = read_json(directory / "development-result.json")
         initialization = read_json(directory / "initialization.json")
         pair = {
-            "head": initialization["head"],
             "encoder": initialization["encoder"],
             "batch_plan": manifest["outputs"]["batch-plan.json"],
             "query_order": result["query_order_sha256"],
@@ -406,6 +475,13 @@ def compare_development(run_dirs: list[str | Path], output: str | Path) -> dict:
                 "paired initialization, batches or query conditions differ"
             )
         pairing[seed] = pair
+        head_key = (
+            seed,
+            identity["method_specification"]["embedding_dimension"],
+            head_recipe(identity["method"]),
+        )
+        if heads.setdefault(head_key, initialization["head"]) != initialization["head"]:
+            raise ValueError("paired initialization differs within a head recipe")
         runs[key] = {
             "method": key[0],
             "seed": key[1],

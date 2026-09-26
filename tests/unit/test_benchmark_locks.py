@@ -190,6 +190,36 @@ def test_complete_selection_uses_six_seed_means_and_earliest_tie(lock_context) -
     assert selection["methods"]["contextual"]["selected_steps"] == 1
     assert selection["methods"]["contextual_1536"]["embedding_dimension"] == 1536
     assert locks.validate_selection() == selection
+
+
+def test_selection_pairs_different_head_recipes_and_excludes_warmup(lock_context):
+    directories = _runs(lock_context, "development")
+    for directory in directories:
+        manifest = read_json(directory / "run-manifest.json")
+        identity = manifest["identity"]
+        if identity["method"] != "proxy_nca_pp":
+            continue
+        _change_json(
+            directory,
+            "initialization.json",
+            lambda value, identity=identity: value.update(
+                head=digest(["maxpool-head", identity["seed"]])
+            ),
+        )
+        identity["training_recipe"] = {"minimum_selected_step": 2}
+        _change_json(
+            directory,
+            "development-result.json",
+            lambda value, identity=identity: value.update(identity=identity),
+        )
+        _change_json(
+            directory,
+            "run-manifest.json",
+            lambda value, identity=identity: value.update(identity=identity),
+        )
+    selection = locks.create_selection(directories)
+    assert selection["methods"]["proxy_nca_pp"]["selected_steps"] == 2
+    assert selection["methods"]["contextual"]["selected_steps"] == 1
     with pytest.raises(ValueError, match="overwrite"):
         locks.create_selection(directories)
 

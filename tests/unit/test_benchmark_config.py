@@ -29,7 +29,8 @@ def test_complete_suite_and_dimension_matched_rows() -> None:
     assert config.training.physical_batch_size == 32
     assert methods["contextual_1536"].embedding_dimension == 1536
     assert methods["proxy_anchor_avsl"].embedding_dimension == 1536
-    assert methods["proxy_nca_pp"].status == "blocked"
+    assert methods["proxy_nca_pp"].status == "implemented"
+    assert methods["proxy_nca_pp"].parameters["warmup_epochs"] == 5
 
 
 @pytest.mark.parametrize(

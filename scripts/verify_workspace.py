@@ -18,6 +18,7 @@ EXPECTED_UPSTREAMS = {
     "MotionCLIP",
     "contextual-similarity",
     "intra-batch",
+        "proxynca-pp",
     "MMAction2",
     "st-gcn",
     "text-to-motion-retrieval",

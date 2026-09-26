@@ -121,6 +121,28 @@ def test_actual_step_updates_head_and_only_requested_encoder(train_encoder):
     torch.testing.assert_close(embeddings.norm(dim=-1), torch.ones(4))
 
 
+@pytest.mark.parametrize("method", ["contrastive", "proxy_nca_pp"])
+def test_raw_and_feature_interfaces_preserve_retrieval_projection(method):
+    model = MotionRetrievalModel(
+        TinyEncoder(),
+        method_id=method,
+        representation_dimension=4,
+        joints=2,
+        embedding_dimension=8,
+    ).eval()
+    poses = torch.randn(4, 2, 3, 2, 3)
+    poses[..., 2] = 1
+    features = model.forward_features(poses)
+    projected = model.project_features(features, poses[..., 2] > 0)
+    torch.testing.assert_close(projected, model(poses))
+    torch.testing.assert_close(
+        torch.nn.functional.normalize(model.forward_raw(poses), dim=-1), projected
+    )
+    if method == "proxy_nca_pp":
+        with pytest.raises(ValueError, match="requires a valid token mask"):
+            model.project_features(features)
+
+
 @pytest.fixture
 def experiment(tmp_path, monkeypatch):
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
@@ -144,6 +166,7 @@ def experiment(tmp_path, monkeypatch):
         manifests={
             "development-train.jsonl": records,
             "development-validation.jsonl": records,
+            "final-train.jsonl": records,
         },
         annotations=[
             {"frame_dir": r.sample_id, "index": i} for i, r in enumerate(records)
@@ -172,6 +195,7 @@ def experiment(tmp_path, monkeypatch):
         state = encoder.state_dict()
         dimension = identity["method_specification"]["embedding_dimension"]
         return {
+            "encoder_parameters": tuple(name for name, _ in encoder.named_parameters()),
             "initialization_sha256": runtime.state_digest(encoder),
             "unused_head_sha256": runtime._state_digest(
                 {key: value for key, value in state.items() if key.startswith("head.")}
@@ -180,7 +204,10 @@ def experiment(tmp_path, monkeypatch):
                 **{
                     f"encoder.{key}": tuple(value.shape) for key, value in state.items()
                 },
-                "head.projection.weight": (dimension, 8),
+                "head.projection.weight": (
+                    dimension,
+                    4 if identity["method"] == "proxy_nca_pp" else 8,
+                ),
                 "head.projection.bias": (dimension,),
             },
         }
@@ -329,4 +356,128 @@ def test_rehashed_invalid_checkpoint_state_is_rejected(experiment, tmp_path, cha
     torch.save(checkpoint, path / "checkpoint.pt")
     _rehash_output(path, "checkpoint.pt")
     with pytest.raises(ValueError, match=expected):
+        runtime.verify_run(path)
+
+
+def _proxy_config(experiment, *, steps=6):
+    import yaml
+
+    path = experiment["config_path"]
+    config = yaml.safe_load(path.read_text())
+    config["training"].update(steps=steps, validation_every=1, encoder_mode="finetune")
+    path.write_text(yaml.safe_dump(config))
+
+
+def test_proxy_full_run_verifies_and_pairs_with_common_head(experiment, tmp_path):
+    _proxy_config(experiment)
+    paths = []
+    for method in ("contrastive", "proxy_nca_pp"):
+        path = tmp_path / "benchmark-v2" / method
+        runner.run_experiment(**experiment, method=method, output_dir=path)
+        runtime.verify_run(path)
+        paths.append(path)
+    proxy = paths[1]
+    checkpoint = torch.load(proxy / "checkpoint.pt", weights_only=True)
+    history = runtime.read_json(proxy / "history.json")
+    assert [row["phase"] for row in history["steps"]] == ["warmup"] * 5 + ["main"]
+    assert all(row["encoder_gradient_parameters"] == 0 for row in history["steps"][:5])
+    assert history["steps"][5]["encoder_gradient_parameters"] > 0
+    assert checkpoint["training_state"]["main_updates"] == 1
+    assert checkpoint["selected_step"] == 6
+    assert checkpoint["model"]["head.projection.weight"].shape == (512, 4)
+    reloaded = MotionRetrievalModel(
+        TinyEncoder(),
+        embedding_dimension=512,
+        representation_dimension=4,
+        joints=2,
+        method_id="proxy_nca_pp",
+    )
+    reloaded.load_state_dict(checkpoint["model"], strict=True)
+    assert runtime.state_digest(reloaded) == runtime._state_digest(checkpoint["model"])
+    compared = runner.compare_development(
+        paths, tmp_path / "benchmark-v2/comparison.json"
+    )
+    assert compared["methods"] == ["contrastive", "proxy_nca_pp"]
+
+
+def test_proxy_profile_executes_encoder_backward_without_claiming_warmup(
+    experiment, tmp_path
+):
+    _proxy_config(experiment, steps=2)
+    path = tmp_path / "benchmark-v2/profile-proxy"
+    runner.run_experiment(
+        **experiment, method="proxy_nca_pp", output_dir=path, profile_steps=2
+    )
+    manifest = runtime.verify_run(path)
+    assert manifest["identity"]["scientific_use_allowed"] is False
+    assert (
+        manifest["identity"]["training_recipe"]["profile_phase"]
+        == "post_warmup_capacity"
+    )
+    checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
+    assert checkpoint["training_state"]["warmup_updates"] == 0
+    assert checkpoint["training_state"]["main_updates"] == 2
+    assert runtime.read_json(path / "telemetry.json")["encoder_backward_steps"] == 2
+
+
+def test_proxy_short_scientific_budget_is_rejected_before_model_load(
+    experiment, tmp_path, monkeypatch
+):
+    _proxy_config(experiment, steps=5)
+    monkeypatch.setattr(
+        runner,
+        "load_frozen_encoder",
+        lambda *_: pytest.fail("must reject before loading GPU model"),
+    )
+    with pytest.raises(ValueError, match="complete five-epoch warmup"):
+        runner.run_experiment(
+            **experiment,
+            method="proxy_nca_pp",
+            output_dir=tmp_path / "benchmark-v2/short",
+        )
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "head",
+        "proxy",
+        "optimizer_shape",
+        "optimizer_lr",
+        "phase",
+        "encoder_parameter",
+        "encoder_all_moments",
+        "encoder_one_moment",
+    ],
+)
+def test_proxy_checkpoint_auxiliary_state_cannot_be_rehashed_into_validity(
+    experiment, tmp_path, change
+):
+    _proxy_config(experiment)
+    path = tmp_path / "benchmark-v2/corrupt"
+    runner.run_experiment(**experiment, method="proxy_nca_pp", output_dir=path)
+    checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
+    if change == "head":
+        checkpoint["model"]["head.projection.weight"] = torch.ones(512, 8)
+    elif change == "proxy":
+        checkpoint["criterion"] = {}
+    elif change == "optimizer_shape":
+        next(iter(checkpoint["optimizer"]["state"].values()))["exp_avg"] = torch.ones(1)
+    elif change == "optimizer_lr":
+        checkpoint["optimizer"]["param_groups"][2]["lr"] = 0.004
+    elif change.startswith("encoder_"):
+        group = checkpoint["optimizer"]["param_groups"][0]
+        indices = group["params"][:]
+        if change == "encoder_parameter":
+            del group["param_names"][0]
+            del group["params"][0]
+        if change != "encoder_all_moments":
+            indices = indices[:1]
+        for index in indices:
+            checkpoint["optimizer"]["state"].pop(index)
+    else:
+        checkpoint["training_state"]["warmup_updates"] = 1
+    torch.save(checkpoint, path / "checkpoint.pt")
+    _rehash_output(path, "checkpoint.pt")
+    with pytest.raises(ValueError, match="optimizer|warmup|shape"):
         runtime.verify_run(path)

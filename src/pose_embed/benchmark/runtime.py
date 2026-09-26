@@ -154,6 +154,18 @@ def _reference_encoder_state(checkpoint_path: str, checkpoint_sha256: str) -> di
     }
 
 
+@lru_cache(maxsize=2)
+def _reference_encoder_parameters(data_root: str, checkpoint_sha256: str) -> tuple:
+    """Read parameter identities from the verified architecture, excluding buffers."""
+    from pose_embed.models.motionbert import load_frozen_encoder
+
+    with torch.random.fork_rng(devices=[]):
+        encoder, metadata = load_frozen_encoder(Path(data_root))
+    if metadata["checkpoint_sha256"] != checkpoint_sha256:
+        raise ValueError("pretrained encoder changed while verifying parameters")
+    return tuple(name for name, _ in encoder.named_parameters())
+
+
 def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
     from pose_embed.config import load_protocol
     from pose_embed.models.motionbert import verify_motionbert_assets
@@ -171,20 +183,30 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
     )
     protocol = load_protocol(REPOSITORY / config.input_protocol)
     dimension = identity["method_specification"]["embedding_dimension"]
+    input_dimension = protocol.encoder.representation_dimension
+    if identity["method"] != "proxy_nca_pp":
+        input_dimension *= protocol.dataset.joints
     return {
         **reference,
+        "encoder_parameters": _reference_encoder_parameters(
+            str(Path(data_root).resolve()), str(assets["checkpoint_sha256"])
+        )
+        if identity["method"] == "proxy_nca_pp"
+        else (),
         "model_shapes": {
             **{f"encoder.{key}": shape for key, shape in reference["shapes"].items()},
             "head.projection.weight": (
                 dimension,
-                protocol.dataset.joints * protocol.encoder.representation_dimension,
+                input_dimension,
             ),
             "head.projection.bias": (dimension,),
         },
     }
 
 
-def _verify_batches(directory: Path, identity: dict, config: BenchmarkConfig) -> int:
+def _verify_batches(
+    directory: Path, identity: dict, config: BenchmarkConfig
+) -> tuple[int, int]:
     from pose_embed.training.sampler import BalancedBatchSampler
 
     records = _verified_training_records(identity, config)
@@ -213,7 +235,143 @@ def _verify_batches(directory: Path, identity: dict, config: BenchmarkConfig) ->
         raise ValueError(
             "physical batch plan differs from its deterministic paired seed"
         )
-    return len(actions)
+    return len(actions), len(records)
+
+
+def _verify_training_recipe(identity: dict, config: BenchmarkConfig, num_records: int):
+    from pose_embed.benchmark.model import head_recipe
+    from pose_embed.benchmark.training import resolve_recipe
+
+    selection_records = num_records
+    if identity["method"] == "proxy_nca_pp" and identity["stage"] != "final":
+        selection_records = len(
+            _verified_training_records(identity | {"stage": "final"}, config)
+        )
+    expected = resolve_recipe(
+        identity["method"],
+        identity["method_specification"]["parameters"],
+        config.training,
+        num_records,
+        selection_num_records=selection_records,
+        profile=identity["stage"] == "profile",
+    )
+    if (
+        identity.get("training_recipe") != expected
+        or identity.get("optimizer") != expected["optimizer"]
+        or identity.get("head_recipe") != head_recipe(identity["method"])
+    ):
+        raise ValueError("run head/optimizer/warmup recipe differs from its method")
+    if (
+        identity["stage"] != "profile"
+        and identity["steps"] < expected["minimum_selected_step"]
+    ):
+        raise ValueError("scientific run does not complete the full warmup")
+    return expected
+
+
+def _verify_proxy_optimizer(
+    checkpoint: dict, recipe: dict, encoder_parameters: tuple
+) -> None:
+    """Validate method-specific auxiliary state and named Adam moment shapes."""
+    from pose_embed.benchmark.training import phase_for_step
+
+    step = checkpoint["selected_step"]
+    phase = phase_for_step(recipe, step)
+    profiling = recipe["profile_phase"] is not None
+    expected = {
+        "phase": phase,
+        "step": step,
+        "warmup_updates": 0 if profiling else min(step, recipe["warmup_steps"]),
+        "main_updates": step if profiling else max(0, step - recipe["warmup_steps"]),
+        "encoder_trainable": recipe["encoder_mode"] == "finetune" and phase == "main",
+    }
+    if checkpoint.get("training_state") != expected:
+        raise ValueError("checkpoint warmup/optimizer phase state is invalid")
+    optimizer = checkpoint.get("optimizer", {})
+    groups = optimizer.get("param_groups", [])
+    states = optimizer.get("state", {})
+    if [group.get("name") for group in groups] != ["encoder", "head", "proxies"]:
+        raise ValueError("checkpoint optimizer groups are invalid")
+    tensors = {
+        **{"model." + name: value for name, value in checkpoint["model"].items()},
+        **{
+            "criterion." + name: value
+            for name, value in checkpoint["criterion"].items()
+        },
+    }
+    seen_ids, seen_names = set(), set()
+    for group, prefix in zip(
+        groups, ["model.encoder.", "model.head.", "criterion."], strict=True
+    ):
+        names, indices = group.get("param_names", []), group.get("params", [])
+        learning_rate = (
+            recipe["proxy_learning_rate"]
+            if group["name"] == "proxies"
+            else recipe["head_learning_rate"]
+        )
+        if group["name"] == "encoder" and not expected["encoder_trainable"]:
+            learning_rate = 0.0
+        if (
+            len(names) != len(indices)
+            or not names
+            or group.get("lr") != learning_rate
+            or group.get("eps") != recipe["optimizer_epsilon"]
+            or group.get("weight_decay") != 0
+            or tuple(group.get("betas", [])) != (0.9, 0.999)
+            or group.get("amsgrad") is not False
+        ):
+            raise ValueError(
+                "checkpoint optimizer recipe or parameter mapping is invalid"
+            )
+        for name, index in zip(names, indices, strict=True):
+            if (
+                type(index) is not int
+                or index in seen_ids
+                or name in seen_names
+                or name not in tensors
+                or not name.startswith(prefix)
+                or name.startswith("model.encoder.head.")
+            ):
+                raise ValueError("checkpoint optimizer parameter mapping is invalid")
+            seen_ids.add(index)
+            seen_names.add(name)
+            state = states.get(index)
+            if state is None:
+                if group["name"] != "encoder" or expected["encoder_trainable"]:
+                    raise ValueError(
+                        "checkpoint optimizer is missing required parameter moments"
+                    )
+                continue
+            updates = (
+                expected["main_updates"]
+                if phase == "main"
+                else expected["warmup_updates"]
+            )
+            if (
+                set(state) != {"step", "exp_avg", "exp_avg_sq"}
+                or not all(
+                    isinstance(value, torch.Tensor) and torch.isfinite(value).all()
+                    for value in state.values()
+                )
+                or state["step"].numel() != 1
+                or state["step"].item() != updates
+                or state["exp_avg"].shape != tensors[name].shape
+                or state["exp_avg_sq"].shape != tensors[name].shape
+                or (state["exp_avg_sq"] < 0).any()
+                or (group["name"] == "encoder" and not expected["encoder_trainable"])
+            ):
+                raise ValueError(
+                    "checkpoint optimizer moments or update count are invalid"
+                )
+    required = {
+        name for name in tensors if name.startswith(("model.head.", "criterion."))
+    } | {
+        "model.encoder." + name
+        for name in encoder_parameters
+        if not name.startswith("head.")
+    }
+    if required != seen_names or not set(states).issubset(seen_ids):
+        raise ValueError("checkpoint optimizer has missing or unknown parameters")
 
 
 def _verify_checkpoint_state(
@@ -387,7 +545,24 @@ def verify_run(directory: str | Path) -> dict:
         1, steps + 1
     ):
         raise ValueError("checkpoint selection differs from training history")
-    num_classes = _verify_batches(directory, identity, config)
+    num_classes, num_records = _verify_batches(directory, identity, config)
+    recipe = _verify_training_recipe(identity, config, num_records)
+    from pose_embed.benchmark.training import phase_for_step
+
+    if any(row.get("phase") != phase_for_step(recipe, row["step"]) for row in rows):
+        raise ValueError("training history has an incorrect warmup phase")
+    if identity["method"] == "proxy_nca_pp":
+        for row in rows:
+            gradients = row.get("encoder_gradient_parameters")
+            needs_encoder = identity["track"] == "finetune" and row["phase"] == "main"
+            if (
+                type(gradients) is not int
+                or gradients < 0
+                or (gradients > 0) != needs_encoder
+            ):
+                raise ValueError(
+                    "training history lacks the required encoder backward evidence"
+                )
     if stage == "development":
         validation = [row for row in rows if "validation" in row]
         expected = [
@@ -402,7 +577,12 @@ def verify_run(directory: str | Path) -> dict:
             for row in validation
         ):
             raise ValueError("development validation score is invalid")
-        best = max(validation, key=lambda row: row["validation"]["r_at_1"])
+        eligible = [
+            row for row in validation if row["step"] >= recipe["minimum_selected_step"]
+        ]
+        if not eligible:
+            raise ValueError("no development checkpoint completed the full warmup")
+        best = max(eligible, key=lambda row: row["validation"]["r_at_1"])
         result = read_json(directory / "development-result.json")
         if (
             result.get("identity") != identity
@@ -420,4 +600,10 @@ def verify_run(directory: str | Path) -> dict:
         ):
             raise ValueError("checkpoint contains invalid parameters")
     _verify_checkpoint_state(directory, identity, config, checkpoint, num_classes)
+    if identity["method"] == "proxy_nca_pp":
+        _verify_proxy_optimizer(
+            checkpoint,
+            recipe,
+            _expected_model_state(identity, config)["encoder_parameters"],
+        )
     return manifest
