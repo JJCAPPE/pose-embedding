@@ -57,7 +57,7 @@
       },
       {
         "label": "Workload and calendar",
-        "value": "The 14 records through December 18 are a planning horizon, not a promised full-survey completion date. Measure human work, GPU time, memory and storage before committing dates; record any extension before novel-test opening."
+        "value": "The 14 records through December 18 are a planning horizon. Measure all 26 methods, 468 development runs, 156 main final runs, separate supplementary matrices, validation, checkpoint segments and artifact storage before committing dates. Preserve all immutable attempts and resumable segments; record any extension before novel-test opening."
       },
       {
         "label": "Governance",
@@ -79,7 +79,7 @@
       },
       {
         "label": "Fairness",
-        "value": "Pair six seeds, common backbone initialization, shared head initialization within each dimension group, data augmentation and physical P by K batch/sample plans. Loss-only methods share the same head. Architecture changes must be explicitly documented and paired wherever compatible."
+        "value": "Pair six seeds, common backbone initialization, shared head initialization within compatible head recipes and dimensions, applicable data augmentation, and physical P by K batch/sample plans. Architecture methods retain their required distinct heads and scorers, whose costs are reported. Equal embedding dimensions alone do not make head initialization compatible."
       },
       {
         "label": "Physical batches",
@@ -87,7 +87,7 @@
       },
       {
         "label": "Tuning",
-        "value": "Declare equal development-selection budgets and method-specific parameter spaces before comparisons. Record every trial and failure. The first two-method engineering pilot never receives extra undisclosed selection trials in the final benchmark."
+        "value": "Three predeclared candidates multiply every method-specific learning rate together by 1, 0.5 or 2, preserving rate ratios and all other settings. Six paired seeds per candidate yield 468 development runs. Mean development R@1 chooses candidate and eligible checkpoint; exact ties prefer 1, then 0.5, then 2, and the earliest eligible step. The provisional budget is 50,000 total updates including warmup. Disclose engineering pilots separately; they cannot select final recipes."
       },
       {
         "label": "Seed and final-run count",

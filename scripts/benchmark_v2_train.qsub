@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#$ -cwd
+#$ -j y
+#$ -N pose_v2_train
+#$ -l h_rt=12:00:00
+#$ -pe omp 4
+#$ -l gpus=1
+#$ -l gpu_c=7.0
+#$ -l gpu_memory=80G
+#$ -l mem_per_core=16G
+#$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT
+
+# Pass the explicit arguments accepted by `pose-embed benchmark train`.
+# Campaign development requires --candidate; selected final training omits it.
+# The soft ten-hour boundary leaves scheduler headroom for a complete validation
+# and immutable checkpoint. Use the printed resume command for the next job.
+set -euo pipefail
+: "${JOB_ID:?Submit through Grid Engine; never train on a login node}"
+: "${NSLOTS:?Grid Engine must provide the allocated CPU count}"
+: "${POSE_EMBED_DATA_ROOT:?Licensed input root is required}"
+: "${POSE_EMBED_ARTIFACT_ROOT:?External artifact root is required}"
+export OMP_NUM_THREADS="$NSLOTS" MKL_NUM_THREADS="$NSLOTS" OPENBLAS_NUM_THREADS="$NSLOTS"
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+if [[ ! -x .venv/bin/pose-embed || -n "$(git status --porcelain)" ]]; then
+  printf 'A clean committed checkout and its locked environment are required.\n' >&2
+  exit 2
+fi
+if [[ "$#" -eq 0 ]]; then
+  printf 'Pass explicit benchmark train arguments, including method, seed and output.\n' >&2
+  exit 2
+fi
+.venv/bin/python scripts/verify_workspace.py
+.venv/bin/python scripts/fetch_upstreams.py --check --name MotionBERT
+nvidia-smi
+.venv/bin/pose-embed benchmark train --device cuda --max-segment-seconds 36000 "$@"

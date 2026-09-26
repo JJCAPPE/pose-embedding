@@ -122,7 +122,15 @@ def test_source_feature_pooling_cam_certainty_and_relation_parity(official):
     descriptors, links = ours.construct(
         levels, torch.ones(2, 1, 9, 2, dtype=torch.bool), compute_relations=True
     )
-    embeddings, certainty, source_links = source(features)
+    # The CPU source oracle uses max_unpool, which PyTorch rejects under the
+    # process-wide strict flag. Keep production and subsequent tests unchanged.
+    deterministic = torch.are_deterministic_algorithms_enabled()
+    warn_only = torch.is_deterministic_algorithms_warn_only_enabled()
+    try:
+        torch.use_deterministic_algorithms(False)
+        embeddings, certainty, source_links = source(features)
+    finally:
+        torch.use_deterministic_algorithms(deterministic, warn_only=warn_only)
     torch.testing.assert_close(
         descriptors["embeddings"],
         torch.stack([F.normalize(x, dim=-1) for x in embeddings], 1).flatten(1),

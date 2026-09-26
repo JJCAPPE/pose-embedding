@@ -1,4 +1,4 @@
-# Required remaining motion method adaptations
+# Motion method adaptations and validation requirements
 
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
@@ -15,7 +15,7 @@ dimensions except the matched AVSL/Contextual 1536 comparison.
 
 ## Shared completion requirements
 
-For each blocked row, completion requires:
+Every row remains subject to these completion requirements:
 
 1. Record the exact paper variant, component equations, source revision,
    licenses and dependency audit. Any reused source must go through
@@ -50,10 +50,11 @@ representing those methods with an unrelated scalar loss under their names.
 
 ## Source and license inventory
 
-These are observed revision candidates, **not yet approved/pinned dependencies**.
-MIT entries require a component and transitive-source audit; a top-level MIT
-file does not establish the rights of every bundled dependency. No source was
-copied as part of this audit.
+These are the source revisions reviewed for the adapters. Exact adopted pins
+and reuse boundaries are recorded in `third_party/upstreams.toml` and each
+adapter document. A top-level MIT file does not establish rights to every
+bundled dependency. The minimal AVSL adaptation retains its MIT notice; all
+unlicensed repositories remain reference-only.
 
 | Required ID(s) | Official source candidate and observed revision | Observed reuse status |
 | --- | --- | --- |
