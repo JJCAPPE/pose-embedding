@@ -194,6 +194,30 @@ def experiment(tmp_path, monkeypatch):
             encoder = TinyEncoder()
         state = encoder.state_dict()
         dimension = identity["method_specification"]["embedding_dimension"]
+        head_shapes = {
+            "head.projection.weight": (
+                dimension,
+                4
+                if identity["method"]
+                in {
+                    "proxy_nca_pp",
+                    "hist",
+                    "proxy_nca_metrix",
+                    "proxy_anchor_metrix",
+                    "multi_similarity_metrix",
+                }
+                else 8,
+            ),
+            "head.projection.bias": (dimension,),
+        }
+        if identity["method"] == "drml":
+            from pose_embed.benchmark.drml import DRMLHead
+
+            with torch.random.fork_rng(devices=[]):
+                head_shapes = {
+                    "head." + key: tuple(value.shape)
+                    for key, value in DRMLHead(4, dimension // 4).state_dict().items()
+                }
         return {
             "encoder_parameters": tuple(name for name, _ in encoder.named_parameters()),
             "initialization_sha256": runtime.state_digest(encoder),
@@ -204,20 +228,7 @@ def experiment(tmp_path, monkeypatch):
                 **{
                     f"encoder.{key}": tuple(value.shape) for key, value in state.items()
                 },
-                "head.projection.weight": (
-                    dimension,
-                    4
-                    if identity["method"]
-                    in {
-                        "proxy_nca_pp",
-                        "hist",
-                        "proxy_nca_metrix",
-                        "proxy_anchor_metrix",
-                        "multi_similarity_metrix",
-                    }
-                    else 8,
-                ),
-                "head.projection.bias": (dimension,),
+                **head_shapes,
             },
         }
 
@@ -545,3 +556,97 @@ def test_metrix_factory_runner_and_checkpoint_roundtrip(experiment, tmp_path, me
     _rehash_output(path, "checkpoint.pt")
     with pytest.raises(ValueError, match="optimizer|shape"):
         runtime.verify_run(path)
+
+
+@pytest.mark.parametrize("track", ["frozen", "finetune"])
+def test_drml_runner_executes_full_objective_and_restores_checkpoint(
+    experiment, tmp_path, track
+):
+    import yaml
+
+    from pose_embed.benchmark.config import load_methods
+    from pose_embed.benchmark.losses import build_loss
+    from pose_embed.benchmark.training import build_optimizer
+
+    config = yaml.safe_load(experiment["config_path"].read_text())
+    config["training"]["encoder_mode"] = track
+    experiment["config_path"].write_text(yaml.safe_dump(config))
+    path = tmp_path / "benchmark-v2/drml"
+    manifest = runner.run_experiment(**experiment, method="drml", output_dir=path)
+    runtime.verify_run(path)
+    checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
+    model = MotionRetrievalModel(
+        TinyEncoder(), method_id="drml", representation_dimension=4, joints=2
+    )
+    model.load_state_dict(checkpoint["model"], strict=True)
+    criterion = build_loss("drml", load_methods()["drml"].parameters, 2)
+    criterion.load_state_dict(checkpoint["criterion"], strict=True)
+    recipe = manifest["identity"]["training_recipe"]
+    optimizer = build_optimizer(model, criterion, recipe, "main")
+    optimizer.load_state_dict(checkpoint["optimizer"])
+    assert optimizer.param_groups[0]["lr"] == (1e-5 if track == "finetune" else 0)
+    assert [group["lr"] for group in optimizer.param_groups[1:]] == [1e-4, 1e-4]
+    assert criterion.training_steps.item() == checkpoint["selected_step"]
+    for row in runtime.read_json(path / "history.json")["steps"]:
+        assert sum(row["drml_assignment_counts"]) == 8
+        assert (row["encoder_gradient_parameters"] > 0) == (track == "finetune")
+    model.eval()
+    poses = torch.randn(2, 2, 3, 2, 3)
+    poses[..., 2] = 1
+    assert model(poses).shape == (2, 512)
+    reference = MotionRetrievalModel(
+        TinyEncoder(), method_id="drml", representation_dimension=4, joints=2
+    ).eval()
+    reference.load_state_dict(checkpoint["model"])
+    torch.testing.assert_close(model(poses), reference(poses))
+
+
+@pytest.mark.parametrize(
+    "change",
+    ["decoder", "proxy", "mapping", "moment", "counter", "history", "learning_rate"],
+)
+def test_rehashed_drml_auxiliary_checkpoint_tampering_is_rejected(
+    experiment, tmp_path, change
+):
+    path = tmp_path / "benchmark-v2/drml-corrupt"
+    runner.run_experiment(**experiment, method="drml", output_dir=path)
+    checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
+    if change == "decoder":
+        checkpoint["model"]["head.decoders.0.weight"] = torch.ones(1, 1)
+    elif change == "proxy":
+        del checkpoint["criterion"]["embedding_loss.proxies"]
+    elif change == "mapping":
+        group = checkpoint["optimizer"]["param_groups"][0]
+        del group["params"][0]
+        del group["param_names"][0]
+    elif change == "moment":
+        index = checkpoint["optimizer"]["param_groups"][1]["params"][-1]
+        del checkpoint["optimizer"]["state"][index]
+    elif change == "counter":
+        checkpoint["criterion"]["branch_steps"][0] += 1
+    elif change == "learning_rate":
+        checkpoint["optimizer"]["param_groups"][2]["lr"] = 1
+    else:
+        history = runtime.read_json(path / "history.json")
+        history["steps"][0]["drml_assignment_counts"] = [0, 0, 0, 0]
+        (path / "history.json").write_text(json.dumps(history))
+        _rehash_output(path, "history.json")
+    torch.save(checkpoint, path / "checkpoint.pt")
+    _rehash_output(path, "checkpoint.pt")
+    with pytest.raises(ValueError, match="DRML|keys or shapes|criterion/proxy"):
+        runtime.verify_run(path)
+
+
+def test_drml_profile_measures_real_finetuning_step(experiment, tmp_path):
+    import yaml
+
+    config = yaml.safe_load(experiment["config_path"].read_text())
+    config["training"]["encoder_mode"] = "finetune"
+    experiment["config_path"].write_text(yaml.safe_dump(config))
+    path = tmp_path / "benchmark-v2/drml-profile"
+    manifest = runner.run_experiment(
+        **experiment, method="drml", output_dir=path, profile_steps=2
+    )
+    runtime.verify_run(path)
+    assert manifest["identity"]["scientific_use_allowed"] is False
+    assert runtime.read_json(path / "telemetry.json")["encoder_backward_steps"] == 2

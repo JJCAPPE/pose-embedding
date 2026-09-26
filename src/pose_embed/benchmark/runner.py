@@ -110,6 +110,8 @@ def optimizer_step(
     if value.ndim != 0 or not torch.isfinite(value):
         raise ValueError("objective must produce a finite scalar")
     value.backward()
+    if hasattr(criterion, "after_backward"):
+        criterion.after_backward(model)
     parameters = [*model.parameters(), *criterion.parameters()]
     if any(p.grad is not None and not torch.isfinite(p.grad).all() for p in parameters):
         raise ValueError("training produced non-finite gradients")
@@ -138,7 +140,7 @@ def _checkpoint_state(model, criterion, optimizer, recipe, step, phase):
         "model": _cpu_snapshot(model.state_dict()),
         "criterion": _cpu_snapshot(criterion.state_dict()),
     }
-    if recipe["optimizer"] == "Adam":
+    if recipe["optimizer"] == "Adam" or recipe.get("named_optimizer_state"):
         profiling = recipe["profile_phase"] is not None
         state["optimizer"] = _cpu_snapshot(optimizer.state_dict())
         state["training_state"] = {
@@ -355,6 +357,8 @@ def run_experiment(
                     p.grad is not None for p in model.encoder.parameters()
                 ),
             }
+            if method == "drml":
+                row["drml_assignment_counts"] = list(criterion.assignment_counts)
             if (
                 stage == "development"
                 and profile_steps is None

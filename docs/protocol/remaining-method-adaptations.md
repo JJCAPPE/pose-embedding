@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 20 implemented and 6 blocked**. A working priority pair is
+configurations: 21 implemented and 5 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -107,7 +107,13 @@ retrieval scorer. This also supplies the base of `proxy_nca_metrix`.
 
 ## 2. DRML with Proxy Anchor
 
-**Required recipe.** The screenshot's DRML result is the Proxy Anchor variant.
+The independent DRML-PA motion adapter is callable and CPU-tested; see
+[its equation mapping and motion choices](drml-motion-adaptation.md).
+Allocated-GPU validation and scientific runs remain outstanding. The CUB/Cars
+image rows use DRML-PA, whereas the screenshot's SOP row uses DRML-MDW; this
+configuration explicitly selects the former.
+
+**Required recipe.** The screenshot's CUB/Cars DRML results use the Proxy Anchor variant.
 DRML learns four 128-dimensional individual branches, eight meta-relation
 branches, reconstruction-based assignment to individual branches, and a graph
 updater producing the concatenated 512-dimensional retrieval embedding.

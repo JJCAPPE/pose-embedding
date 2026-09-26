@@ -16,6 +16,7 @@ from pytorch_metric_learning import distances, losses, miners
 from torch import nn
 
 from pose_embed.benchmark.config import StrictModel, load_methods
+from pose_embed.benchmark.drml import DRMLLoss, DRMLParameters
 from pose_embed.benchmark.hist import HISTParameters, HypergraphSemanticTupletLoss
 from pose_embed.benchmark.ibc import IBCParameters, IntraBatchConnectionsLoss
 from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixLoss
@@ -47,6 +48,7 @@ SUPPORTED_METHODS = METRIX_METHODS | frozenset(
         "smooth_ap",
         "normalized_softmax",
         "supcon",
+        "drml",
         "ibc",
         "hist",
     }
@@ -319,6 +321,11 @@ def build_loss(
         parameters["embedding_dimension"] = dimension or 512
     if method_id in METRIX_METHODS:
         return MetrixLoss(method_id, parameters, num_classes, dimension or 512)
+    if method_id == "drml":
+        config = DRMLParameters.model_validate(parameters)
+        if dimension is not None and dimension != 4 * config.branch_dimension:
+            raise ValueError("DRML dimension differs from its four individual branches")
+        return DRMLLoss(num_classes, config)
     if method_id == "contrastive":
         config = ContrastiveParameters.model_validate(parameters)
         module = PairwiseContrastiveLoss(**config.model_dump())

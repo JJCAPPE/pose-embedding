@@ -7,6 +7,7 @@ import math
 import torch
 
 from pose_embed.benchmark.config import BenchmarkTraining
+from pose_embed.benchmark.drml import DRMLParameters
 from pose_embed.benchmark.hist import HISTParameters
 from pose_embed.benchmark.proxy_nca_plus import ProxyNCAPlusParameters
 
@@ -51,6 +52,16 @@ def resolve_recipe(
             "schedule": "main_epochs_step_decay",
             "profile_phase": "post_warmup_capacity" if profile else None,
             "profile_executes_warmup": False if profile else None,
+        }
+    if method_id == "drml":
+        config = DRMLParameters.model_validate(parameters)
+        return common | {
+            **config.model_dump(mode="json"),
+            "optimizer": "AdamW",
+            "optimizer_epsilon": 1e-8,
+            "weight_decay": training.weight_decay,
+            "named_optimizer_state": True,
+            "schedule": "constant_lr_validation_r_at_1_selection",
         }
     if method_id not in {"proxy_nca_pp", "proxy_nca_metrix"}:
         return common | {
@@ -100,7 +111,7 @@ def build_optimizer(model, criterion, recipe: dict, phase: str):
     model.set_encoder_trainable(
         recipe["encoder_mode"] == "finetune" and phase == "main"
     )
-    if recipe["optimizer"] == "AdamW":
+    if recipe["optimizer"] == "AdamW" and not recipe.get("named_optimizer_state"):
         parameters = [
             p for p in [*model.parameters(), *criterion.parameters()] if p.requires_grad
         ]
@@ -162,6 +173,8 @@ def build_optimizer(model, criterion, recipe: dict, phase: str):
             if name == "proxies"
             else recipe["head_learning_rate"]
         )
+        if name == "encoder":
+            learning_rate = recipe.get("encoder_learning_rate", learning_rate)
         if name == "encoder" and not model.train_encoder:
             learning_rate = 0.0
         groups.append(
@@ -172,11 +185,14 @@ def build_optimizer(model, criterion, recipe: dict, phase: str):
                 "lr": learning_rate,
             }
         )
-    return torch.optim.Adam(
+    optimizer_class = (
+        torch.optim.AdamW if recipe["optimizer"] == "AdamW" else torch.optim.Adam
+    )
+    return optimizer_class(
         groups,
         lr=recipe["head_learning_rate"],
         eps=recipe["optimizer_epsilon"],
-        weight_decay=0.0,
+        weight_decay=recipe["weight_decay"],
     )
 
 

@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as functional
 from torch import nn
 
+from pose_embed.benchmark.drml import DRMLHead
 from pose_embed.benchmark.hist import HISTHead
 from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixMeanMaxHead
 from pose_embed.models.action_head import ActionHeadEmbed
@@ -16,6 +17,8 @@ def head_recipe(method_id: str) -> str:
         return "confidence_valid_token_mean_plus_max"
     if method_id == "hist":
         return "confidence_valid_token_mean_plus_max_project_nonaffine_ln"
+    if method_id == "drml":
+        return "drml_four_branch_directed_relations_mean_tokens"
     return (
         "confidence_valid_token_max_nonaffine_ln"
         if method_id in {"proxy_nca_pp", "proxy_nca_metrix"}
@@ -33,7 +36,7 @@ def supports_embedding_inference(method_id: str) -> bool:
         and supports(method_id)
         and (
             specification.family == "embedding_loss"
-            or method_id in {"proxy_nca_pp", "ibc", "hist"}
+            or method_id in {"proxy_nca_pp", "ibc", "hist", "drml"}
             or method_id in METRIX_METHODS
         )
     )
@@ -91,7 +94,9 @@ class MotionRetrievalModel(nn.Module):
         self.encoder = encoder
         self.method_id = method_id
         self.head = (
-            MaskedMaxHead(embedding_dimension, representation_dimension)
+            DRMLHead(representation_dimension, embedding_dimension // 4)
+            if method_id == "drml"
+            else MaskedMaxHead(embedding_dimension, representation_dimension)
             if method_id in {"proxy_nca_pp", "proxy_nca_metrix"}
             else ActionHeadEmbed(
                 embedding_dimension=embedding_dimension,
@@ -103,6 +108,8 @@ class MotionRetrievalModel(nn.Module):
             self.head = MetrixMeanMaxHead(embedding_dimension, representation_dimension)
         if method_id == "hist":
             self.head = HISTHead(embedding_dimension, representation_dimension)
+        if method_id == "drml" and embedding_dimension % 4:
+            raise ValueError("DRML embedding dimension must be divisible by four")
         self.set_encoder_trainable(train_encoder)
 
     def set_encoder_trainable(self, enabled: bool) -> None:

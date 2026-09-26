@@ -186,26 +186,36 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
     input_dimension = protocol.encoder.representation_dimension
     if identity["method"] not in {
         "proxy_nca_pp",
+        "drml",
         "hist",
         "proxy_nca_metrix",
         "proxy_anchor_metrix",
         "multi_similarity_metrix",
     }:
         input_dimension *= protocol.dataset.joints
+    head_shapes = {
+        "head.projection.weight": (dimension, input_dimension),
+        "head.projection.bias": (dimension,),
+    }
+    if identity["method"] == "drml":
+        from pose_embed.benchmark.drml import DRMLHead
+
+        with torch.random.fork_rng(devices=[]):
+            head = DRMLHead(input_dimension, dimension // 4)
+        head_shapes = {
+            "head." + key: tuple(value.shape)
+            for key, value in head.state_dict().items()
+        }
     return {
         **reference,
         "encoder_parameters": _reference_encoder_parameters(
             str(Path(data_root).resolve()), str(assets["checkpoint_sha256"])
         )
-        if identity["method"] in {"proxy_nca_pp", "hist", "proxy_nca_metrix"}
+        if identity["method"] in {"proxy_nca_pp", "hist", "drml", "proxy_nca_metrix"}
         else (),
         "model_shapes": {
             **{f"encoder.{key}": shape for key, shape in reference["shapes"].items()},
-            "head.projection.weight": (
-                dimension,
-                input_dimension,
-            ),
-            "head.projection.bias": (dimension,),
+            **head_shapes,
         },
     }
 
@@ -628,6 +638,16 @@ def verify_run(directory: str | Path) -> dict:
         ):
             raise ValueError("checkpoint contains invalid parameters")
     _verify_checkpoint_state(directory, identity, config, checkpoint, num_classes)
+    if identity["method"] == "drml":
+        from pose_embed.benchmark.drml import verify_drml_optimizer
+
+        verify_drml_optimizer(
+            checkpoint,
+            recipe,
+            _expected_model_state(identity, config)["encoder_parameters"],
+            rows,
+            config.training.physical_batch_size,
+        )
     if identity["method"] in {"proxy_nca_pp", "hist", "proxy_nca_metrix"}:
         _verify_proxy_optimizer(
             checkpoint,

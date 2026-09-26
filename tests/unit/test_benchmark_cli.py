@@ -39,8 +39,8 @@ def experiment_arguments(operation: str) -> list[str]:
 def test_coverage_exposes_all_methods_without_granting_test_access() -> None:
     result = cli.run(parse("coverage"))
     assert result["required_method_count"] == len(result["methods"]) == 26
-    assert result["implemented_method_count"] == 20
-    assert result["blocked_method_count"] == 6
+    assert result["implemented_method_count"] == 21
+    assert result["blocked_method_count"] == 5
     assert result["required_final_run_count"] == 156
     assert result["priority_methods"] == ["contrastive", "contextual"]
     assert result["paired_seeds"] == [7, 17, 29, 43, 59, 71]
@@ -121,7 +121,7 @@ def test_blocked_methods_invalid_seeds_and_track_mismatch_never_start_a_run(
         cli, "run_experiment", lambda **arguments: calls.append(arguments) or {}
     )
     arguments = parse(*experiment_arguments("train"))
-    arguments.method = "drml"
+    arguments.method = "diml"
     with pytest.raises(ValueError, match="blocked"):
         cli.run(arguments)
     arguments.method = "contextual"

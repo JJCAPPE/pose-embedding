@@ -25,7 +25,9 @@ def parameters(method: str) -> dict[str, object]:
     return dict(load_methods()[method].parameters) | {"embedding_dimension": 12}
 
 
-@pytest.mark.parametrize("method", sorted(SUPPORTED_METHODS - METRIX_METHODS))
+@pytest.mark.parametrize(
+    "method", sorted(SUPPORTED_METHODS - METRIX_METHODS - {"drml"})
+)
 def test_supported_losses_have_finite_scalar_and_embedding_gradients(
     method: str,
 ) -> None:

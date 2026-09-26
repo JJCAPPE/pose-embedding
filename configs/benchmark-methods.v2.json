@@ -219,10 +219,25 @@
       "family": "architecture",
       "embedding_dimension": 512,
       "source_url": "https://arxiv.org/abs/2108.10026",
-      "implementation": "pending_drml_proxy_anchor_motion_adaptation",
-      "status": "blocked",
-      "blocker": "Official code has no discovered reuse license; independent four-branch adaptive ensemble, reconstruction assignment, relation graph, and Proxy Anchor training are not implemented.",
-      "parameters": {}
+      "implementation": "independent_zheng2021_pa_motion_v1",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "zheng2021_pa_motion_v1",
+        "branches": 4,
+        "branch_dimension": 128,
+        "reconstruction_weight": 0.1,
+        "embedding_weight": 10.0,
+        "alpha": 32.0,
+        "margin": 0.1,
+        "encoder_learning_rate": 1e-05,
+        "head_learning_rate": 0.0001,
+        "proxy_learning_rate": 0.0001,
+        "pooling": "confidence_valid_token_mean",
+        "all_invalid_policy": "zero_pooled_feature",
+        "assignment_tie": "lowest_branch_index",
+        "score_normalization": "linear_divided_by_incoming_sum"
+      }
     },
     {
       "method_id": "diml",
