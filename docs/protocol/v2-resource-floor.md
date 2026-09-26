@@ -57,10 +57,13 @@ full moments for every segment after encoder updates, plus any new best-state
 snapshots. The measured per-method checkpoint bytes and actual segment count
 must replace these lower bounds in the final forecast.
 
-The earlier SCC shared-space observation was approximately 507 GB remaining;
-even interpreting that observation as GiB does not cover the smallest floor.
-Recheck current project quota and reserve sufficient accessible storage before
-launching the full campaign. Capacity profiling does not reserve that space.
+At 2026-09-26 22:28 UTC, `pquota textconv` reported **18,402.00 GB used of
+18,800 GB** on the project storage that holds these artifacts: **398.00 GB
+remaining**. An earlier observation was approximately 507 GB, illustrating
+that other shared usage can change availability. Neither observation covers
+the smallest floor. Recheck current project quota and reserve sufficient
+accessible storage before launching the full campaign. Capacity profiling
+does not reserve that space.
 Preserve prior artifacts; silently deleting checkpoints or shortening the
 scientific budget is not a storage solution.
 
