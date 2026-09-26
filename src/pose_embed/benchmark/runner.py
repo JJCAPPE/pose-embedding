@@ -13,9 +13,14 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 
 from pose_embed.benchmark.config import benchmark_digest, load_benchmark, load_methods
+from pose_embed.benchmark.descriptors import (
+    descriptor_summary,
+    encode_retrieval,
+    make_score_rows,
+)
 from pose_embed.benchmark.losses import build_loss, supports
 from pose_embed.benchmark.model import MotionRetrievalModel, head_recipe
-from pose_embed.benchmark.retrieval import evaluate_retrieval
+from pose_embed.benchmark.retrieval import evaluate_retrieval, method_retrieval_policy
 from pose_embed.benchmark.runtime import (
     REPOSITORY,
     artifact_path,
@@ -79,19 +84,7 @@ class PoseDataset(Dataset):
 
 
 def encode(model, dataset, device, batch_size: int) -> np.ndarray:
-    was_training = model.training
-    model.eval()
-    chunks = []
-    try:
-        with torch.inference_mode():
-            for poses, _ in DataLoader(dataset, batch_size=batch_size, shuffle=False):
-                embedded = model(poses.to(device))
-                if not torch.isfinite(embedded).all():
-                    raise ValueError("model produced non-finite retrieval embeddings")
-                chunks.append(embedded.cpu().numpy())
-    finally:
-        model.train(was_training)
-    return np.concatenate(chunks)
+    return encode_retrieval(model, dataset, device, batch_size)["embeddings"]
 
 
 def optimizer_step(
@@ -277,6 +270,7 @@ def run_experiment(
             embedding_dimension=spec.embedding_dimension,
             train_encoder=track == "finetune",
             method_id=method,
+            method_parameters=spec.parameters,
         ).to(device)
         annotations = {a["frame_dir"]: a for a in inputs.annotations}
         dataset = PoseDataset(train_rows, annotations, inputs.protocol)
@@ -366,15 +360,26 @@ def run_experiment(
                 and profile_steps is None
                 and (step % config.training.validation_every == 0 or step == steps)
             ):
-                embedded = encode(model, validation, device, batch_size)
+                encoding_started = time.perf_counter()
+                descriptors = encode_retrieval(model, validation, device, batch_size)
+                encoding_seconds = time.perf_counter() - encoding_started
+                scoring_started = time.perf_counter()
+                embedded = descriptors["embeddings"]
                 result = evaluate_retrieval(
                     embedded,
                     embedded,
                     validation_rows,
                     validation_rows,
                     recall_k=config.metrics.recall_k,
+                    score_rows=make_score_rows(model, descriptors, descriptors),
+                    scoring_policy=method_retrieval_policy(method, spec.parameters),
                 )
                 row["validation"] = result["metrics"]
+                row["descriptor_storage"] = descriptor_summary(descriptors)
+                row["retrieval_timing"] = {
+                    "encoding_seconds": encoding_seconds,
+                    "scoring_seconds": time.perf_counter() - scoring_started,
+                }
                 score = result["metrics"][config.selection_metric]
                 if step >= recipe["minimum_selected_step"] and score > best_score:
                     best_score = score

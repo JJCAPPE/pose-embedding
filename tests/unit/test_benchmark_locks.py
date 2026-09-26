@@ -9,6 +9,7 @@ import torch
 
 from pose_embed.benchmark import locks
 from pose_embed.benchmark.config import benchmark_digest, load_benchmark, load_methods
+from pose_embed.benchmark.retrieval import method_retrieval_policy
 from pose_embed.benchmark.runtime import (
     artifact_root,
     code_digest,
@@ -153,9 +154,9 @@ def _runs(lock_context, stage: str, *, selection=None) -> list[Path]:
                         "query_order_sha256": "c" * 64,
                         "gallery_order_sha256": "c" * 64,
                         "exclusion_sha256": "d" * 64,
-                        "policy": {
-                            "exclusion": "self_and_all_synchronized_performance_views"
-                        },
+                        "policy": method_retrieval_policy(
+                            method, methods[method].parameters
+                        ),
                     },
                 )
                 names.append("development-result.json")

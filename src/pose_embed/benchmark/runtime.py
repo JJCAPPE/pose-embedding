@@ -192,6 +192,7 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
         "proxy_nca_metrix",
         "proxy_anchor_metrix",
         "multi_similarity_metrix",
+        "diml",
     }:
         input_dimension *= protocol.dataset.joints
     head_shapes = {

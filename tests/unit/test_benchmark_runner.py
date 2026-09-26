@@ -202,6 +202,7 @@ def experiment(tmp_path, monkeypatch):
                 in {
                     "proxy_nca_pp",
                     "hist",
+                    "diml",
                     "proxy_nca_metrix",
                     "proxy_anchor_metrix",
                     "multi_similarity_metrix",
@@ -743,3 +744,37 @@ def test_s2sd_profiles_active_delayed_path_and_rejects_short_scientific_run(
         runner.run_experiment(
             **experiment, method="s2sd", output_dir=tmp_path / "short"
         )
+
+
+def test_diml_full_runner_uses_structural_validation_and_checks_head(
+    experiment, tmp_path, monkeypatch
+):
+    def poses(annotation, protocol):
+        values = (
+            np.random.default_rng(annotation["index"])
+            .normal(size=(2, 4, 17, 3))
+            .astype(np.float32)
+        )
+        values[..., 2] = 1
+        return values
+
+    monkeypatch.setattr(runner, "preprocess_annotation", poses)
+    path = tmp_path / "benchmark-v2/diml"
+    runner.run_experiment(**experiment, method="diml", output_dir=path)
+    checked = runtime.verify_run(path)
+    assert checked["identity"]["method"] == "diml"
+    result = runtime.read_json(path / "development-result.json")
+    assert (
+        result["policy"]["similarity"] == "diml_cross_correlation_transport_multiscale"
+    )
+    history = runtime.read_json(path / "history.json")["steps"]
+    assert history[-1]["descriptor_storage"]["bytes_per_sample"] == 17 * 512 * 4 + 16
+    assert history[-1]["retrieval_timing"]["scoring_seconds"] > 0
+    state = torch.load(path / "checkpoint.pt", weights_only=True)
+    state["model"]["head.projection.weight"] = torch.ones(512, 8)
+    torch.save(state, path / "checkpoint.pt")
+    manifest = runtime.read_json(path / "run-manifest.json")
+    manifest["outputs"]["checkpoint.pt"] = sha256_file(path / "checkpoint.pt")
+    (path / "run-manifest.json").write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="keys or shapes"):
+        runtime.verify_run(path)

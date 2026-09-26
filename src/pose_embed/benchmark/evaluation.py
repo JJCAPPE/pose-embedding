@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import time
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
@@ -12,12 +13,23 @@ import torch
 
 from pose_embed.benchmark.analysis import analysis_plan_sha256, paired_intervals
 from pose_embed.benchmark.config import benchmark_digest, load_benchmark, load_methods
+from pose_embed.benchmark.descriptors import (
+    encode_retrieval,
+    make_score_rows,
+    read_descriptors,
+    save_descriptors,
+)
 from pose_embed.benchmark.locks import open_test, validate_final_runs, validate_opening
 from pose_embed.benchmark.model import (
     MotionRetrievalModel,
     supports_embedding_inference,
 )
-from pose_embed.benchmark.retrieval import RETRIEVAL_POLICY, evaluate_retrieval
+from pose_embed.benchmark.retrieval import (
+    CUSTOM_SCORERS,
+    RETRIEVAL_POLICY,
+    evaluate_retrieval,
+    method_retrieval_policy,
+)
 from pose_embed.benchmark.runner import PoseDataset, encode
 from pose_embed.benchmark.runtime import (
     REPOSITORY,
@@ -32,6 +44,7 @@ from pose_embed.benchmark.runtime import (
 from pose_embed.data.ntu import parse_ntu_sample_id
 from pose_embed.models.motionbert import (
     configure_deterministic_inference,
+    inference_environment,
     load_frozen_encoder,
     verify_motionbert_assets,
 )
@@ -121,6 +134,7 @@ def evaluate_final(
         embedding_dimension=spec.embedding_dimension,
         train_encoder=True,
         method_id=spec.method_id,
+        method_parameters=spec.parameters,
     ).to(device)
     checkpoint = torch.load(
         directory / "checkpoint.pt", map_location="cpu", weights_only=True
@@ -154,12 +168,46 @@ def evaluate_final(
         {"identity": evaluation_identity, "started_at": now()},
     )
     try:
-        embedded = encode(model, dataset, device, config.training.physical_batch_size)
+        encoding_started = time.perf_counter()
+        custom = spec.method_id in CUSTOM_SCORERS
+        descriptors = (
+            encode_retrieval(
+                model, dataset, device, config.training.physical_batch_size
+            )
+            if custom
+            else {
+                "embeddings": encode(
+                    model, dataset, device, config.training.physical_batch_size
+                )
+            }
+        )
+        encoding_seconds = time.perf_counter() - encoding_started
+        scoring_started = time.perf_counter()
+        embedded = descriptors["embeddings"]
         if embedded.shape != (len(rows), spec.embedding_dimension):
             raise ValueError("trained model output dimension differs from the registry")
         result = evaluate_retrieval(
-            embedded, embedded, rows, rows, recall_k=config.metrics.recall_k
+            embedded,
+            embedded,
+            rows,
+            rows,
+            recall_k=config.metrics.recall_k,
+            score_rows=make_score_rows(model, descriptors, descriptors),
+            scoring_policy=method_retrieval_policy(spec.method_id, spec.parameters),
         )
+        scoring_seconds = time.perf_counter() - scoring_started
+        if custom:
+            write_immutable_json(
+                destination / "retrieval-timing.json",
+                {
+                    "encoding_seconds": encoding_seconds,
+                    "scoring_seconds": scoring_seconds,
+                    "environment": inference_environment(device),
+                },
+            )
+            save_descriptors(
+                destination, descriptors, spec.method_id, spec.embedding_dimension
+            )
         write_immutable_json(destination / "rank-metrics.json", result)
         write_immutable_json(
             destination / "outcome.json", {"status": "succeeded", "completed_at": now()}
@@ -169,7 +217,18 @@ def evaluate_final(
             "identity": evaluation_identity,
             "outputs": {
                 name: sha256_file(destination / name)
-                for name in ("attempt.json", "rank-metrics.json", "outcome.json")
+                for name in (
+                    ("attempt.json", "rank-metrics.json", "outcome.json")
+                    + (
+                        (
+                            "retrieval-descriptors.npz",
+                            "descriptor-storage.json",
+                            "retrieval-timing.json",
+                        )
+                        if custom
+                        else ()
+                    )
+                )
             },
             "completed_at": now(),
         }
@@ -189,12 +248,14 @@ def evaluate_final(
         raise
 
 
-def _validated_metrics(result: dict, episode: dict, cutoffs: tuple[int, ...]) -> dict:
+def _validated_metrics(
+    result: dict, episode: dict, cutoffs: tuple[int, ...], expected_policy=None
+) -> dict:
     """Rederive every metric from valid ranks and the locked candidate identities."""
     sample_ids = episode["sample_ids"]
     if (
         result.get("schema_version") != 1
-        or result.get("policy") != RETRIEVAL_POLICY
+        or result.get("policy") != (expected_policy or RETRIEVAL_POLICY)
         or result.get("query_sample_ids") != sample_ids
         or result.get("gallery_sample_ids") != sample_ids
         or result.get("query_order_sha256") != digest(sample_ids)
@@ -285,16 +346,77 @@ def _validated_metrics(result: dict, episode: dict, cutoffs: tuple[int, ...]) ->
     return metrics
 
 
+def _replay_structural_result(directory, run_dir, spec, episode, config, result):
+    from pose_embed.config import load_protocol
+
+    descriptors = read_descriptors(
+        directory, spec.method_id, len(episode["sample_ids"]), spec.embedding_dimension
+    )
+    protocol = load_protocol(REPOSITORY / config.input_protocol)
+    checkpoint = torch.load(
+        run_dir / "checkpoint.pt", map_location="cpu", weights_only=True
+    )
+    replay_encoder = torch.nn.Identity()
+    if spec.method_id == "proxy_anchor_avsl":
+        widths = [
+            checkpoint["model"][f"head.projections.{index}.weight"].shape[1]
+            for index in (0, 1)
+        ]
+        if widths[0] != widths[1]:
+            raise ValueError("AVSL intermediate feature widths differ")
+        replay_encoder.dim_feat = widths[0]
+    with torch.random.fork_rng():
+        model = MotionRetrievalModel(
+            replay_encoder,
+            method_id=spec.method_id,
+            embedding_dimension=spec.embedding_dimension,
+            representation_dimension=protocol.encoder.representation_dimension,
+            method_parameters=spec.parameters,
+        )
+    model.head.load_state_dict(
+        {
+            name.removeprefix("head."): value
+            for name, value in checkpoint["model"].items()
+            if name.startswith("head.")
+        },
+        strict=True,
+    )
+    model.eval()
+    rows = [{"sample_id": value} for value in episode["sample_ids"]]
+    replay = evaluate_retrieval(
+        descriptors["embeddings"],
+        descriptors["embeddings"],
+        rows,
+        rows,
+        recall_k=config.metrics.recall_k,
+        score_rows=make_score_rows(model, descriptors, descriptors),
+        scoring_policy=method_retrieval_policy(spec.method_id, spec.parameters),
+    )
+    if result != replay:
+        raise ValueError(
+            "saved structural retrieval ranks differ from descriptor/checkpoint replay"
+        )
+
+
 def _read_evaluation(
     directory: Path, final_runs: dict, opening: dict, config
 ) -> tuple[tuple[str, int], dict, list[dict]]:
     manifest = read_json(directory / "evaluation-manifest.json")
     identity = manifest.get("identity", {})
-    if manifest.get("schema_version") != 2 or set(manifest.get("outputs", {})) != {
-        "attempt.json",
-        "rank-metrics.json",
-        "outcome.json",
-    }:
+    custom = identity.get("run", {}).get("method") in CUSTOM_SCORERS
+    output_names = {"attempt.json", "rank-metrics.json", "outcome.json"}
+    if custom:
+        output_names.update(
+            {
+                "retrieval-descriptors.npz",
+                "descriptor-storage.json",
+                "retrieval-timing.json",
+            }
+        )
+    if (
+        manifest.get("schema_version") != 2
+        or set(manifest.get("outputs", {})) != output_names
+    ):
         raise ValueError("evaluation manifest has incomplete output evidence")
     for name, expected in manifest["outputs"].items():
         if sha256_file(directory / name) != expected:
@@ -326,9 +448,18 @@ def _read_evaluation(
     if identity != expected_identity:
         raise ValueError("evaluation provenance differs from the complete test lock")
     result = read_json(directory / "rank-metrics.json")
+    if custom:
+        _replay_structural_result(
+            directory, run_dir, spec, opening["novel_episode"], config, result
+        )
     return (
         (reference["method"], reference["seed"]),
-        _validated_metrics(result, opening["novel_episode"], config.metrics.recall_k),
+        _validated_metrics(
+            result,
+            opening["novel_episode"],
+            config.metrics.recall_k,
+            method_retrieval_policy(spec.method_id, spec.parameters),
+        ),
         result["per_query"],
     )
 

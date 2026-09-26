@@ -228,6 +228,18 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
             result = read_json(directory / "development-result.json")
             if result.get("identity") != manifest["identity"]:
                 raise ValueError("development result identity differs from its run")
+            from pose_embed.benchmark.retrieval import (
+                common_retrieval_policy,
+                method_retrieval_policy,
+            )
+
+            expected_policy = method_retrieval_policy(
+                method, methods[method].parameters
+            )
+            if result.get("policy") != expected_policy:
+                raise ValueError(
+                    "development scorer policy differs from the bound method"
+                )
             condition = {
                 key: result.get(key)
                 for key in (
@@ -237,6 +249,7 @@ def _selection_content(run_dirs, config, methods) -> tuple[dict, datetime]:
                     "policy",
                 )
             }
+            condition["policy"] = common_retrieval_policy(expected_policy)
             if not all(condition.values()):
                 raise ValueError(
                     "development retrieval identity and exclusions are missing"

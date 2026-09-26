@@ -201,7 +201,7 @@ def test_checkpoint_shape_mismatch_cannot_open_test(final_fixture):
 
 
 @pytest.mark.parametrize("corrupt_head", [False, True])
-@pytest.mark.parametrize("method", ["proxy_nca_pp", "drml"])
+@pytest.mark.parametrize("method", ["proxy_nca_pp", "drml", "diml"])
 def test_method_evaluation_reconstructs_declared_head_before_opening(
     final_fixture, monkeypatch, corrupt_head, method
 ):
@@ -246,7 +246,7 @@ def test_method_evaluation_reconstructs_declared_head_before_opening(
             encoder, representation_dimension=4, joints=2, **kwargs
         ),
     )
-    poses = torch.randn(4, 2, 3, 2, 3, generator=torch.Generator().manual_seed(17))
+    poses = torch.randn(4, 2, 4, 17, 3, generator=torch.Generator().manual_seed(17))
     poses[..., 2] = 1
     monkeypatch.setattr(
         evaluation,
@@ -260,6 +260,11 @@ def test_method_evaluation_reconstructs_declared_head_before_opening(
     else:
         result = _evaluate(f)
         assert result["identity"]["run"]["method"] == method
+
+        if method == "diml":
+            assert "retrieval-descriptors.npz" in result["outputs"]
+            assert "descriptor-storage.json" in result["outputs"]
+            assert "retrieval-timing.json" in result["outputs"]
 
 
 def test_wrong_physical_bindings_cannot_open_test(final_fixture, monkeypatch):

@@ -241,14 +241,26 @@
     },
     {
       "method_id": "diml",
-      "name": "DIML",
+      "name": "DIML (motion MS + miner, 512-D)",
       "family": "architecture",
       "embedding_dimension": 512,
-      "source_url": "https://arxiv.org/abs/2108.05889",
-      "implementation": "pending_diml_structural_similarity_motion_adaptation",
-      "status": "blocked",
-      "blocker": "Official code has no discovered reuse license; exact published baseline recipe, spatiotemporal local-feature optimal transport, cross-correlation marginals, and multiscale retrieval scorer remain unresolved or unimplemented.",
-      "parameters": {}
+      "source_url": "https://openaccess.thecvf.com/content/ICCV2021/papers/Zhao_Towards_Interpretable_Deep_Metric_Learning_With_Structural_Matching_ICCV_2021_paper.pdf",
+      "implementation": "independent_diml_ms_motion_v2",
+      "status": "implemented",
+      "blocker": null,
+      "parameters": {
+        "recipe": "motion_ms_miner_512_time_anatomy_v1",
+        "alpha": 2.0,
+        "beta": 50.0,
+        "base": 0.5,
+        "miner_epsilon": 0.1,
+        "entropy": 0.05,
+        "shortlist": 100,
+        "temporal_bins": 4,
+        "sinkhorn_tolerance": 1e-07,
+        "sinkhorn_iterations": 10000,
+        "pair_chunk_size": 64
+      }
     },
     {
       "method_id": "diva",

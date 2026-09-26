@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 23 implemented and 3 blocked**. A working priority pair is
+configurations: 24 implemented and 2 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -403,3 +403,12 @@ source/license audit, component tests, development run, GPU profile and exact
 adapter/configuration hashes. Record the unresolved decisions above as
 blockers until resolved. Do not claim paper replication, complete comparison,
 or superiority while required adapters or final evaluations remain missing.
+
+## DIML implementation checkpoint
+
+DIML uses the declared MS+miner motion variant, 4×4 time/anatomy local
+descriptors and top-100 global+optimal-transport reranking. The source table
+combines different baseline objectives across its three datasets; this
+variant is explicit in [the adaptation record](diml-motion-adaptation.md).
+Custom descriptors, scorer policy, exact CPU-float64 rank replay, storage
+and measured scoring/encoding time are separate from cosine retrieval.

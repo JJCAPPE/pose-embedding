@@ -16,6 +16,7 @@ from pytorch_metric_learning import distances, losses, miners
 from torch import nn
 
 from pose_embed.benchmark.config import StrictModel, load_methods
+from pose_embed.benchmark.diml import DIMLParameters
 from pose_embed.benchmark.drml import DRMLLoss, DRMLParameters
 from pose_embed.benchmark.hist import HISTParameters, HypergraphSemanticTupletLoss
 from pose_embed.benchmark.ibc import IBCParameters, IntraBatchConnectionsLoss
@@ -55,6 +56,7 @@ SUPPORTED_METHODS = METRIX_METHODS | frozenset(
         "mhgl",
         "ibc",
         "hist",
+        "diml",
     }
 )
 
@@ -357,6 +359,13 @@ def build_loss(
         config = MultiSimilarityParameters.model_validate(parameters)
         module = losses.MultiSimilarityLoss(
             **config.model_dump(), distance=distances.CosineSimilarity()
+        )
+    elif method_id == "diml":
+        config = DIMLParameters.model_validate(parameters)
+        module = _MinedLoss(
+            MinedMultiSimilarityParameters.model_validate(
+                config.model_dump(include={"alpha", "beta", "base", "miner_epsilon"})
+            )
         )
     elif method_id == "multi_similarity_miner":
         module = _MinedLoss(MinedMultiSimilarityParameters.model_validate(parameters))

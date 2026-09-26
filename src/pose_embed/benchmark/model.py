@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as functional
 from torch import nn
 
+from pose_embed.benchmark.diml import DIMLHead
 from pose_embed.benchmark.drml import DRMLHead
 from pose_embed.benchmark.hist import HISTHead
 from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixMeanMaxHead
@@ -14,6 +15,8 @@ from pose_embed.models.action_head import ActionHeadEmbed
 
 
 def head_recipe(method_id: str) -> str:
+    if method_id == "diml":
+        return "confidence_valid_mean_shared_time_anatomy_projection"
     if method_id in {"multi_similarity_metrix", "proxy_anchor_metrix"}:
         return "confidence_valid_token_mean_plus_max"
     if method_id == "mhgl":
@@ -39,7 +42,8 @@ def supports_embedding_inference(method_id: str) -> bool:
         and supports(method_id)
         and (
             specification.family == "embedding_loss"
-            or method_id in {"proxy_nca_pp", "ibc", "hist", "drml", "s2sd", "mhgl"}
+            or method_id
+            in {"proxy_nca_pp", "ibc", "hist", "drml", "s2sd", "mhgl", "diml"}
             or method_id in METRIX_METHODS
         )
     )
@@ -92,6 +96,7 @@ class MotionRetrievalModel(nn.Module):
         representation_dimension: int = 512,
         joints: int = 17,
         method_id: str = "contrastive",
+        method_parameters: dict | None = None,
     ) -> None:
         super().__init__()
         self.encoder = encoder
@@ -119,6 +124,10 @@ class MotionRetrievalModel(nn.Module):
                 global_dimension=representation_dimension,
                 embedding_dimension=embedding_dimension,
             )
+        if method_id == "diml":
+            self.head = DIMLHead(
+                embedding_dimension, representation_dimension, method_parameters
+            )
         self.set_encoder_trainable(train_encoder)
 
     def set_encoder_trainable(self, enabled: bool) -> None:
@@ -137,6 +146,13 @@ class MotionRetrievalModel(nn.Module):
 
     def forward(self, poses: torch.Tensor) -> torch.Tensor:
         return functional.normalize(self.forward_raw(poses), dim=-1)
+
+    def retrieval_descriptors(self, poses: torch.Tensor) -> dict[str, torch.Tensor]:
+        if self.method_id == "diml":
+            return self.head.forward_descriptors(
+                self.forward_features(poses), poses[..., 2] > 0
+            )
+        return {"embeddings": self(poses)}
 
     def forward_raw(self, poses: torch.Tensor) -> torch.Tensor:
         if self.method_id == "mhgl":

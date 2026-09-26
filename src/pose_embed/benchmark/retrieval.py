@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 import torch
@@ -23,6 +23,29 @@ RETRIEVAL_POLICY = {
     "average_precision_at_r": "first_r_ranks_divided_by_valid_relevant_count",
     "aggregation": "unweighted_mean_over_queries",
 }
+
+CUSTOM_SCORERS = {
+    "diml": "diml_cross_correlation_transport_multiscale",
+    "proxy_anchor_avsl": "avsl_negative_hierarchical_distance",
+}
+
+
+def method_retrieval_policy(method_id: str, parameters: Mapping | None = None) -> dict:
+    policy = dict(RETRIEVAL_POLICY)
+    if method_id in CUSTOM_SCORERS:
+        if parameters is None:
+            raise ValueError("custom retrieval requires its bound method parameters")
+        policy["similarity"] = CUSTOM_SCORERS[method_id]
+        policy["scoring_arithmetic"] = "cpu_float64"
+        policy["scoring_specification_sha256"] = _digest(
+            {"method_id": method_id, "parameters": dict(parameters)}
+        )
+    return policy
+
+
+def common_retrieval_policy(policy: Mapping) -> dict:
+    """Comparison conditions shared by cosine and declared structural scorers."""
+    return {key: policy[key] for key in RETRIEVAL_POLICY if key != "similarity"}
 
 
 def _digest(value: object) -> str:
@@ -52,7 +75,9 @@ def _identities(
     return identities
 
 
-def _normalized(values: Any, count: int, label: str) -> torch.Tensor:
+def _validated_vectors(
+    values: Any, count: int, label: str, *, normalize: bool
+) -> torch.Tensor:
     embeddings = torch.as_tensor(values).detach()
     if embeddings.ndim != 2 or embeddings.shape[0] != count:
         raise ValueError(f"{label} embeddings must be [N,D] aligned with records")
@@ -64,6 +89,8 @@ def _normalized(values: Any, count: int, label: str) -> torch.Tensor:
         raise ValueError(f"{label} embeddings must contain only finite values")
     if embeddings.dtype not in {torch.float32, torch.float64}:
         embeddings = embeddings.to(torch.float32)
+    if not normalize:
+        return embeddings
     # Scaling first avoids overflow/underflow for finite, nonzero input vectors.
     scale = embeddings.abs().amax(dim=1, keepdim=True)
     if (scale == 0).any():
@@ -79,6 +106,9 @@ def evaluate_retrieval(
     gallery_records: Sequence[ManifestRecord | Mapping[str, Any]],
     recall_k: Sequence[int] = (1, 2, 4, 8),
     chunk_size: int = 128,
+    *,
+    score_rows: Callable | None = None,
+    scoring_policy: Mapping | None = None,
 ) -> dict[str, Any]:
     """Rank every valid candidate exactly, retaining only relevant-item ranks.
 
@@ -93,6 +123,21 @@ def evaluate_retrieval(
         or chunk_size < 1
     ):
         raise ValueError("chunk_size must be a positive integer")
+    policy = dict(RETRIEVAL_POLICY if scoring_policy is None else scoring_policy)
+    if score_rows is None:
+        if policy != RETRIEVAL_POLICY:
+            raise ValueError("non-cosine policy requires its actual retrieval scorer")
+    elif (
+        set(policy)
+        != set(RETRIEVAL_POLICY)
+        | {"scoring_specification_sha256", "scoring_arithmetic"}
+        or common_retrieval_policy(policy) != common_retrieval_policy(RETRIEVAL_POLICY)
+        or policy["similarity"] not in CUSTOM_SCORERS.values()
+        or policy["scoring_arithmetic"] != "cpu_float64"
+        or not isinstance(policy["scoring_specification_sha256"], str)
+        or len(policy["scoring_specification_sha256"]) != 64
+    ):
+        raise ValueError("custom retrieval requires a complete declared scoring policy")
     cutoffs = tuple(recall_k)
     if (
         not cutoffs
@@ -102,8 +147,12 @@ def evaluate_retrieval(
         raise ValueError("recall_k must contain distinct positive integers")
     queries = _identities(query_records, "query")
     galleries = _identities(gallery_records, "gallery")
-    query_vectors = _normalized(query_embeddings, len(queries), "query")
-    gallery_vectors = _normalized(gallery_embeddings, len(galleries), "gallery")
+    query_vectors = _validated_vectors(
+        query_embeddings, len(queries), "query", normalize=score_rows is None
+    )
+    gallery_vectors = _validated_vectors(
+        gallery_embeddings, len(galleries), "gallery", normalize=score_rows is None
+    )
     if query_vectors.shape[1] != gallery_vectors.shape[1]:
         raise ValueError("query and gallery embedding dimensions differ")
     if query_vectors.device != gallery_vectors.device:
@@ -121,7 +170,26 @@ def evaluate_retrieval(
     per_query: list[dict[str, Any]] = []
     with torch.no_grad():
         for start in range(0, len(queries), chunk_size):
-            scores = query_vectors[start : start + chunk_size] @ gallery_vectors.T
+            stop = min(start + chunk_size, len(queries))
+            if score_rows is None:
+                scores = query_vectors[start:stop] @ gallery_vectors.T
+            else:
+                scores = torch.as_tensor(
+                    score_rows(
+                        list(range(start, stop)),
+                        list(range(len(galleries))),
+                        exclusions[start:stop],
+                    ),
+                    device=query_vectors.device,
+                ).clone()
+                if (
+                    scores.shape != (stop - start, len(galleries))
+                    or not scores.is_floating_point()
+                    or not torch.isfinite(scores).all()
+                ):
+                    raise ValueError(
+                        "custom scorer must return finite floating-point [Q,G] scores"
+                    )
             for offset in range(len(scores)):
                 excluded = exclusions[start + offset]
                 scores[offset, excluded] = -torch.inf
@@ -197,7 +265,7 @@ def evaluate_retrieval(
     metrics.update(query_count=len(queries), gallery_count=len(galleries))
     return {
         "schema_version": 1,
-        "policy": dict(RETRIEVAL_POLICY),
+        "policy": policy,
         "query_sample_ids": query_ids,
         "gallery_sample_ids": gallery_ids,
         "query_order_sha256": _digest(query_ids),
