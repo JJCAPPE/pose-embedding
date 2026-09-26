@@ -27,7 +27,11 @@ def parameters(method: str) -> dict[str, object]:
 
 @pytest.mark.parametrize(
     "method",
-    sorted(SUPPORTED_METHODS - METRIX_METHODS - {"drml", "s2sd", "proxy_anchor_avsl"}),
+    sorted(
+        SUPPORTED_METHODS
+        - METRIX_METHODS
+        - {"drml", "s2sd", "proxy_anchor_avsl", "diva"}
+    ),
 )
 def test_supported_losses_have_finite_scalar_and_embedding_gradients(
     method: str,

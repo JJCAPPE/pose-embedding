@@ -2,6 +2,15 @@ schema_version = 1
 cache_directory = ".cache/upstreams"
 
 [[upstream]]
+name = "DiVA"
+repository = "https://github.com/Confusezius/ECCV2020_DiVA_MultiFeature_DML.git"
+commit = "e5713049fa446d3180b4ca122963697ee16ee9f9"
+license = "UNSPECIFIED"
+license_files = []
+reference_only = true
+purpose = "Published DiVA recipe audit only; source has no discovered license and must not be copied, adapted, imported or redistributed. Independent published mathematics only."
+
+[[upstream]]
 name = "intra-batch"
 repository = "https://github.com/dvl-tum/intra_batch.git"
 commit = "a1ae3de8bf1ccedefb89258f24295beeec7e81a3"

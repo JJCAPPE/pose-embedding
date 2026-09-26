@@ -1,8 +1,8 @@
 # V2 implementation and release record
 
 Recorded 2026-09-26. The required study is **not complete**: the software supports
-23 of 26 configurations, and no motion retrieval result is established by these
-local checks. DIML, DiVA and AVSL adaptations remain in progress in
+all 26 configurations, and no motion retrieval result is established by these
+local checks. Their implementation and remaining scientific gates are documented in
 [the completion map](remaining-method-adaptations.md).
 
 ## Changes delivered
@@ -62,8 +62,8 @@ comparison; novel evaluation remains behind complete final-suite locks.
 
 ## Outstanding scientific implementation
 
-DIML, DiVA and AVSL still need final integration and verification, including
-their custom scorers and training state. Equal tuning budgets and final
+All 26 adapters are integrated with component/provenance checks. Equal tuning
+budgets, continuation controls, supplementary matrices and final
 training duration must be declared and measured before selection. Supporting
 ablations, training-noise experiments and supplementary motion corruptions also
 require their own locked run matrices. No generic loss wrapper, frozen pilot,
@@ -123,3 +123,20 @@ including optimizer corruption and active delayed-capacity profiling. MHGL
 passed 13 component/real-small-DSTformer checks, including frozen/fine-tuned
 updates and optimizer tamper rejection; 125 companion integration checks passed.
 The original local working tree and running SCC release remain preserved.
+
+## Full adapter integration
+
+All 26 configurations are now callable on the integration branch. DIML passed
+164 integrated checks plus the corrected CLI fixture suite (17 checks). AVSL
+passed 221 integrated checks and 16 component/optimizer checks, including
+licensed source oracles and post-warmup capacity state. DiVA passed 234 integrated
+checks and 19 focused checks including actual scaled beta optimizer rates.
+These counts overlap and are not a total unique-test count.
+
+The frozen Contrastive seed-7 pilot completed on SCC at
+`2026-09-26T21:38:43.766106+00:00` in job `7748366`, release `0ef858379c36`.
+Its 1,000 updates used 4,120.33 seconds total, of which summed update timing was
+574.00 seconds; validation/input overhead therefore dominates this short pilot.
+Peak allocated GPU memory was 2,893,729,792 bytes and its checkpoint was
+187,778,419 bytes. Contextual and the fine-tuned pair are still running at this
+recording. No paired retrieval result or novel-test outcome is asserted.

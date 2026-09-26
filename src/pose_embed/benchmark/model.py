@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import copy
+
 import torch
 import torch.nn.functional as functional
 from torch import nn
@@ -9,11 +11,12 @@ from torch import nn
 from pose_embed.benchmark.avsl import AVSLHead
 from pose_embed.benchmark.avsl import motionbert_levels as avsl_levels
 from pose_embed.benchmark.diml import DIMLHead
+from pose_embed.benchmark.diva import DiVAHead
 from pose_embed.benchmark.drml import DRMLHead
 from pose_embed.benchmark.hist import HISTHead
 from pose_embed.benchmark.metrix import METRIX_METHODS, MetrixMeanMaxHead
 from pose_embed.benchmark.mhgl import MHGLHead, motionbert_levels
-from pose_embed.models.action_head import ActionHeadEmbed
+from pose_embed.models.action_head import ActionHeadEmbed, pool_action_features
 
 
 def head_recipe(method_id: str) -> str:
@@ -21,6 +24,8 @@ def head_recipe(method_id: str) -> str:
         return "confidence_valid_mean_shared_time_anatomy_projection"
     if method_id == "proxy_anchor_avsl":
         return "motionbert_depth3_depth4_depth5_avsl_hierarchical"
+    if method_id == "diva":
+        return "diva_four_task_mean_pool_weighted_concatenation"
     if method_id in {"multi_similarity_metrix", "proxy_anchor_metrix"}:
         return "confidence_valid_token_mean_plus_max"
     if method_id == "mhgl":
@@ -55,6 +60,7 @@ def supports_embedding_inference(method_id: str) -> bool:
                 "s2sd",
                 "mhgl",
                 "diml",
+                "diva",
                 "proxy_anchor_avsl",
             }
             or method_id in METRIX_METHODS
@@ -148,6 +154,13 @@ class MotionRetrievalModel(nn.Module):
                 embedding_dimension,
                 method_parameters,
             )
+        if method_id == "diva":
+            self.head = DiVAHead(embedding_dimension, representation_dimension, joints)
+            self.momentum_encoder = copy.deepcopy(self.encoder).requires_grad_(False)
+            self.momentum_projection = copy.deepcopy(
+                self.head.projections["sample"]
+            ).requires_grad_(False)
+            self.register_buffer("momentum_updates", torch.zeros((), dtype=torch.long))
         self.set_encoder_trainable(train_encoder)
 
     def set_encoder_trainable(self, enabled: bool) -> None:
@@ -162,6 +175,9 @@ class MotionRetrievalModel(nn.Module):
         super().train(mode)
         if not self.train_encoder:
             self.encoder.eval()
+        if self.method_id == "diva":
+            self.momentum_encoder.eval()
+            self.momentum_projection.eval()
         return self
 
     def forward(self, poses: torch.Tensor) -> torch.Tensor:
@@ -222,3 +238,41 @@ class MotionRetrievalModel(nn.Module):
             with torch.no_grad():
                 represented = self.encoder.get_representation(flattened)
         return represented.reshape(batch, people, frames, joints, -1)
+
+    @torch.no_grad()
+    def momentum_embedding(self, poses: torch.Tensor) -> torch.Tensor:
+        if self.method_id != "diva":
+            raise ValueError("momentum embeddings require the DiVA model")
+        batch, people, frames, joints, channels = poses.shape
+        represented = self.momentum_encoder.get_representation(
+            poses.reshape(batch * people, frames, joints, channels)
+        ).reshape(batch, people, frames, joints, -1)
+        return functional.normalize(
+            self.momentum_projection(pool_action_features(represented)), dim=-1
+        )
+
+    @torch.no_grad()
+    def update_momentum(self, decay: float) -> None:
+        if self.method_id != "diva" or not self.training or not 0 <= decay < 1:
+            raise ValueError(
+                "DiVA EMA updates require a training model and valid decay"
+            )
+        if self.train_encoder:
+            for target, online in zip(
+                self.momentum_encoder.parameters(),
+                self.encoder.parameters(),
+                strict=True,
+            ):
+                if online.requires_grad:
+                    target.lerp_(online, 1 - decay)
+            for target, online in zip(
+                self.momentum_encoder.buffers(), self.encoder.buffers(), strict=True
+            ):
+                target.copy_(online)
+        for target, online in zip(
+            self.momentum_projection.parameters(),
+            self.head.projections["sample"].parameters(),
+            strict=True,
+        ):
+            target.lerp_(online, 1 - decay)
+        self.momentum_updates.add_(1)

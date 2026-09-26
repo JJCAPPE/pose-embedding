@@ -16,6 +16,7 @@ from pose_embed.benchmark.avsl import (
     optimizer_recipe as avsl_optimizer_recipe,
 )
 from pose_embed.benchmark.config import BenchmarkTraining
+from pose_embed.benchmark.diva import DiVAParameters
 from pose_embed.benchmark.drml import DRMLParameters
 from pose_embed.benchmark.hist import HISTParameters
 from pose_embed.benchmark.proxy_nca_plus import ProxyNCAPlusParameters
@@ -87,6 +88,26 @@ def _resolve_recipe(
             "profile_phase": "post_feature_delay_capacity" if profile else None,
             "profile_counter_offset": config.feature_delay if profile else 0,
         }
+    if method_id == "diva":
+        config = DiVAParameters.model_validate(parameters)
+        if (
+            training.physical_batch_size != config.physical_batch_size
+            or training.classes_per_batch < 3
+            or training.samples_per_class < 3
+        ):
+            raise ValueError(
+                "DiVA needs its declared physical batch with P>=3 and K>=3"
+            )
+        return (
+            common
+            | config.model_dump(mode="json")
+            | {
+                "optimizer": "Adam",
+                "optimizer_epsilon": 1e-8,
+                "schedule": "constant_lr_validation_r_at_1_selection",
+                "memory_bootstrap": "first_seeded_training_batches",
+            }
+        )
     if method_id == "hist":
         config = HISTParameters.model_validate(parameters)
         epoch_steps = math.ceil(num_records / training.physical_batch_size)
@@ -165,6 +186,38 @@ def build_optimizer(model, criterion, recipe: dict, phase: str):
     model.set_encoder_trainable(
         recipe["encoder_mode"] == "finetune" and phase == "main"
     )
+    if recipe.get("recipe") == "milbich2020_cub_motion_corrected2021":
+        groups = []
+        for name, module in (("encoder", model.encoder), ("head", model.head)):
+            named = [
+                (f"model.{name}.{key}", value)
+                for key, value in module.named_parameters()
+                if value.requires_grad
+            ]
+            groups.append(
+                {
+                    "name": name,
+                    "params": [value for _, value in named],
+                    "param_names": [key for key, _ in named],
+                    "lr": recipe["learning_rate"],
+                }
+            )
+        names = {
+            id(value): "criterion." + key for key, value in criterion.named_parameters()
+        }
+        for group in criterion.parameter_groups(
+            recipe["learning_rate"], recipe["weight_decay"]
+        ):
+            group["param_names"] = [names[id(value)] for value in group["params"]]
+            if group["name"] == "diva_boundaries":
+                group["lr"] = recipe["beta_learning_rate"]
+            groups.append(group)
+        return torch.optim.Adam(
+            groups,
+            lr=recipe["learning_rate"],
+            weight_decay=recipe["weight_decay"],
+            eps=recipe["optimizer_epsilon"],
+        )
     if recipe.get("recipe") == "zhang2022_cub_motion_v1":
         return build_avsl_optimizer(model, criterion, recipe)
     if recipe.get("recipe") == "ebrahimpour2022_printed_equations_motion_v1":

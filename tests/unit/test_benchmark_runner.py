@@ -144,10 +144,11 @@ def test_raw_and_feature_interfaces_preserve_retrieval_projection(method):
 
 
 @pytest.fixture
-def experiment(tmp_path, monkeypatch):
+def experiment(tmp_path, monkeypatch, request):
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
     config = load_benchmark().model_dump()
-    config["training"].update(steps=2, validation_every=1, classes_per_batch=2)
+    classes = 3 if getattr(request, "param", None) == "diva" else 2
+    config["training"].update(steps=2, validation_every=1, classes_per_batch=classes)
     import yaml
 
     path = tmp_path / "config.yaml"
@@ -157,7 +158,7 @@ def experiment(tmp_path, monkeypatch):
             sample_id=f"S001C001P{person:03d}R001A{action:03d}",
             split="development_train",
         )
-        for action in [1, 2]
+        for action in range(1, classes + 1)
         for person in range(1, 5)
     ]
     inputs = SimpleNamespace(
@@ -219,6 +220,39 @@ def experiment(tmp_path, monkeypatch):
                     "head." + key: tuple(value.shape)
                     for key, value in DRMLHead(4, dimension // 4).state_dict().items()
                 }
+        if identity["method"] == "diva":
+            shapes = {
+                **{
+                    f"{prefix}.{key}": tuple(value.shape)
+                    for prefix in ("encoder", "momentum_encoder")
+                    for key, value in state.items()
+                },
+                **{
+                    f"head.projections.{task}.{part}": shape
+                    for task in ("discriminative", "shared", "intra", "sample")
+                    for part, shape in (
+                        ("weight", (dimension // 4, 8)),
+                        ("bias", (dimension // 4,)),
+                    )
+                },
+                "momentum_projection.weight": (dimension // 4, 8),
+                "momentum_projection.bias": (dimension // 4,),
+                "momentum_updates": (),
+            }
+            return {
+                "encoder_parameters": tuple(
+                    name for name, _ in encoder.named_parameters()
+                ),
+                "initialization_sha256": runtime.state_digest(encoder),
+                "unused_head_sha256": runtime._state_digest(
+                    {
+                        key: value
+                        for key, value in state.items()
+                        if key.startswith("head.")
+                    }
+                ),
+                "model_shapes": shapes,
+            }
         return {
             "encoder_parameters": tuple(name for name, _ in encoder.named_parameters()),
             "initialization_sha256": runtime.state_digest(encoder),
@@ -777,4 +811,67 @@ def test_diml_full_runner_uses_structural_validation_and_checks_head(
     manifest["outputs"]["checkpoint.pt"] = sha256_file(path / "checkpoint.pt")
     (path / "run-manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="keys or shapes"):
+        runtime.verify_run(path)
+
+
+@pytest.mark.parametrize("experiment", ["diva"], indirect=True)
+@pytest.mark.parametrize("profile", [False, True])
+def test_diva_runner_memory_state_and_tamper_rejection(
+    experiment, tmp_path, monkeypatch, profile
+):
+    methods = runner.load_methods()
+    methods["diva"] = methods["diva"].model_copy(
+        update={
+            "embedding_dimension": 16,
+            "parameters": methods["diva"].parameters
+            | {
+                "feature_dimension": 8,
+                "physical_batch_size": 12,
+                "queue_batches": 2,
+                "decorrelation_hidden": 8,
+            },
+        }
+    )
+    monkeypatch.setattr(runner, "load_methods", lambda *args: methods)
+    monkeypatch.setattr(runtime, "load_methods", lambda *args: methods)
+    path = tmp_path / "benchmark-v2/diva"
+    runner.run_experiment(
+        **experiment,
+        method="diva",
+        output_dir=path,
+        profile_steps=2 if profile else None,
+    )
+    manifest = runtime.verify_run(path)
+    assert manifest["identity"]["stage"] == ("profile" if profile else "development")
+    checkpoint = torch.load(path / "checkpoint.pt", weights_only=True)
+    assert checkpoint["criterion"]["queue"].shape == (24, 4)
+    assert checkpoint["model"]["momentum_updates"].item() == checkpoint["selected_step"]
+    assert checkpoint["criterion"]["queue_indices"].max() < 12
+    telemetry = runtime.read_json(path / "telemetry.json")
+    assert telemetry["memory_items"] == 24
+    assert telemetry["memory_bootstrap_seconds"] > 0
+    assert telemetry["momentum_parameters"] > 0
+    memory = runtime.read_json(path / "memory-plan.json")
+    assert memory["partition"] == "development_train"
+    original = copy.deepcopy(checkpoint)
+    for change in ("identity", "counter", "queue", "optimizer"):
+        changed = copy.deepcopy(original)
+        if change == "identity":
+            changed["criterion"]["training_identity"][0] ^= 1
+        elif change == "counter":
+            changed["model"]["momentum_updates"].add_(1)
+        elif change == "queue":
+            changed["criterion"]["queue_indices"][0] = 100
+        else:
+            changed["optimizer"]["param_groups"][-1]["lr"] = 1
+        torch.save(changed, path / "checkpoint.pt")
+        _rehash_output(path, "checkpoint.pt")
+        with pytest.raises(ValueError, match="DiVA|optimizer"):
+            runtime.verify_run(path)
+    torch.save(original, path / "checkpoint.pt")
+    _rehash_output(path, "checkpoint.pt")
+    memory["partition"] = "novel"
+    (path / "memory-plan.json").write_text(json.dumps(memory))
+    _rehash_output(path, "memory-plan.json")
+    with pytest.raises(ValueError, match="memory plan"):
         runtime.verify_run(path)

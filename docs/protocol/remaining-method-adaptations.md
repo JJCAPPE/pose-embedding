@@ -3,7 +3,7 @@
 Source audit date: 2026-09-26. This document completes the implementation map
 for the required suite in `configs/benchmark-methods.v2.json`; it does not
 authorize final-test access. The registry currently contains **26 required
-configurations: 25 implemented and 1 blocked**. A working priority pair is
+configurations: 26 implemented and 0 blocked**. A working priority pair is
 development evidence, and does not complete the requested comparison.
 
 The scientific target is Contextual Similarity against all methods represented
@@ -421,3 +421,13 @@ a separately documented CUB optimizer/warmup adaptation and exact licensed
 source component tests: [recipe and attribution](avsl-motion.md). Both online
 retrieval and replay use canonical CPU float64 scoring; its measured cost
 is included explicitly. No image-style cosine concatenation substitutes for AVSL.
+
+## DiVA implementation checkpoint
+
+The four published tasks, learned margin boundaries, gradient-reversal
+decorrelation and corrected-author DaNCE weighting have a declared motion
+adaptation. Training-only bootstrap, full momentum encoder/queue state and
+private RNG streams are checkpointed and verified against training identities.
+See [the recipe and source distinctions](diva-motion-adaptation.md). All 26
+method configurations now have callable adapters; this does not certify their
+GPU feasibility or complete the required motion comparison.

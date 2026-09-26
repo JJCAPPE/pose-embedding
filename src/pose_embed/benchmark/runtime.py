@@ -236,6 +236,37 @@ def _expected_model_state(identity: dict, config: BenchmarkConfig) -> dict:
             "head." + key: tuple(value.shape)
             for key, value in head.state_dict().items()
         }
+    if identity["method"] == "diva":
+        from pose_embed.benchmark.diva import TASKS
+
+        branch_dimension = dimension // 4
+        return {
+            **reference,
+            "encoder_parameters": _reference_encoder_parameters(
+                str(Path(data_root).resolve()), str(assets["checkpoint_sha256"])
+            ),
+            "model_shapes": {
+                **{
+                    f"encoder.{key}": shape
+                    for key, shape in reference["shapes"].items()
+                },
+                **{
+                    f"momentum_encoder.{key}": shape
+                    for key, shape in reference["shapes"].items()
+                },
+                **{
+                    f"head.projections.{task}.{key}": shape
+                    for task in TASKS
+                    for key, shape in (
+                        ("weight", (branch_dimension, input_dimension)),
+                        ("bias", (branch_dimension,)),
+                    )
+                },
+                "momentum_projection.weight": (branch_dimension, input_dimension),
+                "momentum_projection.bias": (branch_dimension,),
+                "momentum_updates": (),
+            },
+        }
     return {
         **reference,
         "encoder_parameters": _reference_encoder_parameters(
@@ -529,6 +560,166 @@ def _verify_checkpoint_state(
             checkpoint["selected_step"]
             + identity["training_recipe"].get("profile_counter_offset", 0),
         )
+    if identity["method"] == "diva":
+        _verify_diva_state(directory, identity, config, checkpoint, expected, criterion)
+
+
+def _verify_diva_state(
+    directory, identity, config, checkpoint, expected_model, criterion
+):
+    from pose_embed.benchmark.diva import training_identity
+    from pose_embed.benchmark.optimizer_state import verify_named_adam
+    from pose_embed.training.sampler import BalancedBatchSampler
+
+    recipe = identity["training_recipe"]
+    selected_step = checkpoint["selected_step"]
+    model_state, state = checkpoint["model"], checkpoint["criterion"]
+    if (
+        model_state["momentum_updates"].dtype != torch.long
+        or model_state["momentum_updates"].item() != selected_step
+    ):
+        raise ValueError("DiVA momentum update count differs from checkpoint step")
+    momentum_encoder = {
+        key.removeprefix("momentum_encoder."): value
+        for key, value in model_state.items()
+        if key.startswith("momentum_encoder.")
+    }
+    if (
+        _state_digest(
+            {
+                key: value
+                for key, value in momentum_encoder.items()
+                if key.startswith("head.")
+            }
+        )
+        != expected_model["unused_head_sha256"]
+    ):
+        raise ValueError("DiVA unused momentum pose head changed")
+    if (
+        identity["track"] == "frozen"
+        and _state_digest(momentum_encoder) != expected_model["initialization_sha256"]
+    ):
+        raise ValueError("DiVA frozen momentum encoder changed")
+    records = _verified_training_records(identity, config)
+    mapping = {
+        action: index
+        for index, action in enumerate(
+            sorted({record.ntu.action for record in records})
+        )
+    }
+    labels = [mapping[record.ntu.action] for record in records]
+    stage = "final" if identity["stage"] == "final" else "development"
+    if state["training_identity"].dtype != torch.uint8 or not torch.equal(
+        state["training_identity"], training_identity(records, labels, stage)
+    ):
+        raise ValueError("DiVA memory is bound to another training partition")
+    memory_batches = list(
+        BalancedBatchSampler(
+            labels,
+            classes_per_batch=config.training.classes_per_batch,
+            samples_per_class=config.training.samples_per_class,
+            seed=identity["seed"],
+            batches_per_epoch=recipe["queue_batches"],
+        )
+    )
+    expected_memory_plan = {
+        "schema_version": 1,
+        "policy": recipe["memory_bootstrap"],
+        "partition": "final_train" if stage == "final" else "development_train",
+        "batch_plan_sha256": sha256_file(directory / "batch-plan.json"),
+        "steps": memory_batches,
+    }
+    if read_json(directory / "memory-plan.json") != expected_memory_plan:
+        raise ValueError("DiVA memory plan differs from canonical training batches")
+    initialized = read_json(directory / "memory-initialization.json")
+    if (
+        initialized.get("memory_plan_sha256")
+        != sha256_file(directory / "memory-plan.json")
+        or initialized.get("completed_steps") != 0
+        or initialized.get("queue_count") != criterion.config.queue_size
+        or initialized.get("momentum_updates") != 0
+        or not isinstance(initialized.get("criterion_sha256"), str)
+        or len(initialized["criterion_sha256"]) != 64
+        or any(c not in "0123456789abcdef" for c in initialized["criterion_sha256"])
+    ):
+        raise ValueError("DiVA memory bootstrap evidence is invalid")
+    optimization = read_json(directory / "batch-plan.json")["steps"][:selected_step]
+    recent = [index for batch in memory_batches + optimization for index in batch][
+        -criterion.config.queue_size :
+    ]
+    indices = torch.roll(
+        torch.tensor(recent),
+        shifts=(selected_step * criterion.config.physical_batch_size)
+        % criterion.config.queue_size,
+    )
+    if not torch.equal(state["queue_indices"], indices) or not torch.equal(
+        state["queue_labels"], torch.tensor(labels)[indices]
+    ):
+        raise ValueError("DiVA queue does not match the committed training history")
+    expected_groups = []
+    for name, prefix, names, rate, decay in (
+        (
+            "encoder",
+            "model.encoder.",
+            [
+                key
+                for key in expected_model["encoder_parameters"]
+                if not key.startswith("head.")
+            ]
+            if identity["track"] == "finetune"
+            else [],
+            recipe["learning_rate"],
+            recipe["weight_decay"],
+        ),
+        (
+            "head",
+            "model.",
+            [key for key in model_state if key.startswith("head.")],
+            recipe["learning_rate"],
+            recipe["weight_decay"],
+        ),
+        (
+            "diva_decorrelation",
+            "criterion.",
+            [
+                key
+                for key, _ in criterion.named_parameters()
+                if key.startswith("decorators.")
+            ],
+            recipe["learning_rate"],
+            recipe["weight_decay"],
+        ),
+        (
+            "diva_boundaries",
+            "criterion.",
+            [
+                key
+                for key, _ in criterion.named_parameters()
+                if key.startswith("boundaries.")
+            ],
+            recipe["beta_learning_rate"],
+            0.0,
+        ),
+    ):
+        expected_groups.append(
+            {
+                "name": name,
+                "param_names": [prefix + key for key in names],
+                "lr": rate,
+                "weight_decay": decay,
+                "updates": selected_step,
+            }
+        )
+    verify_named_adam(checkpoint, expected_groups, epsilon=recipe["optimizer_epsilon"])
+    expected_training_state = {
+        "phase": "main",
+        "step": selected_step,
+        "warmup_updates": 0,
+        "main_updates": selected_step,
+        "encoder_trainable": identity["track"] == "finetune",
+    }
+    if checkpoint.get("training_state") != expected_training_state:
+        raise ValueError("DiVA optimizer phase state is invalid")
 
 
 def save_checkpoint(path: Path, payload: dict[str, Any]) -> None:
@@ -603,6 +794,8 @@ def verify_run(directory: str | Path) -> dict:
     }
     if stage == "development":
         required.add("development-result.json")
+    if identity["method"] == "diva":
+        required.update({"memory-plan.json", "memory-initialization.json"})
     if not required.issubset(manifest.get("outputs", {})):
         raise ValueError("run is missing required evidence")
     for name, expected in manifest["outputs"].items():
@@ -640,6 +833,7 @@ def verify_run(directory: str | Path) -> dict:
         "hist",
         "proxy_nca_metrix",
         "proxy_anchor_avsl",
+        "diva",
     }:
         for row in rows:
             gradients = row.get("encoder_gradient_parameters")

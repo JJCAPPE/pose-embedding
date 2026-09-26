@@ -115,6 +115,8 @@ def optimizer_step(
     optimizer.step()
     if any(not torch.isfinite(p).all() for p in parameters):
         raise ValueError("training produced non-finite parameters")
+    if hasattr(criterion, "after_optimizer_step"):
+        criterion.after_optimizer_step(model)
     return float(value.detach().cpu())
 
 
@@ -311,6 +313,56 @@ def run_experiment(
                 "steps": batches,
             },
         )
+        memory_bootstrap_seconds = 0.0
+        memory_bootstrap_peak_allocated_bytes = 0
+        if method == "diva":
+            criterion.configure_training(train_rows, dataset.labels, stage)
+            memory_batches = list(
+                BalancedBatchSampler(
+                    dataset.labels,
+                    classes_per_batch=config.training.classes_per_batch,
+                    samples_per_class=config.training.samples_per_class,
+                    seed=seed,
+                    batches_per_epoch=recipe["queue_batches"],
+                )
+            )
+            write_immutable_json(
+                destination / "memory-plan.json",
+                {
+                    "schema_version": 1,
+                    "policy": recipe["memory_bootstrap"],
+                    "partition": "final_train"
+                    if stage == "final"
+                    else "development_train",
+                    "batch_plan_sha256": sha256_file(destination / "batch-plan.json"),
+                    "steps": memory_batches,
+                },
+            )
+            memory_started = time.perf_counter()
+            for indices, (poses, _) in zip(
+                memory_batches,
+                DataLoader(dataset, batch_sampler=memory_batches),
+                strict=True,
+            ):
+                criterion.bootstrap(model, poses.to(device), indices)
+            if torch.device(device).type == "cuda":
+                torch.cuda.synchronize(device)
+            memory_bootstrap_seconds = time.perf_counter() - memory_started
+            memory_bootstrap_peak_allocated_bytes = (
+                torch.cuda.max_memory_allocated(device)
+                if torch.device(device).type == "cuda"
+                else 0
+            )
+            write_immutable_json(
+                destination / "memory-initialization.json",
+                {
+                    "criterion_sha256": state_digest(criterion),
+                    "memory_plan_sha256": sha256_file(destination / "memory-plan.json"),
+                    "completed_steps": 0,
+                    "queue_count": criterion.config.queue_size,
+                    "momentum_updates": 0,
+                },
+            )
         validation_rows = inputs.manifests["development-validation.jsonl"]
         validation = PoseDataset(validation_rows, annotations, inputs.protocol)
         batch_size = (
@@ -336,6 +388,8 @@ def run_experiment(
                 )
             set_step_learning_rates(optimizer, recipe, step)
             step_started = time.perf_counter()
+            if hasattr(criterion, "set_training_batch"):
+                criterion.set_training_batch(batches[step - 1])
             value = optimizer_step(
                 model,
                 criterion,
@@ -423,6 +477,8 @@ def run_experiment(
                 {"identity": identity, "selected_step": selected_step, **best_result},
             )
             output_names.append("development-result.json")
+        if method == "diva":
+            output_names.extend(["memory-plan.json", "memory-initialization.json"])
         telemetry = {
             "elapsed_seconds": elapsed,
             "environment": inference_environment(device) | {"batch_size": batch_size},
@@ -444,6 +500,16 @@ def run_experiment(
                 row["encoder_gradient_parameters"] > 0 for row in history
             ),
         }
+        if method == "diva":
+            telemetry.update(
+                memory_bootstrap_seconds=memory_bootstrap_seconds,
+                memory_bootstrap_peak_allocated_bytes=memory_bootstrap_peak_allocated_bytes,
+                memory_items=criterion.config.queue_size,
+                momentum_parameters=sum(
+                    p.numel() for p in model.momentum_encoder.parameters()
+                )
+                + sum(p.numel() for p in model.momentum_projection.parameters()),
+            )
         write_immutable_json(destination / "telemetry.json", telemetry)
         write_immutable_json(
             destination / "outcome.json", {"status": "succeeded", "completed_at": now()}

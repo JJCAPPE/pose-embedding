@@ -39,8 +39,8 @@ def experiment_arguments(operation: str) -> list[str]:
 def test_coverage_exposes_all_methods_without_granting_test_access() -> None:
     result = cli.run(parse("coverage"))
     assert result["required_method_count"] == len(result["methods"]) == 26
-    assert result["implemented_method_count"] == 25
-    assert result["blocked_method_count"] == 1
+    assert result["implemented_method_count"] == 26
+    assert result["blocked_method_count"] == 0
     assert result["required_final_run_count"] == 156
     assert result["priority_methods"] == ["contrastive", "contextual"]
     assert result["paired_seeds"] == [7, 17, 29, 43, 59, 71]
@@ -183,6 +183,13 @@ def test_final_cli_cannot_seal_a_partial_implementation(
     operation, tmp_path, monkeypatch
 ):
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    from pose_embed.benchmark import locks
+
+    methods = cli.load_methods()
+    methods["diva"] = methods["diva"].model_copy(
+        update={"status": "blocked", "blocker": "synthetic missing adapter"}
+    )
+    monkeypatch.setattr(locks, "load_methods", lambda: methods)
     config = REPOSITORY_ROOT / "configs/benchmark.finetune.v2.yaml"
     with pytest.raises(ValueError, match="not implemented"):
         cli.run(parse(operation, "--config", str(config), "--runs", "/does/not/exist"))
@@ -193,6 +200,13 @@ def test_evaluate_cli_runs_the_complete_suite_gate_before_loading_data(
     tmp_path, monkeypatch
 ):
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    from pose_embed.benchmark import locks
+
+    methods = cli.load_methods()
+    methods["diva"] = methods["diva"].model_copy(
+        update={"status": "blocked", "blocker": "synthetic missing adapter"}
+    )
+    monkeypatch.setattr(locks, "load_methods", lambda: methods)
     config = REPOSITORY_ROOT / "configs/benchmark.finetune.v2.yaml"
     with pytest.raises(ValueError, match="not implemented"):
         cli.run(

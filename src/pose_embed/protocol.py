@@ -797,6 +797,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/benchmark/__init__.py",
         "src/pose_embed/benchmark/cli.py",
         "src/pose_embed/benchmark/config.py",
+        "src/pose_embed/benchmark/diva.py",
         "src/pose_embed/benchmark/avsl.py",
         "src/pose_embed/benchmark/diml.py",
         "src/pose_embed/benchmark/descriptors.py",

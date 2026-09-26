@@ -18,6 +18,7 @@ from torch import nn
 from pose_embed.benchmark.avsl import AVSLLoss
 from pose_embed.benchmark.config import StrictModel, load_methods
 from pose_embed.benchmark.diml import DIMLParameters
+from pose_embed.benchmark.diva import DiVALoss, DiVAParameters
 from pose_embed.benchmark.drml import DRMLLoss, DRMLParameters
 from pose_embed.benchmark.hist import HISTParameters, HypergraphSemanticTupletLoss
 from pose_embed.benchmark.ibc import IBCParameters, IntraBatchConnectionsLoss
@@ -56,6 +57,7 @@ SUPPORTED_METHODS = METRIX_METHODS | frozenset(
         "s2sd",
         "mhgl",
         "proxy_anchor_avsl",
+        "diva",
         "ibc",
         "hist",
         "diml",
@@ -319,6 +321,8 @@ def build_loss(
         raise ValueError("num_classes must be an integer >= 2")
     if importlib.metadata.version("pytorch-metric-learning") != PML_VERSION:
         raise RuntimeError("benchmark requires pytorch-metric-learning==2.9.0")
+    if method_id == "diva":
+        return DiVALoss(DiVAParameters.model_validate(parameters), num_classes)
     parameters = dict(parameters)
     dimension = parameters.pop("embedding_dimension", None)
     if dimension is not None and (

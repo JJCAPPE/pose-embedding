@@ -3,7 +3,7 @@ protocol_id: motion-retrieval-v2
 phase: development
 input_protocol: configs/protocol.v1.yaml
 input_protocol_sha256: c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f
-methods_sha256: 1d12117d81d0b8b1a25c975dade40fe0a124a5db3da91be47440ed058b5c3e9a
+methods_sha256: 3c4495d710ad4919e48590b9f841d3e911e1e4d052b72fecd2c277f3e30b0c16
 priority_methods: [contrastive, contextual]
 final_methods:
   - contrastive

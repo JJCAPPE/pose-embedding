@@ -18,6 +18,7 @@ EXPECTED_UPSTREAMS = {
     "MotionBERT",
     "AVSL",
     "S2SD",
+    "DiVA",
     "MotionCLIP",
     "contextual-similarity",
     "intra-batch",
