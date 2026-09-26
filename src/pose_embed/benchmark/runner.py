@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import copy
+import json
+import math
 import random
+import shlex
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -34,6 +38,19 @@ from pose_embed.benchmark.runtime import (
     save_checkpoint,
     state_digest,
     verify_run,
+)
+from pose_embed.benchmark.segments import (
+    StopAtBoundary,
+    begin_segment,
+    capture_rng,
+    load_continuation,
+    optimizer_layout,
+    restore_module,
+    restore_optimizer,
+    restore_rng,
+    seal_segment,
+    verify_chain,
+    verify_environment,
 )
 from pose_embed.benchmark.training import (
     advance_optimizer,
@@ -137,7 +154,7 @@ def _checkpoint_state(model, criterion, optimizer, recipe, step, phase):
         "model": _cpu_snapshot(model.state_dict()),
         "criterion": _cpu_snapshot(criterion.state_dict()),
     }
-    if recipe["optimizer"] == "Adam" or recipe.get("named_optimizer_state"):
+    if optimizer is not None:
         profiling = recipe["profile_phase"] is not None
         state["optimizer"] = _cpu_snapshot(optimizer.state_dict())
         state["training_state"] = {
@@ -164,9 +181,26 @@ def run_experiment(
     device: str = "cuda",
     stage: str = "development",
     profile_steps: int | None = None,
+    resume_from: str | Path | None = None,
+    segment_steps: int | None = None,
+    max_segment_seconds: float | None = None,
 ) -> dict[str, Any]:
     """Run one declared method/seed. Profiling can never certify a final run."""
+    attempt_started = time.perf_counter()
     require_unopened()
+    segmented = any(
+        value is not None for value in (resume_from, segment_steps, max_segment_seconds)
+    )
+    if segmented and profile_steps is not None:
+        raise ValueError("capacity profiles cannot be segmented or resumed")
+    if segment_steps is not None and (
+        type(segment_steps) is not int or segment_steps < 1
+    ):
+        raise ValueError("segment_steps must be a positive integer")
+    if max_segment_seconds is not None and (
+        not math.isfinite(max_segment_seconds) or max_segment_seconds <= 0
+    ):
+        raise ValueError("max_segment_seconds must be positive and finite")
     config = load_benchmark(config_path)
     track = track or config.training.encoder_mode
     if track != config.training.encoder_mode:
@@ -260,10 +294,31 @@ def run_experiment(
         "scientific_use_allowed": profile_steps is None,
     }
     destination = artifact_path(output_dir)
-    destination.mkdir(parents=True, exist_ok=False)
-    write_immutable_json(
-        destination / "attempt.json", {"identity": identity, "started_at": now()}
-    )
+    parent = None
+    continuation = None
+    prior_best = None
+    segment = None
+    stop = StopAtBoundary()
+    if resume_from is None:
+        destination.mkdir(parents=True, exist_ok=False)
+        write_immutable_json(
+            destination / "attempt.json", {"identity": identity, "started_at": now()}
+        )
+    else:
+        if read_json(destination / "attempt.json").get("identity") != identity:
+            raise ValueError(
+                "resume requires the identical code, inputs and experiment identity"
+            )
+        parent = verify_chain(destination, resume_from, identity)
+        verify_environment(
+            parent["manifest"]["telemetry"]["environment"],
+            inference_environment(device)
+            | {"batch_size": config.training.physical_batch_size},
+        )
+        continuation, prior_best = load_continuation(destination, parent, identity)
+    if segmented:
+        segment = begin_segment(destination, identity, parent)
+        stop.__enter__()
     try:
         random.seed(seed)
         np.random.seed(seed)
@@ -293,7 +348,12 @@ def run_experiment(
             "head": state_digest(model.head),
             "criterion": state_digest(criterion),
         }
-        write_immutable_json(destination / "initialization.json", initial)
+        if continuation is None:
+            write_immutable_json(destination / "initialization.json", initial)
+        elif read_json(destination / "initialization.json") != initial:
+            raise ValueError(
+                "continuation fresh initialization differs from the original"
+            )
         # A proxy's random initialization must not shift the shared model RNG stream.
         torch.manual_seed(seed)
         batches = list(
@@ -305,17 +365,22 @@ def run_experiment(
                 batches_per_epoch=steps,
             )
         )
-        write_immutable_json(
-            destination / "batch-plan.json",
-            {
-                "sample_ids": [r.sample_id for r in train_rows],
-                "label_mapping": dataset.label_mapping,
-                "steps": batches,
+        batch_plan = {
+            "sample_ids": [r.sample_id for r in train_rows],
+            "label_mapping": {
+                str(key): value for key, value in dataset.label_mapping.items()
             },
-        )
+            "steps": batches,
+        }
+        if continuation is None:
+            write_immutable_json(destination / "batch-plan.json", batch_plan)
+        elif digest(read_json(destination / "batch-plan.json")) != digest(batch_plan):
+            raise ValueError(
+                "continuation batch plan differs from the original experiment"
+            )
         memory_bootstrap_seconds = 0.0
         memory_bootstrap_peak_allocated_bytes = 0
-        if method == "diva":
+        if method == "diva" and continuation is None:
             criterion.configure_training(train_rows, dataset.labels, stage)
             memory_batches = list(
                 BalancedBatchSampler(
@@ -341,7 +406,11 @@ def run_experiment(
             memory_started = time.perf_counter()
             for indices, (poses, _) in zip(
                 memory_batches,
-                DataLoader(dataset, batch_sampler=memory_batches),
+                DataLoader(
+                    dataset,
+                    batch_sampler=memory_batches,
+                    generator=torch.Generator().manual_seed(seed),
+                ),
                 strict=True,
             ):
                 criterion.bootstrap(model, poses.to(device), indices)
@@ -368,18 +437,57 @@ def run_experiment(
         batch_size = (
             config.training.classes_per_batch * config.training.samples_per_class
         )
-        loader = DataLoader(dataset, batch_sampler=batches)
+        completed_steps = continuation["step"] if continuation else 0
+        loader = iter(DataLoader(dataset, batch_sampler=batches[completed_steps:]))
         best_score = -1.0
         best_state = None
         best_result = None
         selected_step = steps
-        history = []
+        history = list(parent["rows"]) if parent else []
+        if continuation:
+            restore_module(model, continuation["model"])
+            restore_module(criterion, continuation["criterion"])
+            if hasattr(criterion, "configure_training"):
+                criterion.configure_training(train_rows, dataset.labels, stage)
+            if method == "diva":
+                memory_bootstrap_seconds = continuation["bootstrap_telemetry"][
+                    "seconds"
+                ]
+                memory_bootstrap_peak_allocated_bytes = continuation[
+                    "bootstrap_telemetry"
+                ]["peak_allocated_bytes"]
+            phase = phase_for_step(recipe, completed_steps)
+            optimizer = build_optimizer(model, criterion, recipe, phase)
+            set_step_learning_rates(optimizer, recipe, completed_steps)
+            restore_optimizer(
+                model,
+                criterion,
+                optimizer,
+                continuation["optimizer"],
+                continuation["optimizer_layout"],
+            )
+            if hasattr(criterion, "validate_checkpoint_state"):
+                criterion.validate_checkpoint_state(
+                    continuation["criterion"], completed_steps
+                )
+            if prior_best:
+                best_state = {
+                    key: value
+                    for key, value in prior_best.items()
+                    if key not in {"identity", "selected_step", "result"}
+                }
+                selected_step = prior_best["selected_step"]
+                best_result = prior_best["result"]
+                best_score = parent["manifest"]["best"]["score"]
+            # DataLoader iterator creation consumes a Torch base seed. Restore after it.
+            restore_rng(continuation["rng"])
+            del continuation, prior_best
         if torch.device(device).type == "cuda":
             torch.cuda.reset_peak_memory_stats(device)
         started = time.perf_counter()
         model.train()
         criterion.train()
-        for step, (poses, labels) in enumerate(loader, start=1):
+        for step, (poses, labels) in enumerate(loader, start=completed_steps + 1):
             requested_phase = phase_for_step(recipe, step)
             if requested_phase != phase:
                 phase = requested_phase
@@ -444,11 +552,181 @@ def run_experiment(
                     best_state = _checkpoint_state(
                         model, criterion, optimizer, recipe, step, phase
                     )
+                print(
+                    json.dumps(
+                        {
+                            "event": "development_validation",
+                            "method": method,
+                            "seed": seed,
+                            "step": step,
+                            "planned_steps": steps,
+                            "r_at_1": score,
+                            "selected_step": selected_step
+                            if best_state is not None
+                            else None,
+                            "attempt_elapsed_seconds": time.perf_counter()
+                            - attempt_started,
+                        }
+                    ),
+                    file=sys.stderr,
+                    flush=True,
+                )
             history.append(row)
+            if segmented and step < steps:
+                elapsed_now = time.perf_counter() - attempt_started
+                if (
+                    stop.reason
+                    or (
+                        segment_steps is not None
+                        and step - completed_steps >= segment_steps
+                    )
+                    or (
+                        max_segment_seconds is not None
+                        and elapsed_now >= max_segment_seconds
+                    )
+                ):
+                    break
         elapsed = time.perf_counter() - started
-        if best_state is None:
+        if best_state is None and step == steps:
             best_state = _checkpoint_state(
                 model, criterion, optimizer, recipe, steps, phase
+            )
+        environment = inference_environment(device) | {"batch_size": batch_size}
+        peak_allocated = (
+            torch.cuda.max_memory_allocated(device)
+            if torch.device(device).type == "cuda"
+            else 0
+        )
+        peak_reserved = (
+            torch.cuda.max_memory_reserved(device)
+            if torch.device(device).type == "cuda"
+            else 0
+        )
+        if segmented:
+            if any(
+                getattr(criterion, name, None) is not None
+                for name in ("_pending", "_batch_indices")
+            ):
+                raise ValueError(
+                    "criterion has an unfinished update at the continuation boundary"
+                )
+            latest = _checkpoint_state(model, criterion, optimizer, recipe, step, phase)
+            latest.update(
+                {
+                    "step": step,
+                    "rng": capture_rng(),
+                    "optimizer_layout": optimizer_layout(model, criterion, optimizer),
+                }
+            )
+            if method == "diva":
+                latest["bootstrap_telemetry"] = {
+                    "seconds": memory_bootstrap_seconds,
+                    "peak_allocated_bytes": memory_bootstrap_peak_allocated_bytes,
+                }
+            seal_segment(
+                destination,
+                segment,
+                identity,
+                parent,
+                latest,
+                best_state,
+                best_result,
+                selected_step,
+                best_score,
+                history,
+                batches,
+                time.perf_counter() - attempt_started,
+                environment,
+                peak_allocated,
+                peak_reserved,
+                stop.reason or ("completed" if step == steps else "segment_limit"),
+            )
+            chain = verify_chain(destination, segment, identity)
+            elapsed = chain["elapsed_seconds"]
+            peak_allocated = chain["peak_allocated_bytes"]
+            peak_reserved = chain["peak_reserved_bytes"]
+            if step < steps:
+                arguments = [
+                    "uv",
+                    "run",
+                    "pose-embed",
+                    "benchmark",
+                    "train",
+                    "--config",
+                    str(
+                        Path(
+                            identity.get("campaign_base_config_path", config_path)
+                        ).resolve()
+                    ),
+                    "--manifest-set",
+                    str(Path(manifest_set_path).resolve()),
+                    "--parity-evidence",
+                    str(Path(parity_evidence_path).resolve()),
+                    "--method",
+                    method,
+                    "--seed",
+                    str(seed),
+                    "--output-dir",
+                    str(destination),
+                    "--device",
+                    device,
+                    "--phase",
+                    stage,
+                    "--resume-from",
+                    str(segment / "segment-manifest.json"),
+                ]
+                if segment_steps is not None:
+                    arguments.extend(["--segment-steps", str(segment_steps)])
+                if max_segment_seconds is not None:
+                    arguments.extend(
+                        ["--max-segment-seconds", str(max_segment_seconds)]
+                    )
+                if "secondary" in identity:
+                    arguments.extend(
+                        ["--secondary-cell", identity["secondary"]["cell_id"]]
+                    )
+                if stage == "development" and identity.get("candidate") is not None:
+                    arguments.extend(["--candidate", identity["candidate"]])
+                return {
+                    "status": "resumable",
+                    "scientific_use_allowed": False,
+                    "completed_steps": step,
+                    "planned_steps": steps,
+                    "segment_manifest": str(segment / "segment-manifest.json"),
+                    "segment_manifest_sha256": sha256_file(
+                        segment / "segment-manifest.json"
+                    ),
+                    "next_resume_command": shlex.join(arguments),
+                    "retained_artifact_bytes": sum(
+                        path.stat().st_size
+                        for path in destination.rglob("*")
+                        if path.is_file()
+                    ),
+                    "checkpoint_bytes": (segment / "checkpoint.pt").stat().st_size,
+                    "storage_scenario": {
+                        "planned_segments": math.ceil(steps / segment_steps),
+                        "checkpoint_archive_bytes": (
+                            2 * math.ceil(steps / segment_steps) + 1
+                        )
+                        * (segment / "checkpoint.pt").stat().st_size,
+                        "assumption": (
+                            "unchanged segment step limit and checkpoint size; "
+                            "excludes history/descriptor overhead"
+                        ),
+                    }
+                    if segment_steps
+                    else None,
+                }
+            write_immutable_json(
+                destination / "segments.json",
+                {
+                    "schema_version": 1,
+                    "leaf": str(
+                        (segment / "segment-manifest.json").relative_to(destination)
+                    ),
+                    "leaf_sha256": sha256_file(segment / "segment-manifest.json"),
+                    "chain": chain["chain"],
+                },
             )
         save_checkpoint(
             destination / "checkpoint.pt",
@@ -471,6 +749,10 @@ def run_experiment(
             "initialization.json",
             "telemetry.json",
         ]
+        if segmented:
+            output_names.append("segments.json")
+        if method == "diva":
+            output_names.extend(["memory-plan.json", "memory-initialization.json"])
         if best_result is not None:
             write_immutable_json(
                 destination / "development-result.json",
@@ -481,13 +763,9 @@ def run_experiment(
             output_names.extend(["memory-plan.json", "memory-initialization.json"])
         telemetry = {
             "elapsed_seconds": elapsed,
-            "environment": inference_environment(device) | {"batch_size": batch_size},
-            "peak_allocated_bytes": torch.cuda.max_memory_allocated(device)
-            if torch.device(device).type == "cuda"
-            else 0,
-            "peak_reserved_bytes": torch.cuda.max_memory_reserved(device)
-            if torch.device(device).type == "cuda"
-            else 0,
+            "environment": environment,
+            "peak_allocated_bytes": peak_allocated,
+            "peak_reserved_bytes": peak_reserved,
             "checkpoint_bytes": (destination / "checkpoint.pt").stat().st_size,
             "training_steps": steps,
             "trainable_parameters": sum(
@@ -499,6 +777,13 @@ def run_experiment(
             "encoder_backward_steps": sum(
                 row["encoder_gradient_parameters"] > 0 for row in history
             ),
+            "segment_artifact_bytes": sum(
+                path.stat().st_size
+                for path in (destination / "segments").rglob("*")
+                if path.is_file()
+            )
+            if segmented
+            else 0,
         }
         if method == "diva":
             telemetry.update(
@@ -516,17 +801,22 @@ def run_experiment(
         )
         return publish_manifest(destination, identity, output_names)
     except BaseException as exc:
-        if not (destination / "outcome.json").exists():
+        failure_dir = segment if segmented and segment is not None else destination
+        if not (failure_dir / "outcome.json").exists():
             write_immutable_json(
-                destination / "outcome.json",
+                failure_dir / "outcome.json",
                 {
                     "status": "failed",
                     "error_type": type(exc).__name__,
                     "error": str(exc),
+                    "elapsed_seconds": time.perf_counter() - attempt_started,
                     "completed_at": now(),
                 },
             )
         raise
+    finally:
+        if segmented:
+            stop.__exit__()
 
 
 def compare_development(run_dirs: list[str | Path], output: str | Path) -> dict:

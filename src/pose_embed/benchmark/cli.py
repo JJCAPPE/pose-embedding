@@ -65,6 +65,23 @@ def add_parser(subparsers: argparse._SubParsersAction) -> argparse.ArgumentParse
             command.add_argument("--steps", type=_profile_steps, default=3)
         else:
             command.add_argument(
+                "--resume-from",
+                help="latest sealed segment manifest of this experiment",
+            )
+            command.add_argument(
+                "--segment-steps",
+                type=int,
+                help="stop at a safe boundary after this many additional updates",
+            )
+            command.add_argument(
+                "--max-segment-seconds",
+                type=float,
+                help=(
+                    "request a safe stop after this wall time; leave job time "
+                    "for validation/checkpoint writes"
+                ),
+            )
+            command.add_argument(
                 "--phase",
                 choices=("development", "final"),
                 default="development",
@@ -187,4 +204,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         device=args.device,
         stage=args.phase if operation == "train" else "development",
         profile_steps=args.steps if operation == "profile" else None,
+        resume_from=getattr(args, "resume_from", None),
+        segment_steps=getattr(args, "segment_steps", None),
+        max_segment_seconds=getattr(args, "max_segment_seconds", None),
     )

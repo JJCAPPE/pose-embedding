@@ -811,6 +811,12 @@ def verify_run(directory: str | Path) -> dict:
     if checkpoint.get("identity") != identity:
         raise ValueError("checkpoint identity mismatch")
     history = read_json(directory / "history.json")
+    if "segments.json" in manifest["outputs"]:
+        from pose_embed.benchmark.segments import verify_completed_segments
+
+        verify_completed_segments(directory, identity, checkpoint, history)
+    elif (directory / "segments").exists():
+        raise ValueError("segmented experiment is missing its complete parent chain")
     rows = history.get("steps", [])
     if len(rows) != steps or any(
         row.get("step") != index or not math.isfinite(row.get("loss", math.nan))
