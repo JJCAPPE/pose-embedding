@@ -2,7 +2,7 @@
 #$ -cwd
 #$ -j y
 #$ -N pose_setup_verify
-#$ -l h_rt=00:30:00
+#$ -l h_rt=02:00:00
 #$ -pe omp 4
 #$ -l mem_per_core=4G
 #$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,POSE_EMBED_MANIFEST_SET,UV_PYTHON_INSTALL_DIR
@@ -28,10 +28,25 @@ uv sync --locked --group dev --python 3.11
 .venv/bin/python scripts/verify_workspace.py
 .venv/bin/python scripts/fetch_upstreams.py --check --name MotionBERT
 .venv/bin/pose-embed protocol verify
+# Reject historical or modified bundles before regenerating any manifests.
+.venv/bin/python - <<'PY'
+import os
+
+from pose_embed.benchmark.runtime import require_unopened
+from pose_embed.motionbert_inputs import load_motionbert_inputs
+
+require_unopened()
+load_motionbert_inputs(
+    "configs/protocol.v1.yaml",
+    os.environ["POSE_EMBED_MANIFEST_SET"],
+    load_annotations=False,
+    require_clean=False,
+)
+PY
 .venv/bin/ruff check src tests scripts
 .venv/bin/ruff format --check src tests scripts
 # Tests construct isolated synthetic artifacts, not the live study roots.
-env -u POSE_EMBED_DATA_ROOT -u POSE_EMBED_ARTIFACT_ROOT .venv/bin/pytest
+env -u POSE_EMBED_DATA_ROOT -u POSE_EMBED_ARTIFACT_ROOT .venv/bin/pytest -v --durations=10
 
 (
   cd "$POSE_EMBED_DATA_ROOT"
@@ -42,10 +57,8 @@ reference=$(dirname "$POSE_EMBED_MANIFEST_SET")
 test -f "$reference/manifest-set.json"
 generated="$POSE_EMBED_ARTIFACT_ROOT/manifests/scc-verification-${JOB_ID}"
 .venv/bin/pose-embed data generate --output-dir "$generated"
-for reference_file in "$reference"/*; do
-  cmp "$reference_file" "$generated/$(basename "$reference_file")"
-done
-printf 'All regenerated manifest files match the existing release byte-for-byte.\n'
+diff -r "$reference" "$generated"
+printf 'All regenerated manifest files match the adopted release byte-for-byte.\n'
 sha256sum "$generated"/*
 
 test ! -e "$POSE_EMBED_ARTIFACT_ROOT/locks/test-opening.v1.json"

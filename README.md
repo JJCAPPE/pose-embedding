@@ -194,8 +194,9 @@ development comparison. All attempts, failures, batches, initializations,
 checkpoints, selected metrics and timings are immutable under
 `$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2`. Logs and licensed data stay outside Git.
 Use a separate locked environment for each active release. Complete its setup
-verification first; it regenerates the adopted manifest bundle and compares
-every file without replacing the existing bundle.
+verification first; it validates the adopted bundle before regeneration and
+compares the complete new bundle without replacing the existing one. The setup
+job allows two hours and logs each test plus the ten slowest test durations.
 
 All 26 method adapters are implemented. `benchmark coverage` reports their
 identities explicitly; implementation does not establish GPU feasibility or
