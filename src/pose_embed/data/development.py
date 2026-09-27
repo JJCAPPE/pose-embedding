@@ -133,7 +133,10 @@ def generate_development_episode(
     """Write a new episode from a complete Week 2 manifest bundle."""
     protocol = load_protocol(protocol_path)
     scientific_paths = resolve_scientific_paths(protocol)
-    if scientific_paths.test_opening_ledger.exists():
+    if (
+        scientific_paths.test_opening_ledger.exists()
+        or (scientific_paths.root / "benchmark-v2/locks/test-opening.json").exists()
+    ):
         raise ValueError("development episode cannot be changed after test opening")
     source = Path(manifest_path).resolve()
     inventory = source.parent / "source-inventory.jsonl"

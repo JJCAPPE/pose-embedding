@@ -69,8 +69,15 @@ def test_changed_bundle_fails_closed(
         verify_manifest_bundle(protocol, bundle)
 
 
+@pytest.mark.parametrize(
+    "ledger_name",
+    ["locks/test-opening.v1.json", "benchmark-v2/locks/test-opening.json"],
+)
 def test_opened_test_and_changed_source_fail_before_deserialization(
-    tmp_path: Path, protocol_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
+    protocol_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    ledger_name: str,
 ) -> None:
     protocol, bundle = _bundle(tmp_path, protocol_path)
     monkeypatch.setenv("POSE_EMBED_DATA_ROOT", str(tmp_path))
@@ -78,7 +85,7 @@ def test_opened_test_and_changed_source_fail_before_deserialization(
     monkeypatch.setattr(
         "pose_embed.motionbert_inputs.load_protocol", lambda _: protocol
     )
-    opening = tmp_path / protocol.test_access.opening_ledger_relative_path
+    opening = tmp_path / ledger_name
     opening.parent.mkdir(parents=True)
     opening.write_text("{}")
     with pytest.raises(ValueError, match="after novel-test opening"):

@@ -147,7 +147,10 @@ def load_motionbert_inputs(
     """Verify the adopted complete bundle and hash before any deserialization."""
     protocol = load_protocol(protocol_path)
     scientific = resolve_scientific_paths(protocol)
-    if scientific.test_opening_ledger.exists():
+    if (
+        scientific.test_opening_ledger.exists()
+        or (scientific.root / "benchmark-v2/locks/test-opening.json").exists()
+    ):
         raise ValueError("Week 3 extraction is forbidden after novel-test opening")
     raw_root = os.environ.get("POSE_EMBED_DATA_ROOT")
     if not raw_root or not Path(raw_root).is_absolute():

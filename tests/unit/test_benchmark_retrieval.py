@@ -52,6 +52,44 @@ def test_hand_calculated_ap_and_ap_at_r_use_all_valid_positives() -> None:
     json.dumps(result, allow_nan=False)
 
 
+def test_unequal_positive_counts_use_each_query_denominator_and_equal_query_weight():
+    queries = [_record(2, 1), _record(8, 1)]
+    gallery = [
+        _record(2, 1),
+        _record(2, 1, 2),
+        _record(8, 2),
+        _record(2, 2),
+        _record(8, 1),
+        _record(8, 1, 2),
+        _record(2, 3),
+        _record(3, 1),
+    ]
+    # Equal scores make the remaining gallery order the independently known rank.
+    result = evaluate_retrieval(np.ones((2, 2)), np.ones((8, 2)), queries, gallery)
+    first, second = result["per_query"]
+    assert first["relevant_ranks"] == [2, 5]
+    assert second["relevant_ranks"] == [3]
+    assert [row["relevant_count"] for row in (first, second)] == [2, 1]
+    assert [row["valid_gallery_count"] for row in (first, second)] == [6, 6]
+    assert first["average_precision"] == pytest.approx((1 / 2 + 2 / 5) / 2)
+    assert second["average_precision"] == pytest.approx(1 / 3)
+    assert first["average_precision_at_r"] == 1 / 4
+    assert second["average_precision_at_r"] == 0
+    assert result["metrics"] == pytest.approx(
+        {
+            "map": 47 / 120,
+            "map_at_r": 1 / 8,
+            "mrr": 5 / 12,
+            "r_at_1": 0,
+            "r_at_2": 1 / 2,
+            "r_at_4": 1,
+            "r_at_8": 1,
+            "query_count": 2,
+            "gallery_count": 8,
+        }
+    )
+
+
 def test_chunked_shared_pool_matches_independent_dense_reference() -> None:
     records = [
         ManifestRecord(
