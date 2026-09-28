@@ -6,7 +6,7 @@ test("public dashboard exposes all published weeks", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toContainText("protocol lock");
   await expect(page.getByRole("heading", { name: "Unblock Week 1: Protocol and access" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent completions" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Profile the GPU path" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Measure extraction reproducibility" })).toBeVisible();
   await expect(page.getByRole("list", { name: undefined }).last().getByRole("listitem")).toHaveCount(14);
 });
 
