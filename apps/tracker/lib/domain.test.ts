@@ -71,9 +71,9 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(16);
-    expect(progress.completedRequiredTasks).toBe(9);
-    expect(progress.decidedRequiredGates).toBe(8);
+    expect(progress.percent).toBe(22);
+    expect(progress.completedRequiredTasks).toBe(13);
+    expect(progress.decidedRequiredGates).toBe(12);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(0);
   });
@@ -101,12 +101,15 @@ describe("readiness and progress rules", () => {
     expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
   });
 
-  it("keeps Week 3 open with only the fixture-tested metric gate met", () => {
+  it("completes the Week 3 checklist while earlier weekly records remain open", () => {
     const week = seedPlan.weeks[2];
-    expect(weekProgress(week)).toEqual({ required: 5, completed: 1, percent: 20 });
+    expect(weekProgress(week)).toEqual({ required: 5, completed: 5, percent: 100 });
     expect(week.gates.filter((gate) => gate.state === "met").map((gate) => gate.id))
-      .toEqual(["w03-gate-02"]);
-    expect(weekCanClose(week)).toBe(false);
+      .toEqual(["w03-gate-01", "w03-gate-02", "w03-gate-03", "w03-gate-04", "w03-gate-05"]);
+    expect(weekCanClose(week)).toBe(true);
+    expect(weekIsReady(seedPlan.weeks, 3)).toBe(false);
+    expect(week.state).toBe("planned");
+    expect(week.closedAt).toBeNull();
     expect(week.actualMinutes).toBe(0);
   });
 

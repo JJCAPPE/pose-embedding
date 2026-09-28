@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-09-26T22:26:19Z",
+  "generatedAt": "2026-09-28T02:48:26.009568Z",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -429,12 +429,12 @@
         "Feature caching without provenance can mix incompatible experiments."
       ],
       "advisorPrompt": "Are the frozen encoder, 2,048-dimensional head interface, cosine retrieval, and reported metrics faithful to the prospectus?",
-      "reflection": "Implemented the clean frozen encoder, parity checks, immutable caches, fixed development episode and retrieval tests ahead of Week 3. Synthetic checks are not real GPU evidence. The institutional determination is still pending, so no scientific extraction was launched and the novel test remains sealed. Actual research minutes and the researcher checkpoint response have not been supplied. See docs/protocol/week-3-implementation.md. This records v1 frozen-pilot software evidence only. V2 multi-positive metrics, fine-tuning and broad method parity remain uncompleted. Week state stays planned until prior weekly records close.",
+      "reflection": "All five Week 3 technical tasks and gates are verified complete as of 2026-09-28. SCC job 7761714, release b92e7dd88fc261c0b8585039fbe99ad67ee8b445, completed successfully on one L40S at 01:40:59Z. Fresh parity passed, both complete 95,001-row extractions were byte-identical, and all five final/development caches validated. The conservative full-input forecast is 44.12 minutes and 4.07 GiB per cache, with 3.63 GiB peak GPU and 7.65 GiB peak host memory; the declared storage reserve passed. Prior encoder and independent v1/v2 metric/test-seal evidence is preserved. BU determination remains confirmed, and both novel-test opening ledgers remain absent. Actual researcher minutes remain unreported and unchanged at 0; the week remains formally planned and open because earlier weekly records have not closed. This completes Week 3 technical deliverables without claiming completion of the broader v2 study. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
       "plannedMinutes": 480,
       "actualMinutes": 0,
       "state": "planned",
       "closedAt": null,
-      "version": 2,
+      "version": 5,
       "tasks": [
         {
           "id": "w03-task-01",
@@ -445,11 +445,11 @@
           "expectedOutput": "Device-agnostic frozen encoder with attribution.",
           "required": true,
           "estimateMinutes": 150,
-          "state": "in_progress",
-          "completionNote": "Implemented the shared strict checkpoint loader, frozen/eval encoder and attributed preprocessing adapter. Synthetic tests against the pinned upstream pass. The fixed 48-sample real auxiliary parity run remains pending; no GPU parity claim is made. See docs/protocol/week-3-implementation.md.",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 2
+          "state": "done",
+          "completionNote": "Reconciled 2026-09-27 from existing evidence. The strict checkpoint loader, attributed adapter and frozen/evaluation-mode MotionBERT path are implemented and tested. Real allocated-GPU upstream parity passed before the frozen development pilot in SCC job 7748366, release 0ef858379c36; both frozen methods completed 1,000 updates. This completes the encoder task, without claiming full-cache repeatability or a novel-test result. Evidence: docs/protocol/v2-implementation-record.md and the retained pilot parity/comparison records.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/d9b8fb4e490f0462a9e90c172e1294df33d3d8c9/docs/protocol/v2-implementation-record.md",
+          "completedAt": "2026-09-27T20:17:03.355233+00:00",
+          "version": 3
         },
         {
           "id": "w03-task-02",
@@ -460,11 +460,11 @@
           "expectedOutput": "Repeatable cache plus machine-readable provenance manifest.",
           "required": true,
           "estimateMinutes": 120,
-          "state": "in_progress",
-          "completionNote": "Implemented clean float32 8,704-value deterministic caches, complete source/code/parity/checkpoint binding, immutable publication and fail-closed validation. Synthetic extraction and tamper tests pass; real cache provenance still awaits the scientific GPU run. See docs/protocol/week-3-implementation.md.",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 2
+          "state": "done",
+          "completionNote": "Verified 2026-09-28: SCC job 7761714 produced all five real float32 8,704-value caches: two 95,001-row final-training passes, 76,013 development-training rows, 20 clean gallery rows and 18,929 clean query rows. Each cache underwent full archive and provenance validation inside the job before its immutable sidecar was published. Independent post-run metadata and sidecar inspection confirmed counts, digests and bindings to source inputs, complete manifests and ordered samples, adopted protocol, checkpoint/upstream, code, locked environment, parity and artifact hashes. Existing incompatible-reuse tests pass. Full artifacts remain outside Git.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
+          "completedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 5
         },
         {
           "id": "w03-task-03",
@@ -490,11 +490,11 @@
           "expectedOutput": "Determinism report and remaining-compute forecast.",
           "required": true,
           "estimateMinutes": 90,
-          "state": "blocked",
-          "completionNote": "The scheduler runner and full-cache repeatability/resource verifier are implemented. No scientific GPU extraction was launched because the existing BU institutional determination remains unresolved. Two fresh 95,001-row runs and their measured resource evidence are still required. See docs/protocol/week-3-implementation.md.",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 2
+          "state": "done",
+          "completionNote": "Verified 2026-09-28: SCC job 7761714 completed on one scheduler-assigned L40S with failed=0 and exit_status=0 at 2026-09-28T01:40:59Z. Two fresh complete 95,001-row passes have identical feature arrays, NPZ bytes and sample-order hashes. The conservative 113,945-row forecast is 44.12 minutes and 4.07 GiB per cache; peak GPU memory is 3.63 GiB and peak host memory 7.65 GiB. Every declared extraction resource/reserve check passed. This completes the extraction evidence, not the full v2 study or weekly administrative closure.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
+          "completedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 5
         },
         {
           "id": "w03-task-05",
@@ -505,11 +505,11 @@
           "expectedOutput": "New v2 correctness fixtures and sealed-test validation; no reuse of v1 completion as v2 completion.",
           "required": true,
           "estimateMinutes": 180,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 1
+          "state": "done",
+          "completionNote": "Reconciled 2026-09-27 from the completed September 26 integration checks. V2 multi-positive relevance, self/synchronized-performance exclusions, Recall@K, AP/mAP/mAP@R, matched dimension groups and incomplete-roster/final-opening rejection are implemented and covered by the passing 791-test Python suite. PR #24 CI also passed. This is correctness and test-seal evidence, not completion of the 26-method GPU study or authorization to open novel data.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/d9b8fb4e490f0462a9e90c172e1294df33d3d8c9/docs/protocol/v2-implementation-record.md",
+          "completedAt": "2026-09-27T20:17:36.895845+00:00",
+          "version": 2
         }
       ],
       "gates": [
@@ -519,11 +519,11 @@
           "position": 1,
           "criterion": "Two clean feature extractions are identical within the declared tolerance.",
           "required": true,
-          "state": "pending",
-          "evidence": "Byte-identical synthetic caches and the full 95,001-row verification command are tested. Two real extractions on the same GPU are still required; no scientific repeatability result exists yet.",
+          "state": "met",
+          "evidence": "Verified 2026-09-28: two complete 95,001-row float32 extractions ran in distinct processes on the same L40S in SCC job 7761714. Exact feature-array equality, deterministic NPZ equality and ordered-sample equality passed. Both NPZ SHA-256 values are 43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d; repeatability report SHA-256 is 7cfdc738ccded6a371ab3739e9941b90359c0127bb1dd6a1e8a4a5dbb78cd214. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
           "waiverReason": "",
-          "decidedAt": null,
-          "version": 2
+          "decidedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 3
         },
         {
           "id": "w03-gate-02",
@@ -543,11 +543,11 @@
           "position": 3,
           "criterion": "Every cache contains complete provenance and incompatible reuse fails closed.",
           "required": true,
-          "state": "pending",
-          "evidence": "Complete binding, immutable publication and tamper-rejection tests pass on synthetic inputs. The real final/development caches must still be produced and individually verified before this gate is met.",
+          "state": "met",
+          "evidence": "Verified 2026-09-28: SCC job 7761714 fully validated all five real final/development caches and their provenance before immutable sidecar publication. Independent post-run metadata, sidecar and repeatability inspection confirmed counts, digests and provenance bindings; it did not rerun the full archive validator. Rows are 95,001, 95,001, 76,013, 20 and 18,929, each with 8,704 float32 values. Provenance binds the adopted protocol, physical sources, complete manifest bundle, sample order, checkpoint/upstream, code, dependency lock, parity and archive hashes; existing tamper/incompatible-reuse checks pass. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
           "waiverReason": "",
-          "decidedAt": null,
-          "version": 2
+          "decidedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 4
         },
         {
           "id": "w03-gate-04",
@@ -555,11 +555,11 @@
           "position": 4,
           "criterion": "Measured extraction time and storage fit the remaining schedule.",
           "required": true,
-          "state": "pending",
-          "evidence": "The conservative slower-run forecast and all limit checks are implemented and unit-tested. Actual full-run time, memory and storage have not yet been measured; the old encoder-only profile is not a substitute.",
+          "state": "met",
+          "evidence": "Verified 2026-09-28: the slower complete run forecasts 2,647.44 seconds (44.12 minutes) for 113,945 rows with the declared 25% time margin, and 4.07 GiB per cache with the 10% storage margin. Peak GPU memory (larger allocated/reserved) is 3.63 GiB and peak host memory is 7.65 GiB. Runtime, cache storage, GPU memory, host memory and remaining-storage checks all passed; post-run project quota remained above the required 200 GiB reserve. These measurements establish Week 3 extraction feasibility only. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
           "waiverReason": "",
-          "decidedAt": null,
-          "version": 2
+          "decidedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 3
         },
         {
           "id": "w03-gate-05",
@@ -567,11 +567,11 @@
           "position": 5,
           "criterion": "V2 multi-positive retrieval and full-roster test-seal checks pass independently of the historical one-shot metric gate.",
           "required": true,
-          "state": "pending",
-          "evidence": "",
+          "state": "met",
+          "evidence": "Reconciled 2026-09-27 from existing verified software evidence: the September 26 integrated suite passed 791 tests, and PR #24 CI passed. V2 retrieval fixtures cover multi-positive ranking, synchronized-performance/self exclusions and dimension groups; lock/evaluation fixtures reject incomplete method/seed sets and enforce final authorization before novel source loading. See tests/unit/test_benchmark_locks.py, tests/unit/test_benchmark_evaluation.py and docs/protocol/v2-implementation-record.md at merged commit d9b8fb4. This meets the v2 correctness/seal-check gate only; real full-cache gates remain pending.",
           "waiverReason": "",
-          "decidedAt": null,
-          "version": 1
+          "decidedAt": "2026-09-27T20:18:45.499212+00:00",
+          "version": 2
         }
       ]
     },

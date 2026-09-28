@@ -200,6 +200,19 @@ def test_verified_repeat_pair_publishes_bound_process_evidence(repeat_pair) -> N
     assert output.is_file()
 
 
+@pytest.mark.parametrize(
+    "ledger_name", ["sealed.json", "benchmark-v2/locks/test-opening.json"]
+)
+def test_repeatability_rejects_opened_test(repeat_pair, ledger_name) -> None:
+    _, _, verify, output = repeat_pair
+    ledger = output.parent / ledger_name
+    ledger.parent.mkdir(parents=True, exist_ok=True)
+    ledger.write_text("{}")
+    with pytest.raises(ValueError, match="novel test to remain sealed"):
+        verify()
+    assert not output.exists()
+
+
 @pytest.mark.parametrize("key,value", [("sample_count", 950010), ("artifact_bytes", 1)])
 def test_repeat_telemetry_must_match_validated_cache(repeat_pair, key, value) -> None:
     _, sidecars, verify, output = repeat_pair

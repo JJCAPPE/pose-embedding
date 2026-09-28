@@ -169,7 +169,10 @@ def verify_repeatability(
 ) -> dict[str, Any]:
     protocol = load_protocol(protocol_path)
     scientific = resolve_scientific_paths(protocol)
-    if scientific.test_opening_ledger.exists():
+    if (
+        scientific.test_opening_ledger.exists()
+        or (scientific.root / "benchmark-v2/locks/test-opening.json").exists()
+    ):
         raise ValueError("Week 3 verification requires the novel test to remain sealed")
     destination = require_path_within(
         output_path, scientific.root, label="repeatability evidence"

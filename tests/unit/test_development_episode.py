@@ -202,8 +202,14 @@ def test_development_episode_rejects_changed_or_partial_evidence(
         validate_development_episode(output / REPORT_FILENAME, protocol=protocol)
 
 
+@pytest.mark.parametrize(
+    "ledger_name",
+    ["locks/test-opening.v1.json", "benchmark-v2/locks/test-opening.json"],
+)
 def test_development_episode_rejects_source_subset_and_opened_test(
-    episode_bundle: tuple[Path, Path, ProtocolConfig], protocol_path: Path
+    episode_bundle: tuple[Path, Path, ProtocolConfig],
+    protocol_path: Path,
+    ledger_name: str,
 ) -> None:
     manifest, output, protocol = episode_bundle
     rows = load_manifest(manifest)
@@ -211,7 +217,7 @@ def test_development_episode_rejects_source_subset_and_opened_test(
     with pytest.raises(ValueError, match="complete ordered validation manifest"):
         generate_development_episode(manifest, output, protocol_path)
     _write_manifest(manifest, rows)
-    ledger = manifest.parent / protocol.test_access.opening_ledger_relative_path
+    ledger = manifest.parent / ledger_name
     ledger.parent.mkdir(parents=True)
     ledger.write_text("{}")
     with pytest.raises(ValueError, match="after test opening"):

@@ -1,9 +1,13 @@
 # Week 3 gate: real MotionBERT feature extraction
 
-Status: **implementation and synthetic checks complete; scientific GPU evidence
-pending**. The [execution plan](../../plan/week-03-execution-plan.md) fixes the
-choices. The [implementation record](week-3-implementation.md) separates tested
-software from evidence that must still be collected on the GPU host.
+Status: **all technical gates passed in SCC job `7761714`; formal week closure
+pending**. The [SCC execution record](week-3-scc-execution.md) records successful
+setup, fresh GPU parity, exact repeatability, all five validated caches and
+passing resource checks. The [compact evidence](week-3-scc-evidence.json) retains
+their measurements and digests. The
+[execution plan](../../plan/week-03-execution-plan.md) fixes the choices; the
+[implementation record](week-3-implementation.md) preserves the September 24
+software evidence.
 
 The pinned Apache-2.0 checkout is available through
 `scripts/fetch_upstreams.py` at MotionBERT commit
@@ -16,7 +20,9 @@ annotations reconcile exactly to the nominal 114,480 captures after applying
 the dataset authors' 535-item missing-skeleton list. The result-blind
 [input amendment](input-contract-amendment.v1.md) is adopted at protocol SHA-256
 `c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f`.
-The applicable BU determination remains a separate unresolved prerequisite.
+The researcher confirmed the applicable
+[BU determination](../compliance/computational-research-scope.md) on September 24,
+2026. This prerequisite is recorded as met; full-cache evidence is now verified.
 
 ## Implemented contract
 
@@ -84,11 +90,14 @@ then development-training and development-gallery/query caches.
 - Two extractions have identical artifact and sample-order hashes.
 - The slower run forecasts at most 4 hours, 6 GiB per full cache, 16 GiB peak GPU
   memory and 32 GiB host memory, with twice the remaining artifact budget free.
-- All development caches validate. The BU prerequisite, actual researcher time
-  and researcher checkpoint response are recorded before week closure.
+- All development caches validate. The BU prerequisite is researcher-confirmed;
+  actual researcher time and the researcher checkpoint response must be recorded
+  before week closure.
 - No data, checkpoint, cache, private URL, or full run artifact is tracked.
 
-Until the exit evidence exists, Week 3 remains open. Synthetic tests do not
-satisfy the real GPU gates. Novel/corrupted extraction remains unavailable in
-this Week 3 backend. Current independent-research governance requires no advisor
-approval; it does not waive institutional requirements or later protocol gates.
+Technical gates 1, 3 and 4 passed with the completed SCC evidence; gate 2's
+hand-calculated fixtures also pass. Both novel-test opening ledgers were absent
+after the run. Formal Week 3 closure remains pending prior-week closeout and
+actual researcher time. Novel/corrupted extraction remains unavailable in this
+Week 3 backend. Current independent-research governance requires no advisor
+approval; later v2 selection, training and test-opening gates remain separate.
