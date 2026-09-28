@@ -23,8 +23,12 @@ def _bundle(tmp_path: Path, protocol_path: Path):
     return protocol, bundle / "manifest-set.json"
 
 
+@pytest.mark.parametrize("v2_test_opened", [False, True])
 def test_complete_bundle_is_rederived_and_annotations_retained(
-    tmp_path: Path, protocol_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
+    protocol_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    v2_test_opened: bool,
 ) -> None:
     protocol, bundle = _bundle(tmp_path, protocol_path)
     monkeypatch.setenv("POSE_EMBED_DATA_ROOT", str(tmp_path))
@@ -35,6 +39,12 @@ def test_complete_bundle_is_rederived_and_annotations_retained(
     monkeypatch.setattr(
         "pose_embed.motionbert_inputs.motionbert_code_digest", lambda: "a" * 64
     )
+    if v2_test_opened:
+        # Authorized final evaluators reuse source validation after test opening.
+        # Their full-roster authorization is checked before calling this loader.
+        opening = tmp_path / "benchmark-v2/locks/test-opening.json"
+        opening.parent.mkdir(parents=True)
+        opening.write_text("{}")
     inputs = load_motionbert_inputs(protocol_path, bundle, require_clean=False)
     assert inputs.annotations is not None
     assert len(inputs.annotations) == len(inputs.inventory)
@@ -69,15 +79,10 @@ def test_changed_bundle_fails_closed(
         verify_manifest_bundle(protocol, bundle)
 
 
-@pytest.mark.parametrize(
-    "ledger_name",
-    ["locks/test-opening.v1.json", "benchmark-v2/locks/test-opening.json"],
-)
 def test_opened_test_and_changed_source_fail_before_deserialization(
     tmp_path: Path,
     protocol_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-    ledger_name: str,
 ) -> None:
     protocol, bundle = _bundle(tmp_path, protocol_path)
     monkeypatch.setenv("POSE_EMBED_DATA_ROOT", str(tmp_path))
@@ -85,7 +90,7 @@ def test_opened_test_and_changed_source_fail_before_deserialization(
     monkeypatch.setattr(
         "pose_embed.motionbert_inputs.load_protocol", lambda _: protocol
     )
-    opening = tmp_path / ledger_name
+    opening = tmp_path / protocol.test_access.opening_ledger_relative_path
     opening.parent.mkdir(parents=True)
     opening.write_text("{}")
     with pytest.raises(ValueError, match="after novel-test opening"):
@@ -98,3 +103,30 @@ def test_opened_test_and_changed_source_fail_before_deserialization(
     )
     with pytest.raises(ValueError, match="verified aggregate source"):
         load_motionbert_inputs(protocol_path, bundle, require_clean=False)
+
+
+def test_week3_parity_rejects_v2_opening_before_source_loading(
+    tmp_path: Path,
+    protocol_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from pose_embed.motionbert_parity import run_motionbert_parity
+
+    monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    opening = tmp_path / "benchmark-v2/locks/test-opening.json"
+    opening.parent.mkdir(parents=True)
+    opening.write_text("{}")
+
+    def reject_loading(*args, **kwargs):
+        pytest.fail("Week 3 parity must check the v2 seal before loading sources")
+
+    monkeypatch.setattr(
+        "pose_embed.motionbert_inputs.load_motionbert_inputs", reject_loading
+    )
+    with pytest.raises(ValueError, match="forbidden after benchmark v2 opening"):
+        run_motionbert_parity(
+            protocol_path=protocol_path,
+            manifest_set_path=tmp_path / "missing-manifest-set.json",
+            output_path=tmp_path / "parity.json",
+            device="cpu",
+        )

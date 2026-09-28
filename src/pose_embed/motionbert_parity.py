@@ -17,9 +17,11 @@ from typing import Any
 import numpy as np
 import torch
 
+from pose_embed.config import load_protocol
 from pose_embed.data.inventory import NTUInventoryRecord, load_inventory
 from pose_embed.data.manifest import ManifestRecord, load_manifest
 from pose_embed.data.ntu import parse_ntu_sample_id
+from pose_embed.protocol import resolve_scientific_paths
 from pose_embed.provenance import (
     capture_provenance,
     require_path_within,
@@ -308,6 +310,9 @@ def run_motionbert_parity(
     )
 
     started = datetime.now(UTC)
+    scientific = resolve_scientific_paths(load_protocol(protocol_path))
+    if (scientific.root / "benchmark-v2/locks/test-opening.json").exists():
+        raise ValueError("legacy parity is forbidden after benchmark v2 opening")
     inputs = load_motionbert_inputs(protocol_path, manifest_set_path)
     destination = require_path_within(
         output_path, inputs.artifact_root, label="parity report"

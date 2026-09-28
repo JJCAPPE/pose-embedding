@@ -20,6 +20,8 @@ umask 077
 export OMP_NUM_THREADS="$NSLOTS"
 export MKL_NUM_THREADS="$NSLOTS"
 export OPENBLAS_NUM_THREADS="$NSLOTS"
+# Provenance probes can initialize CUDA even when a test's model runs on CPU.
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
 export UV_CACHE_DIR="$TMPDIR/pose-embed-uv-cache"
 export UV_LINK_MODE=copy
 export UV_NO_PROGRESS=1

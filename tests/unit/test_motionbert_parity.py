@@ -413,6 +413,7 @@ def test_parity_runner_preserves_immutable_pass_or_failure_report(
     import pose_embed.motionbert_inputs as input_module
     import pose_embed.motionbert_parity as parity_module
 
+    monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
     root = repository_root / ".cache/upstreams/MotionBERT"
     if not root.is_dir():
         pytest.skip("pinned upstream checkout is not fetched")
