@@ -1,0 +1,207 @@
+{
+  "both_test_ledgers_absent": true,
+  "caches": [
+    {
+      "artifact_sha256": "43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d",
+      "file": "final-train-first.npz",
+      "manifest_sha256": "5775b0b05dd2c80504433273d620069c64804a705a8f373a217e318c4aa28622",
+      "sample_order_sha256": "84c8aec0b8172530e521b4b462e7eb412ffcd4efdeb474bb84cd97ae177c0567",
+      "shape": [
+        95001,
+        8704
+      ],
+      "sidecar_sha256": "2913cb2ea1ed6d321940c1bfe44d46ebff48721ee4d48d29af67b7fa78ceec96",
+      "telemetry": {
+        "artifact_bytes": 3315915790,
+        "peak_gpu_allocated_bytes": 3010839552,
+        "peak_gpu_memory_bytes": 3896508416,
+        "peak_gpu_reserved_bytes": 3896508416,
+        "peak_host_memory_bytes": 8211828736,
+        "sample_count": 95001,
+        "stage_seconds": {
+          "cache_verification": 13.839090510009555,
+          "encoder": 1667.741352800309,
+          "encoder_load_and_parity_validation": 3.6538280280074105,
+          "pooling": 2.554896842513699,
+          "preprocessing": 41.91134317260003,
+          "serialization": 5.011196653998923,
+          "source_verification_load": 17.84505097201327,
+          "transfer": 0.5754513885185588
+        },
+        "wall_time_seconds": 1758.5956112389977
+      }
+    },
+    {
+      "artifact_sha256": "43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d",
+      "file": "final-train-second.npz",
+      "manifest_sha256": "5775b0b05dd2c80504433273d620069c64804a705a8f373a217e318c4aa28622",
+      "sample_order_sha256": "84c8aec0b8172530e521b4b462e7eb412ffcd4efdeb474bb84cd97ae177c0567",
+      "shape": [
+        95001,
+        8704
+      ],
+      "sidecar_sha256": "1b0295a677994aac0f838557a3d416110b507d2be312205255854f7fa0090c71",
+      "telemetry": {
+        "artifact_bytes": 3315915790,
+        "peak_gpu_allocated_bytes": 3010839552,
+        "peak_gpu_memory_bytes": 3896508416,
+        "peak_gpu_reserved_bytes": 3896508416,
+        "peak_host_memory_bytes": 8053698560,
+        "sample_count": 95001,
+        "stage_seconds": {
+          "cache_verification": 13.474691239971435,
+          "encoder": 1670.1004750050197,
+          "encoder_load_and_parity_validation": 3.639252264983952,
+          "pooling": 2.5837000690517016,
+          "preprocessing": 42.38912882754812,
+          "serialization": 4.938314917992102,
+          "source_verification_load": 17.816363438003464,
+          "transfer": 0.5965206924011
+        },
+        "wall_time_seconds": 1765.8320764630043
+      }
+    },
+    {
+      "artifact_sha256": "954067c0c1a84d448dd9df16176cd28a1231373148264f8db9d62667f5f3b667",
+      "file": "development-train.npz",
+      "manifest_sha256": "2278b58090dbd3a00255936c8e4a2bd40887af995a88672334e4ed296605661c",
+      "sample_order_sha256": "4a57e5d1470d115fa6c497d2737c8fca66e4ce08ffcd25c819e1e74554f6dbff",
+      "shape": [
+        76013,
+        8704
+      ],
+      "sidecar_sha256": "5b3f81f633317edb31b4500afa3c58ecb43b7d856de913c208317a9fbcef6e67",
+      "telemetry": {
+        "artifact_bytes": 2653158638,
+        "peak_gpu_allocated_bytes": 3010839552,
+        "peak_gpu_memory_bytes": 3896508416,
+        "peak_gpu_reserved_bytes": 3896508416,
+        "peak_host_memory_bytes": 7377047552,
+        "sample_count": 76013,
+        "stage_seconds": {
+          "cache_verification": 13.626331153005594,
+          "encoder": 1333.535598230781,
+          "encoder_load_and_parity_validation": 3.65339412400499,
+          "pooling": 2.170807209680788,
+          "preprocessing": 34.67443964141421,
+          "serialization": 3.998415590991499,
+          "source_verification_load": 17.846938044007402,
+          "transfer": 0.5609239733894356
+        },
+        "wall_time_seconds": 1414.7142068210233
+      }
+    },
+    {
+      "artifact_sha256": "3fc5bffb6fd72abf7acb4faa0d35727c8c2a9aac0b30244e91ebaf88e6ba86cd",
+      "file": "development-gallery.npz",
+      "manifest_sha256": "f615d66af0260d419f88fef86ae1ea01b427d0dc44ecd6b48ecc4f43c5c806eb",
+      "sample_order_sha256": "d5b3a985a3eaf98a0ee852a9a3b3b6ea824d4bb5267d220464802162f13b439f",
+      "shape": [
+        20,
+        8704
+      ],
+      "sidecar_sha256": "cc2fde13f1f6c4c8794e82acadcbe63d83984f55a661e971067a82dbc2991a28",
+      "telemetry": {
+        "artifact_bytes": 698846,
+        "peak_gpu_allocated_bytes": 1818562048,
+        "peak_gpu_memory_bytes": 2023751680,
+        "peak_gpu_reserved_bytes": 2023751680,
+        "peak_host_memory_bytes": 4363038720,
+        "sample_count": 20,
+        "stage_seconds": {
+          "cache_verification": 19.384644361009123,
+          "encoder": 0.3954711109981872,
+          "encoder_load_and_parity_validation": 3.6449030679941643,
+          "pooling": 0.005205622990615666,
+          "preprocessing": 0.011242861015489325,
+          "serialization": 0.0034649849985726178,
+          "source_verification_load": 24.9652795449947,
+          "transfer": 0.0006934949778951705
+        },
+        "wall_time_seconds": 49.44476500200108
+      }
+    },
+    {
+      "artifact_sha256": "9dc4341b5a55a5cb6cd9867635f8c3e1762f56eec4239988f69904de2da45f64",
+      "file": "development-queries.npz",
+      "manifest_sha256": "7a778405a3ad52f499d0a884eaa5c57b19b556d692f965d4caa39c019a2f830d",
+      "sample_order_sha256": "a826324d26513bea3bad19953f6fd595bf4393b21ec5ac8ca8bc19e15b8f859b",
+      "shape": [
+        18929,
+        8704
+      ],
+      "sidecar_sha256": "5a86d232dd0740bb96dc814ef67d02c5eebf8923b03f6d3b98aaca00f23c7018",
+      "telemetry": {
+        "artifact_bytes": 660698582,
+        "peak_gpu_allocated_bytes": 3010839552,
+        "peak_gpu_memory_bytes": 3896508416,
+        "peak_gpu_reserved_bytes": 3896508416,
+        "peak_host_memory_bytes": 4949299200,
+        "sample_count": 18929,
+        "stage_seconds": {
+          "cache_verification": 17.99882060298114,
+          "encoder": 331.18816566019086,
+          "encoder_load_and_parity_validation": 3.4549090969958343,
+          "pooling": 0.5318376500799786,
+          "preprocessing": 8.523562031652546,
+          "serialization": 1.0557773509935942,
+          "source_verification_load": 23.89860647401656,
+          "transfer": 0.1315450989350211
+        },
+        "wall_time_seconds": 388.8035435269994
+      }
+    }
+  ],
+  "extraction_completed": true,
+  "forecast": {
+    "checks": {
+      "cache_storage": true,
+      "gpu_memory": true,
+      "host_memory": true,
+      "remaining_storage": true,
+      "runtime": true
+    },
+    "full_sample_count": 113945,
+    "limits": {
+      "full_cache_bytes": 6442450944,
+      "full_extraction_seconds": 14400,
+      "peak_gpu_memory_bytes": 17179869184,
+      "peak_host_memory_bytes": 34359738368,
+      "required_free_bytes": 214748364800
+    },
+    "observed_free_bytes": 494411972608,
+    "passed": true,
+    "projected_cache_bytes": 4374851077,
+    "projected_seconds": 2647.442342088202,
+    "remaining_artifact_budget_bytes": 107374182400,
+    "runtime_margin": 1.25,
+    "storage_margin": 1.1
+  },
+  "job_id": "7761714",
+  "protocol_sha256": "c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f",
+  "release_commit": "b92e7dd88fc261c0b8585039fbe99ad67ee8b445",
+  "repeatability": {
+    "identical_arrays": true,
+    "identical_npz": true,
+    "same_gpu_fresh_processes_verified": true,
+    "sha256": "7cfdc738ccded6a371ab3739e9941b90359c0127bb1dd6a1e8a4a5dbb78cd214"
+  },
+  "schema_version": 1,
+  "verification": {
+    "aggregate_sha256": "aaf1f928b4629fa9a0850528d43fdd8d920532805d16672bfdda78085b649df8",
+    "checkpoint_sha256": "02a9ee017e5c9d688b5dd41e0055bddb75b6eee7f5eed326a8cdc6e5bf08eaf8",
+    "code_sha256": "d3054791a5e00ff34993706866f8b436d5db4a8410cb0d42997802cf6dc964a6",
+    "config_sha256": "bc58dfbe5b00424afb6542217c820cca3817f2a859fe84667ef678a08a6b58f8",
+    "dependency_lock_sha256": "11ced81a29e438939a4e489835fd93ddddcd53e29fb0896212ea6a276e24bc3e",
+    "development_episode_sha256": "88f30f96e35dedfd34b42f8e8ee2b561db44bbaf1f93d82d0522ffe011abba46",
+    "license_sha256": "045ee95b545fb51f5c6e28e1a50644fe618f6278f3c8720852c6fe96f53b472f",
+    "manifest_set_sha256": "a6023f13898310b500ff4af30d7545290eda554e8b8d3d4ef5456067b436aea9",
+    "missing_list_sha256": "ab14fe64e89be63d2b08141713fcc31f6ebc7b01955009c3585d8d3367e0facc",
+    "observation_sha256": "25fd1603d7a75351695c4b35781225d978e008dc2a06fc2bc25bbdfc1d9abfc3",
+    "parity_sha256": "837aa87f25e50347c027ae32b66cedaf28d14378a4d3324fd8eed46c74c0214a",
+    "scheduler_sha256": "92c73e663aa18f7b89c71c492a5be4e8d0e6e5fe73defe80c9e61bd2147eadc2",
+    "setup_sha256": "b7d47603741ade7d6ae06b67fd504b6215f92596211508eb032a8813a2d182da",
+    "source_inventory_sha256": "e0ab842fe2a62b50ff7205d0f8658fad373a03c5b29527c281a2db0225ea0058",
+    "upstream_sha256": "6f63e187e4a35c24590b06b8bb0cb03a4d2873fe32e60fc90ccfac4571c7baa8"
+  }
+}

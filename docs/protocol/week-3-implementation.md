@@ -3,6 +3,14 @@
 Recorded 2026-09-24. Status: **software verified; real GPU gates pending**.
 This is not a scientific extraction result and does not close Week 3.
 
+This historical record preserves the September 24 implementation evidence.
+See the [current SCC execution record](week-3-scc-execution.md) for job `7761714`,
+which completed successfully on September 27 EDT with all technical gates passed.
+The [compact evidence](week-3-scc-evidence.json) records all five validated caches,
+exact repeatability and passing resource checks. Formal week closure remains
+pending prior-week closeout and actual researcher time; the September 24 status
+and gate decisions below remain unchanged as historical evidence.
+
 ## Implemented
 
 - Shared strict MotionBERT loader, frozen/evaluation-mode encoder, attributed
