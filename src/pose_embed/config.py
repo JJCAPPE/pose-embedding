@@ -688,18 +688,21 @@ def experiment_hyperparameters_digest(config: ExperimentConfig) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def _load_yaml(path: Path) -> object:
+def _load_configuration(path: Path) -> object:
     try:
-        return yaml.safe_load(path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        return json.loads(text) if path.suffix == ".json" else yaml.safe_load(text)
     except FileNotFoundError as exc:
         raise ValueError(f"configuration file does not exist: {path}") from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"invalid JSON in {path}: {exc}") from exc
     except yaml.YAMLError as exc:
         raise ValueError(f"invalid YAML in {path}: {exc}") from exc
 
 
 def load_protocol(path: str | Path) -> ProtocolConfig | ProtocolV3Config:
     """Load and validate the machine-readable protocol."""
-    payload = _load_yaml(Path(path))
+    payload = _load_configuration(Path(path))
     if isinstance(payload, dict) and payload.get("protocol_id") == "protocol-v3":
         from pose_embed.config_v3 import ProtocolV3Config
 
@@ -709,7 +712,7 @@ def load_protocol(path: str | Path) -> ProtocolConfig | ProtocolV3Config:
 
 def load_experiment(path: str | Path) -> ExperimentConfig:
     """Load and validate one experiment configuration."""
-    return ExperimentConfig.model_validate(_load_yaml(Path(path)))
+    return ExperimentConfig.model_validate(_load_configuration(Path(path)))
 
 
 def validate_experiment_against_protocol(

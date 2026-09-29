@@ -1,5 +1,6 @@
 """Protocol mutations cannot silently adopt settings from another study."""
 
+import json
 from copy import deepcopy
 from datetime import UTC, datetime
 from pathlib import Path
@@ -24,7 +25,7 @@ from pose_embed.protocol_v3 import (
     require_v3_design,
     v3_design_code_hashes,
 )
-from pose_embed.provenance import sha256_file
+from pose_embed.provenance import sha256_file, write_immutable_json
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -48,6 +49,25 @@ def test_explicit_dispatch_preserves_historical_protocol():
     assert v3.training.epochs == 20
     assert len(v1.training.tuning_grid) == 6
     assert len(v3.training.tuning_grid) == 3
+
+
+@pytest.mark.parametrize("version", ["v1", "v3"])
+def test_protocol_json_round_trip_preserves_numbers_and_digest(tmp_path, version):
+    protocol = load_protocol(ROOT / f"configs/protocol.{version}.yaml")
+    frozen = tmp_path / f"protocol.{version}.json"
+    write_immutable_json(frozen, protocol.model_dump(mode="json"))
+    restored = load_protocol(frozen)
+    assert restored == protocol
+    assert protocol_digest(restored) == protocol_digest(protocol)
+
+
+def test_json_protocol_still_rejects_quoted_fixed_numbers(tmp_path):
+    payload = template()
+    payload["training"]["optimizer_epsilon"] = "1e-08"
+    frozen = tmp_path / "protocol.v3.json"
+    frozen.write_text(json.dumps(payload, default=str))
+    with pytest.raises(ValueError, match="optimizer_epsilon"):
+        load_protocol(frozen)
 
 
 @pytest.mark.parametrize(
