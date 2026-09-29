@@ -1,0 +1,2277 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-09-29T20:15:08.089989Z",
+  "project": {
+    "id": "pose-embed",
+    "slug": "pose-embed",
+    "title": "Frozen one-shot pose robustness",
+    "researchQuestion": "Does the full contextual training recipe reduce one-shot retrieval degradation relative to a standard contrastive recipe when only novel pose queries are corrupted?",
+    "summary": "Final v3 December study: frozen MotionBERT, three training recipes, three paired seeds, 20 epochs, and nine query-only corruption conditions. Three engineering pilots precede 27 selection runs, nine fresh final heads, and 180 locked evaluation cells. Implementation, measured capacity, and test-opening gates remain prerequisites; null or negative results are valid outcomes.",
+    "startDate": "2026-09-15",
+    "endDate": "2026-12-18",
+    "timezone": "America/New_York",
+    "visibility": "public",
+    "version": 4
+  },
+  "manualActions": [
+    {
+      "id": "manual-supabase",
+      "dueDate": "2026-10-04",
+      "title": "Verify hosted tracker access",
+      "details": "Verify that public sign-up is disabled and hosted Auth Site URL and redirect origins match the live deployment before enabling editing. Preserve private ownership, RLS, live progress, and actual minutes.",
+      "whyManual": "Hosted account settings and ownership require the researcher or an authorized administrator; keep credentials and owner identity private.",
+      "weekTaskId": null
+    },
+    {
+      "id": "manual-gpu",
+      "dueDate": "2026-10-18",
+      "title": "Confirm GPU access and researcher availability",
+      "details": "Record an allocation calendar for the measured L40S workload, approved job limits, queue and setup allowance, and researcher-confirmed available hours. Apply at least 25% slack to remaining compute and researcher work; prior GPU access is not an allocation commitment.",
+      "whyManual": "Resource access and available researcher hours require confirmation; planned estimates cannot establish either.",
+      "weekTaskId": "w05-task-04"
+    },
+    {
+      "id": "manual-capacity-v3",
+      "dueDate": "2026-10-18",
+      "title": "Resolve the v3 storage prerequisite",
+      "details": "The September 29 observation had 272.80 decimal GB of quota free. The initial 100 GB incremental envelope plus the 200 GiB reserve requires 314.7484 GB free: a 41.95 GB gap. Obtain additional quota or a documented authorized artifact allocation, then remeasure; retain historical artifacts and register every root.",
+      "whyManual": "Additional quota or artifact allocation requires institutional authorization. The dated observation is not current capacity or a reservation.",
+      "weekTaskId": "w05-task-04"
+    }
+  ],
+  "protocol": {
+    "bindingSource": "plan/research-plan.v3.md (final September 29 plan) and docs/decisions/0004-frozen-one-shot-v3.md define the December direction. They supersede the v2 campaign scope, not historical evidence, and are planning decisions rather than an executable protocol or final-test lock. Complete and validate the v3 scientific bundle before experiments. Independent-research governance and all licensing safeguards remain binding.",
+    "successDefinition": "Complete the three-recipe study faithfully: nine verified final heads, all 180 declared result cells, reproducible conditional analysis and descriptive results, and a report with costs, failures and limitations. A positive, null or negative contextual result is successful. A failed capacity or validity gate requires an honest blocked-study record and result-blind amendment; it is not a completed empirical comparison.",
+    "lockedDecisions": [
+      {
+        "label": "Final scope",
+        "value": "One NTU RGB+D 120 one-shot study comparing Contrastive, full Contextual, and single-view supervised contrastive (SupCon). The confirmatory comparison is the full contextual recipe versus the standard contrastive recipe; it does not isolate the contextual term from margins or regularization."
+      },
+      {
+        "label": "Frozen representation",
+        "value": "Freeze the generic pretrained MotionBERT encoder in evaluation mode. Pool time and people to 8,704 features; train a biased linear 8,704-to-2,048 head with L2-normalized output and zero dropout (17,827,840 trainable parameters)."
+      },
+      {
+        "label": "Fixed duration and pairing",
+        "value": "Use exactly 20 epochs for every pilot, selection run and final run, with paired seeds 7, 17, 29 and physical P=8, K=4 batches of 32. Pair initial head states and exact batch plans across recipes and learning-rate candidates within each seed. No automatic ten-epoch fallback, early stopping or best-epoch choice."
+      },
+      {
+        "label": "Required campaign",
+        "value": "Three engineering pilots + 27 clean-development selection runs + nine fresh final heads = 39 required training runs and 1,960,020 head updates before retries or fixtures. The final matrix is three methods × three seeds × ten conditions × two query definitions = 180 cells."
+      },
+      {
+        "label": "Current planning status",
+        "value": "This is the final execution design, not evidence that implementation, GPU training, storage, researcher availability or novel evaluation is complete. Historical Weeks 1-3 and their progress remain unchanged. Future-week effort estimates require researcher confirmation."
+      },
+      {
+        "label": "Measured capacity prerequisite",
+        "value": "Initial storage envelope: 100 GB (decimal) incremental space including slack, while retaining a 200 GiB reserve. On September 29, 272.80 GB quota free fell 41.95 GB short of the 314.7484 GB requirement. Recheck current quota and filesystem space, replace estimates with measured remaining peak bytes, and retain every artifact."
+      },
+      {
+        "label": "October 18 go/no-go",
+        "value": "Before selection, require three complete valid 20-epoch pilots, mathematical loss checks, all nine development corruption paths, fixed analysis, resolved historical seal audits, and a measured schedule/storage/availability forecast. Include at least 25% remaining-work slack plus queue/setup delays. Otherwise stop for a result-blind amendment."
+      },
+      {
+        "label": "Test seal",
+        "value": "Freeze the complete v3 design before fresh caches and pilots; append selection authorization against the unchanged digest after the October gate. Complete and bind all nine final heads before atomic dataset-level opening. Authorize novel inputs before their annotation loader runs; after opening, prohibit scientific training and selection across v1/v2/v3 paths."
+      },
+      {
+        "label": "Historical access audit",
+        "value": "Register and audit all historical artifact roots and releases. Historical aggregate loading deserialized the shared annotation container; the seal claim concerns absence of novel preprocessing, representations, retrieval, visualization, scoring or tuning. Unknown or unreadable roots block the gate; a new namespace cannot restore a compromised test."
+      },
+      {
+        "label": "Governance",
+        "value": "The researcher records decisions and result-blind amendments. No advisor approval is required. Preserve the recorded BU determination and reconcile dataset-terms acceptance with private evidence. The unlicensed contextual repository is reference-only. Retain permitted upstream attribution; do not invent approvals, actual hours, results or completed gates."
+      },
+      {
+        "label": "December delivery",
+        "value": "Finish final heads and locks by November 29, complete novel evaluation by December 6, and preserve December 7-18 for analysis and delivery. Regularizer-only control is omitted before new scores; the 26-method v2 benchmark, fine-tuning and Multi-Similarity are future studies."
+      }
+    ],
+    "experimentalDesign": [
+      {
+        "label": "Dataset and episode",
+        "value": "Bind 113,945 usable HRNet annotations plus 535 official missing-skeleton exclusions (114,480 nominal captures), source hashes and the frozen checkpoint. Preserve the existing 80-action development-training / 20-action validation split, official 20 novel actions, all official exemplars and the exact historical development anchor/query identities."
+      },
+      {
+        "label": "Selection and final data",
+        "value": "Use 76,013 training rows, 20 clean gallery references and 18,929 primary queries for development. Final training uses all 100 auxiliary actions and 95,001 rows. No training-subset contingency or novel outcome access is allowed."
+      },
+      {
+        "label": "Two query definitions",
+        "value": "Primary queries exclude each clean gallery sample and every synchronized view of its underlying performance, keyed by setup, performer, repetition and action. The exact-official secondary set excludes only the exemplar. Verify and lock the exact ordered lists: expected novel counts are 18,884 primary and 18,924 exact-official queries."
+      },
+      {
+        "label": "Deterministic inputs",
+        "value": "Use the adopted float32 tensor with two people, 100 frames, 17 H36M joints and x/y/confidence channels. Keep camera normalization, tracking, joint conversion, uniform temporal sampling, padding and spatial normalization fixed. Random movement is off; compare encoder parity on the same locally corrected confidence tensor."
+      },
+      {
+        "label": "Contrastive recipe",
+        "value": "Standard cosine-margin contrastive loss with positive margin 0.9 and negative margin 0.6. Average positive and negative strictly active hinges separately; empty active sets contribute zero."
+      },
+      {
+        "label": "Contextual recipe",
+        "value": "0.4 L_context + 0.6 L_contrast + 0.1 L_reg, positive/negative margins 0.75/0.6, neighborhood 4, epsilon 0.05, STE alpha 10 and target mean similarity 0.25. Implement the same-label target in Equation 5 and independently verify labeled forward/backward fixtures. These fixed transfer settings are pose-study adaptations, not proven optima."
+      },
+      {
+        "label": "SupCon recipe",
+        "value": "Single-view supervised positive log-softmax at temperature 0.07 with no extra temperature multiplier. It is a required descriptive comparator, not a second confirmatory superiority test."
+      },
+      {
+        "label": "Optimizer and sampling",
+        "value": "Float32 features and parameters; constant-rate AdamW, betas (0.9, 0.999), epsilon 1e-8, amsgrad false, weight decay 1e-4 on both weight and bias. No scheduler, mixed precision, clipping or augmentation. Epochs contain ceil(N/32) physical batches under archived paired sample plans; this is a balanced sampling budget, not one visit per sample."
+      },
+      {
+        "label": "Engineering pilots",
+        "value": "One full 20-epoch pilot per arm, seed 7 and learning rate 3e-4. Retain immutable checkpoints and complete clean development scores at epochs 5, 10, 15 and 20, plus epoch-zero diagnostics. Require mathematical/learnable-fixture checks, finite updates, nonzero vectors and no total numerical collapse. Pilots are ineligible for selection; real-data accuracy has no acceptance floor."
+      },
+      {
+        "label": "Learning-rate selection",
+        "value": "For each arm attempt rates 1e-4, 3e-4 and 1e-3 with all three seeds: 27 fresh 20-epoch development runs. Rank by unrounded mean epoch-20 clean development top-1, then mean MRR, then lower rate. A candidate needs all three valid seeds. Preserve failures and disclose unequal eligibility; an arm with no valid candidate blocks the campaign."
+      },
+      {
+        "label": "Fresh final heads",
+        "value": "Lock the selected rate for each arm and selection evidence, then train nine fresh heads on all 95,001 auxiliary rows for 20 epochs. Keep epoch-20 weights; do not reuse pilot or selection heads. Infrastructure retries restart identical settings in new immutable attempt directories. Corrections rerun every affected comparison under the amendment policy."
+      },
+      {
+        "label": "Fresh caches and evaluation",
+        "value": "Create v3-bound manifests with unchanged identities and fresh clean caches, including parity and two repeat extractions on the same GPU. Encode the union of novel queries once per condition, then export verified immutable primary and exact-official cache files. All nine heads share pre-head caches: the encoder workload is one clean gallery plus ten query conditions, not 180 encoder passes."
+      },
+      {
+        "label": "Metrics",
+        "value": "Use cosine retrieval with a fixed gallery order for ties and query-weighted top-1, MRR and R@5. With one relevant exemplar, mAP equals MRR. Report all methods, seeds, clean/corrupted cells and both query definitions, alongside actual resource costs and retained failures."
+      }
+    ],
+    "corruptionPrinciple": "Apply each family independently to clean, fully preprocessed query tensors before the frozen encoder; keep the gallery clean. Derive a per-sample family seed from SHA-256 of protocol-v3, sample ID and family, excluding severity. Share the realized corruptions across methods/seeds and nest severities. These are synthetic tensor stress tests, not measured camera occlusion or pose-estimator shifts.",
+    "corruptions": [
+      {
+        "label": "Coordinate jitter",
+        "value": "Reuse one seeded CPU float32 Gaussian x/y field at 1%, 2.5% and 5% of clean torso scale. Add noise only where original confidence is positive; leave confidence and missing/padded observations unchanged. Do not clip or renormalize."
+      },
+      {
+        "label": "Joint or limb masking",
+        "value": "Shuffle the fixed ordered limb groups once per sample; take the first 3, 6 or 8 joint trajectories from that same ordering. Zero x/y/confidence across all people and frames, with exact nested masks. Already absent joints are not replaced by visible ones."
+      },
+      {
+        "label": "Consecutive-frame masking",
+        "value": "For L = 10, 25 or 40, use start = floor(u × (101 − L) / 2^64), where u is the first eight hash bytes as an unsigned big-endian integer. Zero the consecutive block across people, joints and channels. Blocks are nested; no frames are deleted, resampled or interpolated."
+      },
+      {
+        "label": "Scale and fallback",
+        "value": "Use the lower median positive finite shoulder-to-hip midpoint distance among clean observations with four positive source confidences. If a sample lacks a scale, use the fixed lower median of valid sample-level scales from the 80-action training set only. Freeze its value, contributing IDs/count/hash before pilots; never recompute it from validation or novel data."
+      },
+      {
+        "label": "Identity and geometry checks",
+        "value": "Severity zero is byte-identical to clean input. Verify exact counts, nesting, shared jitter, missingness, boundary frames, two-person cases, fallback and fresh-process reproducibility on a fixed development panel. Record effective damage, zero-damage cases and fallback frequency; never redraw corruption or drop a troublesome novel query."
+      },
+      {
+        "label": "Preselection verification",
+        "value": "By October 18 complete all nine full-size development query paths. Time a maximum-severity pass per family through source checks, preprocessing, encoding, storage, projection of three pilot heads and full retrieval. Corrupted development scores may validate the evaluator but cannot choose settings, severities, rates or duration."
+      }
+    ],
+    "primaryFormula": "drop(method, seed, cell) = clean_top1(method, seed) − corrupted_top1(method, seed, cell)",
+    "effectFormula": "Delta = mean over the three fixed seeds and nine corruption cells of [drop(Contextual, seed, cell) − drop(Contrastive, seed, cell)]. Negative Delta means less degradation for the full contextual recipe.",
+    "analysisRules": [
+      "The primary estimand uses the primary query set. Queries have equal weight within a cell; all three seeds and all nine cells have equal weight. The nine-cell mixture is prespecified synthetic stress, not real-world corruption prevalence.",
+      "Average the paired correctness-drop difference over the fixed seeds and cells for each query. Cluster by setup, performer, repetition and action. Independently within each of the 20 fixed actions, resample its original number of performance groups with replacement, retaining all camera views and multiplicities.",
+      "Apply the same cluster draw to every method, seed and condition; divide the summed effects by the sampled query count. Do not equally weight unequal-view groups or force equal action weights. Do not resample seeds or actions.",
+      "Use 10,000 bootstrap replicates from numpy Generator(PCG64(2026)), with a two-sided 95% percentile interval and linear 0.025/0.975 quantiles. Freeze and test the analysis before selection; rehash it at opening.",
+      "The interval is conditional on the trained heads, three seeds, fixed official actions/anchors, query definitions and realized corruptions. It assumes exchangeable performance groups within each action; it does not quantify arbitrary seed/action/participant/anchor or real-camera variation.",
+      "Support the single confirmatory statement of smaller clean-to-corrupt top-1 degradation only if the interval upper bound is below zero. Otherwise report a null or contrary result. Always show clean and absolute corrupted accuracy and the descriptive Contextual-minus-Contrastive corrupted-accuracy difference; smaller degradation need not mean better corrupted retrieval.",
+      "Report all three seed effects, nine cell effects/curves and 20 leave-one-action-out effects. For each sensitivity, remove only that action’s query observations while keeping all 20 gallery anchors and original ranks. Report range and sign changes descriptively, without new tests.",
+      "SupCon, exact-official queries, individual cells, seed variation and sensitivities are descriptive. No extra superiority tests, selected winning cells or unique causal attribution to contextual neighborhoods. Report the effects of margins and regularization as part of the full recipe.",
+      "Missing, invalid or unbound cells prevent a complete report. Keep every attempt and preserve the test-opening record after a crash. Post-opening scientific or implementation corrections must be disclosed as deviations; they cannot silently replace the confirmatory pipeline."
+    ],
+    "scopeExclusions": [
+      "The regularizer-only control is omitted before new pilot or selection scores as a scope/capacity decision, not a negative experimental result.",
+      "The 26-method v2 benchmark, encoder fine-tuning, Multi-Similarity, extra datasets, alternative batch sizes and real pose-estimator shifts are future studies; v3 does not complete v2.",
+      "No altered split, corruption, metric, duration, recipe, selected epoch or claim after novel outcomes. No partial-seed candidate, training-subset shortcut or silent omission of required methods/cells.",
+      "No universal robustness, real-camera occlusion, participant-generalization, raw-video, identity, clinical or biomechanical claims.",
+      "No copied unlicensed contextual code, new repository-wide license without authorization, licensed poses, checkpoints, caches, full artifacts, credentials or private governance records in Git or public tracker exports."
+    ]
+  },
+  "weeks": [
+    {
+      "id": "week-01",
+      "projectId": "pose-embed",
+      "number": 1,
+      "startDate": "2026-09-15",
+      "endDate": "2026-09-20",
+      "phase": "Protocol",
+      "title": "Protocol and access",
+      "objective": "Turn the prospectus into a documented, hash-bound, testable protocol and prove that the required data and compute are reachable.",
+      "deliverable": "A documented, hash-bound protocol-v1, verified data and checkpoint inventory, and measured GPU profile.",
+      "risks": [
+        "NTU or checkpoint access may require manual license acceptance.",
+        "GPU availability may not match the planned memory or runtime assumptions.",
+        "Protocol amendments or the BU determination may remain unresolved after technical setup begins."
+      ],
+      "advisorPrompt": "Are the research question, test-opening rule, primary estimand, synchronized-view exclusion, and claim language documented as the binding protocol?",
+      "reflection": "Week 1 established a documented, hash-bound protocol, verified the licensed HRNet aggregate, official one-shot split, and MotionBERT checkpoint, and confirmed physical batch 32 on an SCC A40. The GPU-host inventory accounts for 113,945 usable annotations plus 535 official missing-skeleton exclusions. The researcher adopted the result-blind aggregate-aware input contract on 2026-09-24 and confirmed that BU has issued the applicable governance determination. No determination attachment is required. Researcher-supplied actual minutes and final weekly closeout remain pending; the novel test remains sealed and the weekly record remains open.",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "blocked",
+      "closedAt": null,
+      "version": 6,
+      "tasks": [
+        {
+          "id": "w01-task-01",
+          "weekId": "week-01",
+          "position": 1,
+          "title": "Finalize protocol-v1",
+          "details": "Resolve the objective formula, primary estimand, claim rule, validation split, synchronized-view rule, corruptions, test-opening rule, and failed-run policy.",
+          "expectedOutput": "Documented, hash-bound protocol document.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "done",
+          "completionNote": "All binding scientific choices were confirmed, including mandatory final training on all 100 auxiliary actions. Independent research governance is recorded in docs/protocol/independent-research.md. The result-blind NTU input-contract amendment was adopted on 2026-09-24. Current protocol SHA-256: c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/independent-research.md",
+          "completedAt": "2026-09-11T17:41:08+00:00",
+          "version": 5
+        },
+        {
+          "id": "w01-task-02",
+          "weekId": "week-01",
+          "position": 2,
+          "title": "Verify licensed inputs",
+          "details": "Confirm that the NTU HRNet-derived poses, official one-shot split, and pretrained MotionBERT checkpoint are readable. Record source URLs and SHA-256 checksums without committing licensed files.",
+          "expectedOutput": "Input inventory and checksum report.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "done",
+          "completionNote": "Verified 2026-09-24: dataset access remains active, the complete usable HRNet aggregate, official missing-skeleton list, one-shot definition, and MotionBERT checkpoint are readable and checksummed on the GPU host. The aggregate contains 113,945 usable annotations and all 20 official exemplars; the official 535-item missing-skeleton list accounts for the remaining nominal captures. The result-blind aggregate-aware input contract is adopted in docs/protocol/input-contract-amendment.v1.md, and w01-gate-02 is met. The novel test remains sealed.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md",
+          "completedAt": "2026-09-24T15:35:26+00:00",
+          "version": 7
+        },
+        {
+          "id": "w01-task-03",
+          "weekId": "week-01",
+          "position": 3,
+          "title": "Profile the GPU path",
+          "details": "Run one representative frozen MotionBERT forward pass at batch sizes 32 and 64. Record device, CUDA, memory, runtime, scheduler, quota, and job limits.",
+          "expectedOutput": "Compute profile with a justified physical batch-size decision.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "done",
+          "completionNote": "Completed 2026-09-16: a real frozen MotionBERT encoder profile ran on a scheduler-assigned BU SCC A40 using dense protocol-shaped float32 inputs. Physical batch 32 completed with 2.572 GiB peak allocated, 2.855 GiB peak reserved, and an 842.164 ms median forward; batch 64 completed with 4.977 GiB allocated, 5.514 GiB reserved, and a 1,685.400 ms median. Required device, CUDA, scheduler, quota, and job-limit evidence was captured. Physical batch 32 remained selected for the v1 frozen path because protocol v1 permitted 64 only after all core methods fit. This frozen-forward result does not establish v2 fine-tuning capacity; later v2 priority profiling passed on A100 80 GB and failed with CUDA out of memory on L40S. It is compute evidence only, not preprocessing or encoder-parity evidence.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-gpu-profile.md",
+          "completedAt": "2026-09-16T16:41:15+00:00",
+          "version": 3
+        },
+        {
+          "id": "w01-task-04",
+          "weekId": "week-01",
+          "position": 4,
+          "title": "Record governance decisions",
+          "details": "Record researcher-controlled protocol decisions and the BU data-governance or human-subjects determination. Record unresolved conditions verbatim.",
+          "expectedOutput": "Decision evidence or a visible blocking record.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "done",
+          "completionNote": "The computational scope is recorded in docs/compliance/computational-research-scope.md. On 2026-09-24, the researcher confirmed that BU has issued the applicable human-subjects/data-governance determination and requested completion without attaching proof. The confirmation is recorded and w01-gate-04 is met. This is researcher confirmation, not independent document verification; no specific institutional classification or original decision date is asserted.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/compliance/computational-research-scope.md",
+          "completedAt": "2026-09-16T16:07:48+00:00",
+          "version": 5
+        },
+        {
+          "id": "w01-task-05",
+          "weekId": "week-01",
+          "position": 5,
+          "title": "Close the weekly record",
+          "details": "Update actual hours, blockers, evidence links, and the first-week reflection in the tracker.",
+          "expectedOutput": "A complete Week 1 progress record.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "blocked",
+          "completionNote": "Verified inputs, remote setup, the adopted result-blind input contract, and the researcher-confirmed BU determination are recorded. Final closeout remains blocked until researcher-supplied actual minutes are recorded. No hours or week closure are inferred.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md",
+          "completedAt": null,
+          "version": 6
+        }
+      ],
+      "gates": [
+        {
+          "id": "w01-gate-01",
+          "weekId": "week-01",
+          "position": 1,
+          "criterion": "Protocol-v1 is documented under researcher control and its hash is recorded.",
+          "required": true,
+          "state": "met",
+          "evidence": "Independent research governance is recorded in docs/protocol/independent-research.md. The result-blind NTU input-contract amendment is recorded in docs/protocol/input-contract-amendment.v1.md. Current protocol SHA-256: c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f.",
+          "waiverReason": "",
+          "decidedAt": "2026-09-11T17:41:08+00:00",
+          "version": 4
+        },
+        {
+          "id": "w01-gate-02",
+          "weekId": "week-01",
+          "position": 2,
+          "criterion": "Verified input inventory matches the recorded protocol input contract.",
+          "required": true,
+          "state": "met",
+          "evidence": "Verified 2026-09-24: the local and GPU-host inputs account for 113,945 usable HRNet annotations plus 535 official missing-skeleton exclusions, totaling 114,480 nominal captures. The hash-pinned aggregate and official missing-skeleton list passed aggregate-aware physical-source verification. The researcher adopted the result-blind contract in https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/input-contract-amendment.v1.md; current protocol SHA-256: c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f. GPU-host evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md. The novel test remains sealed.",
+          "waiverReason": "",
+          "decidedAt": "2026-09-24T16:25:10+00:00",
+          "version": 6
+        },
+        {
+          "id": "w01-gate-03",
+          "weekId": "week-01",
+          "position": 3,
+          "criterion": "A representative frozen-forward GPU profile confirms a feasible physical batch size for the v1 extraction path.",
+          "required": true,
+          "state": "met",
+          "evidence": "Verified 2026-09-16: frozen MotionBERT completed the protocol-shaped physical batch 32 profile on a scheduler-assigned BU SCC A40, and all required device, CUDA, memory, runtime, scheduler, quota, and job-limit evidence was captured. This establishes v1 frozen-forward feasibility only. Later v2 fine-tuning priority profiling passed on A100 80 GB and failed with CUDA out of memory on L40S; all-method batch feasibility remains open. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-gpu-profile.md and docs/protocol/v2-implementation-record.md.",
+          "waiverReason": "",
+          "decidedAt": "2026-09-16T16:41:15+00:00",
+          "version": 3
+        },
+        {
+          "id": "w01-gate-04",
+          "weekId": "week-01",
+          "position": 4,
+          "criterion": "Required BU governance determination is recorded.",
+          "required": true,
+          "state": "met",
+          "evidence": "Recorded 2026-09-24 on researcher confirmation: BU has issued the applicable human-subjects/data-governance determination. The researcher requested completion without attaching proof; no document attachment is required. This records the confirmation, not independent document verification or the institution's original decision date. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/compliance/computational-research-scope.md.",
+          "waiverReason": "",
+          "decidedAt": "2026-09-24T22:13:07+00:00",
+          "version": 3
+        }
+      ]
+    },
+    {
+      "id": "week-02",
+      "projectId": "pose-embed",
+      "number": 2,
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-27",
+      "phase": "Data",
+      "title": "Immutable data manifests",
+      "objective": "Create deterministic sample identities and split manifests that make class, exemplar, and synchronized-view leakage impossible.",
+      "deliverable": "Checksummed manifests for development, final training, anchors, and both novel-query definitions, plus a leakage audit.",
+      "risks": [
+        "NTU filename parsing mistakes can silently merge performances.",
+        "Synchronized cameras can leak the anchor performance into queries.",
+        "Upstream one-shot files may use a different action index convention."
+      ],
+      "advisorPrompt": "Does the primary deduplicated query definition answer the intended question while the exact-official query set preserves comparability?",
+      "reflection": "Week 2 technical deliverables are verified: the licensed HRNet aggregate yielded seven hash-bound manifests, independent byte-identical regeneration, zero forbidden overlap, and reproducible synchronized-view exclusions. The result-blind aggregate-aware input contract was adopted. Actual researcher minutes remain unreported, so the formal week is open and later week-state transitions are held by sequential closure.",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 2,
+      "tasks": [
+        {
+          "id": "w02-task-01",
+          "weekId": "week-02",
+          "position": 1,
+          "title": "Parse NTU sample identities",
+          "details": "Parse setup, camera, performer, replication, action, and body metadata from canonical filenames. Reject malformed and duplicate identifiers.",
+          "expectedOutput": "Tested parser and normalized sample inventory.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "done",
+          "completionNote": "Implemented a hash-before-deserialization NTU HRNet importer and canonical S/C/P/R/A parser. Normalized 113,945 unique usable samples with frame count, tensor shapes, pose-track count, and nonempty-track count; malformed identifiers, duplicate aliases, label disagreement, invalid body metadata, missing-listed overlap, and non-finite arrays are rejected.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md",
+          "completedAt": "2026-09-16T01:58:25+00:00",
+          "version": 2
+        },
+        {
+          "id": "w02-task-02",
+          "weekId": "week-02",
+          "position": 2,
+          "title": "Generate split manifests",
+          "details": "Generate the 80-class development train, 20-class class-disjoint validation, final 100-class train, official novel, anchor, deduplicated-primary query, and exact-official query manifests.",
+          "expectedOutput": "Seven deterministic, checksummed manifest files.",
+          "required": true,
+          "estimateMinutes": 180,
+          "state": "done",
+          "completionNote": "Generated seven immutable JSONL manifests from the locked class and exemplar policy: 76,013 development-train, 18,988 development-validation, 95,001 final-train, 18,944 official-novel, 20 anchor, 18,884 primary-query, and 18,924 exact-official-query records. The audit records every SHA-256 digest and generation input.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md",
+          "completedAt": "2026-09-16T01:58:25+00:00",
+          "version": 2
+        },
+        {
+          "id": "w02-task-03",
+          "weekId": "week-02",
+          "position": 3,
+          "title": "Prove leakage invariants",
+          "details": "Test class disjointness, anchor uniqueness, sample uniqueness, synchronized-performance exclusions, stable ordering, and complete file coverage.",
+          "expectedOutput": "Passing leakage and duplication test suite.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "done",
+          "completionNote": "Automated checks prove class disjointness, one anchor per novel class, source and manifest identity uniqueness, exact exclusion of 40 synchronized camera mates, stable ordering, and complete 113,945-sample source coverage. An independent regeneration was byte-identical to the published release bundle.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md",
+          "completedAt": "2026-09-16T01:58:25+00:00",
+          "version": 2
+        },
+        {
+          "id": "w02-task-04",
+          "weekId": "week-02",
+          "position": 4,
+          "title": "Publish the manifest audit",
+          "details": "Record counts by class and split, checksum every manifest, and explain every query excluded from the primary set.",
+          "expectedOutput": "Human-readable manifest audit report.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "done",
+          "completionNote": "Published a source-safe manifest audit with per-class counts, all manifest digests, body-metadata coverage, invariant results, and one explicit explanation for each of the 40 synchronized-view exclusions. The required result-blind amendment is explicitly scoped to both the 114,480-versus-113,945 count and aggregate-aware source verification.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md",
+          "completedAt": "2026-09-16T01:58:25+00:00",
+          "version": 2
+        }
+      ],
+      "gates": [
+        {
+          "id": "w02-gate-01",
+          "weekId": "week-02",
+          "position": 1,
+          "criterion": "All seven manifests have frozen counts and checksums.",
+          "required": true,
+          "state": "met",
+          "evidence": "Seven immutable release manifests have frozen counts and SHA-256 checksums for the verified 113,945-sample usable aggregate; the 535 official missing-skeleton exclusions account for all 114,480 nominal captures. Aggregate-aware physical-source verification and independent byte-identical regeneration passed. The researcher adopted the result-blind contract in https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/input-contract-amendment.v1.md; current protocol SHA-256: c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f. Manifest audit: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v2.md.",
+          "waiverReason": "",
+          "decidedAt": "2026-09-24T16:25:10+00:00",
+          "version": 4
+        },
+        {
+          "id": "w02-gate-02",
+          "weekId": "week-02",
+          "position": 2,
+          "criterion": "Automated checks find zero forbidden overlap or duplicate identities.",
+          "required": true,
+          "state": "met",
+          "evidence": "Verified 2026-09-15: automated construction-time and unit-test invariants found zero forbidden class, anchor/query, synchronized-performance, source-identity, or manifest-identity overlap; complete source coverage and byte-stable regeneration also passed. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md.",
+          "waiverReason": "",
+          "decidedAt": "2026-09-16T01:58:25+00:00",
+          "version": 2
+        },
+        {
+          "id": "w02-gate-03",
+          "weekId": "week-02",
+          "position": 3,
+          "criterion": "Every synchronized-view exclusion is reproducible from the manifest audit.",
+          "required": true,
+          "state": "met",
+          "evidence": "Verified 2026-09-15: the audit enumerates all 40 primary-query exclusions and derives each one as a synchronized camera mate sharing the anchor setup, performer, repetition, and action. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/ntu-manifest-audit.v1.md.",
+          "waiverReason": "",
+          "decidedAt": "2026-09-16T01:58:25+00:00",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "id": "week-03",
+      "projectId": "pose-embed",
+      "number": 3,
+      "startDate": "2026-09-28",
+      "endDate": "2026-10-04",
+      "phase": "Representation",
+      "title": "Frozen encoder and evaluator",
+      "objective": "Build a deterministic frozen MotionBERT feature path and independently verify historical one-shot and current v2 multi-positive retrieval behavior.",
+      "deliverable": "Repeatable clean auxiliary feature caches, independent retrieval and test-seal fixtures, and measured extraction cost.",
+      "risks": [
+        "The legacy upstream code assumes CUDA DataParallel and outdated dependencies.",
+        "Pooling or normalization drift can invalidate comparison with MotionBERT.",
+        "Feature caching without provenance can mix incompatible experiments."
+      ],
+      "advisorPrompt": "What further fine-tuning, quota, and full-roster measurements are needed before the v2 campaign can launch?",
+      "reflection": "All five Week 3 technical tasks and gates are verified complete as of 2026-09-28. SCC job 7761714, release b92e7dd88fc261c0b8585039fbe99ad67ee8b445, completed successfully on one L40S at 01:40:59Z. Fresh parity passed, both complete 95,001-row extractions were byte-identical, and all five final/development caches validated. The conservative full-input forecast is 44.12 minutes and 4.07 GiB per cache, with 3.63 GiB peak GPU and 7.65 GiB peak host memory; the declared storage reserve passed. Prior encoder and independent v1/v2 metric/test-seal evidence is preserved. BU determination remains confirmed, and both novel-test opening ledgers remained absent at the September 28 observation. Actual researcher minutes remain unreported; Week 3 stays formally open. The hosted Week 1 and 2 records were closed later on September 28 with zero minutes while their prior notes said time was unreported; those closures require researcher reconciliation and are not treated here as evidence of zero work. This completes Week 3 technical deliverables without claiming completion of the broader v2 study. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 6,
+      "tasks": [
+        {
+          "id": "w03-task-01",
+          "weekId": "week-03",
+          "position": 1,
+          "title": "Port minimal MotionBERT inference",
+          "details": "Adapt only the required encoder modules with upstream notices. Load the pinned checkpoint, set evaluation mode, and prove every encoder parameter is frozen.",
+          "expectedOutput": "Device-agnostic frozen encoder with attribution.",
+          "required": true,
+          "estimateMinutes": 150,
+          "state": "done",
+          "completionNote": "Reconciled 2026-09-27 from existing evidence. The strict checkpoint loader, attributed adapter and frozen/evaluation-mode MotionBERT path are implemented and tested. Real allocated-GPU upstream parity passed before the frozen development pilot in SCC job 7748366, release 0ef858379c36; both frozen methods completed 1,000 updates. This completes the encoder task, without claiming full-cache repeatability or a novel-test result. Evidence: docs/protocol/v2-implementation-record.md and the retained pilot parity/comparison records.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/d9b8fb4e490f0462a9e90c172e1294df33d3d8c9/docs/protocol/v2-implementation-record.md",
+          "completedAt": "2026-09-27T20:17:03.355233+00:00",
+          "version": 3
+        },
+        {
+          "id": "w03-task-02",
+          "weekId": "week-03",
+          "position": 2,
+          "title": "Build provenance-aware feature caching",
+          "details": "Cache features by data, manifest, model, checkpoint, preprocessing, corruption, and code hashes. Reject partial or mismatched caches.",
+          "expectedOutput": "Repeatable cache plus machine-readable provenance manifest.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "done",
+          "completionNote": "Verified 2026-09-28: SCC job 7761714 produced all five real float32 8,704-value caches: two 95,001-row final-training passes, 76,013 development-training rows, 20 clean gallery rows and 18,929 clean query rows. Each cache underwent full archive and provenance validation inside the job before its immutable sidecar was published. Independent post-run metadata and sidecar inspection confirmed counts, digests and bindings to source inputs, complete manifests and ordered samples, adopted protocol, checkpoint/upstream, code, locked environment, parity and artifact hashes. Existing incompatible-reuse tests pass. Full artifacts remain outside Git.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
+          "completedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 5
+        },
+        {
+          "id": "w03-task-03",
+          "weekId": "week-03",
+          "position": 3,
+          "title": "Implement retrieval evaluation",
+          "details": "Implement cosine ranking, top-1, MRR, and R@5. Verify ties and missing-relevant-item errors using hand-calculated fixtures.",
+          "expectedOutput": "Metric module with exact fixture tests.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "done",
+          "completionNote": "Verified 2026-09-24: ranks [1, 2, 6] produce top-1 1/3, MRR 5/9 and R@5 2/3. Tests cover stable exact ties, zero/nonfinite vectors, duplicate query IDs, missing relevant items and synchronized-view leakage. Fixed result-blind development episode generation is implemented. See docs/protocol/week-3-implementation.md.",
+          "evidenceUrl": null,
+          "completedAt": "2026-09-24T21:50:28Z",
+          "version": 2
+        },
+        {
+          "id": "w03-task-04",
+          "weekId": "week-03",
+          "position": 4,
+          "title": "Measure extraction reproducibility",
+          "details": "Run clean extraction twice, compare outputs, and record full-dataset runtime and storage projections.",
+          "expectedOutput": "Determinism report and remaining-compute forecast.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "done",
+          "completionNote": "Verified 2026-09-28: SCC job 7761714 completed on one scheduler-assigned L40S with failed=0 and exit_status=0 at 2026-09-28T01:40:59Z. Two fresh complete 95,001-row passes have identical feature arrays, NPZ bytes and sample-order hashes. The conservative 113,945-row forecast is 44.12 minutes and 4.07 GiB per cache; peak GPU memory is 3.63 GiB and peak host memory 7.65 GiB. Every declared extraction resource/reserve check passed. This completes the extraction evidence, not the full v2 study or weekly administrative closure.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
+          "completedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 5
+        },
+        {
+          "id": "w03-task-05",
+          "weekId": "week-03",
+          "position": 5,
+          "title": "Validate v2 retrieval and protocol transition",
+          "details": "Keep v1 fixture evidence. Independently test multi-positive relevance, self/synchronized-view exclusions, R@K, AP, mAP@R and dimension groups; verify the v2 gate prevents novel opening before all methods are complete.",
+          "expectedOutput": "New v2 correctness fixtures and sealed-test validation; no reuse of v1 completion as v2 completion.",
+          "required": true,
+          "estimateMinutes": 180,
+          "state": "done",
+          "completionNote": "Reconciled 2026-09-27 from the completed September 26 integration checks. V2 multi-positive relevance, self/synchronized-performance exclusions, Recall@K, AP/mAP/mAP@R, matched dimension groups and incomplete-roster/final-opening rejection are implemented and covered by the passing 791-test Python suite. PR #24 CI also passed. This is correctness and test-seal evidence, not completion of the 26-method GPU study or authorization to open novel data.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/d9b8fb4e490f0462a9e90c172e1294df33d3d8c9/docs/protocol/v2-implementation-record.md",
+          "completedAt": "2026-09-27T20:17:36.895845+00:00",
+          "version": 2
+        }
+      ],
+      "gates": [
+        {
+          "id": "w03-gate-01",
+          "weekId": "week-03",
+          "position": 1,
+          "criterion": "Two clean feature extractions are identical within the declared tolerance.",
+          "required": true,
+          "state": "met",
+          "evidence": "Verified 2026-09-28: two complete 95,001-row float32 extractions ran in distinct processes on the same L40S in SCC job 7761714. Exact feature-array equality, deterministic NPZ equality and ordered-sample equality passed. Both NPZ SHA-256 values are 43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d; repeatability report SHA-256 is 7cfdc738ccded6a371ab3739e9941b90359c0127bb1dd6a1e8a4a5dbb78cd214. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
+          "waiverReason": "",
+          "decidedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 3
+        },
+        {
+          "id": "w03-gate-02",
+          "weekId": "week-03",
+          "position": 2,
+          "criterion": "Hand-calculated top-1, MRR, and R@5 fixtures pass.",
+          "required": true,
+          "state": "met",
+          "evidence": "Verified 2026-09-24: tests/unit/test_evaluation.py checks ranks [1, 2, 6], top-1=1/3, MRR=5/9 and R@5=2/3, plus ties and invalid inputs. See docs/protocol/week-3-implementation.md.",
+          "waiverReason": "",
+          "decidedAt": "2026-09-24T21:50:28Z",
+          "version": 2
+        },
+        {
+          "id": "w03-gate-03",
+          "weekId": "week-03",
+          "position": 3,
+          "criterion": "Every cache contains complete provenance and incompatible reuse fails closed.",
+          "required": true,
+          "state": "met",
+          "evidence": "Verified 2026-09-28: SCC job 7761714 fully validated all five real final/development caches and their provenance before immutable sidecar publication. Independent post-run metadata, sidecar and repeatability inspection confirmed counts, digests and provenance bindings; it did not rerun the full archive validator. Rows are 95,001, 95,001, 76,013, 20 and 18,929, each with 8,704 float32 values. Provenance binds the adopted protocol, physical sources, complete manifest bundle, sample order, checkpoint/upstream, code, dependency lock, parity and archive hashes; existing tamper/incompatible-reuse checks pass. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
+          "waiverReason": "",
+          "decidedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 4
+        },
+        {
+          "id": "w03-gate-04",
+          "weekId": "week-03",
+          "position": 4,
+          "criterion": "Measured extraction time and storage fit the Week 3 limits.",
+          "required": true,
+          "state": "met",
+          "evidence": "Verified 2026-09-28: the slower complete run forecasts 2,647.44 seconds (44.12 minutes) for 113,945 rows with the declared 25% time margin, and 4.07 GiB per cache with the 10% storage margin. Peak GPU memory (larger allocated/reserved) is 3.63 GiB and peak host memory is 7.65 GiB. Runtime, cache storage, GPU memory, host memory and remaining-storage checks all passed; post-run project quota remained above the required 200 GiB reserve. These measurements establish Week 3 extraction feasibility only. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
+          "waiverReason": "",
+          "decidedAt": "2026-09-28T02:44:47.635174+00:00",
+          "version": 4
+        },
+        {
+          "id": "w03-gate-05",
+          "weekId": "week-03",
+          "position": 5,
+          "criterion": "V2 multi-positive retrieval and full-roster test-seal checks pass independently of the historical one-shot metric gate.",
+          "required": true,
+          "state": "met",
+          "evidence": "Reconciled 2026-09-27 from existing verified software evidence: the September 26 integrated suite passed 791 tests, and PR #24 CI passed. V2 retrieval fixtures cover multi-positive ranking, synchronized-performance/self exclusions and dimension groups; lock/evaluation fixtures reject incomplete method/seed sets and enforce final authorization before novel source loading. See tests/unit/test_benchmark_locks.py, tests/unit/test_benchmark_evaluation.py and docs/protocol/v2-implementation-record.md at merged commit d9b8fb4. This meets the v2 correctness/seal-check gate only; real full-cache gates remain pending.",
+          "waiverReason": "",
+          "decidedAt": "2026-09-27T20:18:45.499212+00:00",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "id": "week-04",
+      "projectId": "pose-embed",
+      "number": 4,
+      "startDate": "2026-10-05",
+      "endDate": "2026-10-11",
+      "phase": "Implementation and engineering",
+      "title": "Verified recipes and full pilots",
+      "objective": "Verify the three fixed recipes and the frozen-head path, then complete three full 20-epoch pilots under the immutable v3 design.",
+      "deliverable": "Loss fixtures, paired initialization/batch evidence, fresh parity and clean caches, and three complete pilot records with timing and diagnostics.",
+      "risks": [
+        "The v3 protocol, shared seal checks and all cache-affecting code must be frozen before fresh extraction.",
+        "A mathematical, nonfinite or collapse failure blocks selection; pilot accuracy cannot justify tuning recipes or duration."
+      ],
+      "advisorPrompt": "Do the mathematics, immutable inputs and complete pilot records demonstrate a valid fixed-budget comparison?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 3,
+      "tasks": [
+        {
+          "id": "w04-task-01",
+          "weekId": "week-04",
+          "position": 1,
+          "title": "Freeze and validate the v3 path",
+          "details": "Complete explicit v3 configuration/manifest validation, dataset-wide seal checks and auxiliary/novel source access separation. Register historical roots, preserve old artifacts, and freeze the complete design and cache-affecting code before extraction.",
+          "expectedOutput": "An immutable v3 design/pilot specification and passing version, provenance and seal checks.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w04-task-02",
+          "weekId": "week-04",
+          "position": 2,
+          "title": "Verify losses and paired training",
+          "details": "Check independent labeled forward/backward fixtures, the physical 8 × 4 sampler and shared initialization. Run the constructed 32-row learnable fixture for 1,000 updates per arm; require finite training and 100% self-excluded same-label retrieval.",
+          "expectedOutput": "Verified three-arm numerical behavior and paired initialization/batch hashes.",
+          "required": true,
+          "estimateMinutes": 180,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w04-task-03",
+          "weekId": "week-04",
+          "position": 3,
+          "title": "Generate fresh frozen features",
+          "details": "Create v3-bound manifests with unchanged sample identities; run encoder parity and two fresh-process all-auxiliary extractions on the same GPU. Retain both repeats and development train/gallery/query caches with hashes.",
+          "expectedOutput": "Fresh v3 parity/repeatability evidence and five immutable clean feature caches.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w04-task-04",
+          "weekId": "week-04",
+          "position": 4,
+          "title": "Run three complete engineering pilots",
+          "details": "Run Contrastive, Contextual and SupCon for 20 epochs at seed 7 and rate 3e-4. Preserve epoch-5/10/15/20 checkpoints and complete clean scores plus epoch-zero diagnostics, finite/collapse checks and measured timing/memory/bytes.",
+          "expectedOutput": "Three valid full pilots, ineligible for learning-rate selection, with complete diagnostic evidence.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        }
+      ],
+      "gates": [
+        {
+          "id": "w04-gate-01",
+          "weekId": "week-04",
+          "position": 1,
+          "criterion": "The complete v3 design and cache-affecting release are frozen; source identities are preserved and historical seal audits are resolved.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w04-gate-02",
+          "weekId": "week-04",
+          "position": 2,
+          "criterion": "All three losses pass independent numerical and learnable-fixture checks; initialization and physical batch plans pair exactly.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w04-gate-03",
+          "weekId": "week-04",
+          "position": 3,
+          "criterion": "Fresh parity/repeatability checks and all three 20-epoch pilots pass with four immutable checkpoint/score records each.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        }
+      ]
+    },
+    {
+      "id": "week-05",
+      "projectId": "pose-embed",
+      "number": 5,
+      "startDate": "2026-10-12",
+      "endDate": "2026-10-18",
+      "phase": "Preselection go/no-go",
+      "title": "Corruptions, analysis and capacity",
+      "objective": "Complete every scientific and measured resource prerequisite for the October 18 selection decision.",
+      "deliverable": "Nine verified development corruption paths, fixed analysis fixtures and an immutable go/no-go report against the unchanged v3 protocol digest.",
+      "risks": [
+        "The September 29 quota observation is 41.95 GB short of the initial storage requirement; new measurements and authorized capacity are required.",
+        "The inherited time estimates do not establish available hours; full pipeline timings and an allocation calendar must support the deadline."
+      ],
+      "advisorPrompt": "Do all October 18 validity, seal, storage, runtime and researcher-availability criteria pass without changing the declared study?",
+      "reflection": "",
+      "plannedMinutes": 300,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 3,
+      "tasks": [
+        {
+          "id": "w05-task-01",
+          "weekId": "week-05",
+          "position": 1,
+          "title": "Audit nested corruptions and fallback",
+          "details": "Verify shared jitter fields, nested joint/frame masks, exact missingness and severity-zero identity on a fixed development panel. Freeze the training-only torso fallback and report its source IDs, value and effective damage evidence.",
+          "expectedOutput": "A deterministic geometry audit and bound fallback evidence for all nine conditions.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w05-task-02",
+          "weekId": "week-05",
+          "position": 2,
+          "title": "Complete full development corruption paths",
+          "details": "Run all nine full-size development query paths and retain artifacts. Time maximum severity per family through provenance checks, preprocessing, encoding, storage, projection of all three pilot heads and retrieval. Scores cannot select recipes or settings.",
+          "expectedOutput": "Complete identities/invariants for nine conditions and measured end-to-end family timings.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w05-task-03",
+          "weekId": "week-05",
+          "position": 3,
+          "title": "Verify the fixed analysis",
+          "details": "Use hand-ranked and unequal-view fixtures to verify query weighting, within-action performance-cluster draws, fixed seeds, percentile intervals and leave-one-action-out with an unchanged gallery. Freeze analysis code before selection.",
+          "expectedOutput": "Reproducible metric and conditional-bootstrap fixtures bound to the v3 analysis.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 4
+        },
+        {
+          "id": "w05-task-04",
+          "weekId": "week-05",
+          "position": 4,
+          "title": "Record the October 18 go/no-go",
+          "details": "Combine valid pilots, seal audits and full pipeline timing with final-size memory evidence, an allocation calendar and researcher-confirmed hours. Require available bytes ≥ 200 × 2^30 + 1.25 × remaining peak bytes; apply at least 25% work slack plus queue/setup time. Resolve the initial 41.95 GB gap and append selection authorization against the unchanged digest, or stop for an amendment.",
+          "expectedOutput": "A measured capacity/availability report and explicit pass or documented blocked-study amendment.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        }
+      ],
+      "gates": [
+        {
+          "id": "w05-gate-01",
+          "weekId": "week-05",
+          "position": 1,
+          "criterion": "All nine development conditions pass nesting, fallback, identity, deterministic-output and full pipeline checks.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w05-gate-02",
+          "weekId": "week-05",
+          "position": 2,
+          "criterion": "The predeclared conditional analysis is tested; all three pilots and historical seal audits remain valid under the unchanged protocol digest.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w05-gate-03",
+          "weekId": "week-05",
+          "position": 3,
+          "criterion": "The October 18 schedule, storage and availability report passes and authorizes selection; otherwise no sweep starts.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 4
+        }
+      ]
+    },
+    {
+      "id": "week-06",
+      "projectId": "pose-embed",
+      "number": 6,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-25",
+      "phase": "Clean development selection",
+      "title": "Launch the paired selection matrix",
+      "objective": "Start the equal attempted budget of 27 fresh development runs after the October 18 authorization.",
+      "deliverable": "Immutable attempts for three arms, three learning rates and three seeds, with clean epoch-20 development metrics.",
+      "risks": [
+        "A candidate requires three valid seeds; partial-seed averages cannot compete.",
+        "Infrastructure retries preserve identical settings in new attempt directories and consume forecast capacity."
+      ],
+      "advisorPrompt": "Is every selection attempt authorized, paired, complete at 20 epochs and evaluated only on clean development data?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 3,
+      "tasks": [
+        {
+          "id": "w06-task-01",
+          "weekId": "week-06",
+          "position": 1,
+          "title": "Verify selection authorization",
+          "details": "Check the unchanged v3 digest, complete pilot/corruption/analysis evidence, historical seal audit and measured capacity decision before the first selection job.",
+          "expectedOutput": "A verified immutable selection authorization and exact 27-run attempt matrix.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w06-task-02",
+          "weekId": "week-06",
+          "position": 2,
+          "title": "Run the first selection allocations",
+          "details": "Schedule fresh 20-epoch runs for each arm at 1e-4, 3e-4 and 1e-3 with seeds 7, 17 and 29. Reuse paired initialization and physical batch plans within each seed; respect measured GPU, memory, wall-time and storage limits.",
+          "expectedOutput": "Completed authorized selection attempts with paired hashes and epoch-20 checkpoints.",
+          "required": true,
+          "estimateMinutes": 300,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w06-task-03",
+          "weekId": "week-06",
+          "position": 3,
+          "title": "Score clean development endpoints",
+          "details": "Evaluate complete clean development top-1 and MRR at epoch 20 with the fixed gallery/query lists and tie order. Exclude pilot weights and corrupted scores from ranking.",
+          "expectedOutput": "Unrounded clean endpoint metrics with checkpoint and input provenance.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w06-task-04",
+          "weekId": "week-06",
+          "position": 4,
+          "title": "Maintain the attempt and capacity ledger",
+          "details": "Retain successes, partial outputs and failures. Retry only identical infrastructure-failed attempts from scratch; record updated measured bytes and remaining-work forecasts.",
+          "expectedOutput": "A current immutable attempt ledger with all failures and current capacity checks.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        }
+      ],
+      "gates": [
+        {
+          "id": "w06-gate-01",
+          "weekId": "week-06",
+          "position": 1,
+          "criterion": "All launched runs match the declared matrix and use paired seeds, initialization and physical batch plans.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w06-gate-02",
+          "weekId": "week-06",
+          "position": 2,
+          "criterion": "Selection scores use only complete clean epoch-20 development evaluations; pilots and corrupted scores cannot select configurations.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w06-gate-03",
+          "weekId": "week-06",
+          "position": 3,
+          "criterion": "Every attempt and failure is retained, and current allocation/memory/storage limits pass.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        }
+      ]
+    },
+    {
+      "id": "week-07",
+      "projectId": "pose-embed",
+      "number": 7,
+      "startDate": "2026-10-26",
+      "endDate": "2026-11-01",
+      "phase": "Clean development selection",
+      "title": "Complete selection and lock rates",
+      "objective": "Finish all 27 declared selection attempts and lock one valid rate per arm using the exact ranking rule.",
+      "deliverable": "A complete selection ledger and timestamped three-recipe selection decision by November 1.",
+      "risks": [
+        "A numerical failure makes a candidate ineligible until resolved; each selected candidate needs all three valid seeds.",
+        "An arm with no valid candidate requires a result-blind amendment, not an alternate recipe or reduced seed count."
+      ],
+      "advisorPrompt": "Can an independent replay reproduce every selected rate from the complete unrounded clean development records?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 4,
+      "tasks": [
+        {
+          "id": "w07-task-01",
+          "weekId": "week-07",
+          "position": 1,
+          "title": "Finish the declared selection matrix",
+          "details": "Complete and account for every arm × rate × seed attempt at 20 epochs. Preserve all numerical failures and identical infrastructure retries; never silently omit a setting or replace its budget.",
+          "expectedOutput": "A complete 27-setting attempt ledger with valid-run and failure status.",
+          "required": true,
+          "estimateMinutes": 240,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w07-task-02",
+          "weekId": "week-07",
+          "position": 2,
+          "title": "Reproduce candidate ranking",
+          "details": "Within each arm rank eligible three-seed candidates by mean epoch-20 clean top-1, then mean MRR, then lower learning rate, using unrounded metrics. Report unequal numbers of eligible candidates.",
+          "expectedOutput": "An independently reproducible candidate table with tie and eligibility decisions.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w07-task-03",
+          "weekId": "week-07",
+          "position": 3,
+          "title": "Lock the selected configurations",
+          "details": "Bind the three selected rates, full evidence, attempt provenance and timestamp to the unchanged protocol. If any arm has no valid candidate, stop and document the amendment.",
+          "expectedOutput": "A timestamped selection lock for all three recipes, or an explicit blocker.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w07-task-04",
+          "weekId": "week-07",
+          "position": 4,
+          "title": "Prepare all-auxiliary final training",
+          "details": "Verify the fresh 95,001-row v3 cache and generate paired all-100-action batch plans and initial states for seeds 7, 17 and 29. Recheck capacity and complete-run allocation limits.",
+          "expectedOutput": "Nine fresh final-run specifications and updated capacity evidence.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        }
+      ],
+      "gates": [
+        {
+          "id": "w07-gate-01",
+          "weekId": "week-07",
+          "position": 1,
+          "criterion": "All 27 declared selection settings have an accounted attempt; every selected candidate has three valid seeds.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w07-gate-02",
+          "weekId": "week-07",
+          "position": 2,
+          "criterion": "The three selected rates reproduce under the exact unrounded ranking rule and are immutably recorded before final training.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 4
+        },
+        {
+          "id": "w07-gate-03",
+          "weekId": "week-07",
+          "position": 3,
+          "criterion": "Final training inputs, paired plans and allocation/capacity checks pass for all nine fresh heads.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        }
+      ]
+    },
+    {
+      "id": "week-08",
+      "projectId": "pose-embed",
+      "number": 8,
+      "startDate": "2026-11-02",
+      "endDate": "2026-11-08",
+      "phase": "Fresh final training",
+      "title": "Train the nine final heads",
+      "objective": "Train the selected recipes from fresh paired initialization on all 100 auxiliary actions.",
+      "deliverable": "Authorized final training attempts toward nine 20-epoch heads with immutable provenance and epoch-20 weights.",
+      "risks": [
+        "Development or pilot heads cannot be reused as final heads.",
+        "Complete runs must fit approved allocations; partial attempts remain retained and cannot become resumable selection shortcuts."
+      ],
+      "advisorPrompt": "Are the final heads fresh, paired and bound to the selected clean-development recipes and all-auxiliary data?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 3,
+      "tasks": [
+        {
+          "id": "w08-task-01",
+          "weekId": "week-08",
+          "position": 1,
+          "title": "Validate all-auxiliary inputs",
+          "details": "Revalidate source/checkpoint hashes, all 95,001 sample identities, fresh cache sidecars and locked selected rates before final training.",
+          "expectedOutput": "A verified final-input and configuration manifest.",
+          "required": true,
+          "estimateMinutes": 300,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w08-task-02",
+          "weekId": "week-08",
+          "position": 2,
+          "title": "Train paired final recipes",
+          "details": "Run Contrastive, Contextual and SupCon for 20 epochs with seeds 7, 17 and 29 on all 100 auxiliary actions. Pair head initialization and physical batch plans; retain only the prescribed epoch-20 final choice.",
+          "expectedOutput": "Immutable final attempts with exact 59,380 updates per complete head.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w08-task-03",
+          "weekId": "week-08",
+          "position": 3,
+          "title": "Record final health and cost",
+          "details": "Preserve finite-parameter checks, normalization diagnostics, timing, memory, saved bytes, initialization/batch hashes and the complete attempt history. Do not inspect novel inputs or outcomes.",
+          "expectedOutput": "Per-head health, pairing, cost and provenance records.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w08-task-04",
+          "weekId": "week-08",
+          "position": 4,
+          "title": "Review remaining final workload",
+          "details": "Track remaining heads against the measured allocation calendar and capacity formula, retaining failed outputs and at least 25% remaining-work slack.",
+          "expectedOutput": "An updated remaining-work forecast that preserves the final-lock deadline.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        }
+      ],
+      "gates": [
+        {
+          "id": "w08-gate-01",
+          "weekId": "week-08",
+          "position": 1,
+          "criterion": "Every final attempt begins fresh and matches its selected rate, all-100-action inputs, paired seed and 20-epoch budget.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w08-gate-02",
+          "weekId": "week-08",
+          "position": 2,
+          "criterion": "All completed heads have immutable epoch-20 checkpoints and valid health, pairing and provenance evidence.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w08-gate-03",
+          "weekId": "week-08",
+          "position": 3,
+          "criterion": "Novel retrieval inputs and outcomes remain sealed while final training and any identical retries continue.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        }
+      ]
+    },
+    {
+      "id": "week-09",
+      "projectId": "pose-embed",
+      "number": 9,
+      "startDate": "2026-11-09",
+      "endDate": "2026-11-15",
+      "phase": "Fresh final training",
+      "title": "Complete and verify final heads",
+      "objective": "Finish and independently verify all nine final heads by November 15.",
+      "deliverable": "Nine valid final checkpoints and complete final-run evidence ready for independent lock audit.",
+      "risks": [
+        "One missing or invalid required head blocks final opening.",
+        "Corrections before opening require a dated result-blind decision and rerunning all affected comparisons."
+      ],
+      "advisorPrompt": "Are all nine heads complete, correctly paired and independently verifiable without any novel-data access?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 3,
+      "tasks": [
+        {
+          "id": "w09-task-01",
+          "weekId": "week-09",
+          "position": 1,
+          "title": "Complete remaining final attempts",
+          "details": "Finish all three recipes × three seeds on all 95,001 auxiliary rows. Retain every prior attempt and restart infrastructure failures only with identical inputs and settings.",
+          "expectedOutput": "All nine complete 20-epoch final heads or a visible blocker.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w09-task-02",
+          "weekId": "week-09",
+          "position": 2,
+          "title": "Audit checkpoint and manifest integrity",
+          "details": "Verify every checkpoint hash, source/input contract, protocol/config/code/dependency binding, paired initialization/batches and exact update count. Confirm pilot and development heads are absent from the final set.",
+          "expectedOutput": "A complete nine-head integrity and provenance report.",
+          "required": true,
+          "estimateMinutes": 240,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w09-task-03",
+          "weekId": "week-09",
+          "position": 3,
+          "title": "Build the final evaluation manifest",
+          "details": "Freeze clean gallery order and exact primary/exact-official query lists from metadata. Declare all three methods × three seeds × ten conditions × two query definitions and every expected artifact role.",
+          "expectedOutput": "A fixed 180-cell evaluation matrix with exact ordered identities and role contracts.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w09-task-04",
+          "weekId": "week-09",
+          "position": 4,
+          "title": "Confirm the audit schedule",
+          "details": "Reserve November 16-29 for independent evaluator/run-set/lock checks, report templates and recovery. Update allocation and storage forecasts before any opening decision.",
+          "expectedOutput": "A feasible final-audit and evaluation calendar with recorded capacity evidence.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        }
+      ],
+      "gates": [
+        {
+          "id": "w09-gate-01",
+          "weekId": "week-09",
+          "position": 1,
+          "criterion": "All nine final heads are complete and valid at epoch 20, with no selected checkpoint or configuration dependent on novel outcomes.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w09-gate-02",
+          "weekId": "week-09",
+          "position": 2,
+          "criterion": "The exact query/gallery identities and 180 unique evaluation cells are fixed and cross-bound to the complete final-run set.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w09-gate-03",
+          "weekId": "week-09",
+          "position": 3,
+          "criterion": "The independent audit and evaluation schedule preserves November 29 locks, December 6 results and December 7-18 delivery work.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        }
+      ]
+    },
+    {
+      "id": "week-10",
+      "projectId": "pose-embed",
+      "number": 10,
+      "startDate": "2026-11-16",
+      "endDate": "2026-11-22",
+      "phase": "Independent audit and final locks",
+      "title": "Audit the evaluator and final run set",
+      "objective": "Independently validate final provenance, authorization and result completeness using development evidence.",
+      "deliverable": "A reviewed final-run set, evaluator/analysis verification and report/figure templates prepared without novel outcomes.",
+      "risks": [
+        "Novel loader authorization must precede deserialization; shared dataset seals cannot be bypassed by legacy commands or namespaces.",
+        "A changed protocol digest or cache-affecting defect invalidates affected artifacts and requires documented rework."
+      ],
+      "advisorPrompt": "Can the complete final campaign be authorized and reproduced without bypassing seal, identity or provenance checks?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 3,
+      "tasks": [
+        {
+          "id": "w10-task-01",
+          "weekId": "week-10",
+          "position": 1,
+          "title": "Audit the evaluator end to end",
+          "details": "Verify hand-ranked metrics, deterministic ties, both query definitions, cache subset identity, all-head projection and the expected 180-cell completeness rules using permitted fixtures and development data.",
+          "expectedOutput": "An independent evaluator and completeness-verifier report.",
+          "required": true,
+          "estimateMinutes": 150,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w10-task-02",
+          "weekId": "week-10",
+          "position": 2,
+          "title": "Verify dataset-wide opening controls",
+          "details": "Test cross-version denial, historical-root audit resolution, authorization before novel loading, concurrent first-opening behavior and fail-closed recovery of partial opening transactions.",
+          "expectedOutput": "Passing v1/v2/v3 seal and first-opening safety checks.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w10-task-03",
+          "weekId": "week-10",
+          "position": 3,
+          "title": "Audit and assemble final locks",
+          "details": "Cross-check nine final heads, selected settings, exact IDs, source/checkpoint/input hashes, code/dependency hashes and the evaluation plan before recording the researcher-controlled final lock.",
+          "expectedOutput": "An independently checked complete final-run set and staged final-lock evidence.",
+          "required": true,
+          "estimateMinutes": 150,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w10-task-04",
+          "weekId": "week-10",
+          "position": 4,
+          "title": "Prepare report and figure templates",
+          "details": "Rehearse clean/corrupted accuracy, degradation, conditional intervals, seed/cell/leave-one-action-out tables and costs from development or fixture records. Mark examples as non-final.",
+          "expectedOutput": "Reproducible report/figure templates ready for locked final results.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        }
+      ],
+      "gates": [
+        {
+          "id": "w10-gate-01",
+          "weekId": "week-10",
+          "position": 1,
+          "criterion": "The evaluator, role-specific caches, metrics and 180-cell verifier pass independent development/fixture checks.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w10-gate-02",
+          "weekId": "week-10",
+          "position": 2,
+          "criterion": "Shared seal enforcement and authorization-before-loading checks pass across all scientific entrypoints.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w10-gate-03",
+          "weekId": "week-10",
+          "position": 3,
+          "criterion": "The final-run set and lock dependencies cross-bind all nine heads, exact identities and unchanged scientific settings.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        }
+      ]
+    },
+    {
+      "id": "week-11",
+      "projectId": "pose-embed",
+      "number": 11,
+      "startDate": "2026-11-23",
+      "endDate": "2026-11-29",
+      "phase": "Independent audit and final locks",
+      "title": "Finish locks and preserve recovery time",
+      "objective": "Complete all final-head and lock audits by November 29 while preserving Thanksgiving as recovery time.",
+      "deliverable": "A complete final authorization package and current capacity/seal evidence for the following week’s single novel campaign.",
+      "risks": [
+        "Reaching the date does not authorize opening; every final dependency and current resource check must pass.",
+        "Thanksgiving is recovery capacity, not permission to compress or skip independent verification."
+      ],
+      "advisorPrompt": "Are all nine heads and every opening prerequisite verified, with sufficient current capacity for the complete campaign?",
+      "reflection": "",
+      "plannedMinutes": 240,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 3,
+      "tasks": [
+        {
+          "id": "w11-task-01",
+          "weekId": "week-11",
+          "position": 1,
+          "title": "Resolve pre-opening audit findings",
+          "details": "Correct verified pre-opening defects through documented result-blind decisions, rerunning all affected artifacts/comparisons where required. Preserve superseded evidence.",
+          "expectedOutput": "An audit ledger with no unresolved final-opening blocker.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w11-task-02",
+          "weekId": "week-11",
+          "position": 2,
+          "title": "Complete final locks by November 29",
+          "details": "Bind the nine checkpoints/run manifests, selected configurations, exact gallery/query lists, evaluation plan and source/protocol/code dependencies in the complete final lock. Confirm no scientific training remains active.",
+          "expectedOutput": "The complete immutable final lock and final-run-set record.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w11-task-03",
+          "weekId": "week-11",
+          "position": 3,
+          "title": "Repeat seal and capacity audits",
+          "details": "Recheck every registered historical root and release, filesystem/quota limits, forecast remaining peak bytes, allocation and opening recovery procedure. A missing or unreadable root blocks opening.",
+          "expectedOutput": "Current resolved seal and capacity reports for the authorized source.",
+          "required": true,
+          "estimateMinutes": 30,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w11-task-04",
+          "weekId": "week-11",
+          "position": 4,
+          "title": "Preserve recovery and handoff readiness",
+          "details": "Use the reduced Thanksgiving work budget for required recovery and rehearse the authorized campaign checklist. If prerequisites cannot pass, keep the seal and record a dated blocker/amendment.",
+          "expectedOutput": "A ready or explicitly blocked evaluation handoff with no invented completion.",
+          "required": true,
+          "estimateMinutes": 30,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        }
+      ],
+      "gates": [
+        {
+          "id": "w11-gate-01",
+          "weekId": "week-11",
+          "position": 1,
+          "criterion": "All nine final heads and the complete final lock are verified by November 29; no scientific training is active.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w11-gate-02",
+          "weekId": "week-11",
+          "position": 2,
+          "criterion": "Current historical-root, source, allocation and storage checks pass for the entire final evaluation campaign.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w11-gate-03",
+          "weekId": "week-11",
+          "position": 3,
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 2,
+          "criterion": "The novel test remains unopened until the single authorized campaign; unresolved requirements are visible blockers."
+        }
+      ]
+    },
+    {
+      "id": "week-12",
+      "projectId": "pose-embed",
+      "number": 12,
+      "startDate": "2026-11-30",
+      "endDate": "2026-12-06",
+      "phase": "Authorized novel evaluation",
+      "title": "Open once and evaluate all 180 cells",
+      "objective": "Run one fully authorized novel extraction and evaluation campaign by December 6.",
+      "deliverable": "All 180 unique finite provenance-valid result cells and locked per-query ranks, with every operational attempt retained.",
+      "risks": [
+        "Opening is irreversible: a failed process does not reseal data or permit new training and selection.",
+        "Missing or invalid cells block a complete report; post-opening corrections require explicit deviation reporting."
+      ],
+      "advisorPrompt": "Does every required final cell reproduce from the same authorized source, opening, protocol, caches and checkpoint set?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 4,
+      "tasks": [
+        {
+          "id": "w12-task-01",
+          "weekId": "week-12",
+          "position": 1,
+          "title": "Validate and atomically authorize opening",
+          "details": "Revalidate all lock bindings and prior ledgers, confirm no training is active, and recheck capacity. Atomically record the shared dataset opening and v3 authorization before invoking the novel annotation loader.",
+          "expectedOutput": "One immutable dataset-opening event bound to the complete v3 final lock.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w12-task-02",
+          "weekId": "week-12",
+          "position": 2,
+          "title": "Extract the final novel conditions",
+          "details": "Encode one clean gallery and the novel query union for clean plus nine corruptions. Export two immutable role-specific query caches per condition and verify that primary rows are the exact ordered subset of exact-official rows.",
+          "expectedOutput": "Authorized deterministic caches for both query definitions with complete corruption and source provenance.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w12-task-03",
+          "weekId": "week-12",
+          "position": 3,
+          "title": "Evaluate all heads and cells",
+          "details": "Apply all nine final heads to the clean gallery and every query role/condition. Produce top-1, MRR, R@5 and per-query ranks for three methods × three seeds × ten conditions × two query definitions.",
+          "expectedOutput": "180 unique finite result cells and their checkpoint-bound per-query evidence.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w12-task-04",
+          "weekId": "week-12",
+          "position": 4,
+          "title": "Verify campaign completeness",
+          "details": "Independently regenerate cell metrics from ranks, validate every cross-binding and retain all failures/retries. Retry only the identical authorized operations; preserve any post-opening defect as a disclosed limitation.",
+          "expectedOutput": "A complete final evaluation audit or an explicit incomplete/deviation record.",
+          "required": true,
+          "estimateMinutes": 150,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 4
+        }
+      ],
+      "gates": [
+        {
+          "id": "w12-gate-01",
+          "weekId": "week-12",
+          "position": 1,
+          "criterion": "The immutable dataset opening precedes all novel loading and binds the complete final authorization.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w12-gate-02",
+          "weekId": "week-12",
+          "position": 2,
+          "criterion": "All 180 required result cells are finite, unique, provenance-valid and reproducible from locked per-query evidence.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w12-gate-03",
+          "weekId": "week-12",
+          "position": 3,
+          "criterion": "No scientific training/selection occurs after opening; all operational attempts and any deviations remain visible.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 4
+        }
+      ]
+    },
+    {
+      "id": "week-13",
+      "projectId": "pose-embed",
+      "number": 13,
+      "startDate": "2026-12-07",
+      "endDate": "2026-12-13",
+      "phase": "Analysis and communication",
+      "title": "Analyze and report the declared study",
+      "objective": "Produce the conditional primary analysis and complete descriptive report with accurate recipe-level claims.",
+      "deliverable": "Reproducible conditional interval, absolute accuracy/degradation curves, seed/cell/action sensitivities, resource tables and report/poster draft.",
+      "risks": [
+        "Less degradation can coexist with lower absolute corrupted accuracy; both must be reported.",
+        "The interval is conditional on fixed heads, seeds, actions, anchors and corruptions, and cannot support universal robustness or a contextual-term-only causal claim."
+      ],
+      "advisorPrompt": "Do the claims follow the single prespecified interval rule while showing absolute performance, uncertainty limits and all required descriptive results?",
+      "reflection": "",
+      "plannedMinutes": 480,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 4,
+      "tasks": [
+        {
+          "id": "w13-task-01",
+          "weekId": "week-13",
+          "position": 1,
+          "title": "Compute the locked primary analysis",
+          "details": "Run 10,000 within-action performance-cluster bootstrap replicates with fixed seeds/actions and query-weighted multiplicities. Report Delta and its 95% percentile interval; claim smaller degradation only if the upper bound is below zero.",
+          "expectedOutput": "A reproducible conditional primary estimate/interval and positive, null or contrary conclusion.",
+          "required": true,
+          "estimateMinutes": 180,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 4
+        },
+        {
+          "id": "w13-task-02",
+          "weekId": "week-13",
+          "position": 2,
+          "title": "Publish complete descriptive results",
+          "details": "Show clean and absolute corrupted accuracy, Contextual-minus-Contrastive corrupted differences, every seed/cell effect, SupCon, exact-official results and 20 leave-one-action-out sensitivities with a fixed gallery.",
+          "expectedOutput": "All prespecified tables and curves, including sign changes and conditional limits.",
+          "required": true,
+          "estimateMinutes": 120,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 4
+        },
+        {
+          "id": "w13-task-03",
+          "weekId": "week-13",
+          "position": 3,
+          "title": "Write the report and poster",
+          "details": "Explain the frozen encoder, fixed transfer recipes, nested synthetic corruptions, selection, test seal, resource costs and retained failures. State that margins/regularization are part of the recipe and that v3 does not complete the v2 benchmark.",
+          "expectedOutput": "A report/poster draft with claims traceable to locked evidence and honest scope limits.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w13-task-04",
+          "weekId": "week-13",
+          "position": 4,
+          "title": "Regenerate figures and resolve review findings",
+          "details": "Reproduce every table and figure from immutable ranks/manifests, resolve presentation/reproducibility defects and explicitly label any post-opening scientific deviation.",
+          "expectedOutput": "A reviewed reproduction log and permitted compact final evidence package.",
+          "required": true,
+          "estimateMinutes": 90,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 4
+        }
+      ],
+      "gates": [
+        {
+          "id": "w13-gate-01",
+          "weekId": "week-13",
+          "position": 1,
+          "criterion": "The conditional primary interval and all prespecified descriptive outputs regenerate from the locked records.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w13-gate-02",
+          "weekId": "week-13",
+          "position": 2,
+          "criterion": "The confirmatory statement follows the upper-bound-below-zero rule; absolute accuracy and recipe-level/conditional limitations accompany it.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 4
+        },
+        {
+          "id": "w13-gate-03",
+          "weekId": "week-13",
+          "position": 3,
+          "criterion": "The report includes all methods, seeds, cells, costs and failures without outcome-driven omissions or new superiority tests.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        }
+      ]
+    },
+    {
+      "id": "week-14",
+      "projectId": "pose-embed",
+      "number": 14,
+      "startDate": "2026-12-14",
+      "endDate": "2026-12-18",
+      "phase": "Delivery and archive",
+      "title": "Deliver and archive the December study",
+      "objective": "Deliver the final report/poster and recoverable permitted evidence by December 18.",
+      "deliverable": "Final report/poster, independent reproduction smoke test, public-safe archive and reconciled tracker; if blocked, an explicit incomplete-study record.",
+      "risks": [
+        "Licensed data, checkpoints, caches, full artifacts and private governance records must remain outside Git and public exports.",
+        "A blocked or incomplete campaign cannot be presented as a completed empirical comparison."
+      ],
+      "advisorPrompt": "Can a reader reproduce every permitted result and distinguish completed evidence, limitations and any unresolved work?",
+      "reflection": "",
+      "plannedMinutes": 240,
+      "actualMinutes": 0,
+      "state": "planned",
+      "closedAt": null,
+      "version": 3,
+      "tasks": [
+        {
+          "id": "w14-task-01",
+          "weekId": "week-14",
+          "position": 1,
+          "title": "Run the independent reproduction smoke test",
+          "details": "Reproduce permitted summaries and report outputs from the locked evidence, verify artifact references and document software/hardware requirements and operational limitations.",
+          "expectedOutput": "An independent reproduction record for the final deliverables.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w14-task-02",
+          "weekId": "week-14",
+          "position": 2,
+          "title": "Finalize the report and poster",
+          "details": "Deliver the December report/poster with the full primary/descriptive results, recipe-level interpretation, conditional uncertainty, failures, costs and limitations. If the campaign is blocked, state the missing evidence and amendment explicitly.",
+          "expectedOutput": "Final report/poster or an honest dated blocked-study report.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w14-task-03",
+          "weekId": "week-14",
+          "position": 3,
+          "title": "Archive permitted material",
+          "details": "Preserve source, versioned configs, manifests, compact summaries, license notices and reproduction instructions. Keep historical artifacts recoverable without overwriting them and exclude licensed/private material from Git.",
+          "expectedOutput": "A recoverable license-safe release and evidence index.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w14-task-04",
+          "weekId": "week-14",
+          "position": 4,
+          "title": "Reconcile and export the tracker",
+          "details": "Verify live website, fallback, protocol and schedule consistency; preserve hosted evidence/versions and closed-week history. Record actual time only when supplied by the researcher and export only public-safe fields.",
+          "expectedOutput": "A verified public tracker/export and researcher-supplied retrospective/time record where available.",
+          "required": true,
+          "estimateMinutes": 60,
+          "state": "todo",
+          "completionNote": "",
+          "evidenceUrl": null,
+          "completedAt": null,
+          "version": 3
+        }
+      ],
+      "gates": [
+        {
+          "id": "w14-gate-01",
+          "weekId": "week-14",
+          "position": 1,
+          "criterion": "The final report/poster and required outputs are delivered by December 18, or the incomplete study and dated amendment are explicitly recorded.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w14-gate-02",
+          "weekId": "week-14",
+          "position": 2,
+          "criterion": "All nine final heads, 180 cells and declared analyses are independently evidenced before claiming empirical completion.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w14-gate-03",
+          "weekId": "week-14",
+          "position": 3,
+          "criterion": "Source, permitted evidence and reproduction instructions are recoverable and exclude licensed/private material.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        },
+        {
+          "id": "w14-gate-04",
+          "weekId": "week-14",
+          "position": 4,
+          "criterion": "The live tracker/export matches v3 while preserving historical progress and actual hours without invented completions.",
+          "required": true,
+          "state": "pending",
+          "evidence": "",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 3
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "source-contextual",
+      "title": "Supervised Metric Learning to Rank for Retrieval via Contextual Similarity Optimization",
+      "authors": "Liao et al.",
+      "year": 2023,
+      "canonicalUrl": "https://proceedings.mlr.press/v202/liao23b.html",
+      "purpose": "Defines the contextual objective, controlled metric-learning comparisons, and the limits of the original robustness evidence.",
+      "verifiedAt": "2026-09-06",
+      "version": 1
+    },
+    {
+      "id": "source-motionbert",
+      "title": "MotionBERT: A Unified Perspective on Learning Human Motion Representations",
+      "authors": "Zhu et al.",
+      "year": 2023,
+      "canonicalUrl": "https://openaccess.thecvf.com/content/ICCV2023/html/Zhu_MotionBERT_A_Unified_Perspective_on_Learning_Human_Motion_Representations_ICCV_2023_paper.html",
+      "purpose": "Specifies the pretrained pose encoder and its NTU RGB+D 120 one-shot evaluation context.",
+      "verifiedAt": "2026-09-06",
+      "version": 1
+    },
+    {
+      "id": "source-maskclr",
+      "title": "MaskCLR: Attention-Guided Contrastive Learning for Robust Action Representation Learning",
+      "authors": "Abdelfattah et al.",
+      "year": 2024,
+      "canonicalUrl": "https://openaccess.thecvf.com/content/CVPR2024/html/Abdelfattah_MaskCLR_Attention-Guided_Contrastive_Learning_for_Robust_Action_Representation_Learning_CVPR_2024_paper.html",
+      "purpose": "Grounds the use of Gaussian noise and joint or frame masking as pose-robustness stress tests.",
+      "verifiedAt": "2026-09-06",
+      "version": 1
+    },
+    {
+      "id": "source-skeleton-dml",
+      "title": "Skeleton-DML: Deep Metric Learning for Skeleton-Based One-Shot Action Recognition",
+      "authors": "Memmesheimer et al.",
+      "year": 2022,
+      "canonicalUrl": "https://openaccess.thecvf.com/content/WACV2022/html/Memmesheimer_Skeleton-DML_Deep_Metric_Learning_for_Skeleton-Based_One-Shot_Action_Recognition_WACV_2022_paper.html",
+      "purpose": "Provides precedent for class-disjoint development validation within the NTU one-shot setup.",
+      "verifiedAt": "2026-09-06",
+      "version": 1
+    },
+    {
+      "id": "source-ntu",
+      "title": "NTU RGB+D 120 dataset and one-shot protocol",
+      "authors": "Liu et al.",
+      "year": 2019,
+      "canonicalUrl": "https://github.com/shahroudy/NTURGB-D/blob/master/README.md",
+      "purpose": "Canonical dataset access, action indexing, and one-shot split reference.",
+      "verifiedAt": "2026-09-06",
+      "version": 1
+    },
+    {
+      "id": "source-prospectus",
+      "title": "Robust Human-Motion Retrieval from Noisy Pose Sequences",
+      "authors": "Giacomo Cappelletto",
+      "year": 2026,
+      "canonicalUrl": "https://github.com/JJCAPPE/pose-embedding",
+      "purpose": "Binding local prospectus and scope authority for the project.",
+      "verifiedAt": "2026-09-06",
+      "version": 1
+    },
+    {
+      "id": "source-bu-calendar",
+      "title": "Boston University semester dates",
+      "authors": "Boston University",
+      "year": 2026,
+      "canonicalUrl": "https://www.bu.edu/reg/calendars/semester/",
+      "purpose": "Defines holiday, class-end, study-period, and final-exam constraints on the schedule.",
+      "verifiedAt": "2026-09-06",
+      "version": 1
+    },
+    {
+      "id": "source-benchmark-v2",
+      "title": "Motion retrieval v2 method registry and protocol",
+      "authors": "Pose Embed independent research",
+      "year": 2026,
+      "canonicalUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/configs/benchmark-methods.v2.json",
+      "purpose": "Historical 26-configuration v2 benchmark, preserved for provenance and future work. It is outside the December v3 study and does not authorize v3 execution.",
+      "verifiedAt": "2026-09-24",
+      "version": 2
+    },
+    {
+      "id": "source-plan-v3",
+      "title": "Final v3 plan: frozen one-shot pose robustness",
+      "authors": "Pose Embed independent research",
+      "year": 2026,
+      "canonicalUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/plan/research-plan.v3.md",
+      "purpose": "Final December execution design: three fixed recipes, 20 epochs, three seeds, nested corruption, conditional analysis and explicit capacity/test-opening gates; decision 0004 records the scope change.",
+      "verifiedAt": "2026-09-29",
+      "version": 1
+    },
+    {
+      "id": "source-supcon",
+      "title": "Supervised Contrastive Learning",
+      "authors": "Khosla et al.",
+      "year": 2020,
+      "canonicalUrl": "https://papers.nips.cc/paper_files/paper/2020/hash/d89a66c7c80a29b1bdbab0f2a1a94af8-Abstract.html",
+      "purpose": "Published source for supervised contrastive learning; v3 declares the single-view temperature-0.07 pose adaptation as a descriptive comparator.",
+      "verifiedAt": "2026-09-29",
+      "version": 1
+    }
+  ],
+  "weekSources": [
+    {
+      "weekId": "week-01",
+      "sourceId": "source-prospectus",
+      "purpose": "Lock the final scientific scope and claims.",
+      "priority": "required",
+      "version": 1
+    },
+    {
+      "weekId": "week-01",
+      "sourceId": "source-ntu",
+      "purpose": "Verify licensed data and official one-shot inputs.",
+      "priority": "required",
+      "version": 1
+    },
+    {
+      "weekId": "week-02",
+      "sourceId": "source-ntu",
+      "purpose": "Implement official action and exemplar semantics.",
+      "priority": "required",
+      "version": 1
+    },
+    {
+      "weekId": "week-02",
+      "sourceId": "source-skeleton-dml",
+      "purpose": "Apply class-disjoint development-validation precedent.",
+      "priority": "required",
+      "version": 1
+    },
+    {
+      "weekId": "week-03",
+      "sourceId": "source-motionbert",
+      "purpose": "Reproduce the frozen encoder and one-shot embedding head interface.",
+      "priority": "required",
+      "version": 1
+    },
+    {
+      "weekId": "week-04",
+      "sourceId": "source-contextual",
+      "purpose": "Verify the fixed contextual recipe against published mathematics with independent forward/backward fixtures.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-05",
+      "sourceId": "source-maskclr",
+      "purpose": "Ground synthetic pose corruption choices while validating the exact nested v3 operators before selection.",
+      "priority": "recommended",
+      "version": 3
+    },
+    {
+      "weekId": "week-06",
+      "sourceId": "source-contextual",
+      "purpose": "Run the fixed three-recipe learning-rate matrix with paired clean development evidence.",
+      "priority": "required",
+      "version": 3
+    },
+    {
+      "weekId": "week-07",
+      "sourceId": "source-contextual",
+      "purpose": "Apply the predeclared candidate eligibility and ranking rule without changing recipe parameters.",
+      "priority": "required",
+      "version": 3
+    },
+    {
+      "weekId": "week-09",
+      "sourceId": "source-ntu",
+      "purpose": "Verify official exemplars, action identities and the primary/exact-official query exclusions before locking evaluation.",
+      "priority": "required",
+      "version": 3
+    },
+    {
+      "weekId": "week-10",
+      "sourceId": "source-prospectus",
+      "purpose": "Audit the final v3 design while preserving the historical prospectus and prior protocols.",
+      "priority": "recommended",
+      "version": 3
+    },
+    {
+      "weekId": "week-11",
+      "sourceId": "source-contextual",
+      "purpose": "Complete all final locks and shared seal checks before novel evaluation; no post-core method additions.",
+      "priority": "required",
+      "version": 3
+    },
+    {
+      "weekId": "week-12",
+      "sourceId": "source-motionbert",
+      "purpose": "Verify the frozen encoder, cache provenance and all 180 final evaluation cells.",
+      "priority": "recommended",
+      "version": 2
+    },
+    {
+      "weekId": "week-13",
+      "sourceId": "source-bu-calendar",
+      "purpose": "Preserve the December 7-18 analysis/delivery window and reduced holiday/finals work budget.",
+      "priority": "recommended",
+      "version": 3
+    },
+    {
+      "weekId": "week-14",
+      "sourceId": "source-prospectus",
+      "purpose": "Archive the final v3 plan beside the historical prospectus, prior protocols and recorded amendments.",
+      "priority": "recommended",
+      "version": 3
+    },
+    {
+      "weekId": "week-04",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-05",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-06",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-07",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-08",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-09",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-10",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-11",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-12",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-13",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-14",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
+      "priority": "required",
+      "version": 2
+    },
+    {
+      "weekId": "week-04",
+      "sourceId": "source-supcon",
+      "purpose": "Verify the declared single-view SupCon formulation and temperature adaptation.",
+      "priority": "required",
+      "version": 1
+    }
+  ]
+}

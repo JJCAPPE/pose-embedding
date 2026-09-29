@@ -4,19 +4,20 @@ These rules apply to every automated or human change in this repository.
 
 ## Canonical intent
 
-- Read `plan/research-plan.v2.json`, `configs/benchmark.v2.yaml`,
-  `configs/benchmark-methods.v2.json`, and `docs/protocol/protocol-v2.md` before
-  changing scientific behavior. Preserve the final tracked prospectus and v1
-  protocol as historical records; the v2 amendment supersedes their narrow scope.
+- Read `plan/research-plan.v3.md`, `plan/research-plan.v3.json`, and
+  `docs/decisions/0004-frozen-one-shot-v3.md` before changing the current plan.
+  The v3 website publication does not implement or authorize scientific v3 runs.
+  Before changing scientific behavior, also inspect the applicable existing
+  v1/v2 protocol and hash-bound configuration. Preserve their history and the
+  final tracked prospectus; do not relabel prior artifacts as v3.
 - This is independent research. `docs/protocol/independent-research.md`
   supersedes historical advisor sign-off requirements. Record researcher
   decisions and result-blind amendments; retain all scientific and licensing safeguards.
-- The priority phase is Contextual versus its exact contrastive component on
-  development data. The required benchmark contains all 26 declared method
-  configurations, including MS with and without mining, using a common
-  fine-tuned MotionBERT backbone and six paired seeds. Frozen-encoder work is
-  supplementary. Every final configuration must be selected and trained before
-  any novel test is opened; there is no v2 post-test stretch exception.
+- The December comparison is full contextual recipe versus standard
+  contrastive recipe, with SupCon descriptive, frozen MotionBERT, three paired
+  seeds, and 20 epochs. The v2 26-method fine-tuned benchmark is historical
+  scope. All nine final heads must be trained and locked before novel opening;
+  the optional control and post-opening extensions are omitted.
 - A null or negative contextual result is a successful scientific result. Never
   adjust a split, corruption, metric, or claim after seeing novel-test outcomes.
 

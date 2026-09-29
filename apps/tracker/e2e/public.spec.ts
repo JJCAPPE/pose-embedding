@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { readFileSync } from "node:fs";
+import type { ResearchPlan } from "../lib/schema";
+
+const seedPlan: ResearchPlan = JSON.parse(
+  readFileSync(new URL("../../../plan/research-plan.v3.json", import.meta.url), "utf8"),
+);
 
 test("public dashboard exposes all published weeks", async ({ page }) => {
   await page.goto("/");
@@ -25,11 +31,11 @@ test("an unavailable configured database falls back to the visible plan snapshot
 
 test("week details show tasks, gates, risks, and research checkpoint", async ({ page }) => {
   await page.goto("/weeks/5");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Published loss baselines");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(seedPlan.weeks[4].title);
   await expect(page.getByText("5h planned", { exact: true })).toBeVisible();
   await expect(page.getByText("No time recorded", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Close Week 4 before starting." })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Week 4: Priority pair on development/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: `Week 4: ${seedPlan.weeks[3].title}` })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Work for the week" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Advance when" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Watch closely" })).toBeVisible();
@@ -46,13 +52,28 @@ test("first week always shows its protocol prerequisites", async ({ page }) => {
   );
 });
 
-test("protocol preserves locked decisions and manual actions", async ({ page }) => {
+test("protocol publishes the v3 planning direction and pending capacity gate", async ({ page }) => {
   await page.goto("/protocol");
   await expect(page.getByRole("heading", { name: "The rules before the result." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Actions only you can complete" })).toBeVisible();
-  await expect(page.getByText("26 declared configurations:", { exact: false })).toBeVisible();
-  await expect(page.getByText("delta(method, seed)", { exact: false })).toBeVisible();
-  await expect(page.getByText(/Independent researcher decisions apply/)).toBeVisible();
+  await expect(page.getByText("Capacity is a gate, not a completed result")).toBeVisible();
+  await expect(page.getByText(/100 GB of incremental storage/)).toBeVisible();
+  await expect(page.getByText(/7, 17, 29/).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Read the final v3 plan" })).toHaveAttribute("href", "/protocol/plan");
+  await expect(page.getByText("26 declared configurations:", { exact: false })).toHaveCount(0);
+});
+
+test("final plan and scope decision are readable and downloadable", async ({ page, request }) => {
+  await page.goto("/protocol/plan");
+  await expect(page.getByRole("heading", { level: 1, name: "Final v3 plan: frozen one-shot pose robustness" })).toBeVisible();
+  await expect(page.getByRole("table").first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Capacity gates", exact: true })).toHaveAttribute("href", "#8-capacity-gates");
+  await page.getByRole("link", { name: "Scope decision", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Return the December study");
+  const download = await request.get("/protocol/plan/source");
+  expect(download.headers()["content-type"]).toContain("text/markdown");
+  expect(await download.text()).toContain("100 GB");
+  expect((await request.get("/protocol/private/source")).status()).toBe(404);
 });
 
 test("protocol formula scrollers are keyboard accessible", async ({ page }) => {
@@ -70,14 +91,14 @@ test("print output includes collapsed protocol and weekly detail", async ({ page
   await page.emulateMedia({ media: "print" });
   await page.goto("/protocol");
   await expect(page.getByRole("heading", { name: "The rules before the result." })).toBeVisible();
-  await expect(page.getByText("Development and final classes", { exact: true })).toBeVisible();
+  await expect(page.getByText(seedPlan.protocol.experimentalDesign[0].label, { exact: true })).toBeVisible();
   await expect(page.getByText("Coordinate jitter", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Outside this semester" })).toBeVisible();
 
   await page.goto("/weeks/5");
-  await expect(page.getByRole("heading", { name: "Published loss baselines" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: seedPlan.weeks[4].title })).toBeVisible();
   await expect(page.locator("#task-w05-task-04")).toBeVisible();
-  await expect(page.getByText("Method implementation, license or resource blockers cannot be resolved by silent omission.")).toBeVisible();
+  await expect(page.getByText(seedPlan.weeks[4].risks[0], { exact: true })).toBeVisible();
 });
 
 test("public exports and health endpoint report their current data source", async ({ request }) => {

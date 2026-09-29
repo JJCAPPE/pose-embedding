@@ -1,19 +1,20 @@
 # Pose Embed
 
-Pose Embed tests whether Contextual Similarity improves human-motion retrieval.
-The first experiment compares Contextual with its exact contrastive component
-on development classes. The full study requires all 26 configurations from the
-image-paper comparison and supplementary controls, with six paired seeds.
-Multi-Similarity is a comparator. Positive, null and negative results all count.
+Pose Embed tests whether the full contextual training recipe reduces one-shot
+human-motion retrieval degradation relative to standard contrastive training.
+The [final v3 plan](plan/research-plan.v3.md) fixes a frozen MotionBERT encoder,
+three objectives, three paired seeds, 20 epochs, and nine query corruptions.
+Positive, null and negative results all count. The broader v2 benchmark remains
+preserved as historical work, outside the December study.
 
 The current planning horizon is September 15 through December 18, 2026;
-measured resources determine whether the full study requires an extension. Its companion
+selection requires the measured capacity and validity gates. Its companion
 tracker provides a public research view of all 14 weeks and an authenticated
 owner editor for tasks, evidence, reflections, and advancement gates.
 
 ## Repository map
 
-- `plan/` — current v2 schedule and preserved v1 history
+- `plan/` — current v3 schedule and preserved v1/v2 history
 - `configs/` — validated research and experiment configurations
 - `src/pose_embed/` — data, model, loss, corruption, training, and evaluation code
 - `tests/` — unit, integration, and tiny CPU fixtures
