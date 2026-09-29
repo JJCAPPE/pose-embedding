@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-09-29T21:04:11.106877+00:00",
+  "generatedAt": "2026-09-29T22:28:17.544258+00:00",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -15,14 +15,6 @@
   },
   "manualActions": [
     {
-      "id": "manual-supabase",
-      "dueDate": "2026-10-04",
-      "title": "Verify hosted tracker access",
-      "details": "Verify that public sign-up is disabled and hosted Auth Site URL and redirect origins match the live deployment before enabling editing. Preserve private ownership, RLS, live progress, and actual minutes.",
-      "whyManual": "Hosted account settings and ownership require the researcher or an authorized administrator; keep credentials and owner identity private.",
-      "weekTaskId": null
-    },
-    {
       "id": "manual-gpu",
       "dueDate": "2026-10-18",
       "title": "Confirm GPU access and researcher availability",
@@ -34,7 +26,7 @@
       "id": "manual-capacity-v3",
       "dueDate": "2026-10-18",
       "title": "Resolve the v3 storage prerequisite",
-      "details": "The September 29 observation had 272.80 decimal GB of quota free. The initial 100 GB incremental envelope plus the 200 GiB reserve requires 314.7484 GB free: a 41.95 GB gap. Obtain additional quota or a documented authorized artifact allocation, then remeasure; retain historical artifacts and register every root.",
+      "details": "After September 29 dependency cleanup, measured available space was 274.72 decimal GB. The bounded Week 4 requirement of 239.7484 GB passed. The initial full-campaign envelope plus reserve requires 314.7484 GB, leaving a dated 40.03 GB gap. Recheck quota and filesystem space, account for new artifacts, and obtain any additional authorized allocation before the October 18 gate; preserve historical artifacts.",
       "whyManual": "Additional quota or artifact allocation requires institutional authorization. The dated observation is not current capacity or a reservation.",
       "weekTaskId": "w05-task-04"
     }
@@ -61,11 +53,11 @@
       },
       {
         "label": "Current planning status",
-        "value": "Week 3 v3 software is implemented and checked with fixtures. Real SCC auxiliary preparation, measured fallback, immutable design freeze, GPU pilots, full-campaign capacity, researcher availability and final-test authorization remain pending. Historical Weeks 1-2 and the original Week 3 completion evidence are preserved; additional Week 3 v3 readiness is recorded separately. Future-week effort estimates require researcher confirmation."
+        "value": "Week 3 is complete: verified software, real SCC auxiliary preparation, measured fallback, registered seal audits and the immutable design freeze. Week 4 is ready for fresh v3 parity/caches and three full pilots. Full-campaign capacity, researcher availability and final-test authorization remain pending. Historical evidence is preserved, and actual researcher time remains unreported. Hosted Auth access restrictions were verified on September 29."
       },
       {
         "label": "Measured capacity prerequisite",
-        "value": "Initial storage envelope: 100 GB (decimal) incremental space including slack, while retaining a 200 GiB reserve. On September 29, 272.80 GB quota free fell 41.95 GB short of the 314.7484 GB requirement. Recheck current quota and filesystem space, replace estimates with measured remaining peak bytes, and retain every artifact."
+        "value": "After September 29 dependency cleanup, available space was 274.72 decimal GB, passing the bounded Week 4 threshold of 239.7484 GB. The initial full-campaign envelope is 100 GB incremental plus a 200 GiB reserve: 314.7484 GB total. Its dated remaining gap is 40.03 GB. Remeasure shared quota, filesystem capacity and remaining peak bytes at the October 18 gate."
       },
       {
         "label": "October 18 go/no-go",
@@ -475,17 +467,17 @@
       "objective": "Complete the frozen one-shot v3 protocol and pilot specification, corruption operators and fallback, versioned validators, shared dataset seals, source access separation and pilot instrumentation; freeze cache-affecting code and configuration before fresh extraction.",
       "deliverable": "Verified v3 software with historical evidence preserved, plus auxiliary-only SCC preparation, measured fallback evidence, a complete root audit and an immutable design lock before Week 4 caches and pilots.",
       "risks": [
-        "The historical v1/v2 caches and GPU evidence do not establish v3 preparation, fallback selection or a frozen v3 design.",
-        "Fresh extraction must wait for the measured auxiliary fallback, shared root audit and cache-affecting source/configuration freeze.",
-        "Actual researcher minutes remain unreported; completion of software checks does not close the week or authorize novel access."
+        "Historical v1/v2 caches remain preserved; Week 4 must generate fresh v3 parity and caches under the frozen design.",
+        "Week 4 bounded storage passed at the recorded observation; the October 18 full-campaign capacity and availability gate still needs fresh evidence.",
+        "Actual researcher minutes remain unreported and are displayed as No time recorded; the zero placeholder is not a claim of zero work."
       ],
       "advisorPrompt": "Do auxiliary-only preparation, the measured fallback, the shared seal audit and the immutable design lock authorize fresh Week 4 caches and three engineering pilots?",
-      "reflection": "All five Week 3 technical tasks and gates are verified complete as of 2026-09-28. SCC job 7761714, release b92e7dd88fc261c0b8585039fbe99ad67ee8b445, completed successfully on one L40S at 01:40:59Z. Fresh parity passed, both complete 95,001-row extractions were byte-identical, and all five final/development caches validated. The conservative full-input forecast is 44.12 minutes and 4.07 GiB per cache, with 3.63 GiB peak GPU and 7.65 GiB peak host memory; the declared storage reserve passed. Prior encoder and independent v1/v2 metric/test-seal evidence is preserved. BU determination remains confirmed, and both novel-test opening ledgers remained absent at the September 28 observation. Actual researcher minutes remain unreported; Week 3 stays formally open. The hosted Week 1 and 2 records were closed later on September 28 with zero minutes while their prior notes said time was unreported; those closures require researcher reconciliation and are not treated here as evidence of zero work. This completes Week 3 technical deliverables without claiming completion of the broader v2 study. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md V3 reconciliation on 2026-09-29: the five tasks and gates above remain historical v1/v2 evidence. The current Week 3 objective now follows the final v3 September 29–October 4 plan. V3 software and fixture coverage are recorded separately; real SCC auxiliary preparation, fallback measurement, canonical root audit and immutable design freeze remain pending. No v3 scientific cache, pilot, novel access or weekly closure is claimed. Actual researcher minutes remain unreported. V3 status: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
+      "reflection": "All five Week 3 technical tasks and gates are verified complete as of 2026-09-28. SCC job 7761714, release b92e7dd88fc261c0b8585039fbe99ad67ee8b445, completed successfully on one L40S at 01:40:59Z. Fresh parity passed, both complete 95,001-row extractions were byte-identical, and all five final/development caches validated. The conservative full-input forecast is 44.12 minutes and 4.07 GiB per cache, with 3.63 GiB peak GPU and 7.65 GiB peak host memory; the declared storage reserve passed. Prior encoder and independent v1/v2 metric/test-seal evidence is preserved. BU determination remains confirmed, and both novel-test opening ledgers remained absent at the September 28 observation. Actual researcher minutes remain unreported; Week 3 stays formally open. The hosted Week 1 and 2 records were closed later on September 28 with zero minutes while their prior notes said time was unreported; those closures require researcher reconciliation and are not treated here as evidence of zero work. This completes Week 3 technical deliverables without claiming completion of the broader v2 study. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md V3 reconciliation on 2026-09-29: the five tasks and gates above remain historical v1/v2 evidence. The current Week 3 objective now follows the final v3 September 29–October 4 plan. V3 software and fixture coverage are recorded separately; real SCC auxiliary preparation, fallback measurement, canonical root audit and immutable design freeze remain pending. No v3 scientific cache, pilot, novel access or weekly closure is claimed. Actual researcher minutes remain unreported. V3 status: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md V3 completion on 2026-09-29: Verified 2026-09-29: SCC completion job 7790916 passed the corrected design freeze, independent verification process and capacity checks with failed=0 and exit_status=0. Auxiliary preparation came from job 7790703; its failed initial JSON reload and verification attempt are preserved under decision 0005. The auxiliary container contains 95,001 authorized rows; the fallback was measured from the fixed 76,013-row development-training set and is 0.6601371765136719. All eight identity sets, unchanged manifest bytes and the historical development episode are bound to the immutable design. Both SCC artifact roots and three local historical roots were audited; no opening records were found. Protocol digest: 52241fefab4d1a5aa0fb313d7af4e37bdc6923e2f8277e01cd179bc27a46beea. Design-lock SHA-256: 39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d. This completes Week 3 preparation; fresh v3 parity, caches and three pilots belong to Week 4. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md All seven required tasks and gates now pass, so Week 3 is closed and Week 4 is ready to start. The tracker permits closure on task/gate evidence while preserving unreported actual time; no hours were invented. Seven superseded dependency environments and the retired package-download cache were removed after recording their provenance. Historical scientific artifacts remain preserved. Measured available space after cleanup was 274.72 decimal GB; the bounded Week 4 requirement is 239.7484 GB. The initial full-campaign requirement remains 314.7484 GB and must be remeasured at the October gate.",
       "plannedMinutes": 480,
       "actualMinutes": 0,
-      "state": "active",
-      "closedAt": null,
-      "version": 7,
+      "state": "closed",
+      "closedAt": "2026-09-29T22:28:17.544258+00:00",
+      "version": 8,
       "tasks": [
         {
           "id": "w03-task-01",
@@ -586,11 +578,11 @@
           "expectedOutput": "Immutable auxiliary preparation and fallback evidence, canonical root audit and a validated v3 design lock from the real SCC inputs.",
           "required": true,
           "estimateMinutes": 0,
-          "state": "todo",
-          "completionNote": "Pending. No real v3 auxiliary preparation, measured fallback or immutable design lock has been verified on SCC. The historical five caches and job 7761714 remain evidence for their original protocol only.",
+          "state": "done",
+          "completionNote": "Verified 2026-09-29: SCC completion job 7790916 passed the corrected design freeze, independent verification process and capacity checks with failed=0 and exit_status=0. Auxiliary preparation came from job 7790703; its failed initial JSON reload and verification attempt are preserved under decision 0005. The auxiliary container contains 95,001 authorized rows; the fallback was measured from the fixed 76,013-row development-training set and is 0.6601371765136719. All eight identity sets, unchanged manifest bytes and the historical development episode are bound to the immutable design. Both SCC artifact roots and three local historical roots were audited; no opening records were found. Protocol digest: 52241fefab4d1a5aa0fb313d7af4e37bdc6923e2f8277e01cd179bc27a46beea. Design-lock SHA-256: 39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d. This completes Week 3 preparation; fresh v3 parity, caches and three pilots belong to Week 4. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
-          "completedAt": null,
-          "version": 1
+          "completedAt": "2026-09-29T22:28:17.544258+00:00",
+          "version": 2
         }
       ],
       "gates": [
@@ -672,11 +664,11 @@
           "position": 7,
           "criterion": "Real auxiliary-only preparation, measured fallback and canonical root audit are bound to an immutable v3 design lock before fresh feature extraction.",
           "required": true,
-          "state": "pending",
-          "evidence": "Pending real SCC execution and verification. Required evidence is the auxiliary-only preparation record, prespecified fallback measurement, all-root test-seal audit and frozen cache-affecting code/configuration digests. Historical v1/v2 GPU evidence cannot satisfy this v3 gate.",
+          "state": "met",
+          "evidence": "Verified 2026-09-29: SCC completion job 7790916 passed the corrected design freeze, independent verification process and capacity checks with failed=0 and exit_status=0. Auxiliary preparation came from job 7790703; its failed initial JSON reload and verification attempt are preserved under decision 0005. The auxiliary container contains 95,001 authorized rows; the fallback was measured from the fixed 76,013-row development-training set and is 0.6601371765136719. All eight identity sets, unchanged manifest bytes and the historical development episode are bound to the immutable design. Both SCC artifact roots and three local historical roots were audited; no opening records were found. Protocol digest: 52241fefab4d1a5aa0fb313d7af4e37bdc6923e2f8277e01cd179bc27a46beea. Design-lock SHA-256: 39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d. This completes Week 3 preparation; fresh v3 parity, caches and three pilots belong to Week 4. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
           "waiverReason": "",
-          "decidedAt": null,
-          "version": 1
+          "decidedAt": "2026-09-29T22:28:17.544258+00:00",
+          "version": 2
         }
       ]
     },

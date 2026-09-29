@@ -5,7 +5,24 @@ govern these commands. Use a clean committed release, Python 3.11 and the locked
 environment. Perform tensor processing only inside Grid Engine allocations.
 Historical releases, artifacts and run manifests remain immutable.
 
-## Register the dataset and resolve preparation
+## Active SCC installation
+
+The September 29 installation uses the verified release and rebound manifest
+bundle recorded in [Week 3 readiness](week-3-v3-readiness.md). Start from:
+
+```bash
+source "$HOME/pose-embed-scc/environment.sh"
+cd "$POSE_EMBED_RELEASE"
+```
+
+`$HOME/pose-embed-scc/current` points to the same committed scientific release.
+The environment selects the v3 manifest bundle while retaining the original
+data and artifact roots. Continue with the Week 4 commands below. The initial
+preparation procedure is retained here for provenance; it is already complete.
+The [JSON loader recovery](../decisions/0005-v3-json-protocol-recovery.md) records
+the preserved failed freeze and corrected source binding.
+
+## Initial root registration and preparation
 
 Keep the existing `POSE_EMBED_DATA_ROOT` and `POSE_EMBED_ARTIFACT_ROOT` from the
 SCC environment. Do not change the artifact environment root to `study-v3`.
@@ -64,15 +81,16 @@ The checked-in template alone cannot authorize a scientific run.
 
 ## Week 4: fresh caches and complete pilots
 
-Point `POSE_EMBED_MANIFEST_SET` to the new preparation directory's
-`manifests/manifest-set.json`, then submit:
+The active environment already points `POSE_EMBED_MANIFEST_SET` to the verified
+preparation directory's `manifests/manifest-set.json`. Submit:
 
 ```bash
 qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/study_v3.qsub caches
 ```
 
 The launcher requests `gpu_type=L40S` and requires one scheduler-visible L40S.
-Confirm its resource spelling and availability with `qgpus` on SCC before
+Its resource spelling was verified on September 29. Recheck availability with
+`qgpus` on SCC before
 submission, as described in the [BU GPU guide](https://www.bu.edu/tech/support/research/software-and-programming/gpu-computing/).
 It records fresh parity,
 two complete 95,001-row extractions in separate processes, repeatability and

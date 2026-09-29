@@ -71,9 +71,9 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(23);
-    expect(progress.completedRequiredTasks).toBe(14);
-    expect(progress.decidedRequiredGates).toBe(13);
+    expect(progress.percent).toBe(25);
+    expect(progress.completedRequiredTasks).toBe(15);
+    expect(progress.decidedRequiredGates).toBe(14);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(0);
   });
@@ -101,25 +101,27 @@ describe("readiness and progress rules", () => {
     expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
   });
 
-  it("preserves Week 3 history while real v3 preparation and design freeze remain pending", () => {
+  it("closes Week 3 after verified SCC preparation and makes Week 4 ready", () => {
     const week = seedPlan.weeks[2];
-    expect(weekProgress(week)).toEqual({ required: 7, completed: 6, percent: 86 });
+    expect(weekProgress(week)).toEqual({ required: 7, completed: 7, percent: 100 });
     expect(week.gates.filter((gate) => gate.state === "met").map((gate) => gate.id))
-      .toEqual(["w03-gate-01", "w03-gate-02", "w03-gate-03", "w03-gate-04", "w03-gate-05", "w03-gate-06"]);
+      .toEqual(["w03-gate-01", "w03-gate-02", "w03-gate-03", "w03-gate-04", "w03-gate-05", "w03-gate-06", "w03-gate-07"]);
     expect(week.tasks.slice(0, 5).every((task) => task.state === "done")).toBe(true);
     expect(week.tasks.find((task) => task.id === "w03-task-07")).toMatchObject({
-      state: "todo",
-      completedAt: null,
+      state: "done",
+      completedAt: expect.any(String),
+      completionNote: expect.stringContaining("7790916"),
     });
     expect(week.gates.find((gate) => gate.id === "w03-gate-07")).toMatchObject({
-      state: "pending",
-      decidedAt: null,
+      state: "met",
+      decidedAt: expect.any(String),
+      evidence: expect.stringContaining("39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d"),
     });
     expect(week.reflection).toContain("Actual researcher minutes remain unreported");
-    expect(weekCanClose(week)).toBe(false);
-    expect(weekIsReady(seedPlan.weeks, 3)).toBe(false);
-    expect(week.state).toBe("active");
-    expect(week.closedAt).toBeNull();
+    expect(weekCanClose(week)).toBe(true);
+    expect(weekIsReady(seedPlan.weeks, 4)).toBe(true);
+    expect(week.state).toBe("closed");
+    expect(week.closedAt).not.toBeNull();
     expect(week.actualMinutes).toBe(0);
   });
 

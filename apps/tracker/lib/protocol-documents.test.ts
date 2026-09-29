@@ -9,6 +9,7 @@ import {
   protocolDocuments,
 } from "@/lib/protocol-documents";
 import { seedPlan } from "@/lib/seed";
+import { weekIsReady } from "@/lib/domain";
 
 describe("published v3 protocol", () => {
   it("bundles the exact tracked final plan and decision", () => {
@@ -29,7 +30,11 @@ describe("published v3 protocol", () => {
     expect(week3.gates.slice(0, 5)).toEqual(historicalWeek3.gates);
     expect(week3.reflection.startsWith(historicalWeek3.reflection)).toBe(true);
     expect(week3.actualMinutes).toBe(historicalWeek3.actualMinutes);
-    expect(week3.closedAt).toBe(historicalWeek3.closedAt);
+    expect(week3.state).toBe("closed");
+    expect(week3.closedAt).not.toBeNull();
+    expect(weekIsReady(seedPlan.weeks, 4)).toBe(true);
+    expect(week3.tasks.every((task) => !task.required || task.state === "done")).toBe(true);
+    expect(week3.gates.every((gate) => !gate.required || gate.state === "met")).toBe(true);
     const summary = JSON.stringify(seedPlan.protocol);
     expect(summary).toMatch(/frozen/i);
     expect(summary).toMatch(/20 epochs/);
