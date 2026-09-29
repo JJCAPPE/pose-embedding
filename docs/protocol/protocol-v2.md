@@ -1,7 +1,8 @@
 # Protocol v2: metric learning for human-motion retrieval
 
-Status: **all 26 method adapters implemented; allocated-GPU validation,
-selection, final training and final lock remain pending**. The machine-readable
+Status: **all 26 method adapters implemented; the seed-7 priority GPU pilot is
+complete; all-method GPU profiling, selection, final training and final lock
+remain pending**. The machine-readable
 design and method identities are in
 `configs/benchmark.v2.yaml` and `configs/benchmark-methods.v2.json`. This document
 and `docs/decisions/0003-motion-retrieval-v2.md` supersede the v1 three-method

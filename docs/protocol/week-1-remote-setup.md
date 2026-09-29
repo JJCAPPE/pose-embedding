@@ -1,8 +1,11 @@
 # Week 1 remote data and setup
 
 Status: **technical setup verified** at `2026-09-24T15:35:26Z`.
-This completes `w01-task-02`'s input inventory/checksum deliverable. It does
-not decide the separate protocol or BU gates, or close the weekly record.
+This completed `w01-task-02`'s input inventory/checksum deliverable. The
+input-contract and BU governance gates were subsequently recorded as met;
+the September 24 Week 1 record still lacked actual researcher minutes. A later
+hosted closure with zero recorded minutes requires reconciliation; see the
+[Weeks 1–3 handoff](weeks-1-3-handoff.md).
 
 ## Inputs and storage
 
@@ -80,7 +83,9 @@ Its full log remains at `logs/pose_setup_verify.o7720715` outside Git,
 SHA-256 `fb23d198e6f6761a3105c2673b08d50842d7a822556c10ad730f5b54ef09520e`.
 Home usage was 8.50/10.0 GB (11.0 GB hard limit); the shared project allocation
 reported 18,381.27/18,800 GB. Those are usage observations, not reserved future
-capacity; new data and generated artifacts use project storage.
+capacity; new data and generated artifacts use project storage. The later
+[v2 storage floor](v2-resource-floor.md) determines whether the full campaign
+can launch; this Week 1 reading does not establish that capacity.
 
 The first executed check (`7720663`) preserved 107 passing tests and one
 failure because a missing-lock unit test inherited the real artifact root.
@@ -105,33 +110,38 @@ and Python 3.11.15. All required environment evidence commands succeeded.
 | 32 | success | 2.572 GiB | 2.855 GiB | 516.326 ms |
 | 64 | success | 4.977 GiB | 5.514 GiB | 1,047.984 ms |
 
-Physical batch **32 remains selected** until all core objectives are profiled
-in Week 4. The new profile supplements, rather than replaces, the original
-[A40 profile](week-1-gpu-profile.md). Its immutable raw artifact is
+Physical batch **32 was selected for the v1 frozen-encoder work**. This
+forward-only profile does not establish backward-pass memory or runtime for
+the [v2 fine-tuned study](protocol-v2.md). Later v2 profiling found that
+physical P=8/K=4 fine-tuning exhausted an L40S but fit an A100 80 GB for the
+priority pair; see the [implementation record](v2-implementation-record.md).
+The new profile supplements,
+rather than replaces, the original [A40 profile](week-1-gpu-profile.md). Its
+immutable raw artifact is
 `profiles/motionbert-gpu-7720685-20260924T153254Z.json` under the artifact root,
 SHA-256 `c287a507a184c256a3a0f9dd89e3258ce888d4d3cff9e1f4e78c48c044ee0ead`.
 
-## Remaining closure decisions
+## Subsequent decisions and remaining closure item
 
-Technical input verification, protocol decisions, and institutional requirements are separate.
-The [input-contract amendment draft](input-contract-amendment-draft.md) is
-prepared but **not adopted**. The protocol still requires 114,480 source rows
-and therefore needs a documented result-blind amendment accepting the verified
-usable aggregate and physical-source binding. The setup evidence above binds
-the original protocol hash. The subsequent governance-only revision is recorded
-in [Independent research governance](independent-research.md); it removes advisor
-requirements without adopting the input-contract amendment.
+The setup run above bound the pre-amendment v1 protocol hash. Later on
+September 24, the researcher adopted the [result-blind input-contract
+amendment](input-contract-amendment.v1.md), and independent SCC job `7721684`
+regenerated the manifests under its new protocol hash. The
+[input inventory](week-1-input-inventory.md) and
+[amended input manifest audit](ntu-manifest-audit.v2.md) record that verification;
+`w01-gate-02` is met. The earlier
+[draft](input-contract-amendment-draft.md) remains historical.
 
-Week closure still requires:
+The researcher also confirmed that BU issued the applicable determination,
+recorded in [the governance status](../compliance/computational-research-scope.md);
+`w01-gate-04` is met. Neither confirmation supplies the researcher's actual
+Week 1 minutes. The hosted tracker later marked `w01-task-05` done and closed
+Week 1 with zero minutes, although its note still says time is pending. This
+discrepancy requires researcher confirmation and an audited reopen if the
+closed record is corrected. Dataset-terms acceptance is a separate protocol checkbox
+and has not been inferred from access or from the BU determination.
 
-1. The documented input-contract amendment (`w01-gate-02`).
-2. The applicable BU governance determination (`w01-gate-04`), subsequently
-   confirmed by the researcher on 2026-09-24 without an attachment. See the
-   [confirmation record](../compliance/computational-research-scope.md).
-3. The researcher's actual Week 1 minutes, not an estimate inferred from planned
-   hours, elapsed automation time, or GPU runtime.
-
-To enter time in the owner interface: **Manage → Week 1 → Week details →
-Actual minutes → Save week**. Convert hours to minutes (for example, 2.5 hours
-is 150 minutes). No time or external approval has been invented, and the
+Do not treat the hosted zero as a researcher time report. Convert confirmed
+hours to minutes (for example, 2.5 hours is 150 minutes) before any audited
+correction. No time or external approval has been invented, and the
 novel-test seal has not been opened.

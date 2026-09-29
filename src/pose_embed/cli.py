@@ -137,6 +137,7 @@ def _parser() -> argparse.ArgumentParser:
     feature_repeat.add_argument("--first", required=True)
     feature_repeat.add_argument("--second", required=True)
     feature_repeat.add_argument("--manifest", required=True)
+    feature_repeat.add_argument("--project-quota-report", required=True)
     feature_repeat.add_argument("--output", required=True)
     feature_repeat.add_argument("--protocol-config", default=DEFAULT_PROTOCOL)
     feature_apply_head = feature_commands.add_parser(
@@ -291,6 +292,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                         protocol_path=args.protocol_config,
                         manifest_path=args.manifest,
                         output_path=args.output,
+                        project_quota_report=args.project_quota_report,
                     )
                 )
             elif args.operation == "parity":

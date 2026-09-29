@@ -91,13 +91,16 @@ then development-training and development-gallery/query caches.
 - The slower run forecasts at most 4 hours, 6 GiB per full cache, 16 GiB peak GPU
   memory and 32 GiB host memory, with twice the remaining artifact budget free.
 - All development caches validate. The BU prerequisite is researcher-confirmed;
-  actual researcher time and the researcher checkpoint response must be recorded
-  before week closure.
+  actual researcher time remains a formal closeout input. The later hosted
+  zero-minute Week 1–2 closures need reconciliation. The research checkpoint
+  prompt is optional under current
+  independent-research governance.
 - No data, checkpoint, cache, private URL, or full run artifact is tracked.
 
 Technical gates 1, 3 and 4 passed with the completed SCC evidence; gate 2's
 hand-calculated fixtures also pass. Both novel-test opening ledgers were absent
 after the run. Formal Week 3 closure remains pending prior-week closeout and
-actual researcher time. Novel/corrupted extraction remains unavailable in this
-Week 3 backend. Current independent-research governance requires no advisor
-approval; later v2 selection, training and test-opening gates remain separate.
+actual researcher time. These frozen caches cannot replace raw input and
+backward passes in the v2 fine-tuned campaign. Novel/corrupted extraction
+remains unavailable in this Week 3 backend. Later v2 selection, training and
+test-opening gates remain separate.

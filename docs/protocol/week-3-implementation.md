@@ -1,14 +1,18 @@
 # Week 3 implementation record
 
-Recorded 2026-09-24. Status: **software verified; real GPU gates pending**.
-This is not a scientific extraction result and does not close Week 3.
+Recorded 2026-09-24. At that point, software was verified and real GPU gates
+were pending. **Current status: all Week 3 technical gates passed** in SCC job
+`7761714`; formal week closure remains pending actual researcher time. The
+hosted Week 1–2 zero-minute closures need separate reconciliation. The local
+checks in this historical record alone were not
+scientific extraction evidence.
 
 This historical record preserves the September 24 implementation evidence.
 See the [current SCC execution record](week-3-scc-execution.md) for job `7761714`,
 which completed successfully on September 27 EDT with all technical gates passed.
 The [compact evidence](week-3-scc-evidence.json) records all five validated caches,
 exact repeatability and passing resource checks. Formal week closure remains
-pending prior-week closeout and actual researcher time; the September 24 status
+pending actual researcher time; the September 24 status
 and gate decisions below remain unchanged as historical evidence.
 
 ## Implemented
@@ -39,8 +43,9 @@ The complete choices and sequence are saved in
 - Preserve upstream arithmetic in intermediate preprocessing, then cast the
   encoder input to float32. Correct confidence with the minimum-source rule;
   do not claim upstream confidence parity.
-- Cache the 8,704-value vector before projection/normalization. Training the
-  2,048-value retrieval head remains Week 4 work.
+- Cache the 8,704-value vector before projection/normalization. Under the
+  then-current v1 sequence, training the 2,048-value retrieval head belonged
+  to Week 4; v2 instead specifies fine-tuning and its own embedding dimensions.
 - Require exact repeated arrays and NPZ bytes on the same GPU in two distinct
   processes, with deterministic algorithms, no mixed precision and no TF32.
 - Forecast from the slower run with 25% time and 10% storage margins. Reserve
@@ -93,9 +98,10 @@ metadata: 113,945 total rows, 95,001 auxiliary rows, and at least eight samples
 in every parity stratum. The novel-test opening ledger was absent. A real remote
 runtime check exposed the valid `torch` runtime/package distinction
 (`2.9.1+cu128` versus `2.9.1`); the validator now handles it with a regression
-test while retaining exact runtime/CUDA binding. No scientific GPU job was run.
+test while retaining exact runtime/CUDA binding. No scientific GPU job had been
+run at this September 24 checkpoint.
 
-## Gate decisions and remaining work
+## Gate decisions on September 24
 
 | Gate | Decision | Remaining evidence |
 |---|---|---|
@@ -107,13 +113,13 @@ test while retaining exact runtime/CUDA binding. No scientific GPU job was run.
 At the time of this implementation record, the BU determination was pending
 and scientific parity/extraction had not started. The researcher subsequently
 confirmed the [BU determination](../compliance/computational-research-scope.md)
-on September 24. The v2 scope amendment now prioritizes the paired development
-pilot. For any extraction, use a clean committed checkout and locked GPU environment,
-and submit the provided job with scheduler logs outside the repository as
-shown in the README. Keep every output and failure report outside Git.
+on September 24. The v2 scope amendment then prioritized the paired development
+pilot. The subsequent SCC extraction used a clean committed checkout and locked
+GPU environment, with scheduler logs outside the repository as shown in the
+README. Every output and failure report remains outside Git.
 
-Actual researcher minutes and the researcher checkpoint response have not been
-provided and were not invented. Current independent-research governance does
-not require an advisor response. Head training, corruption runs and novel-test
-evaluation remain outside this implementation. Only the local plan was updated;
-no hosted tracker, deployment or database was changed.
+Actual researcher minutes have not been provided and were not invented. The
+research checkpoint prompt carries no approval requirement under current
+independent-research governance. Head training, corruption runs and novel-test
+evaluation remain outside this implementation. Only the local plan was updated
+at the time of this record; no hosted tracker, deployment or database was changed.

@@ -67,6 +67,30 @@ does not reserve that space.
 Preserve prior artifacts; silently deleting checkpoints or shortening the
 scientific budget is not a storage solution.
 
+At 2026-09-29 02:36 UTC, a fresh read-only `pquota textconv` inspection on
+SCC reported **18,506.56 of 18,800 GB used** on `/projectnb/textconv`, leaving
+**293.44 GB**. Only **93.44 GB** remains above the Week 3 200 GB reserve. This
+shared quota is volatile and cannot hold even the 599.27 GB single-copy tensor
+floor for the planned full campaign, let alone the segment floor or input and
+evaluation artifacts. The earlier Week 3 extraction pass established that its
+five caches fit at the time of that job; it did not establish full-campaign
+storage feasibility. Obtain a documented increase in accessible capacity or a
+result-blind, scientifically justified amendment before starting the full run
+matrix. Preserve the novel-test seal while that decision is made.
+
+The successful A100 priority pair in SCC job 7748592 provides a first timing
+scale, not an all-method runtime forecast. Each 1,000-step development pilot
+took about 6,500 seconds including ten validations; their update steps alone
+took about 2,300 seconds. Multiplying only the observed update time by the
+provisional 50,000-update budget gives about **32 GPU-hours per run**. Applying
+that rate illustratively to the 468 main selection runs gives about **15,000
+GPU-hours** before validation, final training, secondary studies, setup,
+queueing or failed attempts. Architecture methods may be faster or slower, so
+this is an extrapolation rather than a measured lower bound. The all-method
+full-budget profiles and an allocation calendar are required before calling
+the 14-week horizon feasible. See `docs/protocol/v2-implementation-record.md`
+for the pilot provenance.
+
 The complete feasibility decision must also include validation/scorer runtime,
 input setup, integrity-validation I/O, all secondary evaluations, CPU memory,
 queue/bootstrap work and failed attempts. Three optimizer steps and a 128-item

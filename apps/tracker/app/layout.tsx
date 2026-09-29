@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     template: "%s | Pose Embed",
   },
   description:
-    "A public weekly execution plan for robust one-shot human-motion retrieval research.",
+    "A public weekly execution plan for metric learning and human-motion retrieval research.",
 };
 
 async function AntdRuntime({ children }: { children: ReactNode }) {

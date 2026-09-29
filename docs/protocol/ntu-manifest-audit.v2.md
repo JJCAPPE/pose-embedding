@@ -1,10 +1,13 @@
 # NTU RGB+D 120 manifest audit v2
 
 Status: **adopted and independently regenerated**. This is the public-safe
-release evidence for the [result-blind input-contract amendment](input-contract-amendment.v1.md).
+release evidence for the [result-blind v1 input-contract amendment](input-contract-amendment.v1.md).
 The [v1 audit](ntu-manifest-audit.v1.md) is retained unchanged as the
 pre-amendment historical snapshot, including its per-class table and all 40
-named synchronized-view exclusions. The novel test remains sealed.
+named synchronized-view exclusions. The novel test remains sealed. The v2
+study reuses this verified source and class partition, while its multi-positive
+gallery/query construction and fine-tuned runs require separate v2 validation;
+this audit does not certify them.
 
 ## Source accounting
 
@@ -16,7 +19,7 @@ named synchronized-view exclusions. The novel test remains sealed.
 - Physical sources: **2**, with exact relative paths, byte counts, and SHA-256
   digests bound by the amended protocol and listed in the
   [decision record](input-contract-amendment.v1.md).
-- Current canonical protocol SHA-256:
+- Adopted v1 input-protocol SHA-256:
   `c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f`.
 
 ## Immutable inventory and seven split manifests

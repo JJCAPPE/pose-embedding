@@ -1,14 +1,21 @@
 from __future__ import annotations
 
+import json
+import os
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
 import pytest
 
 import pose_embed.motionbert_reproducibility as reproducibility
-from pose_embed.motionbert_reproducibility import GIB, extraction_forecast
+from pose_embed.motionbert_reproducibility import (
+    GIB,
+    extraction_forecast,
+    parse_project_quota,
+)
 
 
 def _runs():
@@ -24,10 +31,20 @@ def _runs():
     ]
 
 
+def _forecast(runs, **overrides):
+    arguments = {
+        "full_sample_count": 113945,
+        "free_bytes": 300 * GIB,
+        "project_quota_free_bytes": 300 * GIB,
+    }
+    arguments.update(overrides)
+    return extraction_forecast(runs, **arguments)
+
+
 def test_forecast_uses_slower_full_run_and_margins() -> None:
     runs = _runs()
     runs[1]["wall_time_seconds"] = 3500
-    forecast = extraction_forecast(runs, full_sample_count=113945, free_bytes=300 * GIB)
+    forecast = _forecast(runs)
     assert forecast["passed"]
     assert forecast["projected_seconds"] == pytest.approx(3500 * 113945 / 95001 * 1.25)
     assert forecast["checks"]["cache_storage"]
@@ -45,19 +62,18 @@ def test_forecast_uses_slower_full_run_and_margins() -> None:
 def test_each_resource_limit_fails_closed(field, value, check) -> None:
     runs = _runs()
     runs[1][field] = value
-    forecast = extraction_forecast(runs, full_sample_count=113945, free_bytes=300 * GIB)
+    forecast = _forecast(runs)
     assert not forecast["passed"]
     assert not forecast["checks"][check]
 
 
 def test_missing_gpu_evidence_or_storage_cannot_pass() -> None:
     runs = _runs()
-    assert not extraction_forecast(
-        runs, full_sample_count=113945, free_bytes=100 * GIB
-    )["passed"]
+    assert not _forecast(runs, free_bytes=100 * GIB)["passed"]
+    assert not _forecast(runs, project_quota_free_bytes=100 * GIB)["passed"]
     runs[0]["peak_gpu_memory_bytes"] = 0
     with pytest.raises(ValueError, match="telemetry"):
-        extraction_forecast(runs, full_sample_count=113945, free_bytes=300 * GIB)
+        _forecast(runs)
 
 
 @pytest.mark.parametrize(
@@ -76,9 +92,13 @@ def test_forecast_rejects_malformed_inventory_or_storage(
     full_count, free_bytes
 ) -> None:
     with pytest.raises(ValueError, match="forecast requires"):
-        extraction_forecast(
-            _runs(), full_sample_count=full_count, free_bytes=free_bytes
-        )
+        _forecast(_runs(), full_sample_count=full_count, free_bytes=free_bytes)
+
+
+@pytest.mark.parametrize("value", [-1, False, 2.5, float("inf")])
+def test_forecast_rejects_invalid_project_quota(value) -> None:
+    with pytest.raises(ValueError, match="forecast requires"):
+        _forecast(_runs(), project_quota_free_bytes=value)
 
 
 @pytest.mark.parametrize(
@@ -97,7 +117,41 @@ def test_forecast_rejects_invalid_run_measurements(field, value) -> None:
     runs = _runs()
     runs[0][field] = value
     with pytest.raises(ValueError):
-        extraction_forecast(runs, full_sample_count=113945, free_bytes=300 * GIB)
+        _forecast(runs)
+
+
+def test_project_quota_parser_uses_matching_project_space() -> None:
+    raw = """quota quota usage usage
+project space (GB) (files) (GB) (files)
+/project/textconv 200 6553600 186.79 442664
+/projectnb/textconv 18800 38502400 18506.56 33682403
+"""
+    result = parse_project_quota(
+        raw, Path("/projectnb/textconv/bujack/pose-embed-artifacts")
+    )
+    assert result == {
+        "project_space": "/projectnb/textconv",
+        "quota_gb": "18800",
+        "usage_gb": "18506.56",
+        "free_bytes": 293_440_000_000,
+    }
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "",
+        "/project/textconv 200 6553600 186.79 442664",
+        "/projectnb/textconv 18800 38502400 unavailable 33682403",
+        "/projectnb/textconv 18800 38502400 18506.56 33682403\n"
+        "/projectnb/textconv 18800 38502400 18506.56 33682403",
+    ],
+)
+def test_project_quota_parser_fails_closed_on_missing_or_malformed_rows(raw) -> None:
+    with pytest.raises(ValueError, match="project quota report"):
+        parse_project_quota(
+            raw, Path("/projectnb/textconv/bujack/pose-embed-artifacts")
+        )
 
 
 @pytest.fixture
@@ -110,6 +164,8 @@ def repeat_pair(tmp_path, monkeypatch):
         path.with_suffix(".npz.manifest.json").write_text("{}")
     manifest = tmp_path / "manifest.jsonl"
     manifest.write_text("fixture")
+    quota_report = tmp_path / "project-quota.txt"
+    quota_report.write_text(f"{tmp_path} 500 999 100 1\n")
     stages = dict.fromkeys(
         (
             "source_verification_load",
@@ -185,6 +241,7 @@ def repeat_pair(tmp_path, monkeypatch):
             protocol_path="unused",
             manifest_path=manifest,
             output_path=tmp_path / "report.json",
+            project_quota_report=quota_report,
         )
 
     return paths, sidecars, verify, tmp_path / "report.json"
@@ -197,7 +254,37 @@ def test_verified_repeat_pair_publishes_bound_process_evidence(repeat_pair) -> N
     assert report["status"] == "passed"
     assert report["identical_arrays"]
     assert report["processes"] == [s.provenance["process"] for s in sidecars]
+    assert report["project_quota"]["evidence_sha256"] == reproducibility.sha256_file(
+        output.parent / "project-quota.txt"
+    )
+    assert report["forecast"]["effective_free_bytes"] == 300 * GIB
     assert output.is_file()
+
+
+def test_project_quota_below_reserve_preserves_failed_report(repeat_pair) -> None:
+    _, _, verify, output = repeat_pair
+    (output.parent / "project-quota.txt").write_text(f"{output.parent} 200 999 100 1\n")
+    with pytest.raises(ValueError, match="resource gate failed"):
+        verify()
+    report = json.loads(output.read_text())
+    assert report["status"] == "failed"
+    assert report["forecast"]["checks"]["remaining_storage"] is False
+    assert report["forecast"]["observed_free_bytes"] == 300 * GIB
+    assert report["forecast"]["observed_project_quota_free_bytes"] == 100_000_000_000
+
+
+def test_project_quota_report_must_be_fresh_and_present(repeat_pair) -> None:
+    _, sidecars, verify, output = repeat_pair
+    quota_path = output.parent / "project-quota.txt"
+    old = datetime.fromisoformat(sidecars[1].provenance["started_at"]).timestamp()
+    os.utime(quota_path, (old, old))
+    with pytest.raises(ValueError, match="captured after both runs"):
+        verify()
+    assert not output.exists()
+    quota_path.unlink()
+    with pytest.raises(FileNotFoundError):
+        verify()
+    assert not output.exists()
 
 
 @pytest.mark.parametrize(

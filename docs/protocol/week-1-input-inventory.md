@@ -11,6 +11,10 @@ valid. The inventory/checksum deliverable closes `w01-task-02`; the
 matches the 113,945 usable annotations and 535 official exclusions, so
 `w01-gate-02` is met. The novel test remains sealed.
 
+The v2 study reuses this verified physical input and class inventory. This
+record does not certify its multi-positive retrieval construction, fine-tuning
+memory, or full-campaign storage and runtime; those have separate v2 checks.
+
 All local paths below are relative to `POSE_EMBED_DATA_ROOT`. Protected files
 remain outside Git; this repository contains only public-safe provenance and
 checksums.
@@ -103,7 +107,7 @@ hash and reproduced every JSONL manifest byte-for-byte.
 
 1. [x] Record the [result-blind input-contract resolution](input-contract-amendment.v1.md)
    before opening the novel test. The earlier prepared draft remains historical.
-2. [x] Apply the documented amendment, verify protocol SHA-256
+2. [x] Apply the documented amendment, verify the amended v1 input-protocol SHA-256
    `c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f`,
    and regenerate the manifests under the exact two-file contract. The
    historical bundle remains untouched. `w01-gate-02` is met; the separate BU

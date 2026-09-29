@@ -1,11 +1,22 @@
 # Week 3 — frozen MotionBERT and retrieval
 
 Implementation plan recorded on 2026-09-24 for September 28–October 4.
+**Execution status as of September 28:** all technical acceptance criteria
+passed in SCC job `7761714`, completed September 27 EDT. Fresh parity, two
+byte-identical 95,001-row extractions, five validated caches and the declared
+resource checks are recorded in the
+[SCC execution report](../docs/protocol/week-3-scc-execution.md). Formal week
+closure still needs actual researcher minutes; the hosted Week 1–2 zero-minute
+closures need separate reconciliation. This
+frozen path is supplementary infrastructure for v2; it does not establish
+fine-tuned campaign feasibility.
+
 The input-contract amendment is adopted at protocol SHA-256
 `c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f`.
 Current independent-research governance replaces historical advisor sign-off
-with researcher decisions. The recorded BU determination and actual research
-minutes remain separate requirements; do not infer either from code completion.
+with researcher decisions. The BU determination is researcher-confirmed;
+actual research minutes remain unreported and are not inferred from code
+completion.
 
 ## Ordered work
 
@@ -48,19 +59,20 @@ minutes remain separate requirements; do not infer either from code completion.
    margin and a 10% storage margin. Require at most 4 hours, 6 GiB per complete
    clean cache, 16 GiB peak GPU memory (the larger of allocated/reserved),
    32 GiB host memory, and twice a conservative 100 GiB remaining artifact
-   budget free. This 200 GiB reserve covers retained caches, nine heads, their
-   retrieval embeddings and run evidence; it is a reservation, not measured
-   storage consumption. Run workspace verification, locked dependency sync, Ruff and
-   the full Python tests. Publish compact evidence, update only supported
-   Week 3 gates, and record actual researcher time/review before closure.
+   budget free. This 200 GiB reserve was defined for retained v1 frozen caches,
+   nine heads, retrieval embeddings and run evidence; it is a reservation, not
+   a v2 campaign storage estimate. Run workspace verification, locked dependency
+   sync, Ruff and the full Python tests. Publish compact evidence, update only
+   supported Week 3 gates, and record actual researcher time before closure.
 
 ## Boundaries
 
 Raw evidence and caches live under `POSE_EMBED_ARTIFACT_ROOT`; licensed source
 files and checkpoints live under `POSE_EMBED_DATA_ROOT`. The 48 samples serve
-parity only; repeatability requires the full auxiliary set. Training objectives
-belong to Week 4, real corruptions to Week 5. Novel extraction and evaluation
-remain sealed until their later protocol gates are satisfied.
+parity only; repeatability requires the full auxiliary set. In the original v1
+sequence, training objectives belonged to Week 4 and real corruptions to Week 5.
+Novel extraction and evaluation remain sealed until their later protocol gates
+are satisfied.
 
 ## Acceptance
 

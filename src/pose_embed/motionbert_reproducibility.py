@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import math
+import re
 import shutil
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +24,11 @@ REMAINING_ARTIFACT_BUDGET_BYTES = 100 * GIB
 
 
 def extraction_forecast(
-    runs: list[dict[str, Any]], *, full_sample_count: int, free_bytes: int
+    runs: list[dict[str, Any]],
+    *,
+    full_sample_count: int,
+    free_bytes: int,
+    project_quota_free_bytes: int,
 ) -> dict[str, Any]:
     if len(runs) != 2:
         raise ValueError("repeatability requires exactly two extraction runs")
@@ -31,9 +37,12 @@ def extraction_forecast(
         or full_sample_count <= 0
         or type(free_bytes) is not int
         or free_bytes < 0
+        or type(project_quota_free_bytes) is not int
+        or project_quota_free_bytes < 0
     ):
         raise ValueError(
-            "forecast requires a positive sample count and nonnegative free bytes"
+            "forecast requires a positive sample count and nonnegative "
+            "filesystem and project-quota free bytes"
         )
     required = (
         "wall_time_seconds",
@@ -86,7 +95,8 @@ def extraction_forecast(
         <= limits["peak_gpu_memory_bytes"],
         "host_memory": max(r["peak_host_memory_bytes"] for r in runs)
         <= limits["peak_host_memory_bytes"],
-        "remaining_storage": free_bytes >= limits["required_free_bytes"],
+        "remaining_storage": min(free_bytes, project_quota_free_bytes)
+        >= limits["required_free_bytes"],
     }
     return {
         "full_sample_count": full_sample_count,
@@ -96,9 +106,41 @@ def extraction_forecast(
         "storage_margin": 1.1,
         "remaining_artifact_budget_bytes": REMAINING_ARTIFACT_BUDGET_BYTES,
         "observed_free_bytes": free_bytes,
+        "observed_filesystem_free_bytes": free_bytes,
+        "observed_project_quota_free_bytes": project_quota_free_bytes,
+        "effective_free_bytes": min(free_bytes, project_quota_free_bytes),
         "limits": limits,
         "checks": checks,
         "passed": all(checks.values()),
+    }
+
+
+def parse_project_quota(raw: str, artifact_root: Path) -> dict[str, Any]:
+    """Select the SCC project-space row containing this artifact directory."""
+    root = artifact_root.resolve()
+    rows = []
+    pattern = re.compile(r"^(/\S+)\s+(\d+(?:\.\d+)?)\s+\d+\s+(\d+(?:\.\d+)?)\s+\d+\s*$")
+    for line in raw.splitlines():
+        match = pattern.fullmatch(line.strip())
+        if match is None:
+            continue
+        space = Path(match.group(1))
+        if root.is_relative_to(space):
+            rows.append((space, Decimal(match.group(2)), Decimal(match.group(3))))
+    if not rows:
+        raise ValueError("project quota report has no row for the artifact root")
+    longest = max(len(space.parts) for space, _, _ in rows)
+    matches = [row for row in rows if len(row[0].parts) == longest]
+    if len(matches) != 1:
+        raise ValueError("project quota report has ambiguous artifact-root rows")
+    space, quota_gb, usage_gb = matches[0]
+    if quota_gb <= 0 or usage_gb < 0:
+        raise ValueError("project quota report has invalid capacity or usage")
+    return {
+        "project_space": str(space),
+        "quota_gb": str(quota_gb),
+        "usage_gb": str(usage_gb),
+        "free_bytes": max(0, int((quota_gb - usage_gb) * 1_000_000_000)),
     }
 
 
@@ -166,6 +208,7 @@ def verify_repeatability(
     protocol_path: str | Path,
     manifest_path: str | Path,
     output_path: str | Path,
+    project_quota_report: str | Path,
 ) -> dict[str, Any]:
     protocol = load_protocol(protocol_path)
     scientific = resolve_scientific_paths(protocol)
@@ -239,6 +282,18 @@ def verify_repeatability(
         raise ValueError(
             "repeat extraction processes must run sequentially in recorded order"
         )
+    quota_path = require_path_within(
+        project_quota_report, scientific.root, label="project quota evidence"
+    )
+    observed_at = datetime.fromtimestamp(quota_path.stat().st_mtime, UTC)
+    if observed_at < evidence[1][2] or observed_at > datetime.now(UTC):
+        raise ValueError("project quota evidence must be captured after both runs")
+    quota = parse_project_quota(quota_path.read_text(encoding="utf-8"), scientific.root)
+    quota.update(
+        evidence_path=str(quota_path),
+        evidence_sha256=sha256_file(quota_path),
+        observed_at=observed_at.isoformat(),
+    )
     with (
         np.load(paths[0], allow_pickle=False) as left,
         np.load(paths[1], allow_pickle=False) as right,
@@ -250,6 +305,7 @@ def verify_repeatability(
         [item[0] for item in evidence],
         full_sample_count=protocol.dataset.expected_source_sample_count,
         free_bytes=shutil.disk_usage(scientific.root).free,
+        project_quota_free_bytes=quota["free_bytes"],
     )
     report = {
         "schema_version": 1,
@@ -269,6 +325,7 @@ def verify_repeatability(
             )
         },
         "forecast": forecast,
+        "project_quota": quota,
     }
     write_immutable_json(destination, report)
     if not forecast["passed"]:

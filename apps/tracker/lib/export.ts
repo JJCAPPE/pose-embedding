@@ -51,12 +51,15 @@ export function planToMarkdown(plan: LoadedPlan): string {
   ];
 
   for (const week of plan.weeks) {
+    const actualHours = week.actualMinutes === 0
+      ? "no time recorded"
+      : `${(week.actualMinutes / 60).toFixed(1)} hours actual`;
     lines.push(
       `## Week ${week.number}: ${week.title}`,
       "",
       `**Dates:** ${formatDateRange(week.startDate, week.endDate)}  `,
       `**Phase:** ${week.phase}  `,
-      `**Budget:** ${week.plannedMinutes / 60} hours planned, ${(week.actualMinutes / 60).toFixed(1)} hours actual  `,
+      `**Budget:** ${week.plannedMinutes / 60} hours planned, ${actualHours}  `,
       `**State:** ${week.state}  `,
       `**Ready to close:** ${weekCanClose(week) ? "yes" : "no"}`,
       "",

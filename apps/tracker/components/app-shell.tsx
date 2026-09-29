@@ -63,7 +63,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </Layout.Content>
       <Layout.Footer className="site-footer">
         <div className="footer-inner">
-          <p>Robust human-motion retrieval · Fall 2026</p>
+          <p>Metric learning for human-motion retrieval · Fall 2026</p>
           <Space size="large" wrap>
             <a href="/api/export?format=markdown">Export plan</a>
             <a href="/api/health">Technical status</a>

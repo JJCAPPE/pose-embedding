@@ -18,6 +18,15 @@ describe("public export", () => {
     expect(markdown).toContain("Required-task progress");
   });
 
+  it("does not present zero entered minutes as actual work, even on a closed week", () => {
+    const markdown = planToMarkdown(loaded);
+    expect(markdown).toContain("**Budget:** 8 hours planned, no time recorded");
+    expect(markdown).not.toContain("0.0 hours actual");
+    const closed = structuredClone(loaded);
+    closed.weeks[0].state = "closed";
+    expect(planToMarkdown(closed)).toContain("**Budget:** 8 hours planned, no time recorded");
+  });
+
   it("does not introduce the banned typographic dash characters", () => {
     expect(planToMarkdown(loaded)).not.toMatch(/[—–]/u);
   });
