@@ -224,7 +224,11 @@ export function WeekDetailView({
                       <h3>{task.title}</h3>
                       <div className="task-meta">
                         <StatusLabel status={task.state} />
-                        <span>{formatHours(task.estimateMinutes)} estimate</span>
+                        <span>
+                          {task.estimateMinutes > 0
+                            ? `${formatHours(task.estimateMinutes)} estimate`
+                            : "Not estimated"}
+                        </span>
                         <Tag bordered>{task.required ? "Required" : "Optional"}</Tag>
                       </div>
                     </div>
