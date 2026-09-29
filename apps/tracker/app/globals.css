@@ -969,6 +969,81 @@ a {
   margin-bottom: 0;
 }
 
+.protocol-document {
+  max-width: 1120px;
+}
+
+.document-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 32px;
+}
+
+.document-contents {
+  padding: 20px 24px;
+  margin-bottom: 32px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-subtle);
+}
+
+.document-contents ol {
+  columns: 2 260px;
+  margin-bottom: 0;
+  padding-left: 20px;
+}
+
+.document-contents li {
+  break-inside: avoid;
+  margin-bottom: 8px;
+}
+
+.protocol-document .markdown-text h2 {
+  margin-top: 48px;
+  scroll-margin-top: 100px;
+}
+
+.protocol-document .markdown-text h1 {
+  line-height: 1.15;
+}
+
+.protocol-document .markdown-text p,
+.protocol-document .markdown-text li {
+  overflow-wrap: anywhere;
+}
+
+.document-table {
+  width: 100%;
+  overflow-x: auto;
+  margin: 24px 0;
+}
+
+.document-table table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.document-table th,
+.document-table td {
+  min-width: 150px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.document-table th {
+  background: var(--surface-subtle);
+}
+
+.protocol-document pre {
+  overflow-x: auto;
+  padding: 16px;
+  border-radius: var(--radius-small);
+  background: var(--surface-subtle);
+}
+
 .evidence-box {
   margin-top: 16px;
   padding: 15px 16px;

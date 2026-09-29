@@ -39,8 +39,8 @@ The product name is Pose Embed. The requested replacement interface uses Ant Des
 
 ## Evidence on Hand
 
-- `plan/research-plan.v2.json` contains the public-safe schedule, deliverables, gates, sources, and protocol summary.
-- `docs/protocol/protocol-v1.md` and the tracked prospectus define the scientific scope and claim rules.
+- `plan/research-plan.v3.json` contains the public-safe schedule, deliverables, gates, sources, and protocol summary.
+- `plan/research-plan.v3.md` and `docs/decisions/0004-frozen-one-shot-v3.md` define the current planning direction and claim rules; v1/v2 remain historical records.
 - Supabase provides live progress and owner-only activity history when configured.
 - No testimonials, commercial claims, participant material, or novel-test outcomes should be fabricated for the interface.
 

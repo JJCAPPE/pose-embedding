@@ -91,9 +91,9 @@ def validate_upstream_manifest(errors: list[str]) -> None:
 
 
 def validate_plan(errors: list[str]) -> None:
-    plan_path = ROOT / "plan" / "research-plan.v2.json"
+    plan_path = ROOT / "plan" / "research-plan.v3.json"
     if not plan_path.is_file():
-        errors.append("missing plan/research-plan.v2.json")
+        errors.append("missing plan/research-plan.v3.json")
         return
 
     try:

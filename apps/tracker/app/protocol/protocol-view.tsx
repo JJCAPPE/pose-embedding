@@ -43,14 +43,27 @@ export function ProtocolView({
       <DataNotice dataSource={dataSource} lastRefreshedAt={lastRefreshedAt} />
       <header className="page-header protocol-header">
         <div>
-          <p className="eyebrow">Locked study design</p>
+          <p className="eyebrow">V3 · Final planning direction</p>
           <h1>The rules before the result.</h1>
           <p className="page-summary">
-            These rules keep the comparison fair by fixing the study before final results are
-            opened. A neutral or negative result still counts as success.
+            Three training recipes, a frozen MotionBERT encoder, and one clean reference per
+            unseen action. Implementation, measured capacity gates, and the final-test lock
+            are still pending. A null or negative result still counts as success.
           </p>
+          <Space size={[12, 12]} wrap>
+            <InternalLinkButton href="/protocol/plan" type="primary">Read the final v3 plan</InternalLinkButton>
+            <InternalLinkButton href="/protocol/decision">Read the scope decision</InternalLinkButton>
+          </Space>
         </div>
       </header>
+
+      <Alert
+        className="protocol-success"
+        title="Capacity is a gate, not a completed result"
+        description="September 29, 2026: the plan budgets 100 GB of incremental storage with slack while preserving a 200 GiB reserve. The inspected quota leaves 58.05 GB above that reserve, a gap of about 42 GB. GPU runtime and researcher availability still require measurement and confirmation."
+        showIcon
+        type="warning"
+      />
 
       <Alert
         className="protocol-success"
@@ -120,7 +133,7 @@ export function ProtocolView({
         <div className="section-heading">
           <div>
             <p className="eyebrow">Already chosen</p>
-            <h2 id="decisions-title">Locked decisions</h2>
+            <h2 id="decisions-title">Fixed planning decisions</h2>
           </div>
           <p>These choices stay fixed so later results cannot change the comparison.</p>
         </div>
@@ -142,7 +155,7 @@ export function ProtocolView({
             <p className="eyebrow">Reference detail</p>
             <h2 id="technical-title">Study design and analysis</h2>
           </div>
-          <p>Open only the technical section you need. The recorded scientific content is unchanged.</p>
+          <p>The v3 summary follows the final plan. Historical v1/v2 records remain preserved.</p>
         </div>
         <Collapse
           className="protocol-collapse"

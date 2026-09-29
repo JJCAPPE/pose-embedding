@@ -231,10 +231,10 @@ async function loadLivePlan(): Promise<LoadedPlan> {
   };
 }
 
-async function getCachedLivePlan(): Promise<LoadedPlan> {
+async function getCachedLivePlan(planRevision: string): Promise<LoadedPlan> {
   "use cache";
   cacheLife({ stale: 300, revalidate: 3600, expire: 31_536_000 });
-  cacheTag("plan");
+  cacheTag("plan", planRevision);
   return loadLivePlan();
 }
 
@@ -251,7 +251,7 @@ export async function getPublicPlan(): Promise<LoadedPlan> {
     // Failed revalidation is not converted into a successful cached seed value.
     // Next can retain the last successful cache entry; a cold failure reaches the
     // checked-in fallback below.
-    return await getCachedLivePlan();
+    return await getCachedLivePlan("research-plan.v3");
   } catch (error) {
     console.error("No live tracker snapshot is available; using the plan seed.", error);
     return {

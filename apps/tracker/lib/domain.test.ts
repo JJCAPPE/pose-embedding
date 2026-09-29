@@ -22,7 +22,7 @@ describe("weekly schedule", () => {
       const currentStart = new Date(`${seedPlan.weeks[index].startDate}T12:00:00Z`);
       expect((currentStart.getTime() - previousEnd.getTime()) / 86_400_000).toBe(1);
     }
-    expect(seedPlan.sources.every((source) => source.version === 1)).toBe(true);
+    expect(seedPlan.sources.every((source) => source.version >= 1)).toBe(true);
     expect(seedPlan.weekSources.every((link) => link.version >= 1)).toBe(true);
   });
 
