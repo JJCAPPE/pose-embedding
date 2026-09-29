@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+#$ -cwd
+#$ -j y
+#$ -N pose_v3
+#$ -l h_rt=12:00:00
+#$ -pe omp 4
+#$ -l gpus=1
+#$ -l gpu_type=L40S
+#$ -l gpu_c=7.0
+#$ -l gpu_memory=16G
+#$ -l mem_per_core=8G
+#$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,POSE_EMBED_MANIFEST_SET
+# Submit with -o "$POSE_EMBED_ARTIFACT_ROOT/logs" so scheduler logs remain
+# outside the clean release. Every attempt and failure is retained.
+set -euo pipefail
+set -o noclobber
+umask 077
+v3_mode=${1:?Use caches or pilot}
+case "$v3_mode" in
+  caches)
+    [[ $# == 1 ]] || { printf 'Usage: study_v3.qsub caches\n' >&2; exit 2; }
+    ;;
+  pilot)
+    [[ $# == 2 ]] || { printf 'Usage: study_v3.qsub pilot METHOD\n' >&2; exit 2; }
+    v3_method=$2
+    case "$v3_method" in contrastive|contextual|supcon) ;; *) printf 'Unknown pilot method.\n' >&2; exit 2 ;; esac
+    # Export this optional variable with qsub -v POSE_EMBED_V3_CACHES=... .
+    : "${POSE_EMBED_V3_CACHES:?Completed v3 cache directory required}"
+    ;;
+  *) printf 'Unsupported v3 stage: %s\n' "$v3_mode" >&2; exit 2 ;;
+esac
+: "${JOB_ID:?Submit through Grid Engine}"
+: "${TMPDIR:?Grid Engine node-local temporary directory required}"
+: "${POSE_EMBED_DATA_ROOT:?Licensed input root required}"
+: "${POSE_EMBED_ARTIFACT_ROOT:?Canonical artifact root required}"
+: "${POSE_EMBED_MANIFEST_SET:?V3 manifest bundle required}"
+export OMP_NUM_THREADS="${NSLOTS:-4}" MKL_NUM_THREADS="${NSLOTS:-4}"
+export OPENBLAS_NUM_THREADS="${NSLOTS:-4}" CUBLAS_WORKSPACE_CONFIG=:4096:8
+if [[ -n "$(git status --porcelain)" ]]; then
+  printf 'A clean committed checkout is required.\n' >&2
+  exit 2
+fi
+export UV_CACHE_DIR="$TMPDIR/pose-embed-uv-cache" UV_LINK_MODE=copy UV_NO_PROGRESS=1
+uv sync --locked --group dev --python 3.11
+v3_protocol="$POSE_EMBED_ARTIFACT_ROOT/study-v3/locks/protocol.v3.json"
+v3_bundle=$(dirname "$POSE_EMBED_MANIFEST_SET")
+v3_stamp=$(date -u +%Y%m%dT%H%M%SZ)
+v3_attempt="$POSE_EMBED_ARTIFACT_ROOT/study-v3/attempts/${v3_stamp}-${JOB_ID}"
+mkdir -p "$(dirname "$v3_attempt")"
+mkdir "$v3_attempt"
+trap 'v3_code=$?; printf "exit_status=%s\n" "$v3_code" > "$v3_attempt/scheduler-exit.txt"' EXIT
+git rev-parse HEAD > "$v3_attempt/release.txt"
+nvidia-smi > "$v3_attempt/nvidia-smi.txt"
+LC_ALL=C pquota textconv > "$v3_attempt/project-quota.txt"
+.venv/bin/python - "$v3_attempt/project-quota.txt" <<'PY'
+import shutil, sys
+import torch
+from pathlib import Path
+from pose_embed.config import load_protocol
+from pose_embed.dataset_seal import canonical_artifact_root, require_dataset_unopened
+from pose_embed.motionbert_reproducibility import parse_project_quota
+from pose_embed.protocol_v3 import require_v3_design
+from pose_embed.models.motionbert import configure_deterministic_inference
+configure_deterministic_inference()
+if torch.cuda.device_count() != 1 or torch.cuda.get_device_name(0) != "NVIDIA L40S":
+    raise ValueError("v3 requires exactly one scheduler-visible, validated L40S")
+root = canonical_artifact_root()
+require_dataset_unopened(require_registry=True)
+require_v3_design(load_protocol(root / "study-v3/locks/protocol.v3.json"))
+quota = parse_project_quota(Path(sys.argv[1]).read_text(), root)
+print(quota)
+# Bounded Week 4 increment, including staging, two repeats and pilot snapshots.
+# This does not pass the separate full-campaign October capacity gate.
+available = min(shutil.disk_usage(root).free, quota["free_bytes"])
+if available < 200 * 2**30 + 1.25 * 20_000_000_000:
+    raise ValueError("Week 4 work would cross its storage reserve")
+PY
+.venv/bin/python scripts/verify_workspace.py
+.venv/bin/python scripts/fetch_upstreams.py --check --name MotionBERT
+.venv/bin/pose-embed protocol verify --config "$v3_protocol"
+if [[ "$v3_mode" == caches ]]; then
+  .venv/bin/pose-embed features parity --protocol-config "$v3_protocol" \
+    --manifest-set "$POSE_EMBED_MANIFEST_SET" --output "$v3_attempt/parity.json" --device cuda
+  for v3_repeat in first second; do
+    .venv/bin/pose-embed features extract --backend motionbert \
+      --protocol-config "$v3_protocol" --input "$POSE_EMBED_DATA_ROOT/ntu120_hrnet.pkl" \
+      --manifest-set "$POSE_EMBED_MANIFEST_SET" --manifest "$v3_bundle/final-train.jsonl" \
+      --parity-evidence "$v3_attempt/parity.json" --role training --split final_train \
+      --device cuda --output "$v3_attempt/final-train-${v3_repeat}.npz"
+  done
+  LC_ALL=C pquota textconv > "$v3_attempt/repeat-quota.txt"
+  .venv/bin/pose-embed features verify-repeatability --protocol-config "$v3_protocol" \
+    --first "$v3_attempt/final-train-first.npz" --second "$v3_attempt/final-train-second.npz" \
+    --manifest "$v3_bundle/final-train.jsonl" --project-quota-report "$v3_attempt/repeat-quota.txt" \
+    --output "$v3_attempt/repeatability.json"
+  .venv/bin/pose-embed features extract --backend motionbert \
+    --protocol-config "$v3_protocol" --input "$POSE_EMBED_DATA_ROOT/ntu120_hrnet.pkl" \
+    --manifest-set "$POSE_EMBED_MANIFEST_SET" --manifest "$v3_bundle/development-train.jsonl" \
+    --parity-evidence "$v3_attempt/parity.json" --role training --split development_train \
+    --device cuda --output "$v3_attempt/development-train.npz"
+  for v3_part in gallery queries; do
+    v3_role=query_clean
+    if [[ "$v3_part" == gallery ]]; then v3_role=gallery_clean; fi
+    .venv/bin/pose-embed features extract --backend motionbert \
+      --protocol-config "$v3_protocol" --input "$POSE_EMBED_DATA_ROOT/ntu120_hrnet.pkl" \
+      --manifest-set "$POSE_EMBED_MANIFEST_SET" --manifest "$v3_bundle/development/development-${v3_part}.jsonl" \
+      --development-episode "$v3_bundle/development/development-episode.json" \
+      --parity-evidence "$v3_attempt/parity.json" --role "$v3_role" --split development_validation \
+      --device cuda --output "$v3_attempt/development-${v3_part}.npz"
+  done
+elif [[ "$v3_mode" == pilot ]]; then
+  v3_config="configs/experiments/v3/${v3_method}-lr3e-4-seed7.yaml"
+  # Complete the fixed synthetic wiring check before consuming scientific caches.
+  .venv/bin/python - "$v3_config" "$v3_attempt/learnable-fixture.json" <<'PYFIXTURE'
+import sys
+from datetime import UTC, datetime
+from pathlib import Path
+from pose_embed.config import load_experiment, load_protocol, validate_experiment_against_protocol
+from pose_embed.dataset_seal import canonical_artifact_root, dataset_access, require_dataset_unopened
+from pose_embed.protocol_v3 import require_v3_design
+from pose_embed.provenance import capture_provenance, capture_runtime_telemetry, reset_peak_memory, sha256_file, write_immutable_json
+from pose_embed.training.runner import check_learnable_fixture
+from pose_embed.models.motionbert import configure_deterministic_inference
+configure_deterministic_inference()
+with dataset_access():
+    require_dataset_unopened(require_registry=True)
+    protocol = load_protocol(canonical_artifact_root() / "study-v3/locks/protocol.v3.json")
+    require_v3_design(protocol)
+    config = load_experiment(sys.argv[1])
+    validate_experiment_against_protocol(config, protocol)
+    output = Path(sys.argv[2])
+    started_at = datetime.now(UTC)
+    write_immutable_json(output.with_name("fixture-attempt.json"), {
+        "status": "started", "started_at": started_at.isoformat(),
+        "config_sha256": sha256_file(sys.argv[1]), "updates": 1000,
+        "scientific_use_allowed": False,
+    })
+    try:
+        reset_peak_memory("cuda")
+        record = check_learnable_fixture(config, device="cuda")
+        ended_at = datetime.now(UTC)
+        record["telemetry"] = capture_runtime_telemetry(started_at=started_at, ended_at=ended_at, device="cuda").model_dump(mode="json")
+        record["provenance"] = capture_provenance(command="v3-learnable-fixture", configuration=config.model_dump(mode="json"), inputs=[sys.argv[1]], started_at=started_at, ended_at=ended_at)
+        write_immutable_json(output, record)
+    except BaseException as error:
+        write_immutable_json(output.with_name("fixture-outcome.json"), {
+            "status": "failed", "error_type": type(error).__name__, "error_message": str(error),
+            "ended_at": datetime.now(UTC).isoformat(),
+        })
+        raise
+    write_immutable_json(output.with_name("fixture-outcome.json"), {
+        "status": "success", "result_sha256": sha256_file(output),
+        "ended_at": datetime.now(UTC).isoformat(),
+    })
+PYFIXTURE
+  .venv/bin/pose-embed train --stage engineering_pilot --device cuda \
+    --protocol-config "$v3_protocol" --config "$v3_config" \
+    --input "$POSE_EMBED_V3_CACHES/development-train.npz" --manifest "$v3_bundle/development-train.jsonl" \
+    --development-gallery "$POSE_EMBED_V3_CACHES/development-gallery.npz" \
+    --development-queries "$POSE_EMBED_V3_CACHES/development-queries.npz" \
+    --development-gallery-manifest "$v3_bundle/development/development-gallery.jsonl" \
+    --development-query-manifest "$v3_bundle/development/development-queries.jsonl" \
+    --output-dir "$v3_attempt/$v3_method"
+else
+  printf 'Unsupported v3 stage: %s\n' "$v3_mode" >&2
+  exit 2
+fi
+printf 'V3_STAGE_COMPLETE=%s\n' "$v3_attempt"

@@ -23,7 +23,9 @@ describe("versioned public plan cache", () => {
 
     const result = await getPublicPlan();
 
-    expect(mocks.cacheTag).toHaveBeenCalledWith("plan", "research-plan.v3");
+    expect(mocks.cacheTag).toHaveBeenCalledWith(
+      "plan", "research-plan.v3", `research-plan.v3:${seedPlan.generatedAt}`,
+    );
     expect(result.dataSource).toBe("seed");
     expect(result.protocol).toEqual(seedPlan.protocol);
     expect(result.weeks).toEqual(seedPlan.weeks);

@@ -218,7 +218,7 @@ def test_development_episode_rejects_source_subset_and_opened_test(
         generate_development_episode(manifest, output, protocol_path)
     _write_manifest(manifest, rows)
     ledger = manifest.parent / ledger_name
-    ledger.parent.mkdir(parents=True)
+    ledger.parent.mkdir(parents=True, exist_ok=True)
     ledger.write_text("{}")
     with pytest.raises(ValueError, match="after test opening"):
         generate_development_episode(manifest, output, protocol_path)

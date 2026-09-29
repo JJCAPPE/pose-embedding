@@ -11,6 +11,7 @@ from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from pose_embed.config import ProtocolConfig
+from pose_embed.dataset_seal import guarded_opening, record_dataset_opening
 from pose_embed.protocol import (
     evaluation_plan_digest,
     final_run_set_digest,
@@ -63,6 +64,7 @@ def _load_ledger(path: Path) -> TestOpeningLedger:
         raise ValueError(f"test-opening ledger does not exist: {path}") from exc
 
 
+@guarded_opening
 def open_final_test_once(
     protocol: ProtocolConfig,
     *,
@@ -131,6 +133,16 @@ def open_final_test_once(
 
     if destination.exists():
         return validate_existing()
+    record_dataset_opening(
+        version="protocol-v1",
+        authorization={
+            "protocol_sha256": protocol_sha256,
+            "protocol_lock_sha256": lock_sha256,
+            "evaluation_plan_sha256": plan_sha256,
+            "final_run_set_sha256": run_set_sha256,
+            "source_inventory_sha256": source_manifest_sha256,
+        },
+    )
     destination.parent.mkdir(parents=True, exist_ok=True)
     ledger = TestOpeningLedger(
         schema_version=2,

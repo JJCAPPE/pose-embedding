@@ -1,0 +1,420 @@
+# Design template only. Preparation resolves real immutable bindings before caches/pilots.
+schema_version: 3
+protocol_id: protocol-v3
+title: Robust Human-Motion Retrieval from Noisy Pose Sequences
+timezone: America/New_York
+schedule:
+  starts_on: 2026-09-15
+  ends_on: 2026-12-18
+  core_results_due_on: '2026-12-06'
+research_question: Does the full contextual transfer recipe reduce clean-to-corrupt
+  one-shot top-1 degradation relative to the standard contrastive recipe under the
+  declared synthetic query stress mixture?
+dataset:
+  name: NTU RGB+D 120
+  representation: HRNet-derived 2D pose sequences
+  frames: 100
+  joints: 17
+  expected_source_sample_count: 113945
+  source_contract:
+    aggregate_relative_path: ntu120_hrnet.pkl
+    aggregate_bytes: 1238461428
+    aggregate_sha256: aaf1f928b4629fa9a0850528d43fdd8d920532805d16672bfdda78085b649df8
+    missing_list_relative_path: provenance/sources/NTU_RGBD120_samples_with_missing_skeletons.txt
+    missing_list_bytes: 11451
+    missing_list_sha256: ab14fe64e89be63d2b08141713fcc31f6ebc7b01955009c3585d8d3367e0facc
+    missing_sample_count: 535
+    nominal_capture_count: 114480
+  novel_actions:
+  - 1
+  - 7
+  - 13
+  - 19
+  - 25
+  - 31
+  - 37
+  - 43
+  - 49
+  - 55
+  - 61
+  - 67
+  - 73
+  - 79
+  - 85
+  - 91
+  - 97
+  - 103
+  - 109
+  - 115
+  development_validation_actions:
+  - 2
+  - 8
+  - 14
+  - 20
+  - 26
+  - 32
+  - 38
+  - 44
+  - 50
+  - 56
+  - 62
+  - 68
+  - 74
+  - 80
+  - 86
+  - 92
+  - 98
+  - 104
+  - 110
+  - 116
+  official_protocol_source_commit: ac2ebc87e6e9777ea6bac67e65e53b325b903f74
+  official_protocol_source_url: https://github.com/shahroudy/NTURGB-D/blob/ac2ebc87e6e9777ea6bac67e65e53b325b903f74/README.md
+  official_one_shot_exemplars:
+  - S001C003P008R001A001
+  - S001C003P008R001A007
+  - S001C003P008R001A013
+  - S001C003P008R001A019
+  - S001C003P008R001A025
+  - S001C003P008R001A031
+  - S001C003P008R001A037
+  - S001C003P008R001A043
+  - S001C003P008R001A049
+  - S001C003P008R001A055
+  - S018C003P008R001A061
+  - S018C003P008R001A067
+  - S018C003P008R001A073
+  - S018C003P008R001A079
+  - S018C003P008R001A085
+  - S018C003P008R001A091
+  - S018C003P008R001A097
+  - S018C003P008R001A103
+  - S018C003P008R001A109
+  - S018C003P008R001A115
+  exclude_anchor_performance_views_from_primary_queries: true
+input_pipeline:
+  tensor_layout: people_frames_joints_channels
+  dtype: float32
+  raw_joint_convention: coco17_hrnet
+  encoder_joint_convention: h36m17_motionbert
+  channels:
+  - x
+  - y
+  - confidence
+  encoder_joint_names:
+  - pelvis
+  - right_hip
+  - right_knee
+  - right_ankle
+  - left_hip
+  - left_knee
+  - left_ankle
+  - belly
+  - neck
+  - nose
+  - head
+  - left_shoulder
+  - left_elbow
+  - left_wrist
+  - right_shoulder
+  - right_elbow
+  - right_wrist
+  coco_to_h36m_sources:
+  - - 11
+    - 12
+  - - 12
+  - - 14
+  - - 16
+  - - 11
+  - - 13
+  - - 15
+  - - 11
+    - 12
+    - 5
+    - 6
+  - - 5
+    - 6
+  - - 0
+  - - 1
+    - 2
+  - - 5
+  - - 7
+  - - 9
+  - - 6
+  - - 8
+  - - 10
+  derived_coordinate_rule: arithmetic_mean_of_sources
+  derived_confidence_rule: minimum_of_source_confidences
+  confidence_compatibility: local_corrected_h36m_mapping_not_upstream_bit_parity
+  parity_layers:
+  - camera_normalization
+  - person_tracking
+  - coordinate_mapping
+  - temporal_sampling
+  - single_person_padding
+  - spatial_normalization
+  - encoder_representation
+  - action_head
+  camera_normalization: divide_xy_by_long_image_side_multiply_two_subtract_one
+  person_tracking: motionbert_two_person_minimum_frame_displacement
+  temporal_sampling: deterministic_uniform_floor_100_frames
+  single_person_padding: append_one_all_zero_person
+  spatial_normalization: valid_confidence_bbox_crop_scale_ratio_one_clip_minus_one_plus_one
+  random_move: false
+  operation_order:
+  - camera_normalization
+  - person_tracking
+  - joint_and_confidence_conversion
+  - temporal_sampling
+  - single_person_padding
+  - spatial_normalization
+  corruption_stage: after_preprocessing_before_frozen_encoder
+encoder:
+  name: MotionBERT
+  frozen: true
+  evaluation_mode: true
+  representation_dimension: 512
+  embedding_dimension: 2048
+  people: 2
+batch:
+  classes_per_batch: 8
+  samples_per_class: 4
+  physical_batch_size: 32
+  profile_batch_size: 64
+objectives:
+  core:
+  - contrastive
+  - supcon
+  - contextual
+  contrastive:
+    positive_margin: 0.9
+    negative_margin: 0.6
+    normalize_embeddings: true
+  supcon:
+    temperature: 0.07
+    normalize_embeddings: true
+  contextual:
+    epsilon: 0.05
+    straight_through_alpha: 10.0
+    contextual_weight: 0.4
+    regularizer_weight: 0.1
+    target_mean_similarity: 0.25
+    positive_margin: 0.75
+    negative_margin: 0.6
+    neighborhood_size: 4
+    normalize_embeddings: true
+    comparison_operator: greater_than_or_equal_with_constant_ste_gradient
+  optional_control: omitted_before_pilots_and_scores
+  contextual_target: equation_5_same_label_indicator
+  contextual_distance: clamp_2_minus_2_cosine_min_zero
+  contextual_neighbors: include_self_detached_kth_threshold
+  contextual_first_stage_counts: detached
+  reciprocal_denominator: non_detached_clamp_min_one
+  contextual_reduction: off_diagonal_squared_error_divided_by_n_squared
+  contrastive_reduction: separate_strictly_active_hinge_means_empty_zero
+  regularizer_reduction: mean_similarity_including_diagonal
+  supcon_reduction: single_view_positive_log_softmax_no_temperature_multiplier
+training:
+  seeds:
+  - 7
+  - 17
+  - 29
+  tuning_trials_per_method: 3
+  tune_on: development_validation_clean_only
+  final_training_actions: all_100_auxiliary_actions
+  insufficient_compute_policy: block_and_require_documented_amendment_before_test_opening
+  epochs: 20
+  optimizer: adamw
+  tuning_grid:
+  - learning_rate: 0.0001
+    weight_decay: 0.0001
+  - learning_rate: 0.0003
+    weight_decay: 0.0001
+  - learning_rate: 0.001
+    weight_decay: 0.0001
+  final_selection_metric: top1
+  final_selection_aggregation: mean_across_three_paired_seeds
+  final_selection_tie_breakers:
+  - higher_mrr
+  - lower_learning_rate
+  paired_initialization: same_seed_same_linear_state_across_methods
+  paired_batch_plan: same_seed_epoch_and_ordered_sample_indices_across_methods
+  gradient_accumulation_equivalent: false
+  failed_run_policy:
+    preserve_every_attempt: true
+    infrastructure_failure: rerun_same_config_seed_initialization_and_batch_plan_from_scratch
+    numerical_failure: mark_failed_debug_on_development_only_and_require_amendment_for_parameter_change
+    seed_replacement: forbidden
+    novel_outcome_based_rerun: forbidden
+  optimizer_betas:
+  - 0.9
+  - 0.999
+  optimizer_epsilon: 1.0e-08
+  optimizer_amsgrad: false
+  weight_decay_scope: weight_and_bias
+  scheduler: null
+  mixed_precision: false
+  gradient_clipping: null
+  augmentation: false
+  dtype: float32
+  initialization: pytorch_linear_default
+  head_bias: true
+  head_dropout: 0.0
+  trainable_parameters: 17827840
+  torch_version: 2.9.1
+  python_version: '3.11'
+  numpy_version: 2.4.6
+  cublas_workspace_config: :4096:8
+  deterministic_algorithms: true
+  allow_tf32: false
+  sampler: ceil_n_over_32_seed_plus_epoch_shuffled_queues_modular_cycle
+  selection_epoch: 20
+  failed_candidate: ineligible_unless_all_three_seeds_valid
+  selection_runs: 27
+  final_runs: 9
+  pilot:
+    seed: 7
+    learning_rate: 0.0003
+    snapshot_epochs:
+    - 5
+    - 10
+    - 15
+    - 20
+    diagnostic_epochs:
+    - 0
+    - 5
+    - 10
+    - 15
+    - 20
+    selection_eligible: false
+    fixture_updates: 1000
+    fixture_self_excluded_top1: 1.0
+    maximum_normalization_error: 1.0e-05
+    minimum_query_variance_exclusive: 1.0e-06
+    real_accuracy_floor: null
+corruptions:
+  query_only: true
+  joint_convention: h36m17_motionbert
+  required_channels:
+  - x
+  - y
+  - confidence
+  coordinate_jitter_fractions:
+  - 0.01
+  - 0.025
+  - 0.05
+  jitter_distribution: shared_cpu_float32_torch_gaussian_xy
+  jitter_scale: lower_median_positive_finite_torso_distances
+  torso_joint_indices:
+    left_shoulder: 11
+    right_shoulder: 14
+    left_hip: 4
+    right_hip: 1
+  jitter_support: confidence_greater_than_zero_only
+  jitter_confidence_behavior: unchanged
+  joint_mask_counts:
+  - 3
+  - 6
+  - 8
+  joint_mask_groups:
+  - - 11
+    - 12
+    - 13
+  - - 14
+    - 15
+    - 16
+  - - 1
+    - 2
+    - 3
+  - - 4
+    - 5
+    - 6
+  - - 0
+    - 7
+    - 8
+    - 9
+    - 10
+  joint_selection: python_random_group_shuffle_then_fixed_within_group_prefix
+  consecutive_frame_mask_counts:
+  - 10
+  - 25
+  - 40
+  frame_selection: floor_u_times_101_minus_length_over_2_to_64
+  masking_value: 0.0
+  masking_channels:
+  - x
+  - y
+  - confidence
+  preserve_tensor_shape: true
+  severity_zero: byte_identical_copy
+  seed_derivation: sha256_protocol_id_nul_sample_id_nul_family_first_u64_and_low63
+  gallery_corruption: forbidden
+  amendments: documented_result_blind_before_selection_new_protocol_and_affected_runs
+  nested_severities: true
+  composition: forbidden_each_family_starts_clean
+  post_corruption_processing: none
+  fallback_rule: lower_median_valid_sample_scales_80_action_development_train_only
+analysis:
+  metrics:
+  - top1
+  - mrr
+  - r_at_5
+  bootstrap_replicates: 10000
+  bootstrap_cluster:
+  - setup
+  - performer
+  - repetition
+  - action
+  confidence_level: 0.95
+  primary_comparison: contextual_minus_contrastive_degradation
+  observation: paired_query_top1_correctness
+  cell_weighting: equal_across_three_seeds_and_nine_corruption_cells
+  effect_direction: negative_means_contextual_degraded_less
+  support_rule: upper_confidence_bound_below_zero
+  claim_caveat: less_degradation_is_not_higher_overall_retrieval_when_clean_accuracy_differs
+  required_reporting:
+  - clean_accuracy
+  - absolute_corrupted_accuracy
+  - every_seed
+  - every_corruption_curve
+  - leave_one_action_out
+  - fallback_frequency
+  - runtime
+  - memory
+  - failures
+  confirmatory_methods:
+  - contrastive
+  - contextual
+  secondary_methods:
+  - supcon
+  bootstrap_stratification: within_each_fixed_action
+  bootstrap_generator: numpy.random.Generator(PCG64(2026))
+  bootstrap_query_weighting: all_views_with_multiplicity_divide_by_sampled_query_count
+  bootstrap_pairing: one_draw_shared_across_methods_seeds_conditions
+  resample_seeds: false
+  resample_actions: false
+  quantile_method: linear
+  leave_one_action_out: remove_queries_only_retain_all_gallery_anchors_and_original_ranks
+  uncertainty_scope: conditional_on_fixed_heads_seeds_actions_anchors_queries_corruptions
+test_access:
+  state: sealed
+  final_evaluation_requires_lock: true
+  evaluation_plan_template: configs/evaluation-plan.v3.yaml
+  artifact_root_environment: POSE_EMBED_ARTIFACT_ROOT
+  protocol_lock_relative_path: study-v3/locks/protocol-lock.v3.json
+  evaluation_plan_relative_path: study-v3/locks/evaluation-plan.v3.yaml
+  final_run_set_relative_path: study-v3/locks/final-run-set.v3.json
+  opening_ledger_relative_path: study-v3/locks/test-opening.v3.json
+  opening_policy: one_atomic_dataset_opening_across_all_protocol_versions
+  training_after_opening: forbidden_across_all_protocol_versions
+  confirmatory_changes_after_opening: forbidden
+  design_lock_relative_path: study-v3/locks/design-lock.v3.json
+  selection_authorization_relative_path: study-v3/locks/selection-authorization.v3.json
+  resolved_protocol_relative_path: study-v3/locks/protocol.v3.json
+status: template
+preparation: null
+provenance:
+  adopted_input_protocol_sha256: c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f
+  historical_development_episode_sha256: 88f30f96e35dedfd34b42f8e8ee2b561db44bbaf1f93d82d0522ffe011abba46
+  development_anchor_prefix: protocol-v1|dev-anchor-v1|
+  historical_aggregate_access: all_annotations_deserialized_before_auxiliary_selection_no_novel_representation_or_outcome_access
+  historical_cache_policy: retain_unchanged_generate_fresh_v3_caches

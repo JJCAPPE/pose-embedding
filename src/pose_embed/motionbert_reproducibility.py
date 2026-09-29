@@ -14,6 +14,7 @@ import numpy as np
 
 from pose_embed.artifacts import sidecar_path_for, validate_feature_artifact
 from pose_embed.config import load_protocol
+from pose_embed.dataset_seal import guarded_auxiliary
 from pose_embed.protocol import protocol_digest, resolve_scientific_paths
 from pose_embed.provenance import require_path_within, sha256_file, write_immutable_json
 
@@ -201,6 +202,7 @@ def _run_evidence(
     return telemetry, start, end
 
 
+@guarded_auxiliary
 def verify_repeatability(
     first_path: str | Path,
     second_path: str | Path,

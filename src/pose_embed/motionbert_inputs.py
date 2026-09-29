@@ -26,6 +26,12 @@ REPOSITORY = Path(__file__).resolve().parents[2]
 MOTIONBERT_CODE_PATHS = (
     "src/pose_embed/artifacts.py",
     "src/pose_embed/config.py",
+    "src/pose_embed/config_v3.py",
+    "src/pose_embed/protocol_v3.py",
+    "src/pose_embed/preparation_v3.py",
+    "src/pose_embed/dataset_seal.py",
+    "src/pose_embed/corruptions/pose.py",
+    "src/pose_embed/corruptions/fallback.py",
     "src/pose_embed/data/inventory.py",
     "src/pose_embed/data/manifest.py",
     "src/pose_embed/data/ntu.py",
@@ -48,7 +54,7 @@ class VerifiedMotionBERTInputs:
     manifest_set_path: Path
     inventory: tuple[NTUInventoryRecord, ...]
     manifests: dict[str, list[ManifestRecord]]
-    annotations: list[dict[str, Any]] | None
+    annotations: list[dict[str, Any]] | dict[int, dict[str, Any]] | None
     bindings: dict[str, str]
 
 
@@ -145,7 +151,19 @@ def load_motionbert_inputs(
     require_clean: bool = True,
 ) -> VerifiedMotionBERTInputs:
     """Verify the adopted complete bundle and hash before any deserialization."""
+    from pose_embed.dataset_seal import (
+        registered_roots,
+        require_dataset_unopened,
+        require_no_v3_opening,
+    )
+
     protocol = load_protocol(protocol_path)
+    if protocol.protocol_id == "protocol-v3":
+        require_dataset_unopened(require_registry=True)
+    else:
+        require_no_v3_opening()
+        if require_clean:
+            registered_roots(required=True)
     scientific = resolve_scientific_paths(protocol)
     if scientific.test_opening_ledger.exists():
         raise ValueError("Week 3 extraction is forbidden after novel-test opening")
@@ -159,6 +177,12 @@ def load_motionbert_inputs(
     if not bundle_path.is_relative_to(scientific.root):
         raise ValueError("manifest bundle must be inside POSE_EMBED_ARTIFACT_ROOT")
     inventory, manifests = verify_manifest_bundle(protocol, bundle_path)
+    if protocol.protocol_id == "protocol-v3" and (
+        protocol.preparation is None
+        or sha256_file(bundle_path.parent / "source-inventory.jsonl")
+        != protocol.preparation.source_inventory.sha256
+    ):
+        raise ValueError("v3 source inventory differs from immutable preparation")
     contract = protocol.dataset.source_contract
     for prefix in ("aggregate", "missing_list"):
         relative = getattr(contract, f"{prefix}_relative_path")
@@ -170,7 +194,11 @@ def load_motionbert_inputs(
         ):
             raise ValueError(f"verified {prefix} source differs from the protocol")
     annotations = None
-    if load_annotations:
+    if load_annotations and protocol.protocol_id == "protocol-v3":
+        from pose_embed.preparation_v3 import load_auxiliary_annotations
+
+        annotations = load_auxiliary_annotations(protocol, inventory, scientific.root)
+    elif load_annotations:
         inspected = inspect_ntu_aggregate_sources(
             data_root,
             protocol,

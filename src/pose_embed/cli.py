@@ -30,6 +30,34 @@ def _parser() -> argparse.ArgumentParser:
 
     add_parser(commands)
 
+    study = commands.add_parser("study-v3", help="prepare the current frozen v3 study")
+    operations = study.add_subparsers(dest="operation", required=True)
+    roots = operations.add_parser(
+        "register-roots", help="record the historical seal audit"
+    )
+    roots.add_argument("--root", action="append", default=[])
+    roots.add_argument("--external-audit", action="append", default=[])
+    prepare = operations.add_parser(
+        "prepare", help="package auxiliary inputs and bind the torso fallback"
+    )
+    prepare.add_argument("--template", default="configs/protocol.v3.yaml")
+    prepare.add_argument("--historical-protocol", default=DEFAULT_PROTOCOL)
+    prepare.add_argument("--manifest-set", required=True)
+    prepare.add_argument("--output-dir", required=True)
+    rebind = operations.add_parser(
+        "rebind-manifests",
+        help="preserve exact identities under the resolved v3 protocol",
+    )
+    rebind.add_argument("--protocol-config", required=True)
+    rebind.add_argument("--historical-manifest-set", required=True)
+    rebind.add_argument("--output-dir", required=True)
+    freeze = operations.add_parser(
+        "freeze-design", help="freeze auxiliary-only engineering authorization"
+    )
+    freeze.add_argument("--protocol-config", required=True)
+    freeze.add_argument("--manifest-set", required=True)
+    freeze.add_argument("--recorded-by", required=True)
+
     profile = commands.add_parser("profile", help="profile compute prerequisites")
     profile_commands = profile.add_subparsers(dest="operation", required=True)
     profile_gpu = profile_commands.add_parser(
@@ -160,6 +188,14 @@ def _parser() -> argparse.ArgumentParser:
     train.add_argument("--device", default="cpu")
     train.add_argument("--allow-fixture", action="store_true")
     train.add_argument("--stretch-gate-evidence")
+    train.add_argument(
+        "--stage",
+        choices=["engineering_pilot", "development_selection", "final_training"],
+    )
+    train.add_argument("--development-gallery")
+    train.add_argument("--development-queries")
+    train.add_argument("--development-gallery-manifest")
+    train.add_argument("--development-query-manifest")
 
     evaluate = commands.add_parser("evaluate", help="evaluate one-shot retrieval")
     evaluate.add_argument("--gallery", required=True)
@@ -217,6 +253,11 @@ def _print(payload: object) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
+        if args.area == "study-v3":
+            from pose_embed.v3_commands import run_preparation_command
+
+            _print(run_preparation_command(args))
+            return 0
         if args.area == "benchmark":
             from pose_embed.benchmark.cli import run
 
@@ -313,8 +354,6 @@ def main(argv: Sequence[str] | None = None) -> int:
                     raise ValueError(
                         "MotionBERT requires --manifest-set and --parity-evidence"
                     )
-                if args.corruption_family is not None or args.corruption_severity != 0:
-                    raise ValueError("Week 3 MotionBERT extraction is clean-only")
                 if args.embedding_dimension != 32 or args.seed != 0:
                     raise ValueError(
                         "--embedding-dimension and --seed are fixture-only"
@@ -331,6 +370,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                         split=args.split,
                         device=args.device,
                         episode_path=args.development_episode,
+                        corruption_family=args.corruption_family,
+                        corruption_severity=args.corruption_severity,
                     )
                 )
             elif args.operation == "extract":
@@ -372,6 +413,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                     device=args.device,
                     allow_fixture=args.allow_fixture,
                     stretch_gate_evidence_path=args.stretch_gate_evidence,
+                    stage=args.stage,
+                    development_gallery_path=args.development_gallery,
+                    development_query_path=args.development_queries,
+                    development_gallery_manifest_path=args.development_gallery_manifest,
+                    development_query_manifest_path=args.development_query_manifest,
                 )
             )
             return 0

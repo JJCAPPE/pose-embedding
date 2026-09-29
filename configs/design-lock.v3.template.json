@@ -1,0 +1,71 @@
+{
+  "schema_version": 3,
+  "kind": "v3_auxiliary_design_and_pilot_authorization",
+  "protocol_sha256": "REPLACE_AFTER_COMPLETE_PREPARATION",
+  "protocol_relative_path": "study-v3/locks/protocol.v3.json",
+  "recorded_at": "REPLACE_WITH_RFC3339_TIMESTAMP",
+  "recorded_by": "REPLACE_WITH_RESEARCHER",
+  "manifests": {
+    "development_train": {
+      "relative_path": "study-v3/manifests/development_train.jsonl",
+      "sha256": "REPLACE_WITH_SHA256"
+    },
+    "development_validation": {
+      "relative_path": "study-v3/manifests/development_validation.jsonl",
+      "sha256": "REPLACE_WITH_SHA256"
+    },
+    "final_train": {
+      "relative_path": "study-v3/manifests/final_train.jsonl",
+      "sha256": "REPLACE_WITH_SHA256"
+    },
+    "novel_anchor": {
+      "relative_path": "study-v3/manifests/novel_anchor.jsonl",
+      "sha256": "REPLACE_WITH_SHA256"
+    },
+    "novel_query_primary": {
+      "relative_path": "study-v3/manifests/novel_query_primary.jsonl",
+      "sha256": "REPLACE_WITH_SHA256"
+    },
+    "novel_query_official": {
+      "relative_path": "study-v3/manifests/novel_query_official.jsonl",
+      "sha256": "REPLACE_WITH_SHA256"
+    },
+    "development_gallery": {
+      "relative_path": "study-v3/manifests/development_gallery.jsonl",
+      "sha256": "REPLACE_WITH_SHA256"
+    },
+    "development_queries": {
+      "relative_path": "study-v3/manifests/development_queries.jsonl",
+      "sha256": "REPLACE_WITH_SHA256"
+    }
+  },
+  "code_sha256": {
+    "REPLACE_WITH_ALL_CACHE_AFFECTING_REPOSITORY_PATHS": "REPLACE_WITH_SHA256"
+  },
+  "artifact_root_registry_sha256": "REPLACE_WITH_AUDITED_HISTORICAL_ROOT_REGISTRY_SHA256",
+  "pilot": {
+    "seed": 7,
+    "learning_rate": 0.0003,
+    "snapshot_epochs": [
+      5,
+      10,
+      15,
+      20
+    ],
+    "diagnostic_epochs": [
+      0,
+      5,
+      10,
+      15,
+      20
+    ],
+    "selection_eligible": false,
+    "fixture_updates": 1000,
+    "fixture_self_excluded_top1": 1.0,
+    "maximum_normalization_error": 1e-05,
+    "minimum_query_variance_exclusive": 1e-06,
+    "real_accuracy_floor": null
+  },
+  "epochs": 20,
+  "novel_access_authorized": false
+}

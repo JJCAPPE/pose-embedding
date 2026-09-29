@@ -22,7 +22,11 @@ from pose_embed.provenance import sha256_file, write_immutable_json
 
 @pytest.fixture
 def lock_context(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    from pose_embed.dataset_seal import register_artifact_roots
+
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    monkeypatch.setenv("POSE_EMBED_DATA_ROOT", str(tmp_path))
+    register_artifact_roots([])
     original = load_benchmark()
     config = original.model_copy(
         update={
@@ -368,7 +372,7 @@ def test_opening_requires_complete_final_set_and_binds_both_locks(
         artifact_root() / "locks/final-runs.json"
     )
     assert locks.open_test(manifest_set_path=tmp_path / "manifest-set.json") == opening
-    with pytest.raises(ValueError, match="forbidden after test opening"):
+    with pytest.raises(ValueError, match="(test opening|forbidden after test opening)"):
         locks.lock_final_runs(final)
     monkeypatch.setattr(
         locks,
@@ -398,7 +402,7 @@ def test_future_selection_timestamp_and_legacy_opening_are_rejected(
         locks.validate_selection()
     legacy = artifact_root().parent / "locks/test-opening.v1.json"
     write_immutable_json(legacy, {})
-    with pytest.raises(ValueError, match="forbidden after test opening"):
+    with pytest.raises(ValueError, match="(test opening|forbidden after test opening)"):
         locks.create_selection(directories)
 
 

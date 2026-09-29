@@ -47,8 +47,9 @@ export function ProtocolView({
           <h1>The rules before the result.</h1>
           <p className="page-summary">
             Three training recipes, a frozen MotionBERT encoder, and one clean reference per
-            unseen action. Implementation, measured capacity gates, and the final-test lock
-            are still pending. A null or negative result still counts as success.
+            unseen action. Week 3 software is implemented and checked; real SCC preparation,
+            design freeze, measured capacity, and final-test authorization remain pending.
+            A null or negative result still counts as success.
           </p>
           <Space size={[12, 12]} wrap>
             <InternalLinkButton href="/protocol/plan" type="primary">Read the final v3 plan</InternalLinkButton>

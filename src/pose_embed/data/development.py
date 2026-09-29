@@ -11,6 +11,7 @@ from typing import Any, Literal
 from pose_embed.config import ProtocolConfig, load_protocol
 from pose_embed.data.inventory import build_split_manifests, load_inventory
 from pose_embed.data.manifest import ManifestRecord, load_manifest, verify_manifests
+from pose_embed.dataset_seal import guarded_auxiliary
 from pose_embed.protocol import protocol_digest, resolve_scientific_paths
 from pose_embed.provenance import (
     require_path_within,
@@ -125,6 +126,7 @@ def _report(
     }
 
 
+@guarded_auxiliary
 def generate_development_episode(
     manifest_path: str | Path,
     output_dir: str | Path,

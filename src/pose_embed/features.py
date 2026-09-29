@@ -137,7 +137,27 @@ def extract_fixture_features(
         raise ValueError("input labels must equal NTU action IDs from the manifest")
 
     pose_tensor = torch.as_tensor(poses, dtype=torch.float32)
-    if corruption_family is not None:
+    if corruption_family is not None and protocol.protocol_id == "protocol-v3":
+        from pose_embed.corruptions.pose import apply_corruption_v3
+
+        fallback = (
+            protocol.preparation.fallback_value
+            if protocol.preparation is not None
+            else None
+        )
+        pose_tensor = torch.stack(
+            [
+                apply_corruption_v3(
+                    pose,
+                    family=corruption_family,
+                    severity=corruption_severity,
+                    sample_id=sample_id,
+                    fallback_scale=fallback,
+                )
+                for pose, sample_id in zip(pose_tensor, sample_ids, strict=True)
+            ]
+        )
+    elif corruption_family is not None:
         corrupted = [
             apply_corruption(
                 pose,

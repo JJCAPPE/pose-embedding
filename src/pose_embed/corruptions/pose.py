@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import math
 import random
 from decimal import Decimal
 from typing import Literal
@@ -177,3 +178,103 @@ def apply_corruption(
             poses, count=int(severity), sample_id=sample_id, value=masking_value
         )
     raise ValueError(f"unsupported corruption family: {family}")
+
+
+def corruption_randomness_v3(
+    sample_id: str, family: CorruptionFamily
+) -> tuple[int, int]:
+    """Return the unsigned 64-bit draw and 63-bit seed, independent of severity."""
+    if family not in {"coordinate_jitter", "joint_mask", "frame_mask"}:
+        raise ValueError(f"unsupported v3 corruption family: {family}")
+    if not sample_id or "\0" in sample_id:
+        raise ValueError("sample identity must be nonempty and contain no NUL")
+    payload = f"protocol-v3\0{sample_id}\0{family}".encode()
+    unsigned = int.from_bytes(hashlib.sha256(payload).digest()[:8], "big")
+    return unsigned, unsigned & (2**63 - 1)
+
+
+def validate_pose_v3(poses: torch.Tensor) -> None:
+    """Enforce the frozen, finite post-preprocessing corruption boundary."""
+    if tuple(poses.shape) != (2, 100, 17, 3):
+        raise ValueError("v3 poses must have shape [2,100,17,3]")
+    if poses.dtype != torch.float32 or poses.device.type != "cpu":
+        raise ValueError("v3 corruption inputs must be CPU float32 tensors")
+    if not torch.isfinite(poses).all():
+        raise ValueError("v3 poses must be finite; source defects cannot be excluded")
+
+
+def torso_scale_v3(poses: torch.Tensor) -> float | None:
+    """Return the lower median valid clean torso distance, or no own scale."""
+    validate_pose_v3(poses)
+    shoulder = (poses[:, :, 11, :2] + poses[:, :, 14, :2]) / 2
+    hip = (poses[:, :, 4, :2] + poses[:, :, 1, :2]) / 2
+    distances = torch.linalg.vector_norm(shoulder - hip, dim=-1)
+    if not torch.isfinite(distances).all():
+        raise ValueError("v3 torso arithmetic produced nonfinite distances")
+    observed = (poses[:, :, [11, 14, 4, 1], 2] > 0).all(dim=-1)
+    valid = distances[observed & (distances > 0)]
+    return float(valid.median()) if valid.numel() else None
+
+
+def apply_corruption_v3(
+    poses: torch.Tensor,
+    *,
+    family: CorruptionFamily,
+    severity: int | float,
+    sample_id: str,
+    fallback_scale: float | None = None,
+) -> torch.Tensor:
+    """Apply one fixed v3 nested operator directly to a clean query tensor.
+
+    The caller must bind ``fallback_scale`` to the immutable development-only
+    evidence in the protocol. This function performs no postprocessing.
+    """
+    validate_pose_v3(poses)
+    unsigned, seed = corruption_randomness_v3(sample_id, family)
+    levels = {
+        "coordinate_jitter": (0, 0.01, 0.025, 0.05),
+        "joint_mask": (0, 3, 6, 8),
+        "frame_mask": (0, 10, 25, 40),
+    }
+    if isinstance(severity, bool) or severity not in levels[family]:
+        raise ValueError(f"severity is not a declared v3 {family} level")
+    result = poses.clone()
+    if severity == 0:
+        return result
+    if family == "coordinate_jitter":
+        scale = torso_scale_v3(poses)
+        if scale is None:
+            if (
+                fallback_scale is None
+                or not math.isfinite(fallback_scale)
+                or fallback_scale <= 0
+            ):
+                raise ValueError(
+                    "v3 jitter needs a positive frozen fallback torso scale"
+                )
+            scale = fallback_scale
+        generator = torch.Generator(device="cpu").manual_seed(seed)
+        field = torch.randn(
+            poses[..., :2].shape,
+            dtype=torch.float32,
+            device="cpu",
+            generator=generator,
+        )
+        # where preserves even signed zero at originally unobserved coordinates.
+        result[..., :2] = torch.where(
+            poses[..., 2:3] > 0,
+            poses[..., :2] + field * scale * float(severity),
+            poses[..., :2],
+        )
+    elif family == "joint_mask":
+        groups = list(_JOINT_GROUPS)
+        random.Random(seed).shuffle(groups)
+        joints = [joint for group in groups for joint in group][: int(severity)]
+        result[:, :, joints, :] = 0
+    else:
+        length = int(severity)
+        start = (unsigned * (101 - length)) // 2**64
+        result[:, start : start + length, :, :] = 0
+    if not torch.isfinite(result).all():
+        raise ValueError("v3 corruption produced nonfinite values")
+    return result

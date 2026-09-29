@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from pose_embed.config import load_protocol
+from pose_embed.dataset_seal import register_artifact_roots
 from pose_embed.protocol import (
     EvaluationManifestValidation,
     final_run_set_digest,
@@ -38,6 +39,8 @@ def test_test_opening_is_atomic_immutable_and_bound_to_lock_and_plan(
     lock_path, _, _ = write_lock_bundle(tmp_path, protocol_sha256)
     ledger_path = tmp_path / "locks/test-opening.v1.json"
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    monkeypatch.setenv("POSE_EMBED_DATA_ROOT", str(tmp_path))
+    register_artifact_roots([])
     monkeypatch.setattr(
         "pose_embed.test_access.validate_evaluation_manifests",
         lambda *args, **kwargs: EvaluationManifestValidation(

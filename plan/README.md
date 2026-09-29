@@ -1,38 +1,32 @@
 # Research plan revisions
 
-`research-plan.v2.json` is the active public-safe schedule and bundled protocol
-summary for the motion-domain comparison. `research-plan.v1.json` preserves the
-previous scope and its historical completion evidence. The JSON schema remains
-`1.0.0`: the scientific revision is v2, while the tracker data shape is unchanged.
+`research-plan.v3.md` is the final scientific execution design.
+`research-plan.v3.json` is the active public-safe schedule and bundled protocol
+summary. Decision 0004 and `docs/protocol/protocol-v3.md` describe its scientific
+scope and implementation. The v1/v2 plans, original prospectus and recorded
+results remain historical evidence; their old campaign requirements do not
+expand the current three-recipe study.
 
-The 14 calendar records through December 18 are a provisional planning horizon.
-They do not promise that all 26 configurations can be implemented and evaluated
-within the previous eight-hour weekly budget. The measured all-method resource
-gate must determine whether a dated continuation is needed. The complete method
-roster remains required.
+The v3 horizon ends December 18, 2026. Frozen MotionBERT, three paired seeds,
+20 epochs and the declared learning-rate grid are fixed. Real SCC preparation
+and the immutable design must precede fresh Week 4 extraction/pilots; the full
+measured capacity and researcher-availability gate is due October 18. Neither
+a published plan nor an implementation test establishes a GPU result.
 
-After production seeding, Supabase is authoritative for live progress. Changing
-the fallback JSON does not overwrite live rows. The tracker combines live rows
-with the protocol summary bundled in its deployed seed, so a revision requires a
-coordinated data migration and deployment. The administrative seed importer is
-for fresh databases and refuses to overwrite an existing project.
+Supabase is authoritative for live progress. Changing fallback JSON does not
+overwrite live rows. The tracker combines those rows with the protocol summary
+bundled in its deployment, so updates require a guarded migration and matching
+app release. The administrative seed importer is for fresh databases and
+refuses to overwrite an existing project.
 
-The original v2 migration is based on a public live snapshot from September 24
-at 22:35 UTC, including the confirmed BU determination. A September 29 read of
-the hosted tracker found Weeks 1 and 2 already closed with zero recorded minutes,
-despite notes that time was unreported; the checked-in fallback still shows the
-earlier open states. An initial all-week reconciliation attempt aborted without
-row changes at its closed-week guard. The revised September 29 migration touches
-only the still-open Week 3 objective, deliverable, review prompt, reflection
-and extraction-gate wording. It does not invent actual researcher time or close a week. Seed
-and hosted row versions are independent concurrency counters. Refresh the live
-snapshot before any hosted migration; never force a conflict or reset production.
-The narrowed migration was applied to the hosted tracker on September 29;
-read-only verification found Week 3 version 6 and extraction gate 4 version 4,
-with hosted Weeks 1–2 unchanged.
-See the [Weeks 1–3 handoff](../docs/protocol/weeks-1-3-handoff.md) for the
-evidence boundaries and required researcher reconciliation.
+Week 3 now tracks the additional v3 work separately from its five historical
+completed tasks and gates. The September 29 readiness migration preserves
+those records, appends the new software/preparation requirements and links the
+current plan. It keeps actual minutes unreported and the week open. Weeks 1–2
+remain closed with their existing records; zero recorded minutes are not proof
+of zero work, and changing closed history requires an audited reopen reason.
+See [Week 3 v3 readiness](../docs/protocol/week-3-v3-readiness.md).
 
 Plans and public exports contain no owner identifiers, private notes, licensed
-data locations, credentials or activity-log records. Preserve prior run artifacts
-and hashes; old evidence does not automatically validate the v2 protocol.
+data locations, credentials or activity-log records. Preserve prior run
+artifacts and hashes. Historical evidence cannot be relabeled as v3 evidence.

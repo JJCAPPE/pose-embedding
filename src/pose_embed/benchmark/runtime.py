@@ -58,6 +58,9 @@ def artifact_path(value: str | Path) -> Path:
 
 
 def require_unopened() -> None:
+    from pose_embed.dataset_seal import require_dataset_unopened
+
+    require_dataset_unopened()
     root = artifact_root()
     if (root / "locks/test-opening.json").exists() or (
         root.parent / "locks/test-opening.v1.json"

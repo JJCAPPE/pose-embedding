@@ -61,6 +61,7 @@ from pose_embed.benchmark.training import (
     set_step_learning_rates,
 )
 from pose_embed.data.motionbert import preprocess_annotation
+from pose_embed.dataset_seal import guarded_auxiliary
 from pose_embed.models.motionbert import (
     configure_deterministic_inference,
     inference_environment,
@@ -170,6 +171,7 @@ def _checkpoint_state(model, criterion, optimizer, recipe, step, phase):
     return state
 
 
+@guarded_auxiliary
 def run_experiment(
     *,
     config_path: str | Path,
