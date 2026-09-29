@@ -57,10 +57,12 @@ for week3_repeat in first second; do
     --role training --split final_train --device cuda \
     --output "$week3_run/final-train-${week3_repeat}.npz"
 done
+pquota textconv > "$week3_run/project-quota.txt"
 .venv/bin/pose-embed features verify-repeatability \
   --first "$week3_run/final-train-first.npz" \
   --second "$week3_run/final-train-second.npz" \
   --manifest "$week3_bundle/final-train.jsonl" \
+  --project-quota-report "$week3_run/project-quota.txt" \
   --output "$week3_run/repeatability.json"
 
 .venv/bin/pose-embed features extract --backend motionbert \

@@ -115,7 +115,11 @@ export function WeekDetailView({
           <div className="week-kicker">
             <span>{formatDateRange(week.startDate, week.endDate)}</span>
             <span>{formatHours(week.plannedMinutes)} planned</span>
-            <span>{formatHours(week.actualMinutes)} actual</span>
+            <span>
+              {week.actualMinutes === 0
+                ? "No time recorded"
+                : `${formatHours(week.actualMinutes)} actual`}
+            </span>
           </div>
         </div>
         <Space className="week-status-stack" size={[8, 8]} wrap>

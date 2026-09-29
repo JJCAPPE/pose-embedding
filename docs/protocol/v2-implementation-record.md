@@ -1,8 +1,9 @@
 # V2 implementation and release record
 
-Recorded 2026-09-26. The required study is **not complete**: the software supports
-all 26 configurations, and no motion retrieval result is established by these
-local checks. Their implementation and remaining scientific gates are documented in
+Recorded 2026-09-26; updated September 29 with a read-only SCC pilot observation.
+The required study is **not complete**: the software supports all 26
+configurations, and no final motion retrieval result is established by these
+engineering checks. Their implementation and remaining scientific gates are documented in
 [the completion map](remaining-method-adaptations.md).
 
 ## Changes delivered
@@ -106,12 +107,13 @@ The unsuccessful fine-tuning attempt is retained; the successful retry changes
 only GPU capacity, without reducing the batch or precision. Three steps exclude
 setup and do not support a training-time or comparative-speed claim.
 
-Job `7748366` continues the frozen paired development pilot. After the larger
-GPU profiles passed, `7748592` was submitted for the fine-tuned paired pilot;
-it runs Contrastive and then Contextual on an A100 allocation. No broader
-method GPU experiment is submitted before this priority comparison. Novel
-classes remain unopened. Running jobs retain their original release checkout
-while subsequent adapter implementation proceeds in separate local worktrees.
+At this September 26 checkpoint, job `7748366` continued the frozen paired
+development pilot. After the larger GPU profiles passed, `7748592` was
+submitted for the fine-tuned paired pilot; it ran Contrastive and then
+Contextual on an A100 allocation. No broader method GPU experiment had been
+submitted before this priority comparison. Novel classes remained unopened.
+Running jobs retained their original release checkout while subsequent adapter
+implementation proceeded in separate local worktrees.
 
 ## Adapter integration checkpoint
 
@@ -140,8 +142,9 @@ The frozen Contrastive seed-7 pilot completed on SCC at
 Its 1,000 updates used 4,120.33 seconds total, of which summed update timing was
 574.00 seconds; validation/input overhead therefore dominates this short pilot.
 Peak allocated GPU memory was 2,893,729,792 bytes and its checkpoint was
-187,778,419 bytes. Contextual and the fine-tuned pair are still running at this
-recording. No paired retrieval result or novel-test outcome is asserted.
+187,778,419 bytes. Contextual and the fine-tuned pair were still running at
+this September 26 checkpoint; the later fine-tuned completion is recorded below.
+No final paired result or novel-test outcome is asserted here.
 
 ## Completed local integration checks
 
@@ -166,6 +169,31 @@ matrices. Full profiles now exercise real post-warmup optimizer paths and a fixe
 prefix found 128 items, 10 actions and at least 11 eligible positives per query.
 No additional motion inference or retrieval score is implied by that check.
 
-The current priority jobs retain release `0ef858379c36`. Publish subsequent
+Those priority jobs retained release `0ef858379c36`. Publish subsequent
 implementation through a separate release and environment; a full-profile job
 must verify their completed fine-tuned comparison before broader GPU work.
+
+## Completed fine-tuned priority pilot: later SCC observation
+
+A September 29 read-only SCC check found completed immutable histories for both
+seed-7, 1,000-update development pilots in job `7748592` on the `a100` queue.
+`qacct -j 7748592` reports `failed=0`, `exit_status=0`, a September 26 local
+start at 16:43:34, end at 20:24:54, and 13,280 seconds of scheduler wall time.
+The artifact directory below `POSE_EMBED_ARTIFACT_ROOT` is
+`benchmark-v2/pilots/20260926T204338Z-7748592-0ef858379c36/`.
+
+| Method | History elapsed seconds | Summed update-step seconds | Development validations |
+| --- | ---: | ---: | ---: |
+| Contrastive | 6,509.0439 | 2,297.7407 | 10 |
+| Contextual | 6,517.1835 | 2,303.6212 | 10 |
+
+Read-only SHA-256 checks bound `comparison.json` to
+`4c55d3591735b16cba9d8c208dd3f074a13f60e95e82a08b09295350431f264e`,
+`parity.json` to
+`7416b10f7affc8346d2f04c98ec5788b5b4f7d91c7fd802929703a65ffad30b7`,
+and the Contrastive and Contextual `history.json` files to
+`80251d298c21a7f21842d1bbb9aaeb51cd0e2e29ba2ba77c02627f1a42c90469`
+and `002af6d30e098565f6b16eedfee9f3ca4c174fcd7d4ad588ec8ba14359506674`,
+respectively. These histories establish that the priority paths ran and provide
+measured short-pilot cost. They do not certify a 50,000-update run, the other
+24 methods, a six-seed comparison, final training or novel-test performance.

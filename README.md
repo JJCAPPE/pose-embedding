@@ -93,7 +93,12 @@ and is reference-only.
 ## Week 3 feature extraction
 
 This is preserved v1 infrastructure. Follow the v2 sequence below for the
-current study; full frozen-cache extraction is supplementary.
+current study; full frozen-cache extraction is supplementary. All Week 3
+technical gates passed in [SCC job `7761714`](docs/protocol/week-3-scc-execution.md):
+fresh parity, two byte-identical full auxiliary extractions, five validated
+caches and the declared resource checks. Formal weekly closeout is recorded
+separately in the plan. The [Weeks 1–3 handoff](docs/protocol/weeks-1-3-handoff.md)
+summarizes verified gates and the next capacity decision.
 
 The [saved execution plan](plan/week-03-execution-plan.md) and
 [implementation record](docs/protocol/week-3-implementation.md) describe the
@@ -106,10 +111,10 @@ uv run pose-embed features extract --backend motionbert --help
 uv run pose-embed features verify-repeatability --help
 ```
 
-After the documented prerequisites are resolved, use a clean committed checkout,
-the locked GPU environment, and `scripts/extract_motionbert_week3.qsub` to run
-the full gate. Inputs stay under `POSE_EMBED_DATA_ROOT`; caches and evidence stay
-under `POSE_EMBED_ARTIFACT_ROOT`. The job also requires
+To reproduce that completed gate, use a clean committed checkout, the locked GPU
+environment, and `scripts/extract_motionbert_week3.qsub`. Inputs stay under
+`POSE_EMBED_DATA_ROOT`; caches and evidence stay under
+`POSE_EMBED_ARTIFACT_ROOT`. The job also requires
 `POSE_EMBED_MANIFEST_SET` pointing to the adopted `manifest-set.json`.
 Pre-head caches contain 8,704 values per sample, not trained retrieval embeddings.
 Submit from the repository root with scheduler logs outside the checkout:
@@ -119,27 +124,36 @@ mkdir -p "$POSE_EMBED_ARTIFACT_ROOT/logs"
 qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/extract_motionbert_week3.qsub
 ```
 
+The wrapper now records a fresh SCC project-quota snapshot and requires the
+repeatability gate to check it alongside filesystem free space.
+
 ## Scientific guardrails
 
-- The tracked final prospectus and `docs/protocol/protocol-v1.md` define scope;
-  the broader UROP draft does not expand the core experiment.
-- Tune only on the class-disjoint auxiliary validation split.
+- [Protocol v2](docs/protocol/protocol-v2.md) and its
+  [scope amendment](docs/decisions/0003-motion-retrieval-v2.md) define the
+  current study. The final prospectus and v1 protocol remain historical records.
+- Select settings only on the class-disjoint auxiliary development split.
 - Never open the official novel-action test through an upstream training script.
-- Final-test evaluation requires the locked protocol hash.
-- Keep galleries clean and apply deterministic corruption only to queries.
-- Report all preregistered conditions and seeds, including null or negative results.
+- Final-test evaluation requires the complete v2 locks and final-run records.
+- The primary v2 outcome is clean multi-positive retrieval. One-shot and query
+  corruption are separately declared supplementary studies. Corruption applies
+  only to evaluation queries; reference galleries remain clean.
+- Report every prespecified condition and paired seed, including null or
+  negative results and resource costs.
 
-## Manual external setup
+## Manual external setup for a new deployment
 
-Before production editing can be enabled, create the dedicated Supabase Free
-organization and acknowledge its displayed project cost. The automation can
-then provision the project; after that, create one owner Auth user in the
-dashboard. In hosted Supabase Auth, disable all public
+For a new hosted deployment, create the dedicated Supabase Free organization
+and acknowledge its displayed project cost. The automation can then provision
+the project; after that, create one owner Auth user in the dashboard. In hosted
+Supabase Auth, disable all public
 sign-up, set and verify the Site URL against the final Vercel production origin,
 and allow only the exact redirect origins needed. The checked
 `supabase/config.toml` is local-only and must not be copied to hosted Auth.
-Dataset terms, GPU access, and BU governance determinations also require the
-researcher. Scientific decisions follow the
+Keep private evidence of dataset-terms acceptance outside Git. SCC GPU access
+is documented in the [Week 1 profile](docs/protocol/week-1-gpu-profile.md), and
+the BU determination is [researcher-confirmed](docs/compliance/computational-research-scope.md).
+Scientific decisions follow the
 [independent research governance record](docs/protocol/independent-research.md),
 with no advisor approval requirement. Everything else is represented as checked code,
 migrations, CI, or tracker gates.
@@ -201,20 +215,23 @@ job allows two hours and logs each test plus the ten slowest test durations.
 All 26 method adapters are implemented. `benchmark coverage` reports their
 identities explicitly; implementation does not establish GPU feasibility or
 retrieval performance. The physical fine-tuning batch failed on an L40S and
-passed on an A100 80 GB for the priority pair. Every other method still requires
-its own allocated-GPU profile.
+passed on an A100 80 GB for the priority pair. The seed-7 paired fine-tuning
+pilot then completed in SCC job `7748592`: each method ran 1,000 updates and ten
+development validations, taking about 6,500 seconds per method. This is
+engineering evidence, not a six-seed or novel-test result. Every other method
+still requires its own allocated-GPU profile; see the
+[implementation record](docs/protocol/v2-implementation-record.md).
 
-After the fine-tuned priority comparison succeeds, profile the complete roster:
+Profile the complete roster using the completed comparison as a prerequisite:
 
 ```bash
-qsub -hold_jid PRIORITY_JOB -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
   scripts/benchmark_v2_profiles.qsub configs/benchmark.selection.v2.yaml 7 \
-  "$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2/pilots/PRIORITY_RUN/comparison.json"
+  "$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2/pilots/20260926T204338Z-7748592-0ef858379c36/comparison.json"
 ```
 
-Replace the two capitalized placeholders with the actual job and artifact
-directory. The wrapper verifies successful paired evidence as well as the job
-dependency. Each method runs three real optimizer steps and a fixed, bounded
+The wrapper verifies successful paired evidence before broader GPU work. Each
+method runs three real optimizer steps and a fixed, bounded
 development retrieval profile. A failed profile remains recorded; other methods
 are still attempted. No profile is eligible for scientific selection.
 
@@ -235,8 +252,10 @@ secondary final runs** must complete before novel-test opening.
 
 The [storage floor](docs/protocol/v2-resource-floor.md) exceeds the previously
 observed available SCC project space even before full auxiliary state and
-segments. Resolve storage and measured runtime before launching the complete
-campaign; the priority pair and bounded capacity profiles remain the next steps.
+segments. A September 29, 02:36 UTC read-only quota check found 293.44 GB
+remaining in the shared allocation, below the 599.27 GB checkpoint-only floor.
+Available capacity can change; recheck it, and resolve storage and measured
+runtime before launching the complete campaign.
 
 Selection, final training and test-opening locks require the full 26 × 6 matrix,
 matched initialization/batches, verified inputs and the statistical analysis

@@ -17,12 +17,21 @@ with the protocol summary bundled in its deployed seed, so a revision requires a
 coordinated data migration and deployment. The administrative seed importer is
 for fresh databases and refuses to overwrite an existing project.
 
-The v2 migration is based on a public live snapshot from September 24 at 22:35 UTC,
-including the confirmed BU determination. It preserves completed v1 work and
-actual time, records only evidenced local Week 3 software progress, and adds a
-separate uncompleted v2 retrieval gate. Row-version drift and edits to closed
-weeks abort the migration. Refresh the live snapshot before publication; do not
-force it through a conflict or reset production.
+The original v2 migration is based on a public live snapshot from September 24
+at 22:35 UTC, including the confirmed BU determination. A September 29 read of
+the hosted tracker found Weeks 1 and 2 already closed with zero recorded minutes,
+despite notes that time was unreported; the checked-in fallback still shows the
+earlier open states. An initial all-week reconciliation attempt aborted without
+row changes at its closed-week guard. The revised September 29 migration touches
+only the still-open Week 3 objective, deliverable, review prompt, reflection
+and extraction-gate wording. It does not invent actual researcher time or close a week. Seed
+and hosted row versions are independent concurrency counters. Refresh the live
+snapshot before any hosted migration; never force a conflict or reset production.
+The narrowed migration was applied to the hosted tracker on September 29;
+read-only verification found Week 3 version 6 and extraction gate 4 version 4,
+with hosted Weeks 1–2 unchanged.
+See the [Weeks 1–3 handoff](../docs/protocol/weeks-1-3-handoff.md) for the
+evidence boundaries and required researcher reconciliation.
 
 Plans and public exports contain no owner identifiers, private notes, licensed
 data locations, credentials or activity-log records. Preserve prior run artifacts

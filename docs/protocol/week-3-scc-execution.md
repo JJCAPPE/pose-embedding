@@ -119,6 +119,25 @@ required 200 GiB (214.75 decimal GB) reserve.
 These measurements cover Week 3 extraction only; resource approval for the
 full v2 campaign remains separate.
 
+Future runs of `scripts/extract_motionbert_week3.qsub` also capture
+`pquota textconv` beside their immutable run evidence. The repeatability
+verifier requires that fresh snapshot, binds its hash and time to the report,
+and checks the smaller of filesystem free space and the matching project quota.
+The completed job `7761714` predates this automated check; its separate
+post-run project-quota observation above remains the evidence for that gate.
+
+A later read-only SCC quota check on September 28 showed
+`/projectnb/textconv` at **18,505.50 / 18,800 GB used**, or **294.50 GB
+remaining**. This shared quota can change independently of this project. It
+does not revise the successful, time-specific Week 3 extraction gate, but is
+below the **599.27 GB encoder-and-optimizer checkpoint floor** for the complete
+v2 training matrix, before most method state or retained segments; see the
+[v2 storage calculation](v2-resource-floor.md). Frozen-cache timing and memory
+cannot establish the cost of fine-tuning: the priority physical batch failed
+on an L40S and passed its three-step profiles on an A100 80 GB, while the other
+methods remain unprofiled on allocated GPUs (see the
+[v2 implementation record](v2-implementation-record.md)).
+
 The final supporting observation is preserved locally at the ignored path
 `artifacts/evidence/week-03/scc-observation-7761714-20260928T014925Z.json`;
 its SHA-256 is bound by the public compact evidence record. Earlier observations
@@ -134,7 +153,11 @@ and failed attempts remain preserved.
 | 4 — measured compute/storage | Passed | All five forecast checks and final project-quota reserve passed |
 | 5 — independent v2 retrieval/test seals | Passed | [Previously verified v2 implementation](v2-implementation-record.md); unequal-positive retrieval and seal regressions passed again in the 797-test suite |
 
-Week 3 technical work is complete. Formal closure remains pending because prior
-weekly records remain open and actual researcher minutes have not been supplied.
-Those records were not invented. This evidence does not authorize or complete
-the v2 selection campaign, final training or novel-test evaluation.
+Week 3 technical work is complete. Formal closure remains pending because actual
+researcher minutes have not been supplied. The later hosted closures of Weeks 1
+and 2 with zero recorded minutes need researcher reconciliation; see the
+[handoff](weeks-1-3-handoff.md). Those records were not invented. This evidence
+does not authorize or complete
+the v2 selection campaign, final training or novel-test evaluation. Recheck
+available quota and measure the complete backward and retrieval paths before
+committing the full campaign.
