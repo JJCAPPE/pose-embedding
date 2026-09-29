@@ -24,6 +24,7 @@ from pose_embed.artifacts import (
 )
 from pose_embed.config import ProtocolConfig, load_protocol
 from pose_embed.data.manifest import ManifestRecord, load_manifest
+from pose_embed.dataset_seal import guarded_auxiliary
 from pose_embed.motionbert_inputs import (
     MOTIONBERT_CODE_PATHS,
     REPOSITORY,
@@ -58,15 +59,19 @@ def validate_selected_manifest(
         expected = manifests[split.replace("_", "-") + ".jsonl"]
         if records != expected:
             raise ValueError("training extraction requires the complete ordered split")
-    elif role in {"gallery_clean", "query_clean"} and split == (
-        "development_validation"
-    ):
+    elif (
+        role in {"gallery_clean", "query_clean"}
+        or (role == "query_corrupted" and protocol.protocol_id == "protocol-v3")
+    ) and split == ("development_validation"):
         from pose_embed.data.development import validate_development_episode
 
         if episode_path is None:
             raise ValueError("development extraction requires its fixed episode report")
         episode = validate_development_episode(
-            episode_path, protocol=protocol, manifest_path=manifest_path, role=role
+            episode_path,
+            protocol=protocol,
+            manifest_path=manifest_path,
+            role="query_clean" if role == "query_corrupted" else role,
         )
         if (
             episode["source_inventory"]["sha256"] != source_inventory_sha256
@@ -81,6 +86,30 @@ def validate_selected_manifest(
     if any(row.split != split for row in records):
         raise ValueError("selected manifest split mismatch")
     return records
+
+
+def extraction_condition(protocol, *, role, split, family, severity) -> str:
+    if split.startswith("novel"):
+        raise ValueError(
+            "novel extraction requires the complete final v3 authorization"
+        )
+    if family is None and severity == 0 and role != "query_corrupted":
+        return "clean"
+    if protocol.protocol_id != "protocol-v3":
+        raise ValueError("historical MotionBERT extraction is clean-only")
+    levels = {
+        "coordinate_jitter": protocol.corruptions.coordinate_jitter_fractions,
+        "joint_mask": protocol.corruptions.joint_mask_counts,
+        "frame_mask": protocol.corruptions.consecutive_frame_mask_counts,
+    }
+    if (
+        role != "query_corrupted"
+        or split != "development_validation"
+        or family not in levels
+        or severity not in levels[family]
+    ):
+        raise ValueError("corrupted extraction requires a declared v3 query condition")
+    return f"{family}:{severity:g}"
 
 
 def write_feature_npz(
@@ -112,6 +141,7 @@ def _source_paths(inputs: VerifiedMotionBERTInputs) -> list[Path]:
     ]
 
 
+@guarded_auxiliary
 def extract_motionbert_features(
     input_path: str | Path,
     output_path: str | Path,
@@ -124,6 +154,8 @@ def extract_motionbert_features(
     split: str,
     device: str = "cuda",
     episode_path: str | Path | None = None,
+    corruption_family: str | None = None,
+    corruption_severity: float = 0,
 ) -> dict[str, Any]:
     from pose_embed.data.motionbert import preprocess_annotation
     from pose_embed.models.action_head import pool_action_features
@@ -141,11 +173,26 @@ def extract_motionbert_features(
         raise ValueError("feature cache output must use the .npz suffix")
     if destination.exists() or sidecar_path_for(destination).exists():
         raise ValueError(f"refusing to overwrite feature cache: {destination}")
-    if split.startswith("novel") or role == "query_corrupted":
+    protocol = load_protocol(protocol_path)
+    if protocol.protocol_id != "protocol-v3" and (
+        split.startswith("novel") or role == "query_corrupted"
+    ):
         raise ValueError(
             "Week 3 MotionBERT extraction permits only clean auxiliary data"
         )
-    scientific = resolve_scientific_paths(load_protocol(protocol_path))
+    condition = extraction_condition(
+        protocol,
+        role=role,
+        split=split,
+        family=corruption_family,
+        severity=corruption_severity,
+    )
+    scientific = resolve_scientific_paths(protocol)
+    if protocol.protocol_id == "protocol-v3":
+        from pose_embed.protocol_v3 import require_v3_design
+
+        require_v3_design(protocol)
+        require_path_within(destination, scientific.root / "study-v3", label="v3 cache")
     if (scientific.root / "benchmark-v2/locks/test-opening.json").exists():
         raise ValueError("legacy extraction is forbidden after benchmark v2 opening")
     resolved_device = torch.device(device)
@@ -183,6 +230,12 @@ def extract_motionbert_features(
     by_id = {row.sample_id: row.annotation_index for row in inputs.inventory}
     assert inputs.annotations is not None
     timings.update(preprocessing=0.0, transfer=0.0, encoder=0.0, pooling=0.0)
+    v3_jitter = (
+        protocol.protocol_id == "protocol-v3"
+        and corruption_family == "coordinate_jitter"
+        and condition != "clean"
+    )
+    fallback_sample_ids: list[str] = []
 
     def synchronize() -> None:
         if resolved_device.type == "cuda":
@@ -201,6 +254,34 @@ def extract_motionbert_features(
                 ]
             )
             timings["preprocessing"] += time.perf_counter() - tick
+            if condition != "clean":
+                from pose_embed.corruptions.pose import (
+                    apply_corruption_v3,
+                    torso_scale_v3,
+                )
+
+                tick = time.perf_counter()
+                if v3_jitter:
+                    fallback_sample_ids.extend(
+                        row.sample_id
+                        for pose, row in zip(poses, batch, strict=True)
+                        if torso_scale_v3(torch.from_numpy(pose)) is None
+                    )
+                poses = np.stack(
+                    [
+                        apply_corruption_v3(
+                            torch.from_numpy(pose),
+                            family=corruption_family,
+                            severity=corruption_severity,
+                            sample_id=row.sample_id,
+                            fallback_scale=protocol.preparation.fallback_value,
+                        ).numpy()
+                        for pose, row in zip(poses, batch, strict=True)
+                    ]
+                )
+                timings["corruption"] = (
+                    timings.get("corruption", 0.0) + time.perf_counter() - tick
+                )
             tick = time.perf_counter()
             tensor = torch.from_numpy(poses).to(resolved_device)
             synchronize()
@@ -254,19 +335,36 @@ def extract_motionbert_features(
     ]
     if episode_path is not None:
         provenance_inputs.append(Path(episode_path).resolve())
+    if v3_jitter:
+        provenance_inputs.append(
+            inputs.artifact_root / protocol.preparation.fallback_evidence.relative_path
+        )
     provenance = capture_provenance(
         command="features extract --backend motionbert",
         configuration={
             "device": str(resolved_device),
             "batch_size": 32,
             "dtype": "float32",
-            "condition": "clean",
+            "condition": condition,
         },
         inputs=provenance_inputs,
         repository=REPOSITORY,
         started_at=started_at,
     )
     provenance["motionbert"] = {"bindings": bindings, "paths": paths}
+    if v3_jitter:
+        provenance["jitter_fallback"] = {
+            "schema_version": 1,
+            "fallback_evidence": protocol.preparation.fallback_evidence.model_dump(
+                mode="json"
+            ),
+            "fallback_value": protocol.preparation.fallback_value,
+            "sample_count": len(sample_ids),
+            "fallback_count": len(fallback_sample_ids),
+            "fallback_fraction": len(fallback_sample_ids) / len(sample_ids),
+            "fallback_sample_ids": fallback_sample_ids,
+            "fallback_sample_order_sha256": sample_order_digest(fallback_sample_ids),
+        }
     provenance["inference_environment"] = environment
     provenance["process"] = {"pid": os.getpid(), "job_id": os.environ.get("JOB_ID")}
     gpu_allocated = (
@@ -300,7 +398,7 @@ def extract_motionbert_features(
         training_seed=None,
         role=role,
         split=split,
-        condition="clean",
+        condition=condition,
         scientific_use_allowed=True,
         protocol_sha256=bindings["protocol_sha256"],
         manifest_sha256=sha256_file(manifest_path),
@@ -351,8 +449,33 @@ def validate_motionbert_cache(
     from pose_embed.motionbert_parity import validate_parity_report
 
     details = sidecar.provenance.get("motionbert")
+    if protocol.protocol_id == "protocol-v3":
+        from pose_embed.protocol_v3 import require_v3_design
+
+        require_v3_design(protocol)
+    if sidecar.condition == "clean":
+        family, severity = None, 0.0
+    else:
+        try:
+            family, raw_severity = sidecar.condition.split(":")
+            severity = float(raw_severity)
+        except (ValueError, TypeError) as exc:
+            raise ValueError("invalid MotionBERT corruption condition") from exc
+    if (
+        extraction_condition(
+            protocol,
+            role=sidecar.role,
+            split=sidecar.split,
+            family=family,
+            severity=severity,
+        )
+        != sidecar.condition
+    ):
+        raise ValueError("cache corruption condition mismatch")
     if not isinstance(details, dict) or not isinstance(details.get("paths"), dict):
         raise ValueError("MotionBERT cache lacks verified source/parity provenance")
+    if protocol.protocol_id == "protocol-v3" and family == "coordinate_jitter":
+        _validate_jitter_fallback_provenance(sidecar, protocol)
     paths = details["paths"]
     try:
         artifact_root = resolve_scientific_paths(protocol).root
@@ -441,7 +564,7 @@ def validate_motionbert_cache(
         for key, value in {
             "batch_size": 32,
             "dtype": "float32",
-            "condition": "clean",
+            "condition": sidecar.condition,
         }.items()
     ):
         raise ValueError("MotionBERT extraction configuration mismatch")
@@ -458,3 +581,61 @@ def validate_motionbert_cache(
         != expected["dependency_lock_sha256"]
     ):
         raise ValueError("MotionBERT cache format or clean-code provenance mismatch")
+
+
+def _validate_jitter_fallback_provenance(sidecar: FeatureSidecar, protocol) -> None:
+    """Check fallback use without reopening clean poses or changing the frozen value."""
+    record = sidecar.provenance.get("jitter_fallback")
+    fields = {
+        "schema_version",
+        "fallback_evidence",
+        "fallback_value",
+        "sample_count",
+        "fallback_count",
+        "fallback_fraction",
+        "fallback_sample_ids",
+        "fallback_sample_order_sha256",
+    }
+    if not isinstance(record, dict) or set(record) != fields:
+        raise ValueError("v3 jitter cache requires its complete fallback usage record")
+    sample_ids = record["fallback_sample_ids"]
+    if (
+        type(record["schema_version"]) is not int
+        or record["schema_version"] != 1
+        or type(record["sample_count"]) is not int
+        or record["sample_count"] != sidecar.shape[0]
+        or record["sample_count"] != len(sidecar.sample_ids)
+        or type(record["fallback_count"]) is not int
+        or not isinstance(sample_ids, list)
+        or any(not isinstance(sample_id, str) for sample_id in sample_ids)
+    ):
+        raise ValueError("v3 jitter fallback record has invalid counts or sample IDs")
+    selected = set(sample_ids)
+    if (
+        record["fallback_count"] != len(sample_ids)
+        or len(selected) != len(sample_ids)
+        or [sample_id for sample_id in sidecar.sample_ids if sample_id in selected]
+        != sample_ids
+        or record["fallback_sample_order_sha256"] != sample_order_digest(sample_ids)
+        or type(record["fallback_fraction"]) is not float
+        or record["fallback_fraction"] != len(sample_ids) / len(sidecar.sample_ids)
+    ):
+        raise ValueError("v3 jitter fallback IDs/count/frequency do not reconcile")
+    binding = protocol.preparation.fallback_evidence
+    if (
+        record["fallback_evidence"] != binding.model_dump(mode="json")
+        or type(record["fallback_value"]) is not float
+        or record["fallback_value"] != protocol.preparation.fallback_value
+    ):
+        raise ValueError("v3 jitter fallback binding differs from its frozen protocol")
+    root = resolve_scientific_paths(protocol).root
+    path = require_path_within(
+        root / binding.relative_path, root / "study-v3", label="fallback evidence"
+    )
+    inputs = sidecar.provenance.get("inputs")
+    if (
+        sha256_file(path) != binding.sha256
+        or not isinstance(inputs, dict)
+        or inputs.get(str(path)) != binding.sha256
+    ):
+        raise ValueError("v3 jitter fallback evidence changed or is unbound")

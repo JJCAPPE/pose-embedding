@@ -1,9 +1,11 @@
 # Weeks 1–3 evidence and handoff
 
 Recorded September 28 and updated September 29, 2026 UTC. This is a status
-index for the current [v2 protocol](protocol-v2.md) and
+index for the historical [v2 protocol](protocol-v2.md) and
 [v2 tracker seed](../../plan/research-plan.v2.json).
-It does not change the scientific protocol or authorize novel-test access.
+The current handoff is [Week 3 v3 readiness](week-3-v3-readiness.md).
+The v2 next-step recommendations below are retired historical scope. This record
+does not change the scientific protocol or authorize novel-test access.
 
 | Week | Verified technical work | Formal state and remaining input |
 | --- | --- | --- |

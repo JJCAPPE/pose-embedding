@@ -21,6 +21,7 @@ from pose_embed.config import load_protocol
 from pose_embed.data.inventory import NTUInventoryRecord, load_inventory
 from pose_embed.data.manifest import ManifestRecord, load_manifest
 from pose_embed.data.ntu import parse_ntu_sample_id
+from pose_embed.dataset_seal import guarded_auxiliary
 from pose_embed.protocol import resolve_scientific_paths
 from pose_embed.provenance import (
     capture_provenance,
@@ -289,6 +290,7 @@ def _model_checks(
     _compare(layers, "action_head", embedding, expected)
 
 
+@guarded_auxiliary
 def run_motionbert_parity(
     *,
     protocol_path: str | Path,

@@ -123,7 +123,9 @@ def test_week3_parity_rejects_v2_opening_before_source_loading(
     monkeypatch.setattr(
         "pose_embed.motionbert_inputs.load_motionbert_inputs", reject_loading
     )
-    with pytest.raises(ValueError, match="forbidden after benchmark v2 opening"):
+    with pytest.raises(
+        ValueError, match="(test opening|forbidden after benchmark v2 opening)"
+    ):
         run_motionbert_parity(
             protocol_path=protocol_path,
             manifest_set_path=tmp_path / "missing-manifest-set.json",

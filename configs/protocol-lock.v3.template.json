@@ -1,0 +1,16 @@
+{
+  "protocol_id": "protocol-v3",
+  "protocol_sha256": "REPLACE_WITH_POSE_EMBED_PROTOCOL_VERIFY_DIGEST",
+  "evaluation_plan_sha256": "REPLACE_WITH_LOCKED_EVALUATION_PLAN_DIGEST",
+  "source_inventory_manifest_sha256": "REPLACE_WITH_SOURCE_INVENTORY_MANIFEST_SHA256",
+  "anchor_manifest_sha256": "REPLACE_WITH_ANCHOR_MANIFEST_SHA256",
+  "official_query_manifest_sha256": "REPLACE_WITH_OFFICIAL_QUERY_MANIFEST_SHA256",
+  "primary_query_manifest_sha256": "REPLACE_WITH_PRIMARY_QUERY_MANIFEST_SHA256",
+  "final_run_set_sha256": "REPLACE_WITH_FINAL_RUN_SET_DIGEST",
+  "locked_at": "REPLACE_WITH_RFC3339_TIMESTAMP",
+  "recorded_by": "REPLACE_WITH_RESEARCHER_NAME",
+  "recorded_at": "REPLACE_WITH_RFC3339_TIMESTAMP",
+  "design_lock_sha256": "REPLACE_WITH_IMMUTABLE_DESIGN_LOCK_SHA256",
+  "selection_authorization_sha256": "REPLACE_WITH_MEASURED_SELECTION_AUTHORIZATION_SHA256",
+  "artifact_root_registry_sha256": "REPLACE_WITH_AUDITED_HISTORICAL_ROOT_REGISTRY_SHA256"
+}

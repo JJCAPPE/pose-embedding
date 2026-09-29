@@ -91,56 +91,50 @@ See `third_party/README.md` before using upstream code. In particular, the
 contextual-similarity repository has no visible license at the pinned revision
 and is reference-only.
 
-## Week 3 feature extraction
+## Current v3 execution
 
-This is preserved v1 infrastructure. Follow the v2 sequence below for the
-current study; full frozen-cache extraction is supplementary. All Week 3
-technical gates passed in [SCC job `7761714`](docs/protocol/week-3-scc-execution.md):
-fresh parity, two byte-identical full auxiliary extractions, five validated
-caches and the declared resource checks. Formal weekly closeout is recorded
-separately in the plan. The [Weeks 1–3 handoff](docs/protocol/weeks-1-3-handoff.md)
-summarizes verified gates and the next capacity decision.
-
-The [saved execution plan](plan/week-03-execution-plan.md) and
-[implementation record](docs/protocol/week-3-implementation.md) describe the
-clean frozen-encoder path. Its CLI entry points are:
+The active study is the [final v3 plan](plan/research-plan.v3.md) and
+[protocol v3](docs/protocol/protocol-v3.md): frozen MotionBERT, a biased
+8,704-to-2,048 head, Contrastive/Contextual/SupCon, three paired seeds and
+20 epochs. The [Week 3 readiness record](docs/protocol/week-3-v3-readiness.md)
+separates implemented preparation from measured SCC evidence.
 
 ```bash
-uv run pose-embed data development-episode --help
-uv run pose-embed features parity --help
-uv run pose-embed features extract --backend motionbert --help
-uv run pose-embed features verify-repeatability --help
+uv run pose-embed protocol verify --config configs/protocol.v3.yaml
+uv run pose-embed study-v3 --help
 ```
 
-To reproduce that completed gate, use a clean committed checkout, the locked GPU
-environment, and `scripts/extract_motionbert_week3.qsub`. Inputs stay under
-`POSE_EMBED_DATA_ROOT`; caches and evidence stay under
-`POSE_EMBED_ARTIFACT_ROOT`. The job also requires
-`POSE_EMBED_MANIFEST_SET` pointing to the adopted `manifest-set.json`.
-Pre-head caches contain 8,704 values per sample, not trained retrieval embeddings.
-Submit from the repository root with scheduler logs outside the checkout:
+The checked-in protocol is a non-executable template. Before the Week 4 GPU
+work, register every historical artifact root, package the auxiliary-only
+source, measure the training-only fallback, rebind the unchanged identities,
+and freeze the resolved design. Follow the
+[SCC v3 runbook](docs/protocol/scc-v3-runbook.md). Preparation uses
+`scripts/prepare_v3.qsub`; fresh caches and the three engineering pilots use
+`scripts/study_v3.qsub`. Inputs remain under `POSE_EMBED_DATA_ROOT`, and v3
+outputs live under the existing canonical artifact root in `study-v3/`.
 
-```bash
-mkdir -p "$POSE_EMBED_ARTIFACT_ROOT/logs"
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/extract_motionbert_week3.qsub
-```
-
-The wrapper now records a fresh SCC project-quota snapshot and requires the
-repeatability gate to check it alongside filesystem free space.
+Historical Week 3 extraction completed in
+[SCC job 7761714](docs/protocol/week-3-scc-execution.md). Those immutable caches
+prove the earlier path worked; v3 requires fresh parity and caches after its
+design freeze. The [v1](docs/protocol/protocol-v1.md) and
+[v2](docs/protocol/protocol-v2.md) configurations, implementations and evidence
+remain for provenance. Their fine-tuning and 26-method campaign instructions
+are retired from the active workflow.
 
 ## Scientific guardrails
 
-- [Protocol v2](docs/protocol/protocol-v2.md) and its
-  [scope amendment](docs/decisions/0003-motion-retrieval-v2.md) define the
-  current study. The final prospectus and v1 protocol remain historical records.
-- Select settings only on the class-disjoint auxiliary development split.
-- Never open the official novel-action test through an upstream training script.
-- Final-test evaluation requires the complete v2 locks and final-run records.
-- The primary v2 outcome is clean multi-positive retrieval. One-shot and query
-  corruption are separately declared supplementary studies. Corruption applies
-  only to evaluation queries; reference galleries remain clean.
-- Report every prespecified condition and paired seed, including null or
-  negative results and resource costs.
+- Select only on the class-disjoint auxiliary development episode. Engineering
+  pilots and corrupted development scores are ineligible for selection.
+- Freeze every cache-affecting input before extraction. Preserve every attempt,
+  failure, manifest and historical cache; never relabel an old artifact as v3.
+- Use the registered canonical artifact root. Test opening is dataset-wide
+  across protocol versions, and source readers check the shared seal.
+- Complete and lock all nine fresh final heads before any novel pose processing.
+  Later selection and final-opening authorizers remain closed until their
+  measured gates have been independently verified.
+- Keep galleries clean. Corrupt queries using the exact fixed v3 operators,
+  fallback and paired seeds; report all prespecified conditions and costs.
+- A null or negative result is a successful scientific result.
 
 ## Manual external setup for a new deployment
 
@@ -167,99 +161,3 @@ This repository intentionally has no project-wide reuse license. Adding one
 requires an explicit researcher decision after rights review and applicable BU
 requirements. Third-party material retains its own license and
 attribution requirements.
-
-## V2: Contextual versus baseline first
-
-Read [protocol v2](docs/protocol/protocol-v2.md), the
-[scope amendment](docs/decisions/0003-motion-retrieval-v2.md), and the
-[method adaptation inventory](docs/protocol/remaining-method-adaptations.md).
-The main study fine-tunes MotionBERT with 512-dimensional embeddings, with a
-separate 1,536-dimensional matched group. The first frozen pilot verifies the
-plumbing and is supplementary to that study. Neither pilot opens the novel test.
-
-```bash
-uv run pose-embed benchmark coverage
-uv run pose-embed benchmark profile --help
-uv run pose-embed benchmark train --help
-uv run pose-embed benchmark compare --help
-```
-
-`configs/benchmark.v2.yaml` declares the frozen pilot;
-`configs/benchmark.finetune.v2.yaml` declares the trainable-backbone track.
-Both fix physical P=8, K=4, six seeds, 1,000 development steps and validation
-every 100 steps. These are development settings, not selected final recipes.
-Use a new result-blind configuration to change them; a CLI track override cannot
-change the hashed setting. A one-seed pilot does not establish superiority.
-
-On SCC, from a clean committed checkout and the locked Linux environment:
-
-```bash
-source ~/pose-embed-scc/environment.sh
-export POSE_EMBED_MANIFEST_SET="$POSE_EMBED_ARTIFACT_ROOT/manifests/ntu-input-v2-7721684/manifest-set.json"
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/verify_scc_setup.qsub
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/benchmark_v2.qsub \
-  pilot configs/benchmark.v2.yaml 7
-qsub -l gpu_memory=80G -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
-  scripts/benchmark_v2.qsub profile configs/benchmark.finetune.v2.yaml 7
-```
-
-The pilot job verifies the upstream adapter, measures three real optimizer
-steps per method, trains Contrastive then Contextual, and writes the paired
-development comparison. All attempts, failures, batches, initializations,
-checkpoints, selected metrics and timings are immutable under
-`$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2`. Logs and licensed data stay outside Git.
-Use a separate locked environment for each active release. Complete its setup
-verification first; it validates the adopted bundle before regeneration and
-compares the complete new bundle without replacing the existing one. The setup
-job allows two hours and logs each test plus the ten slowest test durations.
-
-All 26 method adapters are implemented. `benchmark coverage` reports their
-identities explicitly; implementation does not establish GPU feasibility or
-retrieval performance. The physical fine-tuning batch failed on an L40S and
-passed on an A100 80 GB for the priority pair. The seed-7 paired fine-tuning
-pilot then completed in SCC job `7748592`: each method ran 1,000 updates and ten
-development validations, taking about 6,500 seconds per method. This is
-engineering evidence, not a six-seed or novel-test result. Every other method
-still requires its own allocated-GPU profile; see the
-[implementation record](docs/protocol/v2-implementation-record.md).
-
-Profile the complete roster using the completed comparison as a prerequisite:
-
-```bash
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
-  scripts/benchmark_v2_profiles.qsub configs/benchmark.selection.v2.yaml 7 \
-  "$POSE_EMBED_ARTIFACT_ROOT/benchmark-v2/pilots/20260926T204338Z-7748592-0ef858379c36/comparison.json"
-```
-
-The wrapper verifies successful paired evidence before broader GPU work. Each
-method runs three real optimizer steps and a fixed, bounded
-development retrieval profile. A failed profile remains recorded; other methods
-are still attempted. No profile is eligible for scientific selection.
-
-The [selection campaign](docs/protocol/selection-campaign-v2.md) declares three
-learning-rate candidates and six paired seeds for each method: **468 development
-runs**, followed by **156 selected final runs**. The provisional 50,000-update
-budget requires a complete time/storage forecast before launch. The
-[continuation protocol](docs/protocol/checkpoint-segments.md) supports immutable
-segments across scheduler allocations; `scripts/benchmark_v2_train.qsub` passes
-explicit training arguments with a ten-hour soft checkpoint boundary. Retain
-every segment and use the printed resume command for the next allocation.
-
-The [secondary studies](docs/protocol/secondary-studies-v2.md) add one-shot and
-query-corruption evaluation, loss-component ablations, training label noise,
-pose replacement and reduced training classes. They declare 276 development
-and 276 final training runs, with fixed inherited recipes. All **432 main and
-secondary final runs** must complete before novel-test opening.
-
-The [storage floor](docs/protocol/v2-resource-floor.md) exceeds the previously
-observed available SCC project space even before full auxiliary state and
-segments. A September 29, 02:36 UTC read-only quota check found 293.44 GB
-remaining in the shared allocation, below the 599.27 GB checkpoint-only floor.
-Available capacity can change; recheck it, and resolve storage and measured
-runtime before launching the complete campaign.
-
-Selection, final training and test-opening locks require the full 26 × 6 matrix,
-matched initialization/batches, verified inputs and the statistical analysis
-plan. Final evaluation uses all eligible held-out motions, excludes self and
-synchronized camera views, and reports Recall@K, mAP, mAP@R and MRR. The v1
-one-shot evaluator and its old three-method lock do not authorize this study.

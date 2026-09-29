@@ -6,10 +6,13 @@ import hashlib
 import json
 from datetime import date
 from pathlib import Path, PurePosixPath
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+if TYPE_CHECKING:
+    from pose_embed.config_v3 import ProtocolV3Config
 
 
 class StrictModel(BaseModel):
@@ -694,9 +697,14 @@ def _load_yaml(path: Path) -> object:
         raise ValueError(f"invalid YAML in {path}: {exc}") from exc
 
 
-def load_protocol(path: str | Path) -> ProtocolConfig:
+def load_protocol(path: str | Path) -> ProtocolConfig | ProtocolV3Config:
     """Load and validate the machine-readable protocol."""
-    return ProtocolConfig.model_validate(_load_yaml(Path(path)))
+    payload = _load_yaml(Path(path))
+    if isinstance(payload, dict) and payload.get("protocol_id") == "protocol-v3":
+        from pose_embed.config_v3 import ProtocolV3Config
+
+        return ProtocolV3Config.model_validate(payload)
+    return ProtocolConfig.model_validate(payload)
 
 
 def load_experiment(path: str | Path) -> ExperimentConfig:
@@ -709,6 +717,11 @@ def validate_experiment_against_protocol(
     protocol: ProtocolConfig,
 ) -> None:
     """Reject experiment settings outside the preregistered search space."""
+    if protocol.protocol_id == "protocol-v3":
+        from pose_embed.config_v3 import validate_v3_experiment
+
+        validate_v3_experiment(experiment, protocol)
+        return
     allowed_objectives = {*protocol.objectives.core, protocol.objectives.stretch.method}
     if experiment.objective not in allowed_objectives:
         raise ValueError("experiment objective is absent from the protocol")

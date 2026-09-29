@@ -25,6 +25,7 @@ from pose_embed.benchmark.runtime import (
     verify_run,
 )
 from pose_embed.benchmark.secondary import load_secondary_plan, secondary_plan_sha256
+from pose_embed.dataset_seal import guarded_opening, record_dataset_opening
 from pose_embed.provenance import sha256_file, write_immutable_json
 
 
@@ -472,6 +473,7 @@ def _opening_content(manifest_set_path, config_path) -> tuple[dict, datetime]:
     )
 
 
+@guarded_opening
 def open_test(
     *, manifest_set_path: str | Path, config_path: str | Path | None = None
 ) -> dict:
@@ -484,6 +486,7 @@ def open_test(
     path = _path("test-opening.json")
     if path.exists():
         return _validate_opening_payload(read_json(path), expected, finalized_at)
+    record_dataset_opening(version="protocol-v2", authorization=expected)
     payload = {**expected, "created_at": now()}
     try:
         write_immutable_json(path, payload)

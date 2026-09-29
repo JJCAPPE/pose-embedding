@@ -101,6 +101,9 @@ def cache_context(
     write_manifest_bundle(inventory, protocol, bundle_dir)
     monkeypatch.setenv("POSE_EMBED_DATA_ROOT", str(tmp_path))
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    from pose_embed.dataset_seal import register_artifact_roots
+
+    register_artifact_roots([])
     monkeypatch.setattr(
         "pose_embed.motionbert_inputs.load_protocol", lambda _: protocol
     )

@@ -92,7 +92,7 @@ def test_legacy_extraction_rejects_v2_opening_before_input_loading(
     ledger = tmp_path / "benchmark-v2/locks/test-opening.json"
     ledger.parent.mkdir(parents=True)
     ledger.write_text("{}")
-    with pytest.raises(ValueError, match="forbidden after benchmark v2 opening"):
+    with pytest.raises(ValueError, match="forbidden after test opening"):
         extract_motionbert_features(
             tmp_path / "absent.pkl",
             tmp_path / "features.npz",

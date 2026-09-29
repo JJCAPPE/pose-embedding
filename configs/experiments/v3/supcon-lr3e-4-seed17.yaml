@@ -1,0 +1,14 @@
+schema_version: 1
+name: v3-supcon-lr3e-4-seed17
+objective: supcon
+seed: 17
+input_dimension: 8704
+embedding_dimension: 2048
+epochs: 20
+learning_rate: 0.0003
+weight_decay: 0.0001
+classes_per_batch: 8
+samples_per_class: 4
+temperature: 0.07
+positive_margin: 0.9
+negative_margin: 0.6

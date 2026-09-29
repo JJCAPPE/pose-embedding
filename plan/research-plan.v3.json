@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-09-29T20:15:08.089989Z",
+  "generatedAt": "2026-09-29T21:04:11.106877+00:00",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -61,7 +61,7 @@
       },
       {
         "label": "Current planning status",
-        "value": "This is the final execution design, not evidence that implementation, GPU training, storage, researcher availability or novel evaluation is complete. Historical Weeks 1-3 and their progress remain unchanged. Future-week effort estimates require researcher confirmation."
+        "value": "Week 3 v3 software is implemented and checked with fixtures. Real SCC auxiliary preparation, measured fallback, immutable design freeze, GPU pilots, full-campaign capacity, researcher availability and final-test authorization remain pending. Historical Weeks 1-2 and the original Week 3 completion evidence are preserved; additional Week 3 v3 readiness is recorded separately. Future-week effort estimates require researcher confirmation."
       },
       {
         "label": "Measured capacity prerequisite",
@@ -470,22 +470,22 @@
       "number": 3,
       "startDate": "2026-09-28",
       "endDate": "2026-10-04",
-      "phase": "Representation",
-      "title": "Frozen encoder and evaluator",
-      "objective": "Build a deterministic frozen MotionBERT feature path and independently verify historical one-shot and current v2 multi-positive retrieval behavior.",
-      "deliverable": "Repeatable clean auxiliary feature caches, independent retrieval and test-seal fixtures, and measured extraction cost.",
+      "phase": "V3 implementation and design freeze",
+      "title": "Verified v3 implementation and sealed preparation",
+      "objective": "Complete the frozen one-shot v3 protocol and pilot specification, corruption operators and fallback, versioned validators, shared dataset seals, source access separation and pilot instrumentation; freeze cache-affecting code and configuration before fresh extraction.",
+      "deliverable": "Verified v3 software with historical evidence preserved, plus auxiliary-only SCC preparation, measured fallback evidence, a complete root audit and an immutable design lock before Week 4 caches and pilots.",
       "risks": [
-        "The legacy upstream code assumes CUDA DataParallel and outdated dependencies.",
-        "Pooling or normalization drift can invalidate comparison with MotionBERT.",
-        "Feature caching without provenance can mix incompatible experiments."
+        "The historical v1/v2 caches and GPU evidence do not establish v3 preparation, fallback selection or a frozen v3 design.",
+        "Fresh extraction must wait for the measured auxiliary fallback, shared root audit and cache-affecting source/configuration freeze.",
+        "Actual researcher minutes remain unreported; completion of software checks does not close the week or authorize novel access."
       ],
-      "advisorPrompt": "What further fine-tuning, quota, and full-roster measurements are needed before the v2 campaign can launch?",
-      "reflection": "All five Week 3 technical tasks and gates are verified complete as of 2026-09-28. SCC job 7761714, release b92e7dd88fc261c0b8585039fbe99ad67ee8b445, completed successfully on one L40S at 01:40:59Z. Fresh parity passed, both complete 95,001-row extractions were byte-identical, and all five final/development caches validated. The conservative full-input forecast is 44.12 minutes and 4.07 GiB per cache, with 3.63 GiB peak GPU and 7.65 GiB peak host memory; the declared storage reserve passed. Prior encoder and independent v1/v2 metric/test-seal evidence is preserved. BU determination remains confirmed, and both novel-test opening ledgers remained absent at the September 28 observation. Actual researcher minutes remain unreported; Week 3 stays formally open. The hosted Week 1 and 2 records were closed later on September 28 with zero minutes while their prior notes said time was unreported; those closures require researcher reconciliation and are not treated here as evidence of zero work. This completes Week 3 technical deliverables without claiming completion of the broader v2 study. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md",
+      "advisorPrompt": "Do auxiliary-only preparation, the measured fallback, the shared seal audit and the immutable design lock authorize fresh Week 4 caches and three engineering pilots?",
+      "reflection": "All five Week 3 technical tasks and gates are verified complete as of 2026-09-28. SCC job 7761714, release b92e7dd88fc261c0b8585039fbe99ad67ee8b445, completed successfully on one L40S at 01:40:59Z. Fresh parity passed, both complete 95,001-row extractions were byte-identical, and all five final/development caches validated. The conservative full-input forecast is 44.12 minutes and 4.07 GiB per cache, with 3.63 GiB peak GPU and 7.65 GiB peak host memory; the declared storage reserve passed. Prior encoder and independent v1/v2 metric/test-seal evidence is preserved. BU determination remains confirmed, and both novel-test opening ledgers remained absent at the September 28 observation. Actual researcher minutes remain unreported; Week 3 stays formally open. The hosted Week 1 and 2 records were closed later on September 28 with zero minutes while their prior notes said time was unreported; those closures require researcher reconciliation and are not treated here as evidence of zero work. This completes Week 3 technical deliverables without claiming completion of the broader v2 study. Report: https://github.com/JJCAPPE/pose-embedding/blob/da439697358c795bc7d44a78b062eb1b63af2e0a/docs/protocol/week-3-scc-execution.md V3 reconciliation on 2026-09-29: the five tasks and gates above remain historical v1/v2 evidence. The current Week 3 objective now follows the final v3 September 29–October 4 plan. V3 software and fixture coverage are recorded separately; real SCC auxiliary preparation, fallback measurement, canonical root audit and immutable design freeze remain pending. No v3 scientific cache, pilot, novel access or weekly closure is claimed. Actual researcher minutes remain unreported. V3 status: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
       "plannedMinutes": 480,
       "actualMinutes": 0,
-      "state": "planned",
+      "state": "active",
       "closedAt": null,
-      "version": 6,
+      "version": 7,
       "tasks": [
         {
           "id": "w03-task-01",
@@ -561,6 +561,36 @@
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/d9b8fb4e490f0462a9e90c172e1294df33d3d8c9/docs/protocol/v2-implementation-record.md",
           "completedAt": "2026-09-27T20:17:36.895845+00:00",
           "version": 2
+        },
+        {
+          "id": "w03-task-06",
+          "weekId": "week-03",
+          "position": 6,
+          "title": "Implement and verify the v3 frozen study path",
+          "details": "Implement the fixed three-recipe protocol, auxiliary preparation and fallback, immutable design validation, shared dataset seals, source separation and engineering-pilot diagnostics. Retain historical scientific behavior and verify the v3 boundaries with synthetic fixtures.",
+          "expectedOutput": "Reviewed v3 implementation and passing applicable software checks; no real-data preparation or GPU result inferred.",
+          "required": true,
+          "estimateMinutes": 0,
+          "state": "done",
+          "completionNote": "V3 protocol/configuration validation, result-blind fallback, cross-version dataset seals, source separation, fixed-budget pilot snapshots and diagnostics, and fail-closed launchers are implemented and checked with software fixtures. The complete Python suite passed 1,012 tests with no skips; all 21 tracker tests, lint, typecheck and build passed. Ruff, formatting and workspace checks also passed. This records software capability only; SCC auxiliary preparation and the real immutable design freeze are tracked separately. Detailed verification: docs/protocol/week-3-v3-readiness.md.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
+          "completedAt": "2026-09-29T21:04:11.106877+00:00",
+          "version": 1
+        },
+        {
+          "id": "w03-task-07",
+          "weekId": "week-03",
+          "position": 7,
+          "title": "Prepare auxiliary inputs and freeze the real v3 design on SCC",
+          "details": "Deploy the reviewed release to SCC, audit and register every historical and current artifact root, prepare only the auxiliary inputs, measure the prespecified fallback without novel access, and freeze the cache-affecting source/configuration and preparation evidence before Week 4 extraction.",
+          "expectedOutput": "Immutable auxiliary preparation and fallback evidence, canonical root audit and a validated v3 design lock from the real SCC inputs.",
+          "required": true,
+          "estimateMinutes": 0,
+          "state": "todo",
+          "completionNote": "Pending. No real v3 auxiliary preparation, measured fallback or immutable design lock has been verified on SCC. The historical five caches and job 7761714 remain evidence for their original protocol only.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
+          "completedAt": null,
+          "version": 1
         }
       ],
       "gates": [
@@ -623,6 +653,30 @@
           "waiverReason": "",
           "decidedAt": "2026-09-27T20:18:45.499212+00:00",
           "version": 2
+        },
+        {
+          "id": "w03-gate-06",
+          "weekId": "week-03",
+          "position": 6,
+          "criterion": "V3 protocol, corruption, shared-seal, source-separation and pilot instrumentation checks pass while historical behavior is preserved.",
+          "required": true,
+          "state": "met",
+          "evidence": "Software implementation and synthetic-fixture verification are recorded in docs/protocol/week-3-v3-readiness.md, including the complete 1,012-test Python suite with no skips, all 21 tracker tests, lint/typecheck/build, and Ruff/format/workspace checks. Pilot attempts retain immutable diagnostics and failures and remain ineligible for selection. This gate asserts implementation correctness only, not real SCC preparation, v3 parity, caches, pilots or test access. Report: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
+          "waiverReason": "",
+          "decidedAt": "2026-09-29T21:04:11.106877+00:00",
+          "version": 1
+        },
+        {
+          "id": "w03-gate-07",
+          "weekId": "week-03",
+          "position": 7,
+          "criterion": "Real auxiliary-only preparation, measured fallback and canonical root audit are bound to an immutable v3 design lock before fresh feature extraction.",
+          "required": true,
+          "state": "pending",
+          "evidence": "Pending real SCC execution and verification. Required evidence is the auxiliary-only preparation record, prespecified fallback measurement, all-root test-seal audit and frozen cache-affecting code/configuration digests. Historical v1/v2 GPU evidence cannot satisfy this v3 gate.",
+          "waiverReason": "",
+          "decidedAt": null,
+          "version": 1
         }
       ]
     },
@@ -2270,6 +2324,13 @@
       "weekId": "week-04",
       "sourceId": "source-supcon",
       "purpose": "Verify the declared single-view SupCon formulation and temperature adaptation.",
+      "priority": "required",
+      "version": 1
+    },
+    {
+      "weekId": "week-03",
+      "sourceId": "source-plan-v3",
+      "purpose": "Use the final frozen one-shot v3 plan for current Week 3 implementation, auxiliary preparation and immutable design-freeze readiness; retain existing links as historical evidence.",
       "priority": "required",
       "version": 1
     }

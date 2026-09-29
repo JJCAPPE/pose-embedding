@@ -392,6 +392,10 @@ def resolve_scientific_paths(protocol: ProtocolConfig) -> ScientificPaths:
     if not root.is_absolute():
         raise ValueError(f"{variable} must be an absolute path")
     root = root.resolve()
+    from pose_embed.dataset_seal import canonical_artifact_root
+
+    if root != canonical_artifact_root():
+        raise ValueError("scientific root differs from dataset registry")
 
     def below_root(relative: str) -> Path:
         _validate_relative_path(relative, label="scientific artifact")
@@ -407,7 +411,13 @@ def resolve_scientific_paths(protocol: ProtocolConfig) -> ScientificPaths:
         evaluation_plan=below_root(access.evaluation_plan_relative_path),
         final_run_set=below_root(access.final_run_set_relative_path),
         test_opening_ledger=below_root(access.opening_ledger_relative_path),
-        stretch_gate_evidence=below_root(access.stretch_gate_evidence_relative_path),
+        stretch_gate_evidence=below_root(
+            getattr(
+                access,
+                "stretch_gate_evidence_relative_path",
+                "study-v3/locks/stretch-forbidden.json",
+            )
+        ),
     )
 
 
@@ -777,6 +787,10 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/artifacts.py",
         "src/pose_embed/cli.py",
         "src/pose_embed/config.py",
+        "src/pose_embed/config_v3.py",
+        "src/pose_embed/dataset_seal.py",
+        "src/pose_embed/preparation_v3.py",
+        "src/pose_embed/v3_commands.py",
         "src/pose_embed/features.py",
         "src/pose_embed/gpu_profile.py",
         "src/pose_embed/provenance.py",
@@ -825,6 +839,8 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/evaluation/metrics.py",
         "src/pose_embed/evaluation/result.py",
         "src/pose_embed/protocol.py",
+        "src/pose_embed/protocol_v3.py",
+        "src/pose_embed/protocol_v3_campaign.py",
         "src/pose_embed/test_access.py",
         "src/pose_embed/data/__init__.py",
         "src/pose_embed/data/inventory.py",
@@ -840,6 +856,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
     "corruptions": (
         "src/pose_embed/corruptions/__init__.py",
         "src/pose_embed/corruptions/pose.py",
+        "src/pose_embed/corruptions/fallback.py",
     ),
     "analysis": (
         "src/pose_embed/evaluation/analysis.py",
@@ -2035,6 +2052,13 @@ def verify_protocol(
     """Validate a protocol and, when supplied or required, its recorded lock."""
     protocol = load_protocol(protocol_path)
     digest = protocol_digest(protocol)
+    if protocol.protocol_id == "protocol-v3" and (
+        require_locked or lock_path is not None
+    ):
+        raise ValueError(
+            "v3 final authorization is unavailable before the measured campaign audit; "
+            "a design lock does not authorize novel evaluation"
+        )
     if require_locked and lock_path is None:
         paths = resolve_scientific_paths(protocol)
         lock_path = paths.protocol_lock

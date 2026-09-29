@@ -1,5 +1,9 @@
 # Week 3 — frozen MotionBERT and retrieval
 
+Historical v1/v2 implementation plan. For the active study, see
+[Week 3 v3 readiness](../docs/protocol/week-3-v3-readiness.md) and the
+[v3 SCC runbook](../docs/protocol/scc-v3-runbook.md).
+
 Implementation plan recorded on 2026-09-24 for September 28–October 4.
 **Execution status as of September 28:** all technical acceptance criteria
 passed in SCC job `7761714`, completed September 27 EDT. Fresh parity, two

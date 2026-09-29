@@ -71,9 +71,9 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(22);
-    expect(progress.completedRequiredTasks).toBe(13);
-    expect(progress.decidedRequiredGates).toBe(12);
+    expect(progress.percent).toBe(23);
+    expect(progress.completedRequiredTasks).toBe(14);
+    expect(progress.decidedRequiredGates).toBe(13);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(0);
   });
@@ -101,14 +101,24 @@ describe("readiness and progress rules", () => {
     expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
   });
 
-  it("completes the Week 3 checklist while earlier weekly records remain open", () => {
+  it("preserves Week 3 history while real v3 preparation and design freeze remain pending", () => {
     const week = seedPlan.weeks[2];
-    expect(weekProgress(week)).toEqual({ required: 5, completed: 5, percent: 100 });
+    expect(weekProgress(week)).toEqual({ required: 7, completed: 6, percent: 86 });
     expect(week.gates.filter((gate) => gate.state === "met").map((gate) => gate.id))
-      .toEqual(["w03-gate-01", "w03-gate-02", "w03-gate-03", "w03-gate-04", "w03-gate-05"]);
-    expect(weekCanClose(week)).toBe(true);
+      .toEqual(["w03-gate-01", "w03-gate-02", "w03-gate-03", "w03-gate-04", "w03-gate-05", "w03-gate-06"]);
+    expect(week.tasks.slice(0, 5).every((task) => task.state === "done")).toBe(true);
+    expect(week.tasks.find((task) => task.id === "w03-task-07")).toMatchObject({
+      state: "todo",
+      completedAt: null,
+    });
+    expect(week.gates.find((gate) => gate.id === "w03-gate-07")).toMatchObject({
+      state: "pending",
+      decidedAt: null,
+    });
+    expect(week.reflection).toContain("Actual researcher minutes remain unreported");
+    expect(weekCanClose(week)).toBe(false);
     expect(weekIsReady(seedPlan.weeks, 3)).toBe(false);
-    expect(week.state).toBe("planned");
+    expect(week.state).toBe("active");
     expect(week.closedAt).toBeNull();
     expect(week.actualMinutes).toBe(0);
   });

@@ -21,8 +21,15 @@ describe("published v3 protocol", () => {
     expect(protocolDocuments.decision.markdown).toContain("final planning direction");
   });
 
-  it("keeps Weeks 1–3 evidence unchanged while publishing the v3 scope", () => {
-    expect(seedPlan.weeks.slice(0, 3)).toEqual(historicalPlan.weeks.slice(0, 3));
+  it("preserves historical evidence while tracking Week 3 v3 readiness separately", () => {
+    expect(seedPlan.weeks.slice(0, 2)).toEqual(historicalPlan.weeks.slice(0, 2));
+    const historicalWeek3 = historicalPlan.weeks[2];
+    const week3 = seedPlan.weeks[2];
+    expect(week3.tasks.slice(0, 5)).toEqual(historicalWeek3.tasks);
+    expect(week3.gates.slice(0, 5)).toEqual(historicalWeek3.gates);
+    expect(week3.reflection.startsWith(historicalWeek3.reflection)).toBe(true);
+    expect(week3.actualMinutes).toBe(historicalWeek3.actualMinutes);
+    expect(week3.closedAt).toBe(historicalWeek3.closedAt);
     const summary = JSON.stringify(seedPlan.protocol);
     expect(summary).toMatch(/frozen/i);
     expect(summary).toMatch(/20 epochs/);

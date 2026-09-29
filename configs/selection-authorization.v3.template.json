@@ -1,0 +1,44 @@
+{
+  "schema_version": 3,
+  "kind": "v3_selection_authorization",
+  "protocol_sha256": "REPLACE_WITH_UNCHANGED_RESOLVED_PROTOCOL_DIGEST",
+  "design_lock_sha256": "REPLACE_WITH_DESIGN_LOCK_SHA256",
+  "recorded_at": "REPLACE_WITH_RFC3339_TIMESTAMP",
+  "recorded_by": "REPLACE_WITH_RESEARCHER",
+  "pilot_records": {
+    "contrastive": {
+      "relative_path": "study-v3/pilots/contrastive/metrics.json",
+      "sha256": "REPLACE_WITH_SHA256"
+    },
+    "supcon": {
+      "relative_path": "study-v3/pilots/supcon/metrics.json",
+      "sha256": "REPLACE_WITH_SHA256"
+    },
+    "contextual": {
+      "relative_path": "study-v3/pilots/contextual/metrics.json",
+      "sha256": "REPLACE_WITH_SHA256"
+    }
+  },
+  "corruption_verification": {
+    "relative_path": "study-v3/gates/corruption_verification.json",
+    "sha256": "REPLACE_WITH_SHA256"
+  },
+  "analysis_verification": {
+    "relative_path": "study-v3/gates/analysis_verification.json",
+    "sha256": "REPLACE_WITH_SHA256"
+  },
+  "capacity_report": {
+    "relative_path": "study-v3/gates/capacity_report.json",
+    "sha256": "REPLACE_WITH_SHA256"
+  },
+  "seal_audit": {
+    "relative_path": "study-v3/gates/seal_audit.json",
+    "sha256": "REPLACE_WITH_SHA256"
+  },
+  "run_matrix": {
+    "relative_path": "study-v3/gates/run_matrix.json",
+    "sha256": "REPLACE_WITH_SHA256"
+  },
+  "capacity_passed": true,
+  "novel_access_authorized": false
+}
