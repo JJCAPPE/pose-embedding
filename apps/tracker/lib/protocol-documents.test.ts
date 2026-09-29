@@ -42,7 +42,8 @@ describe("published v3 protocol", () => {
     expect(summary).toContain("180");
     expect(summary).toMatch(/100 GB/);
     expect(summary).not.toMatch(/26 declared configurations|six paired seeds/);
-    expect(seedPlan.weeks.slice(3).every((week) => week.tasks.every((task) => task.state !== "done"))).toBe(true);
+    expect(seedPlan.weeks[3].tasks.slice(1).every((task) => task.state === "todo")).toBe(true);
+    expect(seedPlan.weeks.slice(4).every((week) => week.tasks.every((task) => task.state === "todo"))).toBe(true);
   });
 
   it("resolves local document links without exposing a filesystem path", () => {

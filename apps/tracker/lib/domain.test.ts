@@ -71,9 +71,9 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(25);
-    expect(progress.completedRequiredTasks).toBe(15);
-    expect(progress.decidedRequiredGates).toBe(14);
+    expect(progress.percent).toBe(27);
+    expect(progress.completedRequiredTasks).toBe(16);
+    expect(progress.decidedRequiredGates).toBe(15);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(0);
   });
@@ -123,6 +123,18 @@ describe("readiness and progress rules", () => {
     expect(week.state).toBe("closed");
     expect(week.closedAt).not.toBeNull();
     expect(week.actualMinutes).toBe(0);
+  });
+
+  it("credits the Week 3 freeze in Week 4 without completing its remaining work", () => {
+    const week = seedPlan.weeks[3];
+    expect(weekProgress(week)).toEqual({ required: 4, completed: 1, percent: 25 });
+    expect(week.tasks[0].completionNote).toContain("Satisfied by the verified Week 3 handoff");
+    expect(week.gates[0].state).toBe("met");
+    expect(week.tasks.slice(1).every((task) => task.state === "todo")).toBe(true);
+    expect(week.gates.slice(1).every((gate) => gate.state === "pending")).toBe(true);
+    expect(week.state).toBe("planned");
+    expect(week.actualMinutes).toBe(0);
+    expect(weekCanClose(week)).toBe(false);
   });
 
   it("returns the newest completed tasks for the public dashboard", () => {

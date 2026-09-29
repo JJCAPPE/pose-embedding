@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-09-29T22:28:17.544258+00:00",
+  "generatedAt": "2026-09-29T22:36:10.146581+00:00",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -703,11 +703,11 @@
           "expectedOutput": "An immutable v3 design/pilot specification and passing version, provenance and seal checks.",
           "required": true,
           "estimateMinutes": 90,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 3
+          "state": "done",
+          "completionNote": "Satisfied by the verified Week 3 handoff on 2026-09-29, not a second freeze: SCC job 7790916 completed with failed=0 and exit_status=0. Explicit v3 validators, registered historical-root seals and auxiliary/novel source separation passed; all eight identity sets and the auxiliary preparation are bound to the corrected immutable design lock 39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d. The active scientific release is 2897f4fe4c1fb1857432a0e92a7391dde68307f5. Fresh v3 parity/caches, loss/paired-training evidence and three complete pilots remain Week 4 work. Recheck runtime seals before every job. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
+          "completedAt": "2026-09-29T22:28:17.544258+00:00",
+          "version": 4
         },
         {
           "id": "w04-task-02",
@@ -762,11 +762,11 @@
           "position": 1,
           "criterion": "The complete v3 design and cache-affecting release are frozen; source identities are preserved and historical seal audits are resolved.",
           "required": true,
-          "state": "pending",
-          "evidence": "",
+          "state": "met",
+          "evidence": "Satisfied by the verified Week 3 handoff on 2026-09-29, not a second freeze: SCC job 7790916 completed with failed=0 and exit_status=0. Explicit v3 validators, registered historical-root seals and auxiliary/novel source separation passed; all eight identity sets and the auxiliary preparation are bound to the corrected immutable design lock 39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d. The active scientific release is 2897f4fe4c1fb1857432a0e92a7391dde68307f5. Fresh v3 parity/caches, loss/paired-training evidence and three complete pilots remain Week 4 work. Recheck runtime seals before every job. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
           "waiverReason": "",
-          "decidedAt": null,
-          "version": 3
+          "decidedAt": "2026-09-29T22:28:17.544258+00:00",
+          "version": 4
         },
         {
           "id": "w04-gate-02",

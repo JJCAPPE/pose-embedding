@@ -119,10 +119,14 @@ before each job; full-campaign storage, measured runtime and researcher
 availability remain part of the October 18 go/no-go gate.
 
 All seven Week 3 tasks and gates now have completion evidence. Week 3 is closed
-and Week 4 is ready to start. The migration updates only the final preparation
-task, corresponding gate and open Week 3 record, with version/content conflict
-checks and audit events. Weeks 1–2 and historical task/gate evidence remain
-unchanged. Actual researcher time remains unreported and displays as
+and Week 4 is ready to start. The closure migration updates only the final
+preparation task, corresponding gate and open Week 3 record. A separate handoff
+migration credits the same freeze in Week 4's duplicate design task/gate, so
+the website points to loss/paired-training verification as the next work.
+Week 4 stays planned with one of four tasks complete; fresh caches and pilots
+remain pending. Both migrations use version/content conflict checks and audit
+events. Weeks 1–2 and historical evidence remain unchanged.
+Actual researcher time remains unreported and displays as
 “No time recorded”; the existing task/gate closure rule does not require
 inventing minutes. Additional tasks retain zero estimates as an unestimated
 placeholder.
@@ -134,9 +138,9 @@ placeholder.
   CPU software verification, not a new GPU result.
 - Ruff lint, all-file formatting, workspace verification, locked Python
   synchronization and launcher shell syntax checks passed.
-- Tracker: 21 tests, lint, TypeScript and production build passed.
-- Clean local database reset, 240 database assertions and local security
-  advisors passed. The 18 new completion assertions cover preserved history,
+- Tracker: 22 tests, lint, TypeScript and production build passed.
+- Clean local database reset, 254 database assertions and local security
+  advisors passed. The 32 new completion/handoff assertions cover preserved history,
   optimistic concurrency, atomic rollback, idempotence and closed-week rules.
 - The historical v1 protocol digest remains
   `c8b08b6867bc14dc0a947ebfa94e40b16ea3f0dae38dfa6d86187afecb4fd45f`.
