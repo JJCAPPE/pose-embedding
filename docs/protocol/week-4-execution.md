@@ -1,8 +1,9 @@
 # Week 4 execution — October 8, 2026
 
-Week 4 is **in progress**, not complete. Its October 5–11 scope is the fixed
-v3 loss/pairing verification, fresh frozen features and three complete
-20-epoch engineering pilots. Selection and novel evaluation remain closed.
+Week 4 is **technically complete and formally closed**. Its October 5–11 scope
+is verified: fixed v3 loss/pairing checks, five fresh frozen-feature caches and
+three independently validated 20-epoch engineering pilots. The guarded tracker
+closure is recorded below. Selection and novel evaluation remain closed.
 
 ## Prerequisites and historical-root resolution
 
@@ -162,7 +163,7 @@ and 502 wall seconds. Its retained metrics report 20 epochs, 47,520 updates,
 wall time is 418.697458 seconds; training/validation/checkpoint stages took
 286.739518/4.732477/0.530290 seconds. Peak allocated/reserved GPU bytes are
 3,286,354,944/3,420,454,912 and peak host bytes are 4,714,979,328.
-Independent validation of the complete pilot remains pending.
+The final joint validation below independently passed this complete pilot.
 
 After another clean release, seal and capacity check, **Contextual job 7970756**
 was submitted at 21:23:16 UTC and ran from 21:24:33 to 21:33:18 UTC, with attempt
@@ -173,21 +174,33 @@ time is 443.507612 seconds; training/validation/checkpoint stages took
 323.617977/5.362416/0.525819 seconds. Peak allocated/reserved GPU bytes are
 3,286,356,992/3,420,454,912 and peak host bytes are 4,696,555,520.
 
-Both completed pilots report initialization hash
+All three validated pilots share initialization hash
 `035a3e5e57569c0ae765b797f705b3a9f70353a6832fcb757c7622ebfa9b3284`
 and batch-plan hash
 `67128877ad2ac134c5c218ddd6c366903faa6cbfca270036dc2979e30ec859f5`.
-Their complete artifacts still require independent validation.
+All 20 per-epoch batch-plan hashes also match across the three arms.
 After the next clean release/seal/resource preflight, **SupCon job 7970877**
-started at 21:36:25 UTC, with attempt
+ran from 21:36:26 to 21:43:21 UTC per final scheduler accounting, with attempt
 `study-v3/attempts/20261008T213627Z-7970877`. Its startup fixture passed at
-21:37:10 UTC; real-data results remain pending.
+21:37:10 UTC. Accounting reports `failed=0`, `exit_status=0` and 415 wall
+seconds; the initial running-state observation reported a start one second
+earlier. The retained metrics report 20 epochs, 47,520 updates, 21 diagnostics
+and every required epoch record. Pilot wall time is 364.902558 seconds, with
+training/validation/checkpoint stages of 254.941551/4.431795/0.488615 seconds.
+Peak allocated/reserved GPU bytes are 3,286,354,944/3,420,454,912 and peak host
+bytes are 4,712,165,376. Its reported initialization and batch-plan hashes match
+the other two arms, as confirmed by the final joint validation.
 All arms retain the fixed physical 8 × 4 batches, seed 7,
-learning rate `3e-4` and 20 epochs. All three complete pilots must pass
-independent validation before Week 4 can close.
+learning rate `3e-4` and 20 epochs.
 
-The final CPU validation will retain the original validator and additionally
-audit all 21 diagnostic records per pilot, timestamps and retained output bytes.
+Final CPU validation job **7971490** passed after fresh release, lock, seal
+and resource checks. It ran from 21:46:23 to 21:50:47 UTC; accounting reports
+264 wall seconds, `failed=0`, `exit_status=0` and `maxvmem=5.531G` (virtual
+memory). Its retained scheduler exit is zero. The validation routine took
+220.701193 seconds with peak process resident memory of 1,380,646,912 bytes.
+Its log is `logs/pose_w4_complete.o7971490`.
+This validation retains the original validator and additionally audits all
+21 diagnostic records per pilot, timestamps and retained output bytes.
 The separate metadata audit is
 `study-v3/operations/week4-20261008/audit_pilot_metadata.py`, SHA-256
 `b5e4b0ac282e551d14520233ae9f354f41d15ec78b8f7cf5481a5e539520eb16`.
@@ -196,6 +209,34 @@ Its pilot-only `validate-week4-complete.qsub` wrapper has SHA-256
 Four constructed metadata checks, lint/formatting, shell syntax and rejection of
 cache mode passed. These operational additions leave the frozen release and
 the original successful cache-validation scripts unchanged.
+Both immutable receipts passed in
+`study-v3/validations/20261008T214623Z-7971490-pilots`:
+
+| Receipt | SHA-256 |
+| --- | --- |
+| `validation.json` | `498116254ff24929183c261c93f0d647b9d97f832d572340068f6a54d3468a9e` |
+| `metadata-audit.json` | `e6a9b9a0c46cd1bb3ad43f8fba627ceab3ff5593251b04c0dbb7b5881023102d` |
+
+The unchanged `validate_engineering_pilot` verified the four complete checkpoint
+and 18,929-query score records at epochs 5/10/15/20, epoch-zero health, finite
+values, non-collapsed embeddings and paired training identities. The additional
+audit verified all 21 diagnostic points per arm, including gradient/loss,
+variance, hinge, cosine and contextual-neighborhood fields. No recipe was
+selected or tuned using development accuracy.
+
+| Arm | Retained run files | Retained run bytes | Checkpoint bytes |
+| --- | ---: | ---: | ---: |
+| Contrastive | 43 | 953,144,034 | 285,255,316 |
+| Contextual | 43 | 953,193,125 | 285,255,828 |
+| SupCon | 43 | 953,142,541 | 285,255,316 |
+
+All three complete attempt directories retain **150 files / 2,859,496,735
+logical bytes**, including fixtures and scheduler records. This inventory
+excludes external scheduler logs, validation receipts and shared caches; it is
+not total project storage. At validation startup, node available RAM was
+131,567,489,024 bytes, quota free was 1,004.87 decimal GB and filesystem free
+was 1,186,346,303,488 bytes. These measured resources met the bounded Week 4
+requirement; no allocation or storage commitment for Week 5 is implied.
 
 The initial SCC preflight found no running researcher jobs. At 18:50:52 UTC,
 project quota had 1,025.40 decimal GB free and the filesystem had
@@ -210,7 +251,13 @@ node RAM. Node-wide available RAM is not process peak RAM.
 During Contextual training at 21:31:52 UTC, the allocated GPU used 3,837 MiB
 of 46,068 MiB, node available RAM was 234,071,187,456 bytes, project quota had
 1,006.41 decimal GB free and the filesystem had 1,187,533,291,520 bytes free.
-The immutable resource snapshots remain in the operational artifact directory.
+During SupCon training at 21:40:32 UTC, the allocated GPU also used 3,837 MiB
+of 46,068 MiB, node available RAM was 261,693,734,912 bytes, project quota had
+1,005.52 decimal GB free and the filesystem had 1,187,046,752,256 bytes free.
+The completion snapshot at 21:55:06 UTC showed no researcher scheduler jobs,
+a clean frozen release, 1,003.80 decimal GB quota free and 1,185,201,258,496
+filesystem bytes free. The immutable resource snapshots remain in the
+operational artifact directory.
 
 ## Verification and handoff
 
@@ -270,16 +317,43 @@ pilot task to version 7. Production deployment `dpl_J6poQJ4FQrHxNffdp1B4dfFhPu5x
 passed its build, fresh export checks and promotion; the primary alias, ordinary
 export and live page confirm the same open states. Application source and Journey
 remain unchanged. All PR checks also passed on the preceding documentation
-commit `51b5547`.
+commit `51b5547` and milestone commit `210bbdb`.
+
+After final independent validation passed, guarded migration
+`20261008222524_complete_week_four_verified_pilots.sql` completed the pilot task
+(version 8), met the final gate (version 4) and formally closed Week 4 (version
+10). All four tasks are done and all three gates met. The migration passed
+20 rollback-only assertions, including unchanged history/Week 5, concurrent
+edits, incomplete prerequisites, exact retries and closed-week protection.
+Its SHA-256 is
+`20fca95a7257bc7b457f0a904b1630bf177c529a2a8b83b2281d6884b6180d00`.
+Hosted rows were verified after application. Actual minutes remain zero as
+**unreported**, without inventing researcher time or asserting zero work.
+Week 5 remains planned, version 3, with its tasks and gates untouched.
+The final fallback snapshot matches the closure; tracker lint, typecheck and
+all 22 unit tests passed. The Week 5 browser readiness assertion was updated
+for its now-closed prerequisite; both desktop/mobile cases passed, as did the
+local production build.
+
+Production deployment `dpl_3u5tMSYf3eeNV8KV7ouVuQJEygGQ` passed its build and
+fresh export checks before promotion. Its primary alias, health endpoint,
+ordinary public export and live Week 4 page were then verified: **closed,
+four of four tasks done, three of three gates met**, with both pilot receipt
+hashes present. The public export exactly matches the fallback Week 4 record.
+All 84 non-plan source files still match the preserved production source,
+including Journey; only the public fallback plan changed.
 
 **Done:** unchanged design bindings rechecked; retired roots factually resolved;
 independent numerical checks and full-sized synthetic wiring checks verified;
 all five fresh cache files independently validated with passing parity, exact
-repeatability, bindings and bounded extraction-resource checks.
-**Next:** run and validate each fixed 20-epoch pilot, retaining all attempts and
-paired hashes.
-**Open issues:** real-data pilots are pending. Actual researcher
-minutes remain unreported; Week 4 must remain open until its evidence is complete.
+repeatability, bindings and bounded extraction-resource checks; all three fixed
+20-epoch pilots independently validated, with paired hashes, complete snapshots,
+diagnostics and measured timing/memory/retained bytes.
+**Next:** execute the separately gated Week 5 corruption, analysis and capacity
+work using these validated engineering heads.
+**Open issues:** no remaining technical Week 4 blocker. Actual researcher
+minutes remain unreported; no hours were invented. Future available hours and
+a dated allocation calendar remain Week 5 requirements before selection.
 
 Week 5 depends on the three valid pilot heads for nine complete development
 corruption paths and measured scoring. It also needs analysis checks, a dated

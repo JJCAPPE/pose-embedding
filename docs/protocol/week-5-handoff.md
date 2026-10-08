@@ -1,6 +1,6 @@
 # Week 5 handoff — October 12–18, 2026
 
-Prepared October 8. **Week 4 pilot validation remains pending; Week 5 has not
+Prepared October 8. **Week 4 technical validation passed; Week 5 has not
 been executed.** All four Week 5 tasks remain todo and all three gates pending in the
 [canonical plan](../../plan/research-plan.v3.json). Selection and novel access
 remain closed. This handoff does not authorize either.
@@ -12,14 +12,23 @@ artifact locations below are relative to the canonical SCC artifact root:
 | Evidence | Retained location and status |
 | --- | --- |
 | Five clean caches | `study-v3/attempts/20261008T190856Z-7968689`; independent validation passed |
-| Contrastive attempt | `study-v3/attempts/20261008T211328Z-7970697`; job complete, independent validation pending |
-| Contextual attempt | `study-v3/attempts/20261008T212435Z-7970756`; job complete, independent validation pending |
-| SupCon attempt | `study-v3/attempts/20261008T213627Z-7970877`; running, independent validation pending |
+| Contrastive attempt | `study-v3/attempts/20261008T211328Z-7970697`; independent validation passed |
+| Contextual attempt | `study-v3/attempts/20261008T212435Z-7970756`; independent validation passed |
+| SupCon attempt | `study-v3/attempts/20261008T213627Z-7970877`; independent validation passed |
 
-After all three pilots pass, retain their validation and metadata-audit receipts,
-paired hashes, four checkpoint/score records each, epoch-zero health and 21
-diagnostic points. Carry their timing/memory/byte evidence into Week 5; pilot
-heads remain ineligible for learning-rate selection and final training.
+Final validation job **7971490** passed both receipts and scheduler accounting
+(`failed=0`, `exit_status=0`). Its immutable receipt directory is
+`study-v3/validations/20261008T214623Z-7971490-pilots`:
+`validation.json` SHA-256
+`498116254ff24929183c261c93f0d647b9d97f832d572340068f6a54d3468a9e`, and
+`metadata-audit.json` SHA-256
+`e6a9b9a0c46cd1bb3ad43f8fba627ceab3ff5593251b04c0dbb7b5881023102d`.
+Each pilot completed 47,520 updates, four full checkpoint/score records,
+epoch-zero health and 21 diagnostic points with identical initialization and
+batch-plan hashes. Carry the execution record's timing/memory/byte evidence
+into Week 5; pilot heads remain ineligible for learning-rate selection and
+final training. All three attempt directories retain 2,859,496,735 logical bytes;
+shared caches, external logs and validation receipts are additional storage.
 
 ## Four required tasks
 

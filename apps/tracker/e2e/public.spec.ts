@@ -37,8 +37,8 @@ test("week details show tasks, gates, risks, and research checkpoint", async ({ 
   await expect(page.getByRole("heading", { level: 1 })).toContainText(seedPlan.weeks[4].title);
   await expect(page.getByText("5h planned", { exact: true })).toBeVisible();
   await expect(page.getByText("No time recorded", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Close Week 4 before starting." })).toBeVisible();
-  await expect(page.getByRole("link", { name: `Week 4: ${seedPlan.weeks[3].title}` })).toBeVisible();
+  await expect(page.getByText("Prerequisites ready", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Close Week 4 before starting." })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Work for the week" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Advance when" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Watch closely" })).toBeVisible();

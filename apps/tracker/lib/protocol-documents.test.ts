@@ -43,7 +43,7 @@ describe("published v3 protocol", () => {
     expect(summary).toMatch(/100 GB/);
     expect(summary).not.toMatch(/26 declared configurations|six paired seeds/);
     expect(seedPlan.weeks[3].tasks.map((task) => task.state)).toEqual([
-      "done", "done", "done", "in_progress",
+      "done", "done", "done", "done",
     ]);
     expect(seedPlan.weeks.slice(4).every((week) => week.tasks.every((task) => task.state === "todo"))).toBe(true);
   });

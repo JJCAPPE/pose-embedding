@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-10-08T21:36:25+00:00",
+  "generatedAt": "2026-10-08T22:25:01+00:00",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -53,7 +53,7 @@
       },
       {
         "label": "Current planning status",
-        "value": "Week 3 preparation remains complete as dated September 29 evidence. On October 8, dated cleanup records and researcher confirmation resolved retirement of two historical roots without recovering or recreating artifacts; the original registry, audit and scientific locks remain unchanged. All 46 focused numerical/source checks and three full-size synthetic L40S learnable fixtures passed; reduced-dimension software fixtures verified paired initialization and batch plans. Week 4 is active: all five fresh v3 caches passed independent validation job 7969962. Contrastive and Contextual completed their fixed 20-epoch runs; their matching run records await independent validation. SupCon pilot 7970877 is running after its startup fixture passed at 21:37:10 UTC; training results and independent validation of all three pilots remain pending. The full-campaign capacity/availability gate and final-test authorization remain prerequisites. Actual researcher time remains unreported."
+        "value": "Week 3 preparation remains complete as dated September 29 evidence. On October 8, dated cleanup records and researcher confirmation resolved retirement of two historical roots without recovering or recreating artifacts; the original registry, audit and scientific locks remain unchanged. All 46 focused numerical/source checks and three full-size synthetic L40S learnable fixtures passed; reduced-dimension software fixtures verified paired initialization and batch plans. Week 4 is closed: all five fresh v3 caches passed independent validation job 7969962, and independent validator 7971490 passed the three complete 20-epoch engineering pilots with paired provenance, complete checkpoint/score records and health/resource checks. Week 5 remains planned; full-campaign capacity/availability is required before selection, and final-test authorization remains closed. Pilot accuracy is ineligible for learning-rate selection. Actual researcher time remains unreported."
       },
       {
         "label": "Measured capacity prerequisite",
@@ -687,12 +687,12 @@
         "A mathematical, nonfinite or collapse failure blocks selection; pilot accuracy cannot justify tuning recipes or duration."
       ],
       "advisorPrompt": "Do the mathematics, immutable inputs and complete pilot records demonstrate a valid fixed-budget comparison?",
-      "reflection": "Done: Seal and loss checks, synthetic paired-training fixtures and independent validation of all five fresh v3 caches are complete. Contrastive job 7970697 and Contextual job 7970756 exited successfully; both run records report the fixed 20 epochs, 47,520 updates and required diagnostics/checkpoints, with matching initial-state and batch-plan hashes. Next: Verify completion of running SupCon job 7970877, then independently validate all three complete pilot records and their paired provenance/health checks. Open issues: SupCon started at 21:36:25 UTC and its startup fixture passed at 21:37:10 UTC; training results and independent validation of the three pilots remain pending. No final Week 4 gate or weekly closure is claimed; actual researcher time remains unreported.",
+      "reflection": "Done: Seal revalidation, loss and paired-training fixtures, all five fresh v3 caches and all three fixed 20-epoch engineering pilots are independently verified. Validator 7971490 passed the paired provenance, complete checkpoint/score records and health/resource checks, so all four required tasks and all three gates are complete and Week 4 is closed. Next: Complete Week 5 corruption, analysis and measured capacity/availability checks before learning-rate selection. Open issues: Actual researcher time remains unreported; zero recorded minutes is not a claim of zero work. The full-campaign capacity/availability gate and final-test authorization remain pending. Pilot accuracy is ineligible for selection; no Week 5 work or novel-test opening is claimed.",
       "plannedMinutes": 480,
       "actualMinutes": 0,
-      "state": "active",
-      "closedAt": null,
-      "version": 9,
+      "state": "closed",
+      "closedAt": "2026-10-08T21:57:06+00:00",
+      "version": 10,
       "tasks": [
         {
           "id": "w04-task-01",
@@ -748,11 +748,11 @@
           "expectedOutput": "Three valid full pilots, ineligible for learning-rate selection, with complete diagnostic evidence.",
           "required": true,
           "estimateMinutes": 90,
-          "state": "in_progress",
-          "completionNote": "Progress on 2026-10-08: Contrastive job 7970697 completed at 21:21:48 UTC and Contextual job 7970756 at 21:33:18 UTC; scheduler accounting reports failed=0 and exit_status=0 for both (502 and 525 seconds). Their run records each report 20 epochs, 47,520 updates, 21 diagnostics and the required epoch-0/5/10/15/20 records. Both report initial-state hash 035a3e5e57569c0ae765b797f705b3a9f70353a6832fcb757c7622ebfa9b3284 and batch-plan hash 67128877ad2ac134c5c218ddd6c366903faa6cbfca270036dc2979e30ec859f5. SupCon job 7970877 started at 21:36:25 UTC and its startup fixture passed at 21:37:10 UTC; training results remain unverified. Independent validation of all three complete pilots, including pairing, provenance and health checks, remains pending; the pilot task and final Week 4 gate remain open.",
+          "state": "done",
+          "completionNote": "Verified on 2026-10-08: Contrastive 7970697, Contextual 7970756 and SupCon 7970877 completed all 20 epochs with 47,520 updates each. Independent CPU validation job 7971490 passed all three complete pilot records, shared initialization and batch-plan hashes, four immutable checkpoint/score records per recipe with 18,929 queries each, epoch-zero health and 21 diagnostics per recipe. Finite/collapse, timing, memory and retained-byte checks passed; all three pilot jobs and the validator exited with failed=0 and exit_status=0. The three attempts retain 150 files totaling 2,859,496,735 bytes. Validation SHA-256: 498116254ff24929183c261c93f0d647b9d97f832d572340068f6a54d3468a9e. Metadata audit SHA-256: e6a9b9a0c46cd1bb3ad43f8fba627ceab3ff5593251b04c0dbb7b5881023102d. These are engineering pilots and are ineligible for learning-rate selection.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-execution.md",
-          "completedAt": null,
-          "version": 7
+          "completedAt": "2026-10-08T21:57:06+00:00",
+          "version": 8
         }
       ],
       "gates": [
@@ -786,11 +786,11 @@
           "position": 3,
           "criterion": "Fresh parity/repeatability checks and all three 20-epoch pilots pass with four immutable checkpoint/score records each.",
           "required": true,
-          "state": "pending",
-          "evidence": "",
+          "state": "met",
+          "evidence": "Verified on 2026-10-08: Fresh parity and exact 95,001-row extraction repeatability passed; independent cache validation job 7969962 passed all five fresh v3 cache bindings. Independent pilot validation job 7971490 passed all three fixed 20-epoch pilots, paired initialization and batches, four immutable checkpoint/score records per recipe and the required health/resource checks. Validation SHA-256: 498116254ff24929183c261c93f0d647b9d97f832d572340068f6a54d3468a9e. Metadata audit SHA-256: e6a9b9a0c46cd1bb3ad43f8fba627ceab3ff5593251b04c0dbb7b5881023102d. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-execution.md",
           "waiverReason": "",
-          "decidedAt": null,
-          "version": 3
+          "decidedAt": "2026-10-08T21:57:06+00:00",
+          "version": 4
         }
       ]
     },
