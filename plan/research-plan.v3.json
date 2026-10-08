@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-10-08T20:18:41+00:00",
+  "generatedAt": "2026-10-08T20:53:01+00:00",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -687,12 +687,12 @@
         "A mathematical, nonfinite or collapse failure blocks selection; pilot accuracy cannot justify tuning recipes or duration."
       ],
       "advisorPrompt": "Do the mathematics, immutable inputs and complete pilot records demonstrate a valid fixed-budget comparison?",
-      "reflection": "Done: The October 8 preflight verified unchanged protocol, design-lock and manifest-set hashes. The initial missing-root blocker was resolved using the September 29 sealed audit, dated automatic October 5 workspace cleanup records and researcher confirmation about the intervening interval. The supplemental immutable retirement resolution is 85ea2aa45930bb6525b5142b973e6671704a801f2048c42e2a5ae6e14e94e08d; original evidence remains unchanged and no artifacts were recovered or recreated. All 46 focused numerical/source checks passed without skips. Full-size synthetic L40S job 7968648 completed all three 1,000-update fixtures with finite training and 1.0 self-excluded same-label retrieval (failed=0, exit_status=0; 73 seconds). A separate reduced-dimension 32-to-16, 20-epoch/20-update software fixture verified paired initialization and batch-plan hashes. Neither fixture accessed licensed data. Latest usable SCC space was 1,024.44 decimal GB, above the bounded Week 4 requirement; this is not an allocation commitment. Milestone at 20:17:48 UTC on 2026-10-08: Job 7968689 remains running. Two independent fresh-process auxiliary extractions, run sequentially on the same GPU, passed repeatability for all 95,001 rows × 8,704 features: arrays, labels, ordered IDs and serialized bytes are identical. The passed repeatability report has SHA-256 b3f4139f7f9b3ff459d23940799e7db5a55de023d767751b833b1c9236a2af26. Both artifacts have SHA-256 43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d; their separate sidecars have SHA-256 4bd3668372b8efadab7a52ed3df2dcb42dae21f79a95995bf9c102da4d87d1a4 and 55fd1e0b7ec72cf04a40dd3ae28068f7c1975774db307b4cb57de60e989695dd. Development train/gallery/query caches are still running; no real-data pilot has been submitted. This partial milestone does not complete the feature-cache task or the week. Next: Verify the complete development train/gallery/query cache set and final cache-job accounting, including fresh encoder-parity evidence, then run and verify the three complete 20-epoch engineering pilots under the unchanged design. Open issues: Development-cache completion and successful whole-job exit remain unverified; no real-data pilot result is available and pilot pairing/provenance must still be checked. Actual researcher time remains unreported; no hours were invented and Week 4 remains open.",
+      "reflection": "Done: Loss and synthetic paired-training fixtures are verified. Job 7968689 generated all five fresh v3 cache files and exited successfully. Encoder parity and exact repeatability of the two 95,001-row extractions passed; development train/gallery/query cache counts are 76,013/20/18,929. Next: Await independent CPU validation job 7969962, queued at 20:52 UTC on October 8, then submit and verify the three fixed 20-epoch engineering pilots. Open issues: The independent validation receipt and all three real-data pilots are pending; no pilot has been submitted. Actual researcher time remains unreported and Week 4 remains open.",
       "plannedMinutes": 480,
       "actualMinutes": 0,
       "state": "active",
       "closedAt": null,
-      "version": 6,
+      "version": 7,
       "tasks": [
         {
           "id": "w04-task-01",
@@ -734,10 +734,10 @@
           "required": true,
           "estimateMinutes": 120,
           "state": "in_progress",
-          "completionNote": "In progress on 2026-10-08: Fresh cache job 7968689 was submitted through the existing frozen launcher after the immutable historical-root retirement resolution. Latest available quota was 1,024.44 decimal GB and filesystem free space was 1,207,359,766,528 bytes. Fresh parity, both full auxiliary extraction repeats and development train/gallery/query cache outputs remain pending; no cache result is claimed. Milestone at 20:17:48 UTC on 2026-10-08: Job 7968689 remains running. Two independent fresh-process auxiliary extractions, run sequentially on the same GPU, passed repeatability for all 95,001 rows × 8,704 features: arrays, labels, ordered IDs and serialized bytes are identical. The passed repeatability report has SHA-256 b3f4139f7f9b3ff459d23940799e7db5a55de023d767751b833b1c9236a2af26. Both artifacts have SHA-256 43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d; their separate sidecars have SHA-256 4bd3668372b8efadab7a52ed3df2dcb42dae21f79a95995bf9c102da4d87d1a4 and 55fd1e0b7ec72cf04a40dd3ae28068f7c1975774db307b4cb57de60e989695dd. Development train/gallery/query caches are still running; no real-data pilot has been submitted. This partial milestone does not complete the feature-cache task or the week.",
+          "completionNote": "Cache generation completed on 2026-10-08: Job 7968689 generated all five fresh v3 caches and exited with failed=0 and exit_status=0 (19:08:54–20:42:58 UTC; 5,644 seconds). Encoder parity and exact repeatability of two independent 95,001-row × 8,704-feature extractions passed; the repeatability report SHA-256 is b3f4139f7f9b3ff459d23940799e7db5a55de023d767751b833b1c9236a2af26. Development train/gallery/query cache row counts are 76,013/20/18,929. Independent CPU validation job 7969962 was queued at 20:52 UTC. This task remains in progress until its validation receipt passes; no pilot has been submitted.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-execution.md",
           "completedAt": null,
-          "version": 6
+          "version": 7
         },
         {
           "id": "w04-task-04",

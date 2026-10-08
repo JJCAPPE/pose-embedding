@@ -97,13 +97,21 @@ The second run's peak host memory was 6,923,649,024 bytes; CUDA peaks matched
 the first. All five bounded extraction-resource checks passed. This remains
 separate from the full-campaign capacity gate.
 
-At 20:17 UTC, development extraction was running. All three development caches,
-successful job accounting and independent validation of all five artifacts
-still need completion checks. The three real-data pilots have not started.
+The cache job completed at 20:42:58 UTC with all five artifacts retained.
+Scheduler accounting confirms `failed=0`, `exit_status=0` and 5,644 wall seconds
+(94 minutes 4 seconds); the retained scheduler-exit record also reports zero.
+The three development caches contain 76,013 training rows, 20 gallery rows and
+18,929 query rows. Independent CPU validation job **7969962** was submitted
+at 20:48:42 UTC and started on a CPU node at 20:52:53 UTC. It must pass before
+the cache task is completed or any real-data pilot is submitted.
 A reviewed one-off validator reuses the frozen cache and pilot validators and
 is staged outside the release under `study-v3/operations/week4-20261008`.
 Its SHA-256 is `485beafe748f0efacac12622a23c6b50baea64278fa25b3dcf7e5ac5bda32d7e`;
 it must run inside a scheduler allocation after its inputs complete.
+Its four-slot, 32 GiB CPU launcher has SHA-256
+`bb6ea403206d93522c956c3c516a2a37bc420592d86d94646f2c34f97e62b1b5`.
+The validation log is `logs/pose_w4_verify.o7969962`; both scripts are retained
+in the operational artifact directory, leaving the scientific release unchanged.
 
 The initial SCC preflight found no running researcher jobs. At 18:50:52 UTC,
 project quota had 1,025.40 decimal GB free and the filesystem had
@@ -148,12 +156,19 @@ The repeatability-only fallback was subsequently published by deployment
 `dpl_DUZemD88GqAoi51dw1yXp9hES1fQ`; its fresh export verified Week 4/task 3
 version 6 with the passed repeatability hash, while both remained open.
 The same production source and Journey preservation checks were repeated.
+The cache-generation milestone was then recorded by guarded migration
+`20261008205404` (13 rollback-only assertions passed) and published in deployment
+`dpl_CaPNAqwhh4v3r6xbEqEPUgYqmnC2`. Week 4 and the cache task advanced to
+version 7 while their states stayed active/in progress; no gate or pilot status
+was changed. The fresh export verified the successful-generation/pending-validation
+distinction before promotion.
 
 **Done:** unchanged design bindings rechecked; retired roots factually resolved;
-independent numerical checks and full-sized synthetic wiring checks verified.
-**Next:** verify fresh parity and all five caches, then run and validate each
-fixed 20-epoch pilot, retaining all attempts and paired hashes.
-**Open issues:** real caches and pilots are still pending. Actual researcher
+independent numerical checks and full-sized synthetic wiring checks verified;
+all five fresh cache files generated with passing parity and exact repeatability.
+**Next:** complete independent cache validation, then run and validate each fixed
+20-epoch pilot, retaining all attempts and paired hashes.
+**Open issues:** independent cache validation and pilots are pending. Actual researcher
 minutes remain unreported; Week 4 must remain open until its evidence is complete.
 
 Week 5 depends on the three valid pilot heads for nine complete development
