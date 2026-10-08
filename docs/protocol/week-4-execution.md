@@ -81,8 +81,13 @@ Cache job **7968689** was submitted using the unchanged
 fresh capacity check. It began on an allocated L40S at 19:08:54 UTC. Its output
 directory is `study-v3/attempts/20261008T190856Z-7968689`, and its scheduler log
 is `logs/pose_v3.o7968689`. A submission or running state is not completion.
-Parity, both 95,001-row repeats and the three development caches still require
-independent completion checks. The three real-data pilots have not started.
+Fresh parity passed. The first 95,001-row extraction completed with cache
+SHA-256 `43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d`,
+3,315,915,790 bytes and 1,786.653482448 seconds wall time. Its measured peak
+allocated/reserved CUDA memory was 3,010,839,552/3,896,508,416 bytes and peak
+host memory was 6,915,936,256 bytes. At 19:53 UTC, the second extraction was
+running; both-repeat verification and all three development caches still need
+completion checks. The three real-data pilots have not started.
 
 The initial SCC preflight found no running researcher jobs. At 18:50:52 UTC,
 project quota had 1,025.40 decimal GB free and the filesystem had
@@ -90,7 +95,10 @@ project quota had 1,025.40 decimal GB free and the filesystem had
 1,024.44 decimal GB and 1,207,359,766,528 bytes. Both pass the bounded Week 4
 requirement of 239,748,364,800 bytes. This supersedes the dated September
 capacity shortfall, without reserving shared storage or passing Week 5's
-full-workload capacity gate.
+full-workload capacity gate. At 19:53:49 UTC, an immutable resource snapshot
+recorded 1,020.41 decimal GB quota free, 1,203,031,244,800 filesystem bytes free,
+4,257 MiB used on the allocated GPU and 262,292,209,664 bytes of available
+node RAM. Node-wide available RAM is not process peak RAM.
 
 ## Verification and handoff
 
@@ -99,7 +107,24 @@ passed. The tracker blocker migration passed 20 local database assertions in a
 rolled-back transaction, including optimistic concurrency, audit events,
 idempotence and historical-evidence preservation. Its hosted application and
 the public Week 4 blocked state were verified before the researcher resolved
-the historical interval. Subsequent milestones must be verified separately.
+the historical interval. The subsequent fixture/resolution migration also
+passed its 20 local assertions; hosted migration versions are
+`20261008190007` and `20261008191234`. Live database rows, a fresh public export
+and the Week 4 browser page show **active, two of four tasks done**, with fresh
+features in progress. The remaining gate is pending.
+
+Production deployment `dpl_BCzqk1bxhnTqcSak15LLBiHFsbBd` was built successfully,
+health-checked and promoted on October 8. The primary public alias resolves
+to this READY deployment. Its application source reproduces the preceding
+production deployment byte-for-byte, including Journey; only the public
+`plan/research-plan.v3.json` content changed. The deployment uploaded 84
+public application/plan files (the original `.gitignore` is excluded by the
+CLI). No licensed inputs, results, credentials or local redesign changes were
+uploaded. Production health reports Supabase-backed data and editing enabled.
+The ordinary public export returned Week 4 active/version 5 after promotion;
+a prior stale export response was within the existing five-minute cache plus
+one-hour stale-while-revalidate window. Tracker tests, lint, typecheck and
+production build passed; no tracker runtime logic changed.
 
 **Done:** unchanged design bindings rechecked; retired roots factually resolved;
 independent numerical checks and full-sized synthetic wiring checks verified.
