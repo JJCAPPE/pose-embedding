@@ -138,8 +138,9 @@ describe("readiness and progress rules", () => {
     expect(week.tasks[1].completionNote).toContain("7968648");
     expect(week.tasks[1].completionNote).toContain("32-to-16 software fixture");
     expect(week.tasks[2].completionNote).toContain("7969962 passed all five fresh v3 cache bindings");
-    expect(week.tasks[3].completionNote).toContain("7970697 started at 21:13:26 UTC");
-    expect(week.tasks[3].completionNote).toContain("results are not yet verified");
+    expect(week.tasks[3].completionNote).toContain("7970697 completed at 21:21:48 UTC");
+    expect(week.tasks[3].completionNote).toContain("7970756 at 21:33:18 UTC");
+    expect(week.tasks[3].completionNote).toContain("Independent validation of all three complete pilots");
     expect(week.gates.map((gate) => gate.state)).toEqual(["met", "met", "pending"]);
     expect(week.gates[0].evidence).toContain("Satisfied by the verified Week 3 handoff");
     expect(week.gates[0].evidence).toMatch(/researcher confirmation/i);

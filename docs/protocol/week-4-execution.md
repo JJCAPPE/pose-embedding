@@ -165,9 +165,24 @@ wall time is 418.697458 seconds; training/validation/checkpoint stages took
 Independent validation of the complete pilot remains pending.
 
 After another clean release, seal and capacity check, **Contextual job 7970756**
-was submitted at 21:23:16 UTC. It was queued at 21:24:05 UTC. SupCon has not
-been submitted. Contextual started at 21:24:33 UTC, with attempt
-`study-v3/attempts/20261008T212435Z-7970756`. All arms retain the fixed physical 8 × 4 batches, seed 7,
+was submitted at 21:23:16 UTC and ran from 21:24:33 to 21:33:18 UTC, with attempt
+`study-v3/attempts/20261008T212435Z-7970756`. Accounting reports `failed=0`,
+`exit_status=0` and 525 wall seconds. Its metrics report 20 epochs, 47,520
+updates, 21 diagnostic records and all epoch 0/5/10/15/20 records. Pilot wall
+time is 443.507612 seconds; training/validation/checkpoint stages took
+323.617977/5.362416/0.525819 seconds. Peak allocated/reserved GPU bytes are
+3,286,356,992/3,420,454,912 and peak host bytes are 4,696,555,520.
+
+Both completed pilots report initialization hash
+`035a3e5e57569c0ae765b797f705b3a9f70353a6832fcb757c7622ebfa9b3284`
+and batch-plan hash
+`67128877ad2ac134c5c218ddd6c366903faa6cbfca270036dc2979e30ec859f5`.
+Their complete artifacts still require independent validation.
+After the next clean release/seal/resource preflight, **SupCon job 7970877**
+started at 21:36:25 UTC, with attempt
+`study-v3/attempts/20261008T213627Z-7970877`. Its startup fixture passed at
+21:37:10 UTC; real-data results remain pending.
+All arms retain the fixed physical 8 × 4 batches, seed 7,
 learning rate `3e-4` and 20 epochs. All three complete pilots must pass
 independent validation before Week 4 can close.
 
@@ -192,6 +207,10 @@ full-workload capacity gate. At 19:53:49 UTC, an immutable resource snapshot
 recorded 1,020.41 decimal GB quota free, 1,203,031,244,800 filesystem bytes free,
 4,257 MiB used on the allocated GPU and 262,292,209,664 bytes of available
 node RAM. Node-wide available RAM is not process peak RAM.
+During Contextual training at 21:31:52 UTC, the allocated GPU used 3,837 MiB
+of 46,068 MiB, node available RAM was 234,071,187,456 bytes, project quota had
+1,006.41 decimal GB free and the filesystem had 1,187,533,291,520 bytes free.
+The immutable resource snapshots remain in the operational artifact directory.
 
 ## Verification and handoff
 
@@ -244,6 +263,14 @@ current published seed. Both affected desktop/mobile browser cases, 15 relevant
 unit tests, test-file lint and the local production build passed.
 All PR checks passed on commit `12d9d6f`, including the full tracker browser
 suite, Python/workspace checks and Supabase schema/RLS checks.
+The two-completed-pilot milestone was recorded by guarded migration
+`20261008214009` after 13 rollback-only database assertions and 15 relevant
+tracker unit tests passed. Week 4 advanced to version 9 and the still-open
+pilot task to version 7. Production deployment `dpl_J6poQJ4FQrHxNffdp1B4dfFhPu5x`
+passed its build, fresh export checks and promotion; the primary alias, ordinary
+export and live page confirm the same open states. Application source and Journey
+remain unchanged. All PR checks also passed on the preceding documentation
+commit `51b5547`.
 
 **Done:** unchanged design bindings rechecked; retired roots factually resolved;
 independent numerical checks and full-sized synthetic wiring checks verified;
@@ -257,5 +284,7 @@ minutes remain unreported; Week 4 must remain open until its evidence is complet
 Week 5 depends on the three valid pilot heads for nine complete development
 corruption paths and measured scoring. It also needs analysis checks, a dated
 allocation calendar and researcher-confirmed available hours by October 18.
+The [Week 5 handoff](week-5-handoff.md) records those unexecuted requirements
+and the remaining implementation prerequisites.
 Synthetic timings do not satisfy those requirements. No selection sweep,
 final head, novel opening or empirical recipe comparison is claimed here.
