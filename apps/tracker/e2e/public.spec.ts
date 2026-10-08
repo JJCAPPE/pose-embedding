@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { readFileSync } from "node:fs";
+import { recentCompletedTasks } from "../lib/domain";
 import type { ResearchPlan } from "../lib/schema";
 
 const seedPlan: ResearchPlan = JSON.parse(
@@ -12,7 +13,9 @@ test("public dashboard exposes all published weeks", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toContainText("protocol lock");
   await expect(page.getByRole("heading", { name: "Unblock Week 1: Protocol and access" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent completions" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Measure extraction reproducibility" })).toBeVisible();
+  for (const { task } of recentCompletedTasks(seedPlan)) {
+    await expect(page.getByRole("heading", { name: task.title, exact: true })).toBeVisible();
+  }
   await expect(page.getByRole("list", { name: undefined }).last().getByRole("listitem")).toHaveCount(14);
 });
 

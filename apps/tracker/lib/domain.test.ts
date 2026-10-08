@@ -71,8 +71,8 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(28);
-    expect(progress.completedRequiredTasks).toBe(17);
+    expect(progress.percent).toBe(30);
+    expect(progress.completedRequiredTasks).toBe(18);
     expect(progress.decidedRequiredGates).toBe(16);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(0);
@@ -125,20 +125,21 @@ describe("readiness and progress rules", () => {
     expect(week.actualMinutes).toBe(0);
   });
 
-  it("records the resolved seal audit and verified fixtures while caches and pilots remain open", () => {
+  it("records verified caches while the three complete pilots remain required", () => {
     const week = seedPlan.weeks[3];
-    expect(weekProgress(week)).toEqual({ required: 4, completed: 2, percent: 50 });
+    expect(weekProgress(week)).toEqual({ required: 4, completed: 3, percent: 75 });
     expect(week.tasks[0].completionNote).toContain("Satisfied by the verified Week 3 handoff");
     expect(week.tasks[0].completionNote).toContain("Revalidation on 2026-10-08");
     expect(week.tasks.map((task) => task.state)).toEqual([
-      "done", "done", "in_progress", "todo",
+      "done", "done", "done", "in_progress",
     ]);
-    expect(week.tasks.slice(0, 2).every((task) => task.completedAt !== null)).toBe(true);
-    expect(week.tasks.slice(2).every((task) => task.completedAt === null)).toBe(true);
+    expect(week.tasks.slice(0, 3).every((task) => task.completedAt !== null)).toBe(true);
+    expect(week.tasks[3].completedAt).toBeNull();
     expect(week.tasks[1].completionNote).toContain("7968648");
     expect(week.tasks[1].completionNote).toContain("32-to-16 software fixture");
-    expect(week.tasks[2].completionNote).toContain("generated all five fresh v3 caches");
-    expect(week.tasks[2].completionNote).toContain("validation receipt passes");
+    expect(week.tasks[2].completionNote).toContain("7969962 passed all five fresh v3 cache bindings");
+    expect(week.tasks[3].completionNote).toContain("7970697 started at 21:13:26 UTC");
+    expect(week.tasks[3].completionNote).toContain("results are not yet verified");
     expect(week.gates.map((gate) => gate.state)).toEqual(["met", "met", "pending"]);
     expect(week.gates[0].evidence).toContain("Satisfied by the verified Week 3 handoff");
     expect(week.gates[0].evidence).toMatch(/researcher confirmation/i);

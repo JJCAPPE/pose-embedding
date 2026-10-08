@@ -80,38 +80,87 @@ Cache job **7968689** was submitted using the unchanged
 `scripts/study_v3.qsub caches` launcher after the retirement resolution and a
 fresh capacity check. It began on an allocated L40S at 19:08:54 UTC. Its output
 directory is `study-v3/attempts/20261008T190856Z-7968689`, and its scheduler log
-is `logs/pose_v3.o7968689`. A submission or running state is not completion.
-Fresh parity passed. The first 95,001-row extraction completed with cache
-SHA-256 `43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d`,
-3,315,915,790 bytes and 1,786.653482448 seconds wall time. Its measured peak
-allocated/reserved CUDA memory was 3,010,839,552/3,896,508,416 bytes and peak
-host memory was 6,915,936,256 bytes. The second fresh-process extraction took
-1,787.714046212 seconds and produced the same 3,315,915,790-byte cache hash.
-The frozen repeatability validator passed exact file, feature, label and sample
-order equality on the same allocated GPU/environment. Its immutable report is
-`b3f4139f7f9b3ff459d23940799e7db5a55de023d767751b833b1c9236a2af26`.
-The two sidecar hashes are
-`4bd3668372b8efadab7a52ed3df2dcb42dae21f79a95995bf9c102da4d87d1a4` and
-`55fd1e0b7ec72cf04a40dd3ae28068f7c1975774db307b4cb57de60e989695dd`.
-The second run's peak host memory was 6,923,649,024 bytes; CUDA peaks matched
-the first. All five bounded extraction-resource checks passed. This remains
-separate from the full-campaign capacity gate.
-
-The cache job completed at 20:42:58 UTC with all five artifacts retained.
+is `logs/pose_v3.o7968689`. It completed at 20:42:58 UTC with all five artifacts
+retained.
 Scheduler accounting confirms `failed=0`, `exit_status=0` and 5,644 wall seconds
 (94 minutes 4 seconds); the retained scheduler-exit record also reports zero.
-The three development caches contain 76,013 training rows, 20 gallery rows and
-18,929 query rows. Independent CPU validation job **7969962** was submitted
-at 20:48:42 UTC and started on a CPU node at 20:52:53 UTC. It must pass before
-the cache task is completed or any real-data pilot is submitted.
-A reviewed one-off validator reuses the frozen cache and pilot validators and
-is staged outside the release under `study-v3/operations/week4-20261008`.
+
+Fresh parity and independent validation of all five complete caches **passed**.
+Every row contains 8,704 frozen features. The two final-training extractions
+used distinct sequential processes on the same allocated GPU/environment and
+passed exact file, feature, label and sample-order equality. Both repeats are retained.
+
+| Cache | Rows | Artifact bytes | Artifact SHA-256 |
+| --- | ---: | ---: | --- |
+| Final train, first | 95,001 | 3,315,915,790 | `43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d` |
+| Final train, second | 95,001 | 3,315,915,790 | `43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d` |
+| Development train | 76,013 | 2,653,158,638 | `954067c0c1a84d448dd9df16176cd28a1231373148264f8db9d62667f5f3b667` |
+| Development gallery | 20 | 698,846 | `3fc5bffb6fd72abf7acb4faa0d35727c8c2a9aac0b30244e91ebaf88e6ba86cd` |
+| Development queries | 18,929 | 660,698,582 | `9dc4341b5a55a5cb6cd9867635f8c3e1762f56eec4239988f69904de2da45f64` |
+
+| Cache | Extraction wall seconds | Peak CUDA bytes | Peak host bytes |
+| --- | ---: | ---: | ---: |
+| Final train, first | 1,786.653482 | 3,896,508,416 | 6,915,936,256 |
+| Final train, second | 1,787.714046 | 3,896,508,416 | 6,923,649,024 |
+| Development train | 1,444.639826 | 3,896,508,416 | 6,087,888,896 |
+| Development gallery | 64.978065 | 2,023,751,680 | 3,220,934,656 |
+| Development queries | 408.726459 | 3,896,508,416 | 3,629,514,752 |
+
+Wall seconds are rounded to six decimals. Peak CUDA is the larger of allocated
+and reserved memory; both final-training repeats separately measured
+3,010,839,552 allocated bytes. Host peaks are measured process memory.
+The first and second sidecar hashes remain
+`4bd3668372b8efadab7a52ed3df2dcb42dae21f79a95995bf9c102da4d87d1a4` and
+`55fd1e0b7ec72cf04a40dd3ae28068f7c1975774db307b4cb57de60e989695dd`.
+The compact receipt retains all five sidecar, manifest and sample-order hashes.
+
+Independent CPU validation job **7969962** was submitted at 20:48:42 UTC and
+ran from 20:52:53 to 20:59:42 UTC. Scheduler accounting reports `failed=0`,
+`exit_status=0`, 409 wall seconds and `maxvmem=12.103G` (virtual memory).
+The validation routine measured 376.158733 seconds and a peak resident set of
+8,509,038,592 bytes. It rechecked the unchanged release/protocol/manifest
+bindings, parity, repeatability and all five complete cache artifacts using
+the frozen validators and actual manifests.
+
+| Validation evidence | SHA-256 |
+| --- | --- |
+| Public-safe validation receipt, status passed | `4e87fd994e36f0a5159226138f079a7cf5c68e69aeb03d6a94aed3a4d9288b93` |
+| Fresh parity report | `8a9e5fe56744d17f9d67bddfb7730bfd04082f8491aaabc0e1da604746810512` |
+| Original repeatability report | `b3f4139f7f9b3ff459d23940799e7db5a55de023d767751b833b1c9236a2af26` |
+| Independent repeatability report | `69f35f6978b72127ec1a4605d8fd384aea10e684ba89eb88ceed38957f5d3371` |
+
+All five bounded extraction-resource checks passed again. The conservative
+forecast is 2,680.249116 seconds and 4,374,851,077 bytes for 113,945 source rows;
+effective free storage was 1,008,480,000,000 bytes, the smaller of project quota
+and filesystem availability. This validates the bounded extraction requirement,
+not Week 5's full-campaign capacity or allocation gate.
+
+The reviewed one-off validator is staged outside the release under
+`study-v3/operations/week4-20261008`.
 Its SHA-256 is `485beafe748f0efacac12622a23c6b50baea64278fa25b3dcf7e5ac5bda32d7e`;
-it must run inside a scheduler allocation after its inputs complete.
+it ran inside a scheduler allocation after its inputs completed.
 Its four-slot, 32 GiB CPU launcher has SHA-256
 `bb6ea403206d93522c956c3c516a2a37bc420592d86d94646f2c34f97e62b1b5`.
 The validation log is `logs/pose_w4_verify.o7969962`; both scripts are retained
 in the operational artifact directory, leaving the scientific release unchanged.
+
+The pre-pilot check at 21:08:36 UTC confirmed the clean frozen release, unchanged
+scientific bindings and no opening records in registered roots. Project quota
+had 1,008.48 decimal GB free and the filesystem had 1,189,206,818,816 bytes free.
+The scheduler reported 28 available L40S GPUs at that instant; this is not a
+future allocation commitment.
+
+The first real-data pilot, **Contrastive job 7970697**, was submitted at
+21:12:44 UTC using the unchanged launcher and the newly validated cache attempt.
+It started at 21:13:26 UTC on an allocated L40S. The unchanged launcher passed
+its release, design and resource checks, and its full-size 1,000-update synthetic
+fixture passed at 21:14:43 UTC. The attempt is
+`study-v3/attempts/20261008T211328Z-7970697`, with log `logs/pose_v3.o7970697`.
+The real-data run remains in progress; no complete pilot result is claimed.
+Its fixed settings are physical 8 × 4 batches, seed 7, learning rate `3e-4`
+and 20 epochs.
+Contextual and SupCon have not been submitted. All three arms still require
+complete runs and independent validation before Week 4 can close.
 
 The initial SCC preflight found no running researcher jobs. At 18:50:52 UTC,
 project quota had 1,025.40 decimal GB free and the filesystem had
@@ -136,8 +185,8 @@ passed its 20 local assertions; hosted migration versions are
 `20261008190007` and `20261008191234`. The repeatability milestone migration
 `20261008202132` passed 13 additional rollback-only database assertions and
 updates only the in-progress cache task and Week 4 reflection (versions 5 → 6).
-It does not close a task or gate. Live database rows, a fresh public export
-and the Week 4 browser page show **active, two of four tasks done**, with fresh
+It does not close a task or gate. At that milestone, live database rows, a fresh
+public export and the Week 4 browser page showed **active, two of four tasks done**, with fresh
 features in progress. The remaining gate is pending.
 
 Production deployment `dpl_BCzqk1bxhnTqcSak15LLBiHFsbBd` was built successfully,
@@ -162,13 +211,25 @@ The cache-generation milestone was then recorded by guarded migration
 version 7 while their states stayed active/in progress; no gate or pilot status
 was changed. The fresh export verified the successful-generation/pending-validation
 distinction before promotion.
+After independent validation passed and the first pilot started, migration
+`20261008211839` completed the cache task and marked the pilot task in progress.
+Its 15 rollback-only database assertions passed. Week 4 remains active at
+version 8, with three of four tasks done and the final gate pending; researcher
+minutes remain unreported. Deployment `dpl_2ZainyfJ1KxeWcqEZQgbVyCzXuvT` passed
+its production build and was promoted after a fresh export verified those
+states. The primary alias, ordinary public export and live page were verified.
+The same production source preservation checks passed; only the fallback plan
+changed. The stale browser expectation for recent completions now follows the
+current published seed. Both affected desktop/mobile browser cases, 15 relevant
+unit tests, test-file lint and the local production build passed.
 
 **Done:** unchanged design bindings rechecked; retired roots factually resolved;
 independent numerical checks and full-sized synthetic wiring checks verified;
-all five fresh cache files generated with passing parity and exact repeatability.
-**Next:** complete independent cache validation, then run and validate each fixed
-20-epoch pilot, retaining all attempts and paired hashes.
-**Open issues:** independent cache validation and pilots are pending. Actual researcher
+all five fresh cache files independently validated with passing parity, exact
+repeatability, bindings and bounded extraction-resource checks.
+**Next:** run and validate each fixed 20-epoch pilot, retaining all attempts and
+paired hashes.
+**Open issues:** real-data pilots are pending. Actual researcher
 minutes remain unreported; Week 4 must remain open until its evidence is complete.
 
 Week 5 depends on the three valid pilot heads for nine complete development
