@@ -85,9 +85,25 @@ Fresh parity passed. The first 95,001-row extraction completed with cache
 SHA-256 `43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d`,
 3,315,915,790 bytes and 1,786.653482448 seconds wall time. Its measured peak
 allocated/reserved CUDA memory was 3,010,839,552/3,896,508,416 bytes and peak
-host memory was 6,915,936,256 bytes. At 19:53 UTC, the second extraction was
-running; both-repeat verification and all three development caches still need
-completion checks. The three real-data pilots have not started.
+host memory was 6,915,936,256 bytes. The second fresh-process extraction took
+1,787.714046212 seconds and produced the same 3,315,915,790-byte cache hash.
+The frozen repeatability validator passed exact file, feature, label and sample
+order equality on the same allocated GPU/environment. Its immutable report is
+`b3f4139f7f9b3ff459d23940799e7db5a55de023d767751b833b1c9236a2af26`.
+The two sidecar hashes are
+`4bd3668372b8efadab7a52ed3df2dcb42dae21f79a95995bf9c102da4d87d1a4` and
+`55fd1e0b7ec72cf04a40dd3ae28068f7c1975774db307b4cb57de60e989695dd`.
+The second run's peak host memory was 6,923,649,024 bytes; CUDA peaks matched
+the first. All five bounded extraction-resource checks passed. This remains
+separate from the full-campaign capacity gate.
+
+At 20:17 UTC, development extraction was running. All three development caches,
+successful job accounting and independent validation of all five artifacts
+still need completion checks. The three real-data pilots have not started.
+A reviewed one-off validator reuses the frozen cache and pilot validators and
+is staged outside the release under `study-v3/operations/week4-20261008`.
+Its SHA-256 is `485beafe748f0efacac12622a23c6b50baea64278fa25b3dcf7e5ac5bda32d7e`;
+it must run inside a scheduler allocation after its inputs complete.
 
 The initial SCC preflight found no running researcher jobs. At 18:50:52 UTC,
 project quota had 1,025.40 decimal GB free and the filesystem had
@@ -109,7 +125,10 @@ idempotence and historical-evidence preservation. Its hosted application and
 the public Week 4 blocked state were verified before the researcher resolved
 the historical interval. The subsequent fixture/resolution migration also
 passed its 20 local assertions; hosted migration versions are
-`20261008190007` and `20261008191234`. Live database rows, a fresh public export
+`20261008190007` and `20261008191234`. The repeatability milestone migration
+`20261008202132` passed 13 additional rollback-only database assertions and
+updates only the in-progress cache task and Week 4 reflection (versions 5 → 6).
+It does not close a task or gate. Live database rows, a fresh public export
 and the Week 4 browser page show **active, two of four tasks done**, with fresh
 features in progress. The remaining gate is pending.
 
@@ -125,6 +144,10 @@ The ordinary public export returned Week 4 active/version 5 after promotion;
 a prior stale export response was within the existing five-minute cache plus
 one-hour stale-while-revalidate window. Tracker tests, lint, typecheck and
 production build passed; no tracker runtime logic changed.
+The repeatability-only fallback was subsequently published by deployment
+`dpl_DUZemD88GqAoi51dw1yXp9hES1fQ`; its fresh export verified Week 4/task 3
+version 6 with the passed repeatability hash, while both remained open.
+The same production source and Journey preservation checks were repeated.
 
 **Done:** unchanged design bindings rechecked; retired roots factually resolved;
 independent numerical checks and full-sized synthetic wiring checks verified.

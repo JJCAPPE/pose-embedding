@@ -137,6 +137,8 @@ describe("readiness and progress rules", () => {
     expect(week.tasks.slice(2).every((task) => task.completedAt === null)).toBe(true);
     expect(week.tasks[1].completionNote).toContain("7968648");
     expect(week.tasks[1].completionNote).toContain("32-to-16 software fixture");
+    expect(week.tasks[2].completionNote).toContain("95,001 rows × 8,704 features");
+    expect(week.tasks[2].completionNote).toContain("Development train/gallery/query caches are still running");
     expect(week.gates.map((gate) => gate.state)).toEqual(["met", "met", "pending"]);
     expect(week.gates[0].evidence).toContain("Satisfied by the verified Week 3 handoff");
     expect(week.gates[0].evidence).toMatch(/researcher confirmation/i);
