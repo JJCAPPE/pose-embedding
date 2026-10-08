@@ -71,9 +71,9 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(27);
-    expect(progress.completedRequiredTasks).toBe(16);
-    expect(progress.decidedRequiredGates).toBe(15);
+    expect(progress.percent).toBe(28);
+    expect(progress.completedRequiredTasks).toBe(17);
+    expect(progress.decidedRequiredGates).toBe(16);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(0);
   });
@@ -125,16 +125,28 @@ describe("readiness and progress rules", () => {
     expect(week.actualMinutes).toBe(0);
   });
 
-  it("credits the Week 3 freeze in Week 4 without completing its remaining work", () => {
+  it("records the resolved seal audit and verified fixtures while caches and pilots remain open", () => {
     const week = seedPlan.weeks[3];
-    expect(weekProgress(week)).toEqual({ required: 4, completed: 1, percent: 25 });
+    expect(weekProgress(week)).toEqual({ required: 4, completed: 2, percent: 50 });
     expect(week.tasks[0].completionNote).toContain("Satisfied by the verified Week 3 handoff");
-    expect(week.gates[0].state).toBe("met");
-    expect(week.tasks.slice(1).every((task) => task.state === "todo")).toBe(true);
-    expect(week.gates.slice(1).every((gate) => gate.state === "pending")).toBe(true);
-    expect(week.state).toBe("planned");
+    expect(week.tasks[0].completionNote).toContain("Revalidation on 2026-10-08");
+    expect(week.tasks.map((task) => task.state)).toEqual([
+      "done", "done", "in_progress", "todo",
+    ]);
+    expect(week.tasks.slice(0, 2).every((task) => task.completedAt !== null)).toBe(true);
+    expect(week.tasks.slice(2).every((task) => task.completedAt === null)).toBe(true);
+    expect(week.tasks[1].completionNote).toContain("7968648");
+    expect(week.tasks[1].completionNote).toContain("32-to-16 software fixture");
+    expect(week.gates.map((gate) => gate.state)).toEqual(["met", "met", "pending"]);
+    expect(week.gates[0].evidence).toContain("Satisfied by the verified Week 3 handoff");
+    expect(week.gates[0].evidence).toMatch(/researcher confirmation/i);
+    expect(week.gates[0].decidedAt).not.toBeNull();
+    expect(week.state).toBe("active");
+    expect(week.closedAt).toBeNull();
+    expect(week.reflection).toContain("no artifacts were recovered");
     expect(week.actualMinutes).toBe(0);
     expect(weekCanClose(week)).toBe(false);
+    expect(weekIsReady(seedPlan.weeks, 5)).toBe(false);
   });
 
   it("returns the newest completed tasks for the public dashboard", () => {
