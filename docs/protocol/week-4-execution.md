@@ -156,11 +156,31 @@ It started at 21:13:26 UTC on an allocated L40S. The unchanged launcher passed
 its release, design and resource checks, and its full-size 1,000-update synthetic
 fixture passed at 21:14:43 UTC. The attempt is
 `study-v3/attempts/20261008T211328Z-7970697`, with log `logs/pose_v3.o7970697`.
-The real-data run remains in progress; no complete pilot result is claimed.
-Its fixed settings are physical 8 × 4 batches, seed 7, learning rate `3e-4`
-and 20 epochs.
-Contextual and SupCon have not been submitted. All three arms still require
-complete runs and independent validation before Week 4 can close.
+The job completed at 21:21:48 UTC; accounting reports `failed=0`, `exit_status=0`
+and 502 wall seconds. Its retained metrics report 20 epochs, 47,520 updates,
+21 diagnostic records and all epoch 0/5/10/15/20 records. The measured pilot
+wall time is 418.697458 seconds; training/validation/checkpoint stages took
+286.739518/4.732477/0.530290 seconds. Peak allocated/reserved GPU bytes are
+3,286,354,944/3,420,454,912 and peak host bytes are 4,714,979,328.
+Independent validation of the complete pilot remains pending.
+
+After another clean release, seal and capacity check, **Contextual job 7970756**
+was submitted at 21:23:16 UTC. It was queued at 21:24:05 UTC. SupCon has not
+been submitted. Contextual started at 21:24:33 UTC, with attempt
+`study-v3/attempts/20261008T212435Z-7970756`. All arms retain the fixed physical 8 × 4 batches, seed 7,
+learning rate `3e-4` and 20 epochs. All three complete pilots must pass
+independent validation before Week 4 can close.
+
+The final CPU validation will retain the original validator and additionally
+audit all 21 diagnostic records per pilot, timestamps and retained output bytes.
+The separate metadata audit is
+`study-v3/operations/week4-20261008/audit_pilot_metadata.py`, SHA-256
+`b5e4b0ac282e551d14520233ae9f354f41d15ec78b8f7cf5481a5e539520eb16`.
+Its pilot-only `validate-week4-complete.qsub` wrapper has SHA-256
+`8f64f96464c9b25ef4aaec57fcf050af44acb95dc3d32cd13ee1feadff5c35e0`.
+Four constructed metadata checks, lint/formatting, shell syntax and rejection of
+cache mode passed. These operational additions leave the frozen release and
+the original successful cache-validation scripts unchanged.
 
 The initial SCC preflight found no running researcher jobs. At 18:50:52 UTC,
 project quota had 1,025.40 decimal GB free and the filesystem had
@@ -222,6 +242,8 @@ The same production source preservation checks passed; only the fallback plan
 changed. The stale browser expectation for recent completions now follows the
 current published seed. Both affected desktop/mobile browser cases, 15 relevant
 unit tests, test-file lint and the local production build passed.
+All PR checks passed on commit `12d9d6f`, including the full tracker browser
+suite, Python/workspace checks and Supabase schema/RLS checks.
 
 **Done:** unchanged design bindings rechecked; retired roots factually resolved;
 independent numerical checks and full-sized synthetic wiring checks verified;
