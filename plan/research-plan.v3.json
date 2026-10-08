@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-09-29T22:36:10.146581+00:00",
+  "generatedAt": "2026-10-08T22:25:01+00:00",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -53,7 +53,7 @@
       },
       {
         "label": "Current planning status",
-        "value": "Week 3 is complete: verified software, real SCC auxiliary preparation, measured fallback, registered seal audits and the immutable design freeze. Week 4 is ready for fresh v3 parity/caches and three full pilots. Full-campaign capacity, researcher availability and final-test authorization remain pending. Historical evidence is preserved, and actual researcher time remains unreported. Hosted Auth access restrictions were verified on September 29."
+        "value": "Week 3 preparation remains complete as dated September 29 evidence. On October 8, dated cleanup records and researcher confirmation resolved retirement of two historical roots without recovering or recreating artifacts; the original registry, audit and scientific locks remain unchanged. All 46 focused numerical/source checks and three full-size synthetic L40S learnable fixtures passed; reduced-dimension software fixtures verified paired initialization and batch plans. Week 4 is closed: all five fresh v3 caches passed independent validation job 7969962, and independent validator 7971490 passed the three complete 20-epoch engineering pilots with paired provenance, complete checkpoint/score records and health/resource checks. Week 5 remains planned; full-campaign capacity/availability is required before selection, and final-test authorization remains closed. Pilot accuracy is ineligible for learning-rate selection. Actual researcher time remains unreported."
       },
       {
         "label": "Measured capacity prerequisite",
@@ -687,12 +687,12 @@
         "A mathematical, nonfinite or collapse failure blocks selection; pilot accuracy cannot justify tuning recipes or duration."
       ],
       "advisorPrompt": "Do the mathematics, immutable inputs and complete pilot records demonstrate a valid fixed-budget comparison?",
-      "reflection": "",
+      "reflection": "Done: Seal revalidation, loss and paired-training fixtures, all five fresh v3 caches and all three fixed 20-epoch engineering pilots are independently verified. Validator 7971490 passed the paired provenance, complete checkpoint/score records and health/resource checks, so all four required tasks and all three gates are complete and Week 4 is closed. Next: Complete Week 5 corruption, analysis and measured capacity/availability checks before learning-rate selection. Open issues: Actual researcher time remains unreported; zero recorded minutes is not a claim of zero work. The full-campaign capacity/availability gate and final-test authorization remain pending. Pilot accuracy is ineligible for selection; no Week 5 work or novel-test opening is claimed.",
       "plannedMinutes": 480,
       "actualMinutes": 0,
-      "state": "planned",
-      "closedAt": null,
-      "version": 3,
+      "state": "closed",
+      "closedAt": "2026-10-08T21:57:06+00:00",
+      "version": 10,
       "tasks": [
         {
           "id": "w04-task-01",
@@ -704,10 +704,10 @@
           "required": true,
           "estimateMinutes": 90,
           "state": "done",
-          "completionNote": "Satisfied by the verified Week 3 handoff on 2026-09-29, not a second freeze: SCC job 7790916 completed with failed=0 and exit_status=0. Explicit v3 validators, registered historical-root seals and auxiliary/novel source separation passed; all eight identity sets and the auxiliary preparation are bound to the corrected immutable design lock 39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d. The active scientific release is 2897f4fe4c1fb1857432a0e92a7391dde68307f5. Fresh v3 parity/caches, loss/paired-training evidence and three complete pilots remain Week 4 work. Recheck runtime seals before every job. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
-          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
-          "completedAt": "2026-09-29T22:28:17.544258+00:00",
-          "version": 4
+          "completionNote": "Satisfied by the verified Week 3 handoff on 2026-09-29, not a second freeze: SCC job 7790916 completed with failed=0 and exit_status=0. Explicit v3 validators, registered historical-root seals and auxiliary/novel source separation passed; all eight identity sets and the auxiliary preparation are bound to the corrected immutable design lock 39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d. The active scientific release is 2897f4fe4c1fb1857432a0e92a7391dde68307f5. Fresh v3 parity/caches, loss/paired-training evidence and three complete pilots remain Week 4 work. Recheck runtime seals before every job. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md Revalidation on 2026-10-08: Two previously registered local historical artifact roots are now unavailable, so their current test-seal status cannot be verified. The available local root and inspected SCC roots/releases contained no opening records; this bounded observation does not resolve the missing roots. The protocol file, immutable design lock and manifest-set hashes still match. Fresh v3 caches and pilots are blocked until the historical roots are recovered or an auditable, result-blind resolution establishes their provenance and seal status. No licensed-data extraction or pilot job was submitted. Synthetic-only L40S learnable-fixture job 7968648 subsequently passed all three recipes at 1,000 updates and 1.0 self-excluded same-label retrieval without licensed-data access. The September 29 evidence above is preserved as a dated observation. Resolution on 2026-10-08: Dated automatic workspace cleanup records explain retirement of the two historical roots on October 5. Researcher confirmation of no intervening scientific runs or novel-pose, embedding or score access in the retired roots resolves the historical interval together with the September 29 audit and cleanup evidence. The immutable supplemental resolution has SHA-256 85ea2aa45930bb6525b5142b973e6671704a801f2048c42e2a5ae6e14e94e08d. The original registry, audit and scientific locks remain unchanged; no artifacts were recovered or recreated. Fresh cache job 7968689 was submitted through the frozen launcher after this resolution; cache results remain pending. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-root-recovery.md",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-root-recovery.md",
+          "completedAt": "2026-10-08T19:10:01+00:00",
+          "version": 6
         },
         {
           "id": "w04-task-02",
@@ -718,11 +718,11 @@
           "expectedOutput": "Verified three-arm numerical behavior and paired initialization/batch hashes.",
           "required": true,
           "estimateMinutes": 180,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 3
+          "state": "done",
+          "completionNote": "Verified on 2026-10-08: All 46 focused numerical/source checks passed with no remaining skips, including independent labeled forward/backward fixtures. Synthetic-only L40S job 7968648 completed all three recipes for 1,000 finite updates on the constructed 32-row physical 8 × 4 fixture with full 8,704-to-2,048 heads; each reached 1.0 self-excluded same-label retrieval. Scheduler accounting reports failed=0, exit_status=0, 18:57:39–18:58:52 UTC and 73 seconds. The shared initial-state hash is 035a3e5e57569c0ae765b797f705b3a9f70353a6832fcb757c7622ebfa9b3284. A separate repeated reduced-dimension 32-to-16 software fixture completed 20 epochs/20 updates per recipe with paired initial-state hash f5d2d3619a1d0121cbea51afc35375719ccb1701a8c35f7de933018c648da9d2 and batch-plan hash f581a887be8f1e2c01d48980ec0f1b99a6c6317661e9ed68591c499432ccfcac. These synthetic and software fixtures used no licensed data; real-data pilot pairing and provenance still require validation. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-execution.md",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-execution.md",
+          "completedAt": "2026-10-08T19:10:01+00:00",
+          "version": 5
         },
         {
           "id": "w04-task-03",
@@ -733,11 +733,11 @@
           "expectedOutput": "Fresh v3 parity/repeatability evidence and five immutable clean feature caches.",
           "required": true,
           "estimateMinutes": 120,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 3
+          "state": "done",
+          "completionNote": "Verified on 2026-10-08: Independent CPU validation job 7969962 passed all five fresh v3 cache bindings, exact repeatability and bounded extraction resource checks, with failed=0 and exit_status=0. The validation receipt SHA-256 is 4e87fd994e36f0a5159226138f079a7cf5c68e69aeb03d6a94aed3a4d9288b93. The immutable caches contain two 95,001-row auxiliary repeats plus 76,013/20/18,929 development train/gallery/query rows, all with 8,704 features. Fresh encoder parity passed. These checks complete the feature-cache task; they do not establish the full-campaign capacity gate or pilot results.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-execution.md",
+          "completedAt": "2026-10-08T21:13:26+00:00",
+          "version": 8
         },
         {
           "id": "w04-task-04",
@@ -748,11 +748,11 @@
           "expectedOutput": "Three valid full pilots, ineligible for learning-rate selection, with complete diagnostic evidence.",
           "required": true,
           "estimateMinutes": 90,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 3
+          "state": "done",
+          "completionNote": "Verified on 2026-10-08: Contrastive 7970697, Contextual 7970756 and SupCon 7970877 completed all 20 epochs with 47,520 updates each. Independent CPU validation job 7971490 passed all three complete pilot records, shared initialization and batch-plan hashes, four immutable checkpoint/score records per recipe with 18,929 queries each, epoch-zero health and 21 diagnostics per recipe. Finite/collapse, timing, memory and retained-byte checks passed; all three pilot jobs and the validator exited with failed=0 and exit_status=0. The three attempts retain 150 files totaling 2,859,496,735 bytes. Validation SHA-256: 498116254ff24929183c261c93f0d647b9d97f832d572340068f6a54d3468a9e. Metadata audit SHA-256: e6a9b9a0c46cd1bb3ad43f8fba627ceab3ff5593251b04c0dbb7b5881023102d. These are engineering pilots and are ineligible for learning-rate selection.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-execution.md",
+          "completedAt": "2026-10-08T21:57:06+00:00",
+          "version": 8
         }
       ],
       "gates": [
@@ -763,10 +763,10 @@
           "criterion": "The complete v3 design and cache-affecting release are frozen; source identities are preserved and historical seal audits are resolved.",
           "required": true,
           "state": "met",
-          "evidence": "Satisfied by the verified Week 3 handoff on 2026-09-29, not a second freeze: SCC job 7790916 completed with failed=0 and exit_status=0. Explicit v3 validators, registered historical-root seals and auxiliary/novel source separation passed; all eight identity sets and the auxiliary preparation are bound to the corrected immutable design lock 39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d. The active scientific release is 2897f4fe4c1fb1857432a0e92a7391dde68307f5. Fresh v3 parity/caches, loss/paired-training evidence and three complete pilots remain Week 4 work. Recheck runtime seals before every job. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md",
+          "evidence": "Satisfied by the verified Week 3 handoff on 2026-09-29, not a second freeze: SCC job 7790916 completed with failed=0 and exit_status=0. Explicit v3 validators, registered historical-root seals and auxiliary/novel source separation passed; all eight identity sets and the auxiliary preparation are bound to the corrected immutable design lock 39426a3b2ddea74aaa8c1d39737cd9e5fb9c870c21745f5527e4e97b58d14e2d. The active scientific release is 2897f4fe4c1fb1857432a0e92a7391dde68307f5. Fresh v3 parity/caches, loss/paired-training evidence and three complete pilots remain Week 4 work. Recheck runtime seals before every job. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-3-v3-readiness.md Revalidation on 2026-10-08: Two previously registered local historical artifact roots are now unavailable, so their current test-seal status cannot be verified. The available local root and inspected SCC roots/releases contained no opening records; this bounded observation does not resolve the missing roots. The protocol file, immutable design lock and manifest-set hashes still match. Fresh v3 caches and pilots are blocked until the historical roots are recovered or an auditable, result-blind resolution establishes their provenance and seal status. No licensed-data extraction or pilot job was submitted. Synthetic-only L40S learnable-fixture job 7968648 subsequently passed all three recipes at 1,000 updates and 1.0 self-excluded same-label retrieval without licensed-data access. The September 29 evidence above is preserved as a dated observation. Resolution on 2026-10-08: Dated automatic workspace cleanup records explain retirement of the two historical roots on October 5. Researcher confirmation of no intervening scientific runs or novel-pose, embedding or score access in the retired roots resolves the historical interval together with the September 29 audit and cleanup evidence. The immutable supplemental resolution has SHA-256 85ea2aa45930bb6525b5142b973e6671704a801f2048c42e2a5ae6e14e94e08d. The original registry, audit and scientific locks remain unchanged; no artifacts were recovered or recreated. Fresh cache job 7968689 was submitted through the frozen launcher after this resolution; cache results remain pending. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-root-recovery.md",
           "waiverReason": "",
-          "decidedAt": "2026-09-29T22:28:17.544258+00:00",
-          "version": 4
+          "decidedAt": "2026-10-08T19:10:01+00:00",
+          "version": 6
         },
         {
           "id": "w04-gate-02",
@@ -774,11 +774,11 @@
           "position": 2,
           "criterion": "All three losses pass independent numerical and learnable-fixture checks; initialization and physical batch plans pair exactly.",
           "required": true,
-          "state": "pending",
-          "evidence": "",
+          "state": "met",
+          "evidence": "Verified on 2026-10-08: All 46 focused numerical/source checks passed with no remaining skips, including independent labeled forward/backward fixtures. Synthetic-only L40S job 7968648 completed all three recipes for 1,000 finite updates on the constructed 32-row physical 8 × 4 fixture with full 8,704-to-2,048 heads; each reached 1.0 self-excluded same-label retrieval. Scheduler accounting reports failed=0, exit_status=0, 18:57:39–18:58:52 UTC and 73 seconds. The shared initial-state hash is 035a3e5e57569c0ae765b797f705b3a9f70353a6832fcb757c7622ebfa9b3284. A separate repeated reduced-dimension 32-to-16 software fixture completed 20 epochs/20 updates per recipe with paired initial-state hash f5d2d3619a1d0121cbea51afc35375719ccb1701a8c35f7de933018c648da9d2 and batch-plan hash f581a887be8f1e2c01d48980ec0f1b99a6c6317661e9ed68591c499432ccfcac. These synthetic and software fixtures used no licensed data; real-data pilot pairing and provenance still require validation. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-execution.md",
           "waiverReason": "",
-          "decidedAt": null,
-          "version": 3
+          "decidedAt": "2026-10-08T19:10:01+00:00",
+          "version": 4
         },
         {
           "id": "w04-gate-03",
@@ -786,11 +786,11 @@
           "position": 3,
           "criterion": "Fresh parity/repeatability checks and all three 20-epoch pilots pass with four immutable checkpoint/score records each.",
           "required": true,
-          "state": "pending",
-          "evidence": "",
+          "state": "met",
+          "evidence": "Verified on 2026-10-08: Fresh parity and exact 95,001-row extraction repeatability passed; independent cache validation job 7969962 passed all five fresh v3 cache bindings. Independent pilot validation job 7971490 passed all three fixed 20-epoch pilots, paired initialization and batches, four immutable checkpoint/score records per recipe and the required health/resource checks. Validation SHA-256: 498116254ff24929183c261c93f0d647b9d97f832d572340068f6a54d3468a9e. Metadata audit SHA-256: e6a9b9a0c46cd1bb3ad43f8fba627ceab3ff5593251b04c0dbb7b5881023102d. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week4-execution/docs/protocol/week-4-execution.md",
           "waiverReason": "",
-          "decidedAt": null,
-          "version": 3
+          "decidedAt": "2026-10-08T21:57:06+00:00",
+          "version": 4
         }
       ]
     },

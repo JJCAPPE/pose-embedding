@@ -71,9 +71,9 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(27);
-    expect(progress.completedRequiredTasks).toBe(16);
-    expect(progress.decidedRequiredGates).toBe(15);
+    expect(progress.percent).toBe(32);
+    expect(progress.completedRequiredTasks).toBe(19);
+    expect(progress.decidedRequiredGates).toBe(17);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(0);
   });
@@ -125,16 +125,35 @@ describe("readiness and progress rules", () => {
     expect(week.actualMinutes).toBe(0);
   });
 
-  it("credits the Week 3 freeze in Week 4 without completing its remaining work", () => {
+  it("closes Week 4 after independent cache and complete-pilot validation", () => {
     const week = seedPlan.weeks[3];
-    expect(weekProgress(week)).toEqual({ required: 4, completed: 1, percent: 25 });
+    expect(weekProgress(week)).toEqual({ required: 4, completed: 4, percent: 100 });
     expect(week.tasks[0].completionNote).toContain("Satisfied by the verified Week 3 handoff");
-    expect(week.gates[0].state).toBe("met");
-    expect(week.tasks.slice(1).every((task) => task.state === "todo")).toBe(true);
-    expect(week.gates.slice(1).every((gate) => gate.state === "pending")).toBe(true);
-    expect(week.state).toBe("planned");
+    expect(week.tasks[0].completionNote).toContain("Revalidation on 2026-10-08");
+    expect(week.tasks.map((task) => task.state)).toEqual([
+      "done", "done", "done", "done",
+    ]);
+    expect(week.tasks.every((task) => task.completedAt !== null)).toBe(true);
+    expect(week.tasks[1].completionNote).toContain("7968648");
+    expect(week.tasks[1].completionNote).toContain("32-to-16 software fixture");
+    expect(week.tasks[2].completionNote).toContain("7969962 passed all five fresh v3 cache bindings");
+    expect(week.tasks[3].completionNote).toContain("7971490 passed all three complete pilot records");
+    expect(week.tasks[3].completionNote).toContain("498116254ff24929183c261c93f0d647b9d97f832d572340068f6a54d3468a9e");
+    expect(week.tasks[3].completionNote).toContain("ineligible for learning-rate selection");
+    expect(week.gates.map((gate) => gate.state)).toEqual(["met", "met", "met"]);
+    expect(week.gates[0].evidence).toContain("Satisfied by the verified Week 3 handoff");
+    expect(week.gates[0].evidence).toMatch(/researcher confirmation/i);
+    expect(week.gates[0].decidedAt).not.toBeNull();
+    expect(week.state).toBe("closed");
+    expect(week.closedAt).not.toBeNull();
+    expect(week.reflection).toContain("Done:");
+    expect(week.reflection).toContain("Next:");
+    expect(week.reflection).toContain("Open issues:");
     expect(week.actualMinutes).toBe(0);
-    expect(weekCanClose(week)).toBe(false);
+    expect(weekCanClose(week)).toBe(true);
+    expect(weekIsReady(seedPlan.weeks, 5)).toBe(true);
+    expect(seedPlan.weeks[4].state).toBe("planned");
+    expect(seedPlan.weeks[4].tasks.every((task) => task.state === "todo")).toBe(true);
   });
 
   it("returns the newest completed tasks for the public dashboard", () => {
