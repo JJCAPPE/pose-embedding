@@ -7,12 +7,12 @@ select plan(20);
 create temporary table fixture_edits as
 select value as edit from jsonb_array_elements((
   select split_part(array_to_string(statements, E'\n'), '$edits$', 2)::jsonb
-  from supabase_migrations.schema_migrations where version = '20261008190528'
+  from supabase_migrations.schema_migrations where version = '20261008191234'
 ));
 create function pg_temp.apply_fixture() returns void language plpgsql as $$
 begin
   execute (select array_to_string(statements, E'\n')
-    from supabase_migrations.schema_migrations where version = '20261008190528');
+    from supabase_migrations.schema_migrations where version = '20261008191234');
 end;
 $$;
 truncate public.projects cascade;
