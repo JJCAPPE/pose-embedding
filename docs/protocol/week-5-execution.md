@@ -90,6 +90,19 @@ Journey returned HTTP 200. Fifteen database checks, 22 tracker unit tests,
 typecheck, focused lint, workspace checks and the production build passed;
 live diagnostic/task evidence rendered without page errors.
 
+The parity/extraction milestone (`b6e22c3`) was published through guarded
+migration `20261011233207` and deployment `dpl_3epdmxtE57hmGsjcEST3EBHcws42`.
+At **23:36:05 UTC**, live health/export and rendered-page checks verified Week 5
+version 11 active, task 02 version 8 in progress, task 03 version 8 done and all
+three scientific gates pending. The public fallback and protocol status match;
+all other weeks and source links are unchanged. Actual time remains unreported
+at the researcher's request. Fifteen database assertions, 22 tracker unit tests,
+typecheck, focused lint, production builds, runbook shell checks and workspace
+verification passed. The private export redirects to sign-in; browser checks
+had no page errors and the preserved Journey returned HTTP 200. PR 33 remains
+a draft stacked on PR 31. This is an ongoing handoff: five-cache completion,
+independent validation and the remaining Week 5 work are still pending.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
