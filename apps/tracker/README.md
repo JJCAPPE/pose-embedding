@@ -4,6 +4,18 @@ The tracker is a public, static-first Next.js application. It always builds from
 `plan/research-plan.v3.json`; when Supabase is configured, public reads use the live
 database and fall back to that checked-in seed on failure.
 
+The public `/journey` page explains the research with an original synthetic 3D
+scene, interactive recipe/corruption controls, and all fourteen weekly chapters.
+Its progress comes from the same public loader. Geometry is illustrative; it
+does not load licensed poses, embeddings, or experimental results. Reduced-motion,
+unavailable-WebGL, and print views retain the readable research narrative.
+
+For CLI deployments, the root `.vercelignore` allows only website sources and
+the public v2/v3 plan JSON inputs needed by the build. Inspect `vercel deploy
+--dry --format=json` before uploading. Use a clean website-only staging directory;
+do not archive the research checkout, since archive mode can recurse into an
+excluded directory when that directory itself remains in the upload manifest.
+
 The protocol overview links to the full final v3 plan at `/protocol/plan` and
 its scope decision at `/protocol/decision`. These public Markdown documents are
 bundled in `lib/protocol-documents.json`, with readable tables and source downloads.

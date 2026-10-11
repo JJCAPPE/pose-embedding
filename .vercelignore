@@ -1,0 +1,29 @@
+# Deploy only the tracker and its public planning input. Git ignore rules alone
+# do not exclude licensed research data from a Vercel CLI source upload.
+**
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!apps
+!apps/tracker
+!apps/tracker/**
+!plan
+!plan/research-plan.v3.json
+!plan/research-plan.v2.json
+
+apps/tracker/.env*
+apps/tracker/.next
+apps/tracker/.next/**
+apps/tracker/node_modules
+apps/tracker/node_modules/**
+apps/tracker/test-results
+apps/tracker/test-results/**
+apps/tracker/playwright-report
+apps/tracker/playwright-report/**
+apps/tracker/blob-report
+apps/tracker/blob-report/**
+apps/tracker/.impeccable
+apps/tracker/.impeccable/**
+apps/tracker/tmp
+apps/tracker/tmp/**
+apps/tracker/tsconfig.tsbuildinfo
