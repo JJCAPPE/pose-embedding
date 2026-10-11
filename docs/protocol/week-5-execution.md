@@ -59,6 +59,16 @@ lint, workspace verification and the production build. Live browser checks
 rendered the reflection, completed-task evidence and protocol status without
 page errors; the preserved Journey returned HTTP 200.
 
+The geometry/cache milestone (`db15cfb`) was published through guarded migration
+`20261011225827` and deployment `dpl_Fwyk7yvqPZQmGCPDCMpa348VVrRH`. The live
+export and health at 23:02 UTC match Week 5 version 8 active, task 01 version 6 and task 02 version 5
+in progress, task 03 version 8 done, and all scientific gates pending. Other
+weeks, source links, private-export protection and the production Journey remain
+unchanged. Sixteen database checks, 22 tracker unit tests, typecheck, focused
+lint, workspace checks and the production build passed. Live browser checks
+rendered the reflection, task evidence and protocol without page errors; Journey
+returned HTTP 200 and the private export redirected to sign-in.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
@@ -246,6 +256,24 @@ draft leaves measurements null; no candidate or admission job was submitted.
 The persistent status link points to this directory's `status.txt`, preserving
 the current cache step. At 22:59:31 UTC, cache job 8028119 was still queued;
 an actual GPU allocation is not inferred from submission.
+
+### Verified cache allocation; results pending
+
+Scheduler state and parent resource records subsequently verified job **8028119**
+running from 22:59:35 UTC on `ece@scc-j08.scc.bu.edu` with four slots. The
+operation is `study-v3/operations/20261011T225953Z-8028119-caches/`; scientific
+outputs are under
+`study-v3/revisions/execution-r1/attempts/20261011T225953Z-8028119-caches/`.
+At 23:00:09 UTC the allocated-device check passed: exactly one L40S,
+`CUDA_VISIBLE_DEVICES=0`, 47,240,642,560 GPU bytes free of 47,695,921,152 total,
+and a 34,359,738,368-byte (32 GiB) host limit. RAM/storage checks passed with
+911.76 decimal GB quota free and 1,086,370,873,344 filesystem bytes free.
+
+Workspace, upstream and protocol checks passed. Parity and cache outputs are
+not yet complete or independently validated. The inspection is retained at
+`study-v3/operations/week5-inspection/20261011T230031Z/`. After successful cache
+accounting, continuation must run the independent cache validator before any
+pilot or downstream admission work.
 
 ## Implementation and verification in progress
 
