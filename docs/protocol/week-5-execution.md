@@ -399,6 +399,32 @@ dated samples, not final peaks. Inspection is retained under
 `study-v3/operations/week5-inspection/20261011T232632Z/`. Command 004 remains
 running at this checkpoint; no parity or cache result has been inferred.
 
+### Parity passed; five-cache extraction running
+
+Independent inspection at **23:30:13 UTC** verified that job **8028152** passed
+parity at 23:27:15.814246 UTC with a clean release `731938a`, the exact successor
+protocol file and manifest-set bindings. The parity receipt SHA-256 is
+`7991c538390e5767a9de1256cf31210cf2ce265510b054cf013a362e891373c7`.
+Cache extraction was running on the assigned L40S; five-cache completeness,
+accounting, independent cache validation and admission remain unverified.
+
+The resource sample `004-0003.json` at 23:29:27.882052 UTC recorded
+2,902,032,384 child RSS bytes against the 32-GiB host allocation and 4,248 MiB of
+GPU memory for scientific child PID 2173794. Monitoring parent PID 2118260 was
+absent from the GPU process list. Quota free space was 911.74 decimal GB and
+filesystem free space 1,086,345,707,520 bytes; RAM/storage checks passed. Its
+SHA-256 is `a29549bbe38765c0213bfdb3a816b11d2b98bfc6a882a1f72aae4e1f9435eb0f`.
+These are current observations, not final peaks or reserved future capacity.
+
+The compact verification is retained at
+`study-v3/operations/week5-inspection/20261011T233012Z/cache-progress-verification.json`,
+SHA-256 `5dd0d70236c52a7751bf183bda6c78f1a2888189e07a031866c753fbffbbcdbe`.
+The persistent status link now points to that directory's `status.txt`, including
+the next verification command and the admission revision-2 helper locations.
+Task 02 remains in progress and all scientific gates remain pending. The next
+step is successful accounting and complete five-cache validation before pilots;
+the Week 5-only heartbeat continues the monitored work.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -467,7 +493,9 @@ with the real dataset seal intact; verified successor preparation job 8028032,
 including exact manifest identity and unchanged scientific settings; passed 84
 supplementary checks and independently verified the actual dependence tables.
 Task 03 is complete. The fixed geometry panel passed independent verification
-and exact fresh-process repeats; the fresh five-cache job was submitted.
+and exact fresh-process repeats. The allocated controller remedy passed after
+the preserved first cache failure; the fresh attempt passed parity and was
+independently verified extracting caches on the assigned L40S.
 
 **Next:** Verify new cache attempt 8028152 and its independent cache validator;
 then complete pilots, development corruptions,

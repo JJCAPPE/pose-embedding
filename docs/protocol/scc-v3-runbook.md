@@ -326,6 +326,12 @@ qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
   --pilot-dirs "$V3_CONTRASTIVE" "$V3_CONTEXTUAL" "$V3_SUPCON" \
   --remaining-peak-bytes "$V3_REMAINING_PEAK_BYTES" \
   --recorded-by "researcher-authorized Week 5 execution"
+```
+
+Wait for the corruption job to finish, then inspect its scheduler accounting and
+immutable outcome before submitting timing.
+
+```bash
 qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
   "$V3_GPU_CONTROLLER" timing --cache-dir "$V3_CACHES" \
   --diagnostic-receipt "$V3_GPU_DIAGNOSTIC" \
@@ -334,7 +340,7 @@ qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
   --recorded-by "researcher-authorized Week 5 execution"
 ```
 
-Wait for the corruption job before submitting timing. Timing keeps all 95,001
+Timing keeps all 95,001
 float32 rows resident and maps the locked 76,013 development-training IDs into
 that matrix. Only those 80 actions enter optimization; validation and novel
 actions are rejected. Each arm uses seed 7, rate `3e-4`, the same initialization
