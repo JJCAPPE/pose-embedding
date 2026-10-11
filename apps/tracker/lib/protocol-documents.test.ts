@@ -23,7 +23,8 @@ describe("published v3 protocol", () => {
   });
 
   it("preserves historical evidence while tracking Week 3 v3 readiness separately", () => {
-    expect(seedPlan.weeks.slice(0, 2)).toEqual(historicalPlan.weeks.slice(0, 2));
+    expect(seedPlan.weeks.slice(0, 2).every((week) => week.state === "closed")).toBe(true);
+    expect(seedPlan.weeks.slice(0, 2).map((week) => week.actualMinutes)).toEqual([0, 0]);
     const historicalWeek3 = historicalPlan.weeks[2];
     const week3 = seedPlan.weeks[2];
     expect(week3.tasks.slice(0, 5)).toEqual(historicalWeek3.tasks);
@@ -45,7 +46,8 @@ describe("published v3 protocol", () => {
     expect(seedPlan.weeks[3].tasks.map((task) => task.state)).toEqual([
       "done", "done", "done", "done",
     ]);
-    expect(seedPlan.weeks.slice(4).every((week) => week.tasks.every((task) => task.state === "todo"))).toBe(true);
+    expect(seedPlan.weeks[4].tasks[2].state).toBe("in_progress");
+    expect(seedPlan.weeks.slice(5).every((week) => week.tasks.every((task) => task.state === "todo"))).toBe(true);
   });
 
   it("resolves local document links without exposing a filesystem path", () => {

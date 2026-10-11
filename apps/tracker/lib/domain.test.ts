@@ -47,11 +47,11 @@ describe("weekly schedule", () => {
 describe("readiness and progress rules", () => {
   it("requires the preceding week to be closed", () => {
     expect(weekIsReady(seedPlan.weeks, 1)).toBe(true);
-    expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
+    expect(weekIsReady(seedPlan.weeks, 2)).toBe(true);
     const weeks = seedPlan.weeks.map((week) =>
-      week.number === 1 ? { ...week, state: "closed" as const } : week,
+      week.number === 1 ? { ...week, state: "active" as const } : week,
     );
-    expect(weekIsReady(weeks, 2)).toBe(true);
+    expect(weekIsReady(weeks, 2)).toBe(false);
   });
 
   it("closes only with completed required tasks and decided required gates", () => {
@@ -71,19 +71,19 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(32);
-    expect(progress.completedRequiredTasks).toBe(19);
+    expect(progress.percent).toBe(33);
+    expect(progress.completedRequiredTasks).toBe(20);
     expect(progress.decidedRequiredGates).toBe(17);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(0);
   });
 
-  it("keeps Week 1 open for actual time and closeout after the confirmed BU decision", () => {
+  it("reflects the verified live Week 1 closure without inventing researcher time", () => {
     const week = seedPlan.weeks[0];
     expect(weekProgress(week)).toEqual({
       required: 5,
-      completed: 4,
-      percent: 80,
+      completed: 5,
+      percent: 100,
     });
     expect(
       week.gates
@@ -97,8 +97,11 @@ describe("readiness and progress rules", () => {
       decidedAt: "2026-09-24T22:13:07+00:00",
     });
     expect(week.actualMinutes).toBe(0);
-    expect(weekCanClose(week)).toBe(false);
-    expect(weekIsReady(seedPlan.weeks, 2)).toBe(false);
+    expect(week.state).toBe("closed");
+    expect(week.closedAt).toBe("2026-09-28T17:34:56.63523+00:00");
+    expect(week.reflection).toContain("actual minutes");
+    expect(weekCanClose(week)).toBe(true);
+    expect(weekIsReady(seedPlan.weeks, 2)).toBe(true);
   });
 
   it("closes Week 3 after verified SCC preparation and makes Week 4 ready", () => {
@@ -152,8 +155,11 @@ describe("readiness and progress rules", () => {
     expect(week.actualMinutes).toBe(0);
     expect(weekCanClose(week)).toBe(true);
     expect(weekIsReady(seedPlan.weeks, 5)).toBe(true);
-    expect(seedPlan.weeks[4].state).toBe("planned");
-    expect(seedPlan.weeks[4].tasks.every((task) => task.state === "todo")).toBe(true);
+    expect(seedPlan.weeks[4].state).toBe("active");
+    expect(seedPlan.weeks[4].tasks.map((task) => task.state)).toEqual([
+      "todo", "todo", "in_progress", "todo",
+    ]);
+    expect(seedPlan.weeks[4].gates.every((gate) => gate.state === "pending")).toBe(true);
   });
 
   it("returns the newest completed tasks for the public dashboard", () => {

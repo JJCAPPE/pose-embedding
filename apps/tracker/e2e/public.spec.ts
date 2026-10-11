@@ -11,7 +11,7 @@ const seedPlan: ResearchPlan = JSON.parse(
 test("public dashboard exposes all published weeks", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("protocol lock");
-  await expect(page.getByRole("heading", { name: "Unblock Week 1: Protocol and access" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: `Continue Week 5: ${seedPlan.weeks[4].title}` })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent completions" })).toBeVisible();
   for (const { task } of recentCompletedTasks(seedPlan)) {
     await expect(page.getByRole("heading", { name: task.title, exact: true })).toBeVisible();
