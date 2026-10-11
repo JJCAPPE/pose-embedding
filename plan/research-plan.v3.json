@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-10-11T22:12:37Z",
+  "generatedAt": "2026-10-11T22:45:23Z",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -53,7 +53,7 @@
       },
       {
         "label": "Current planning status",
-        "value": "Week 3 preparation remains complete as dated September 29 evidence. On October 8, dated cleanup records and researcher confirmation resolved retirement of two historical roots without recovering or recreating artifacts; the original registry, audit and scientific locks remain unchanged. All 46 focused numerical/source checks and three full-size synthetic L40S learnable fixtures passed; reduced-dimension software fixtures verified paired initialization and batch plans. Week 4 is closed: all five fresh v3 caches passed independent validation job 7969962, and independent validator 7971490 passed the three complete 20-epoch engineering pilots with paired provenance, complete checkpoint/score records and health/resource checks. Week 5 is active: release 731938a was verified and synchronized to SCC, and CPU rehearsal job 8028010 passed 41 checks with no failures or skips while preserving the real dataset seal. Prepared-source manifests and metadata-dependence tables still need verification before task 03 can close; all Week 5 tasks and scientific gates remain unfinished. The researcher confirmed up to 5 hours weekly normally and 10 if necessary, with limited Thanksgiving availability; budget no guaranteed hours that week. SCC uses ordinary queued access without a reservation. Full-campaign measured capacity is required before selection, and final-test authorization remains closed. Pilot accuracy is ineligible for learning-rate selection. Actual researcher time remains unreported."
+        "value": "Week 3 preparation remains complete as dated September 29 evidence. On October 8, dated cleanup records and researcher confirmation resolved retirement of two historical roots without recovering or recreating artifacts; the original registry, audit and scientific locks remain unchanged. All 46 focused numerical/source checks and three full-size synthetic L40S learnable fixtures passed; reduced-dimension software fixtures verified paired initialization and batch plans. Week 4 is closed: all five fresh v3 caches passed independent validation job 7969962, and independent validator 7971490 passed the three complete 20-epoch engineering pilots with paired provenance, complete checkpoint/score records and health/resource checks. Week 5 is active: release 731938a was verified and synchronized to SCC, and CPU rehearsal job 8028010 passed 41 checks with no failures or skips while preserving the real dataset seal. Preparation job 8028032 verified eight byte-identical successor manifests and unchanged scientific settings. Supplementary job 8028071 passed 84 checks and independently verified actual development/novel metadata tables without loading novel poses or outcomes; task 03 is complete. Geometry job 8028081 is queued, with no passing result yet. The other three tasks and all Week 5 scientific gates remain unfinished. Repeated validation and complete report costs must enter the measured capacity forecast; feasibility remains unverified. The researcher confirmed up to 5 hours weekly normally and 10 if necessary, with limited Thanksgiving availability; budget no guaranteed hours that week. SCC uses ordinary queued access without a reservation. Full-campaign measured capacity is required before selection, and final-test authorization remains closed. Pilot accuracy is ineligible for learning-rate selection. Actual researcher time remains unreported."
       },
       {
         "label": "Measured capacity prerequisite",
@@ -833,12 +833,12 @@
         "Current quota and remaining peak bytes must pass; dated capacity readings and prior GPU access are not reservations."
       ],
       "advisorPrompt": "Do all October 18 validity, seal, storage, runtime and researcher-availability criteria pass without changing the declared study?",
-      "reflection": "Done: Committed release 731938a, verified its exact SCC source, locked dependencies and upstream, and passed CPU rehearsal job 8028010: 41 checks, no failures or skips, 414 seconds scheduler wall time. The real dataset seal remained intact. Next: Prepare and verify successor manifests and metadata-dependence tables, then regenerate caches/pilots and complete geometry, corruption and capacity evidence. Open issues: Task 03 remains in progress until prepared-source metadata tables are verified; all four tasks and three gates remain unfinished. The dated allocation calendar and measured pipeline forecast are still required. Availability remains up to 5 hours weekly normally, 10 if necessary; budget no guaranteed Thanksgiving hours. Actual researcher time remains unreported. No selection, final training or novel-test opening is authorized.",
+      "reflection": "Done: Verified release 731938a on SCC, the 41-check full command rehearsal, successor preparation with eight byte-identical manifests, and supplementary job 8028071 with 84 passing checks and independently verified development/novel metadata tables. The real dataset seal remained intact; task 03 is complete. Next: Complete geometry job 8028081, fresh caches and pilots, all nine development corruption paths and measured timing, then verify the full capacity forecast. Open issues: The remaining three tasks and all three scientific gates are unfinished. Repeated validation and whole-report costs must fit the dated calendar; feasibility is not yet established. Availability remains up to 5 hours weekly normally, 10 if necessary; budget no guaranteed Thanksgiving hours. Actual researcher time remains unreported. No selection, final training or novel-test opening is authorized.",
       "plannedMinutes": 300,
       "actualMinutes": 0,
       "state": "active",
       "closedAt": null,
-      "version": 6,
+      "version": 7,
       "tasks": [
         {
           "id": "w05-task-01",
@@ -849,11 +849,11 @@
           "expectedOutput": "Immutable panel IDs/hashes, invariant/repeatability receipts and full-query damage denominators for all nine conditions.",
           "required": true,
           "estimateMinutes": 90,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
+          "state": "in_progress",
+          "completionNote": "Geometry job 8028081 was queued at 22:44:39 UTC using the unchanged frozen CLI with its required locks/geometry destination. The queued job is not a passing result. Panel invariants, repeats and all nine full-query damage summaries remain to be verified.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 4
+          "version": 5
         },
         {
           "id": "w05-task-02",
@@ -879,11 +879,11 @@
           "expectedOutput": "Reviewed successor release and regeneration matrix; complete fixture-to-v3-report receipts and fixed analysis/interpretation template before real revalidation.",
           "required": true,
           "estimateMinutes": 60,
-          "state": "in_progress",
-          "completionNote": "Release 731938a was synchronized and verified on SCC. CPU rehearsal job 8028010 passed 41 checks with no failures or skips (390.055 seconds test time; 414 seconds scheduler wall time), with the real seal intact before and after. Prepared successor manifests and their actual metadata-dependence tables still require verification, so this task remains in progress. See the Week 5 execution record; no scientific admission is implied.",
+          "state": "done",
+          "completionNote": "Release 731938a and its completion/regeneration workflow are verified. SCC job 8028010 passed 41 full command/rehearsal checks; job 8028071 passed 84 supplementary checks with no failures, errors or skips. Successor preparation preserved all eight manifest byte identities and scientific settings. Actual dependence tables were independently rehashed and matched to the locked manifests: 18,929 development queries and 18,884 primary novel query IDs, each across 20 actions. Only metadata was inspected; real seals remained intact. The fixed analysis/interpretation path is complete. Fresh cache/pilot/corruption and capacity admission remain separate pending gates; see the Week 5 execution record.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
-          "completedAt": null,
-          "version": 7
+          "completedAt": "2026-10-11T22:44:38.000Z",
+          "version": 8
         },
         {
           "id": "w05-task-04",

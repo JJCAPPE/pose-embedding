@@ -71,8 +71,8 @@ describe("readiness and progress rules", () => {
 
   it("counts only required tasks in the primary percentage", () => {
     const progress = projectProgress(seedPlan);
-    expect(progress.percent).toBe(33);
-    expect(progress.completedRequiredTasks).toBe(20);
+    expect(progress.percent).toBe(35);
+    expect(progress.completedRequiredTasks).toBe(21);
     expect(progress.decidedRequiredGates).toBe(17);
     expect(progress.requiredTasks).toBeGreaterThan(50);
     expect(progress.optionalTasks).toBe(0);
@@ -157,7 +157,7 @@ describe("readiness and progress rules", () => {
     expect(weekIsReady(seedPlan.weeks, 5)).toBe(true);
     expect(seedPlan.weeks[4].state).toBe("active");
     expect(seedPlan.weeks[4].tasks.map((task) => task.state)).toEqual([
-      "todo", "todo", "in_progress", "todo",
+      "in_progress", "todo", "done", "todo",
     ]);
     expect(seedPlan.weeks[4].gates.every((gate) => gate.state === "pending")).toBe(true);
   });

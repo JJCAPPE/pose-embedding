@@ -73,9 +73,10 @@ envelope. The capacity calculation uses current remaining peak bytes plus the
 ## SCC operational record
 
 The existing `remote:0.0` SSH pane was inspected and reused. Host `scc1`, user
-`bujack`, no scheduler jobs at the October 11 21:13 UTC observation. The original
-scientific release remains `2897f4fe4c1fb1857432a0e92a7391dde68307f5`.
-No Week 5 scientific job has been launched at this checkpoint.
+`bujack`, no scheduler jobs at the October 11 21:13 UTC initial observation. At
+that checkpoint, the original scientific release was
+`2897f4fe4c1fb1857432a0e92a7391dde68307f5` and no Week 5 scientific job had
+launched. The later allocated work is recorded below.
 
 Canonical roots remain `POSE_EMBED_DATA_ROOT` and `POSE_EMBED_ARTIFACT_ROOT`.
 The immutable resource/availability snapshot relative to the artifact root is
@@ -119,9 +120,62 @@ The inspection recorded 911.99 decimal GB quota free and 1,086,609,948,672
 filesystem bytes free; the rehearsal allocation had 32 GiB host memory. These
 are measurements for that checkpoint. The full campaign forecast and GPU
 admission evidence remain pending. Successor preparation job **8028032** was
-submitted next at 22:12:18 UTC;
-its result and metadata-dependence tables were not yet verified at this record.
-Task 03 stays in progress and all Week 5 gates stay pending.
+submitted next at 22:12:18 UTC. Its result was verified at the following
+checkpoint; the initial rehearsal milestone did not claim preparation success.
+
+### Verified successor preparation
+
+Preparation job **8028032** completed on `scc-pi8`: scheduler `failed=0`,
+`exit_status=0`, 941 seconds wall time. Its immutable operation is
+`study-v3/operations/20261011T222327Z-8028032-prepare/` relative to the canonical
+artifact root. The successor uses release 731938a and
+`study-v3/revisions/execution-r1/locks/` with these bindings:
+
+| Binding | SHA-256 |
+| --- | --- |
+| Canonical protocol | `cfe70a6520bac36a0466b26709841215ddaa55d61318b5f19173669285729992` |
+| Protocol file bytes | `b92b243e81324dfbc83ed612f9d024c74165de807b90985afc3ac418a1df4ae8` |
+| Design lock | `5a38707efd2211123a220489da09d96606ccde2c8bb7d9d99780ea0e7d9c89e7` |
+| Manifest set | `107d5bfc723ceac06f984eb6429098187109dee7f5e1198fdcf66ecd6c687479` |
+
+All eight manifests are byte-identical to their predecessors. Scientific fields
+are unchanged except for the declared successor-relative artifact paths; source
+hashes were verified and the shared registry was unchanged.
+
+### Verified supplementary checks and metadata
+
+Supplementary CPU job **8028071**, submitted at 22:36 UTC, completed on
+`scc-ne7`: scheduler `failed=0`, `exit_status=0`, 284 seconds wall time. Its
+JUnit records **84 passed, zero failures/errors/skips** in 150.93 seconds.
+All nine resource samples passed the RAM/storage requirements; the latest
+recorded 1,379,651,584 RSS bytes against 32 GiB and 911.93 decimal GB quota free.
+The real dataset remained sealed before and after; novel pose data and outcomes
+were not loaded.
+
+The operation is
+`study-v3/operations/20261011T224100Z-8028071-additional-checks/`. The independent
+verification at 22:44:38 UTC and scheduler accounting are in
+`study-v3/operations/week5-launches/20261011T224426Z/`, including
+`additional-checks-verification.json`. The JUnit SHA-256 is
+`1c69f7359c32f603836bb3ef3d95328cab1184cbe42e56f6e0dd1f33147d573e`;
+the validation receipt SHA-256 is
+`c61337b3190e98b092610bea958b91589dbee08f56fe1d844b8621c1222fa865`.
+
+Actual metadata-dependence tables reside under
+`study-v3/revisions/execution-r1/analysis/metadata-dependence/20261011T224100Z-8028071-additional-checks/`:
+
+| Table | Verified query/action counts | SHA-256 |
+| --- | --- | --- |
+| `development_queries.json` | 18,929 / 20 | `04bad108a88c690e33f50a88ecb1ec654284cb5ed1b2980d7433d5f73a5e296e` |
+| `novel_query_primary.json` | 18,884 / 20 | `776bbf1f4a94b1d3c75eb8a8f9eba5a443ed40aec38a5ea9943f23aa18ad0a30` |
+
+Hashes, manifest bindings and counts were independently verified. Task 03's
+completion-release, command/report rehearsal, interpretation and actual metadata
+requirements are complete. This technical task completion does not pass the
+scientific admission gate, which still requires fresh caches, pilots and the
+other Week 5 evidence. Geometry job **8028081** was queued at 22:44:39 UTC;
+its invariants and full-query damage summaries remain unverified. All three
+Week 5 gates remain pending.
 
 ### Geometry invocation correction
 
@@ -204,12 +258,17 @@ None of these software checks substitutes for SCC calibration or admission.
 published the active Week 5 scope; inspected SCC; recorded future availability;
 implemented and verified the completion path and review fixes; committed and
 synchronized release 731938a; passed the allocated 41-check software rehearsal
-with the real dataset seal intact.
+with the real dataset seal intact; verified successor preparation job 8028032,
+including exact manifest identity and unchanged scientific settings; passed 84
+supplementary checks and independently verified the actual dependence tables.
+Task 03 is complete.
 
-**Next:** Verify the prepared successor manifests and metadata-dependence tables,
-then complete allocated geometry, fresh caches, pilots, development corruptions
-and timing. Use their immutable receipts for the capacity decision and next-week
-handoff. Software rehearsal does not replace fresh scientific admission evidence.
+**Next:** Complete allocated geometry, fresh caches, pilots, development
+corruptions and timing. Include the
+[repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
+the measured forecast, including whole-report costs. Use the immutable receipts
+for the capacity decision and next-week handoff. Software rehearsal does not
+replace fresh scientific admission evidence.
 
 **Open issues:** Full Week 5 evidence and selection authorization are unfinished.
 Actual researcher minutes remain unreported. Technical completion and formal

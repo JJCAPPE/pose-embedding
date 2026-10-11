@@ -80,6 +80,9 @@ before handoff.
 
 Budget complete command wall time, including CPU hashing, source/cache validation,
 checkpoint-to-projection replay, scoring, serialization and report regeneration.
+Use the [verified validation call-count audit](week-5-capacity-validation-audit.md)
+when forecasting repeated checks and the indivisible report commands; runtime
+feasibility still requires measurements.
 Include fresh extraction, failed attempts, repeats, queues and review. Use the
 slower pilot/full-size estimate per arm with at least 25% compute and researcher
 slack. Each unsplit job must fit its usable window and scheduler limit. Start

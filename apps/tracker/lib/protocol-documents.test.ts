@@ -46,7 +46,7 @@ describe("published v3 protocol", () => {
     expect(seedPlan.weeks[3].tasks.map((task) => task.state)).toEqual([
       "done", "done", "done", "done",
     ]);
-    expect(seedPlan.weeks[4].tasks[2].state).toBe("in_progress");
+    expect(seedPlan.weeks[4].tasks[2].state).toBe("done");
     expect(seedPlan.weeks.slice(5).every((week) => week.tasks.every((task) => task.state === "todo"))).toBe(true);
   });
 
