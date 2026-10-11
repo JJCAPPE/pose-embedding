@@ -274,10 +274,29 @@ is retained at `study-v3/operations/week5-inspection/20261011T230031Z/`.
 Subsequent verification found job 8028119 ended at 23:00:54 UTC: the outer
 operation failed and command 002 exited 2 after 45.0216 seconds with
 `CUDA-capable devices busy or unavailable`. No `parity.json` or cache files were
-created. The original attempt and release are preserved. The cause remains
-under investigation; no automatic retry or successful cache result is claimed.
+created. The original attempt and release are preserved. No automatic retry or
+successful cache result is claimed.
 After any corrected attempt completes successfully, continuation must verify
 accounting and run the independent cache validator before pilots or admission.
+
+### Verified controller blocker; correction pending
+
+The saved `nvidia-smi.txt` at 23:00:10 UTC and resource record `002-0000` confirm
+GPU 0 L40S in `E. Process` (exclusive-process) mode, with the sole compute
+process being parent Python PID 81091 (426 MiB). The frozen parent calls
+`torch.cuda.mem_get_info` and retains that CUDA context while launching parity.
+The child's initial workspace/upstream/protocol checks passed, but parity could
+not acquire the exclusive GPU. Independent review confirmed this operational
+failure mechanism. Diagnosis and failed accounting are preserved under
+`study-v3/operations/week5-cache-failure/20261011T230352Z/`.
+
+Task 02 is temporarily blocked. An external controller correction is being
+prepared with identical scientific commands, a short-lived GPU preflight child
+and a CUDA-uninitialized parent. It must pass a small allocated synthetic
+reproduction/remedy check before an identical fresh cache retry. No frozen
+source, scientific setting, original artifact or approved budget is changed.
+There is no running GPU job at this diagnostic checkpoint. Other independent
+Week 5 work may continue; all scientific gates remain pending.
 
 ## Implementation and verification in progress
 
@@ -349,7 +368,7 @@ supplementary checks and independently verified the actual dependence tables.
 Task 03 is complete. The fixed geometry panel passed independent verification
 and exact fresh-process repeats; the fresh five-cache job was submitted.
 
-**Next:** Diagnose the failed first cache attempt before a corrected launch;
+**Next:** Verify the controller correction in an allocated synthetic check;
 then verify fresh caches and complete pilots, development corruptions,
 full-query damage telemetry and timing. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
@@ -358,7 +377,7 @@ for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
 **Open issues:** The first cache attempt failed before parity or cache creation;
-its cause is not yet established. Full Week 5 evidence and selection
+the verified controller context conflict is awaiting a tested remedy. Full Week 5 evidence and selection
 authorization are unfinished.
 Actual researcher minutes remain unreported. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.

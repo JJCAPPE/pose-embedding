@@ -157,7 +157,7 @@ describe("readiness and progress rules", () => {
     expect(weekIsReady(seedPlan.weeks, 5)).toBe(true);
     expect(seedPlan.weeks[4].state).toBe("active");
     expect(seedPlan.weeks[4].tasks.map((task) => task.state)).toEqual([
-      "in_progress", "in_progress", "done", "todo",
+      "in_progress", "blocked", "done", "todo",
     ]);
     expect(seedPlan.weeks[4].gates.every((gate) => gate.state === "pending")).toBe(true);
   });
