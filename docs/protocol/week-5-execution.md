@@ -257,7 +257,7 @@ The persistent status link points to this directory's `status.txt`, preserving
 the current cache step. At 22:59:31 UTC, cache job 8028119 was still queued;
 an actual GPU allocation is not inferred from submission.
 
-### Verified cache allocation; results pending
+### Cache allocation verified; first attempt failed
 
 Scheduler state and parent resource records subsequently verified job **8028119**
 running from 22:59:35 UTC on `ece@scc-j08.scc.bu.edu` with four slots. The
@@ -269,11 +269,15 @@ At 23:00:09 UTC the allocated-device check passed: exactly one L40S,
 and a 34,359,738,368-byte (32 GiB) host limit. RAM/storage checks passed with
 911.76 decimal GB quota free and 1,086,370,873,344 filesystem bytes free.
 
-Workspace, upstream and protocol checks passed. Parity and cache outputs are
-not yet complete or independently validated. The inspection is retained at
-`study-v3/operations/week5-inspection/20261011T230031Z/`. After successful cache
-accounting, continuation must run the independent cache validator before any
-pilot or downstream admission work.
+Workspace, upstream and protocol checks passed. The dated allocation inspection
+is retained at `study-v3/operations/week5-inspection/20261011T230031Z/`.
+Subsequent verification found job 8028119 ended at 23:00:54 UTC: the outer
+operation failed and command 002 exited 2 after 45.0216 seconds with
+`CUDA-capable devices busy or unavailable`. No `parity.json` or cache files were
+created. The original attempt and release are preserved. The cause remains
+under investigation; no automatic retry or successful cache result is claimed.
+After any corrected attempt completes successfully, continuation must verify
+accounting and run the independent cache validator before pilots or admission.
 
 ## Implementation and verification in progress
 
@@ -345,13 +349,16 @@ supplementary checks and independently verified the actual dependence tables.
 Task 03 is complete. The fixed geometry panel passed independent verification
 and exact fresh-process repeats; the fresh five-cache job was submitted.
 
-**Next:** Verify fresh caches, then complete pilots, development corruptions,
+**Next:** Diagnose the failed first cache attempt before a corrected launch;
+then verify fresh caches and complete pilots, development corruptions,
 full-query damage telemetry and timing. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
-**Open issues:** Full Week 5 evidence and selection authorization are unfinished.
+**Open issues:** The first cache attempt failed before parity or cache creation;
+its cause is not yet established. Full Week 5 evidence and selection
+authorization are unfinished.
 Actual researcher minutes remain unreported. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.
