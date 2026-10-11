@@ -219,13 +219,33 @@ qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/study_v3_execution.qsub \
   --recorded-by "researcher-authorized Week 5 execution"
 ```
 
-Run the fixed geometry panel before producing corruption scores:
+Run the fixed geometry panel before producing corruption scores. Review found
+that release `731938a`'s convenience launcher supplies an `attempts/` destination,
+while its geometry validator requires the existing `locks/` subtree. Preserve
+the frozen release and invoke the unchanged geometry CLI through the reviewed
+operational wrapper below. It uses `locks/geometry/<unique-attempt>`, retains the
+same operation/seal locks and resource monitoring, and independently validates
+the resulting panel. This changes the invocation only, not the scientific code,
+panel selection or corruption operators.
+
+The immutable SCC wrapper is
+`study-v3/operations/week5-tools/20261011T222146Z/additional-checks.py`, SHA-256
+`14b6799627cd506ae5733c5d84e410b0d8656a3dca6b1d0e05c99e7272ede5cc`.
+Its companion qsub file records the exact scheduler environment. Verify both
+against the adjacent `tools.json` before submitting from the frozen checkout:
 
 ```bash
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/study_v3_execution.qsub geometry \
+V3_WEEK5_TOOLS="$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-tools/20261011T222146Z"
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_WEEK5_TOOLS/additional-checks.qsub" \
+  --mode geometry --expected-release 731938a157be575ee433d6939876f8ca0b95e459 \
   --remaining-peak-bytes "$V3_REMAINING_PEAK_BYTES" \
   --recorded-by "researcher-authorized Week 5 execution"
 ```
+
+The same wrapper's `--mode additional-checks` runs supplementary isolated
+analysis/failure-path tests and freezes both dependence tables from locked IDs
+only. It does not load novel poses. Retain its JUnit, metadata hashes, source
+hashes and seal observations alongside the initial software rehearsal.
 
 Run each pilot separately, waiting for accounting and inspecting its preserved
 outcome before submitting the next. Repeat this exact command with `contextual`

@@ -40,6 +40,13 @@ security advisors passed. Hosted advisors reported existing Auth settings for
 leaked-password protection and MFA, with no RLS/table/function findings; those
 Auth settings were preserved.
 
+The allocated-rehearsal milestone (`af06ff1`) was published through guarded
+migration `20261011221237` and deployment `dpl_FVcgjiXWy6xU8DRnGAm9fx8QYkiy`.
+Live page/export and health checks at 22:18 UTC verified Week 5 version 6 active,
+task 03 version 7 in progress, all gates pending, unchanged closed history and
+existing evidence links, and a private-export redirect to sign-in. The public
+fallback matches the live data; no researcher hours or completion were inferred.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
@@ -115,6 +122,23 @@ admission evidence remain pending. Successor preparation job **8028032** was
 submitted next at 22:12:18 UTC;
 its result and metadata-dependence tables were not yet verified at this record.
 Task 03 stays in progress and all Week 5 gates stay pending.
+
+### Geometry invocation correction
+
+Review found a destination mismatch in release 731938a's convenience geometry
+launcher: it supplies `attempts/`, while the frozen validator requires `locks/`.
+The pending-only cancellation guard for preparation job 8028032 declined before
+issuing `qdel`, because that job had started at 22:16:44 UTC on `scc-pi8`.
+Preparation was not interrupted and no frozen source was changed.
+
+The corrected invocation uses the unchanged geometry CLI under
+`locks/geometry/<unique-attempt>`. An independently reviewed operational wrapper
+retains the seal, monitoring, immutable commands and output validation. Its
+transferred bytes match SHA-256
+`14b6799627cd506ae5733c5d84e410b0d8656a3dca6b1d0e05c99e7272ede5cc`;
+see the [exact SCC command](scc-v3-runbook.md#week-5-execution-r1-successor).
+The path-contract self-check passed locally. This is an invocation correction,
+not a scientific amendment or evidence that the actual geometry run passed.
 
 ## Implementation and verification in progress
 
