@@ -47,6 +47,18 @@ task 03 version 7 in progress, all gates pending, unchanged closed history and
 existing evidence links, and a private-export redirect to sign-in. The public
 fallback matches the live data; no researcher hours or completion were inferred.
 
+The verified software/metadata milestone (`38b5dc6`) was published through
+guarded migration `20261011224523` and deployment
+`dpl_6pyeNk2LtqHMjHQo2hmgw66eDMGp`. Live export and health checks at 22:50 UTC
+verified Week 5 version 7 active, task 03 version 8 done, task 01 version 5 in
+progress, and all three scientific gates pending. All other weeks and existing
+source links were unchanged; the private export redirected to sign-in. The
+fallback matches the public export, with researcher time still unreported.
+Publication passed 16 database tests, 22 tracker unit tests, typecheck, focused
+lint, workspace verification and the production build. Live browser checks
+rendered the reflection, completed-task evidence and protocol status without
+page errors; the preserved Journey returned HTTP 200.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
