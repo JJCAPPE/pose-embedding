@@ -79,6 +79,17 @@ typecheck, focused lint, workspace checks and the production build passed. The
 browser rendered the failure evidence and protocol status without page errors;
 Journey remained available. This is an interim blocker record, not closure.
 
+The verified controller/new-attempt milestone (`34699c7`) was published through
+guarded migration `20261011232411` and deployment
+`dpl_F89BHGZVWEwXaV7G8Xt9GqfyAfTE`. At 23:28 UTC, live page/export and health
+verified Week 5 version 10 active, task 02 version 7 in progress, task 03 still
+done, and all scientific gates pending. Actual time stays unreported at the
+researcher's explicit request. All other weeks and source links were unchanged;
+fallback/protocol data matched, private export redirected to sign-in, and
+Journey returned HTTP 200. Fifteen database checks, 22 tracker unit tests,
+typecheck, focused lint, workspace checks and the production build passed;
+live diagnostic/task evidence rendered without page errors.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
@@ -369,6 +380,24 @@ preserved. The 110 new local checks comprise 57 admission and 53 GPU/diagnostic
 tests. No candidate or admission job was launched. The persistent status link
 now points to this bundle and records cache job 8028152, still queued at the
 23:24:48 UTC observation.
+
+### Corrected cache attempt running; parity pending
+
+Job **8028152** was subsequently verified running from 23:25:46 UTC on
+`ece@scc-j01` with four slots. Its operation is
+`study-v3/operations/20261011T232601Z-8028152-caches/`, and its scientific output
+directory is `study-v3/revisions/execution-r1/attempts/20261011T232601Z-8028152-caches/`.
+The first short-lived GPU preflight passed at 23:26:18 UTC with
+`CUDA_VISIBLE_DEVICES=3`, logical device 0, one L40S, and 47,162,982,400 bytes
+free of 47,695,921,152 total. The second preflight also passed before scientific
+command 004.
+
+The first command-004 monitor sample recorded 31,182,848 RSS bytes against the
+34,359,738,368-byte host allocation, passing RAM/storage checks with 911.74
+decimal GB quota free and 1,086,345,707,520 filesystem bytes free. These are
+dated samples, not final peaks. Inspection is retained under
+`study-v3/operations/week5-inspection/20261011T232632Z/`. Command 004 remains
+running at this checkpoint; no parity or cache result has been inferred.
 
 ## Implementation and verification in progress
 
