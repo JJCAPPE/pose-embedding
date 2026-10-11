@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-10-08T22:25:01+00:00",
+  "generatedAt": "2026-10-09T17:54:14+00:00",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -25,14 +25,14 @@
     {
       "id": "manual-capacity-v3",
       "dueDate": "2026-10-18",
-      "title": "Resolve the v3 storage prerequisite",
-      "details": "After September 29 dependency cleanup, measured available space was 274.72 decimal GB. The bounded Week 4 requirement of 239.7484 GB passed. The initial full-campaign envelope plus reserve requires 314.7484 GB, leaving a dated 40.03 GB gap. Recheck quota and filesystem space, account for new artifacts, and obtain any additional authorized allocation before the October 18 gate; preserve historical artifacts.",
-      "whyManual": "Additional quota or artifact allocation requires institutional authorization. The dated observation is not current capacity or a reservation.",
+      "title": "Verify current remaining capacity",
+      "details": "Remeasure quota and filesystem space for the October 18 decision. Use 200 GiB reserve plus 1.25 times remaining peak bytes, including completion-release regeneration, projections, failures and staging; existing files count once. The campaign-wide envelope is 120 decimal GB including slack. October 8 observed 1,008.48 GB quota free; neither that nor September shortfalls establish current capacity. Request additional authorized allocation only if the current calculation fails.",
+      "whyManual": "Any additional quota or artifact allocation requires institutional authorization; current measurements determine whether it is needed.",
       "weekTaskId": "w05-task-04"
     }
   ],
   "protocol": {
-    "bindingSource": "plan/research-plan.v3.md (final September 29 plan) and docs/decisions/0004-frozen-one-shot-v3.md define the December direction. They supersede the v2 campaign scope, not historical evidence, and are planning decisions rather than an executable protocol or final-test lock. Complete and validate the v3 scientific bundle before experiments. Independent-research governance and all licensing safeguards remain binding.",
+    "bindingSource": "plan/research-plan.v3.md and decision 0004 define the scientific v3 scope; decision 0006 (October 9) amends upcoming execution, verification and reporting. Scientific settings remain fixed. Complete one successor release with new provenance bindings and fresh admission evidence before selection. Original locks, Week 4 evidence and closed history remain unchanged. Planning documents are not executable authorization or final-test locks.",
     "successDefinition": "Complete the three-recipe study faithfully: nine verified final heads, all 180 declared result cells, reproducible conditional analysis and descriptive results, and a report with costs, failures and limitations. A positive, null or negative contextual result is successful. A failed capacity or validity gate requires an honest blocked-study record and result-blind amendment; it is not a completed empirical comparison.",
     "lockedDecisions": [
       {
@@ -49,7 +49,7 @@
       },
       {
         "label": "Required campaign",
-        "value": "Three engineering pilots + 27 clean-development selection runs + nine fresh final heads = 39 required training runs and 1,960,020 head updates before retries or fixtures. The final matrix is three methods × three seeds × ten conditions × two query definitions = 180 cells."
+        "value": "Three valid completion-release engineering pilots + 27 clean-development selection runs + nine fresh final heads = 39 admitted campaign runs and 1,960,020 updates. Retain the three original Week 4 pilots separately: 42 complete runs and 2,102,580 updates across releases before other retries/fixtures. Final evaluation remains 180 cells."
       },
       {
         "label": "Current planning status",
@@ -57,15 +57,15 @@
       },
       {
         "label": "Measured capacity prerequisite",
-        "value": "After September 29 dependency cleanup, available space was 274.72 decimal GB, passing the bounded Week 4 threshold of 239.7484 GB. The initial full-campaign envelope is 100 GB incremental plus a 200 GiB reserve: 314.7484 GB total. Its dated remaining gap is 40.03 GB. Remeasure shared quota, filesystem capacity and remaining peak bytes at the October 18 gate."
+        "value": "The October 9 campaign-wide planning envelope is 120 decimal GB including slack, replacing the historical 100 GB envelope. It itemizes 27 development-corruption projections and retained successor caches/pilots. October 8 observed 1,008.48 GB quota free; this is dated evidence, not a reservation. Admission requires current min(filesystem free, quota remaining) >= 200 GiB + 1.25 times remaining peak bytes; existing files count once."
       },
       {
         "label": "October 18 go/no-go",
-        "value": "Before selection, require three complete valid 20-epoch pilots, mathematical loss checks, all nine development corruption paths, fixed analysis, resolved historical seal audits, and a measured schedule/storage/availability forecast. Include at least 25% remaining-work slack plus queue/setup delays. Otherwise stop for a result-blind amendment."
+        "value": "Before selection require the coordinated completion release and full fixture-to-v3-report rehearsal, fresh successor parity/five caches/three pilots, fixed geometry panel and nine complete development corruption paths, fixed analysis/report template, resolved seals and a measured dependency/schedule/storage/availability ledger. Apply at least 25% remaining-work slack plus queue/setup delays; otherwise stop before selection."
       },
       {
         "label": "Test seal",
-        "value": "Freeze the complete v3 design before fresh caches and pilots; append selection authorization against the unchanged digest after the October gate. Complete and bind all nine final heads before atomic dataset-level opening. Authorize novel inputs before their annotation loader runs; after opening, prohibit scientific training and selection across v1/v2/v3 paths."
+        "value": "Preserve the original design/locks and Week 4 closure. Admit the completion release at study-v3/revisions/execution-r1/ with explicit predecessor/successor bindings and fresh caches/pilots. The successor digest may change for provenance paths; scientific settings must compare equal and its digest stays fixed thereafter. One shared dataset seal spans all releases. Lock all nine final heads and atomically authorize before novel loading; forbid subsequent training/selection across versions."
       },
       {
         "label": "Historical access audit",
@@ -78,6 +78,10 @@
       {
         "label": "December delivery",
         "value": "Finish final heads and locks by November 29, complete novel evaluation by December 6, and preserve December 7-18 for analysis and delivery. Regularizer-only control is omitted before new scores; the 26-method v2 benchmark, fine-tuning and Multi-Similarity are future studies."
+      },
+      {
+        "label": "October 9 execution amendment",
+        "value": "Complete the currently disabled final-training, novel-extraction, selection/final authorization, corrupted-development evaluation and actual v3 report interfaces before selection. A new immutable completion release and fresh admission evidence are chosen over bypass wrappers or relabeled artifacts. No scientific settings, accuracy-based acceptance rules or new evaluation arms are added. Implementation remains pending."
       }
     ],
     "experimentalDesign": [
@@ -132,6 +136,18 @@
       {
         "label": "Metrics",
         "value": "Use cosine retrieval with a fixed gallery order for ties and query-weighted top-1, MRR and R@5. With one relevant exemplar, mAP equals MRR. Report all methods, seeds, clean/corrupted cells and both query definitions, alongside actual resource costs and retained failures."
+      },
+      {
+        "label": "Failure adjudication",
+        "value": "Freeze infrastructure, numerical/health, implementation/provenance and unresolved failure categories before ranking. Infrastructure needs logs/accounting, cause resolution and identical fresh retries; allow one automatic retry, then record cause/remedy and renewed capacity. Numerical failures cannot be rerun to shop for success. Block unresolved eligibility; correct implementation defects across every affected comparison. Report all 27 slots, retries, updates, hashes, unrounded metrics, eligibility and cost. An endpoint winner does not expand the grid."
+      },
+      {
+        "label": "Measured execution and reuse",
+        "value": "Reuse nine development corruption encodings across three pilot heads and one novel gallery plus ten query-condition encodings across nine final heads. Retain 21 final pre-head files, nine gallery projections and 180 query projections. Time hashing/loading, preprocessing, encoding, CPU projection/revalidation, retrieval and serialization separately. Start with one scientific subprocess at a time on the validated L40S; preserve float32 arithmetic and validation. Group fresh runs only after measured savings and whole-allocation capacity checks."
+      },
+      {
+        "label": "Provisional remaining compute",
+        "value": "Pilot extrapolation estimates 6.23 allocated GPU hours for selection/final head jobs including 25% slack; fresh completion-release caches/pilots add 2.46 hours with slack. Combined 8.69 hours excludes CPU validation, development/novel corruption extraction, projection/report work, queues, retries and engineering/researcher time. Replace with successor and full-size measurements before the gate; do not apply slack twice."
       }
     ],
     "corruptionPrinciple": "Apply each family independently to clean, fully preprocessed query tensors before the frozen encoder; keep the gallery clean. Derive a per-sample family seed from SHA-256 of protocol-v3, sample ID and family, excluding severity. Share the realized corruptions across methods/seeds and nest severities. These are synthetic tensor stress tests, not measured camera occlusion or pose-estimator shifts.",
@@ -154,11 +170,15 @@
       },
       {
         "label": "Identity and geometry checks",
-        "value": "Severity zero is byte-identical to clean input. Verify exact counts, nesting, shared jitter, missingness, boundary frames, two-person cases, fallback and fresh-process reproducibility on a fixed development panel. Record effective damage, zero-damage cases and fallback frequency; never redraw corruption or drop a troublesome novel query."
+        "value": "Freeze 40 base rows: two smallest SHA256(protocol-v3|geometry-panel-v1| + sample_id) per development action, with sample-ID tie-breaks. Add up to eight deterministic support/second-person/scale/fallback/all-missing sentinels, deduplicate and log absent categories. Record sorted IDs/hashes outside Git before corrupted scores; use constructed fixtures for absent cases. Repeat all panel conditions in two fresh processes and require exact output agreement plus identity/nesting/missingness checks. This is engineering coverage, not a statistical sample."
       },
       {
         "label": "Preselection verification",
         "value": "By October 18 complete all nine full-size development query paths. Time a maximum-severity pass per family through source checks, preprocessing, encoding, storage, projection of three pilot heads and full retrieval. Corrupted development scores may validate the evaluator but cannot choose settings, severities, rates or duration."
+      },
+      {
+        "label": "Full-query damage telemetry",
+        "value": "During all nine full 18,929-query development paths, record clean observed support (confidence > 0), newly masked counts/fractions, jitter per-coordinate RMS sqrt(sum_observed(dx^2 + dy^2)/(2*N_observed))/own-or-fallback scale (undefined for zero observed locations), fallback fraction, zero-damage and undefined-denominator counts. Report min/median/95th percentile/max over finite per-row values, using NumPy linear quantiles for median/p95. No outcome-based severity changes, query exclusions or redraws."
       }
     ],
     "primaryFormula": "drop(method, seed, cell) = clean_top1(method, seed) − corrupted_top1(method, seed, cell)",
@@ -172,7 +192,10 @@
       "Support the single confirmatory statement of smaller clean-to-corrupt top-1 degradation only if the interval upper bound is below zero. Otherwise report a null or contrary result. Always show clean and absolute corrupted accuracy and the descriptive Contextual-minus-Contrastive corrupted-accuracy difference; smaller degradation need not mean better corrupted retrieval.",
       "Report all three seed effects, nine cell effects/curves and 20 leave-one-action-out effects. For each sensitivity, remove only that action’s query observations while keeping all 20 gallery anchors and original ranks. Report range and sign changes descriptively, without new tests.",
       "SupCon, exact-official queries, individual cells, seed variation and sensitivities are descriptive. No extra superiority tests, selected winning cells or unique causal attribution to contextual neighborhoods. Report the effects of margins and regularization as part of the full recipe.",
-      "Missing, invalid or unbound cells prevent a complete report. Keep every attempt and preserve the test-opening record after a crash. Post-opening scientific or implementation corrections must be disclosed as deviations; they cannot silently replace the confirmatory pipeline."
+      "Missing, invalid or unbound cells prevent a complete report. Keep every attempt and preserve the test-opening record after a crash. Post-opening scientific or implementation corrections must be disclosed as deviations; they cannot silently replace the confirmatory pipeline.",
+      "Before selection, test the actual v3 report entry point and its exact 180-cell fixture matrix. Show clean accuracy, mean corrupted accuracy, drop, contextual-minus-contrastive gaps and Delta/interval in percentage points together; verify Delta = clean gap - mean corrupted gap. Keep every seed/cell and both query definitions.",
+      "Prewrite claim cases: upper Delta bound below zero supports smaller degradation; a nonpositive absolute corrupted gap prevents describing higher corrupted accuracy. An interval containing zero is inconclusive, not equivalence/no effect; lower bound above zero favors greater contextual degradation. No invented useful-effect cutoff or extra test. Explain percentage points also as descriptive correct retrievals per 1,000 queries.",
+      "Before selection report development metadata counts by action: queries, performance groups, views/group, distinct performers and largest performer share of groups. Produce the novel counterpart from permitted metadata before opening. These tables expose residual dependence without changing the bootstrap or implying participant-generalization."
     ],
     "scopeExclusions": [
       "The regularizer-only control is omitted before new pilot or selection scores as a scope/capacity decision, not a negative experimental result.",
@@ -801,12 +824,13 @@
       "startDate": "2026-10-12",
       "endDate": "2026-10-18",
       "phase": "Preselection go/no-go",
-      "title": "Corruptions, analysis and capacity",
-      "objective": "Complete every scientific and measured resource prerequisite for the October 18 selection decision.",
-      "deliverable": "Nine verified development corruption paths, fixed analysis fixtures and an immutable go/no-go report against the unchanged v3 protocol digest.",
+      "title": "Complete the execution path and preselection evidence",
+      "objective": "Complete one successor release, revalidate its caches/pilots and meet every scientific/resource prerequisite before selection.",
+      "deliverable": "A reviewed completion release, full fixture-to-report rehearsal, fresh bound admission evidence, nine verified development conditions and immutable go/no-go report.",
       "risks": [
-        "The September 29 quota observation is 41.95 GB short of the initial storage requirement; new measurements and authorized capacity are required.",
-        "The inherited time estimates do not establish available hours; full pipeline timings and an allocation calendar must support the deadline."
+        "Frozen final-training/extraction guards require a new release and fresh evidence; preserve original locks and Week 4 closure.",
+        "Inherited five-hour tracker estimates are not a measured forecast: re-estimate implementation, revalidation, corruptions, reporting and resource planning before October 18.",
+        "Current quota and remaining peak bytes must pass; dated capacity readings and prior GPU access are not reservations."
       ],
       "advisorPrompt": "Do all October 18 validity, seal, storage, runtime and researcher-availability criteria pass without changing the declared study?",
       "reflection": "",
@@ -820,9 +844,9 @@
           "id": "w05-task-01",
           "weekId": "week-05",
           "position": 1,
-          "title": "Audit nested corruptions and fallback",
-          "details": "Verify shared jitter fields, nested joint/frame masks, exact missingness and severity-zero identity on a fixed development panel. Freeze the training-only torso fallback and report its source IDs, value and effective damage evidence.",
-          "expectedOutput": "A deterministic geometry audit and bound fallback evidence for all nine conditions.",
+          "title": "Audit the fixed geometry panel and fallback",
+          "details": "Freeze 40 hash-selected base queries plus up to eight deterministic geometry sentinels before corrupted scores. Cover absent categories with fixtures, repeat all conditions in two fresh processes, and require exact identity/nesting/missingness checks. Bind the existing training-only fallback 0.6601371765136719 and original evidence; do not estimate a new value. Record full-query damage/fallback summaries under plan Section 5.",
+          "expectedOutput": "Immutable panel IDs/hashes, invariant/repeatability receipts and full-query damage denominators for all nine conditions.",
           "required": true,
           "estimateMinutes": 90,
           "state": "todo",
@@ -835,9 +859,9 @@
           "id": "w05-task-02",
           "weekId": "week-05",
           "position": 2,
-          "title": "Complete full development corruption paths",
-          "details": "Run all nine full-size development query paths and retain artifacts. Time maximum severity per family through provenance checks, preprocessing, encoding, storage, projection of all three pilot heads and retrieval. Scores cannot select recipes or settings.",
-          "expectedOutput": "Complete identities/invariants for nine conditions and measured end-to-end family timings.",
+          "title": "Revalidate the release and development paths",
+          "details": "After the completion-release freeze, regenerate parity, all five clean caches and all three full pilots under successor bindings; independently validate/account for them while retaining original evidence. Then complete all nine 18,929-query corrupted development paths, reused across three pilot heads. Time maximum severity per family through all CPU/I/O/GPU stages. Corrupted scores cannot select settings.",
+          "expectedOutput": "Fresh successor admission receipts, nine complete corruption paths, 27 head projections and measured stage-level runtime/memory/bytes.",
           "required": true,
           "estimateMinutes": 90,
           "state": "todo",
@@ -850,9 +874,9 @@
           "id": "w05-task-03",
           "weekId": "week-05",
           "position": 3,
-          "title": "Verify the fixed analysis",
-          "details": "Use hand-ranked and unequal-view fixtures to verify query weighting, within-action performance-cluster draws, fixed seeds, percentile intervals and leave-one-action-out with an unchanged gallery. Freeze analysis code before selection.",
-          "expectedOutput": "Reproducible metric and conditional-bootstrap fixtures bound to the v3 analysis.",
+          "title": "Complete and rehearse the execution/report path",
+          "details": "Do this dependency first: finish selection/final authorization, final training, novel roles, corrupted-development evaluation and actual v3 report dispatch in one completion release. Preserve old locks at the canonical root; use study-v3/revisions/execution-r1/ with reviewed scientific-field equality and new provenance. Rehearse actual commands on fixtures: 180 cells, ordered subsets, bootstrap/report identity, tamper/revision rejection, pre-loader atomic opening, crash/concurrency recovery and cross-version training denial. Add the metadata-dependence table and interpretation template. Opening fixtures use only a temporary synthetic registry/artifact root, never the real ledger; verify real opening records remain absent/unchanged.",
+          "expectedOutput": "Reviewed successor release and regeneration matrix; complete fixture-to-v3-report receipts and fixed analysis/interpretation template before real revalidation.",
           "required": true,
           "estimateMinutes": 60,
           "state": "todo",
@@ -866,8 +890,8 @@
           "weekId": "week-05",
           "position": 4,
           "title": "Record the October 18 go/no-go",
-          "details": "Combine valid pilots, seal audits and full pipeline timing with final-size memory evidence, an allocation calendar and researcher-confirmed hours. Require available bytes ≥ 200 × 2^30 + 1.25 × remaining peak bytes; apply at least 25% work slack plus queue/setup time. Resolve the initial 41.95 GB gap and append selection authorization against the unchanged digest, or stop for an amendment.",
-          "expectedOutput": "A measured capacity/availability report and explicit pass or documented blocked-study amendment.",
+          "details": "Require completion/revalidation/corruption/report receipts and resolved seals. Combine successor and full-size timing with current storage, an allocation calendar and researcher-confirmed available hours. Re-estimate separate implementation/review, revalidation, corruption, reporting and planning packages; inherited minutes are not capacity. Require reserve plus 1.25 times remaining peak bytes and 25% work slack plus queue/setup. Append selection authorization against the admitted successor digest only if all pass.",
+          "expectedOutput": "Measured dependency, capacity and availability ledger plus immutable selection authorization or explicit blocker; no date-based waiver.",
           "required": true,
           "estimateMinutes": 60,
           "state": "todo",
@@ -882,7 +906,7 @@
           "id": "w05-gate-01",
           "weekId": "week-05",
           "position": 1,
-          "criterion": "All nine development conditions pass nesting, fallback, identity, deterministic-output and full pipeline checks.",
+          "criterion": "The fixed geometry panel and all nine full development conditions pass exact nesting, fallback, identity and fresh-process checks, with full-query damage telemetry and reusable head projections.",
           "required": true,
           "state": "pending",
           "evidence": "",
@@ -894,7 +918,7 @@
           "id": "w05-gate-02",
           "weekId": "week-05",
           "position": 2,
-          "criterion": "The predeclared conditional analysis is tested; all three pilots and historical seal audits remain valid under the unchanged protocol digest.",
+          "criterion": "Completion-release scientific equivalence, full command/report rehearsal, fresh parity/five caches/three pilots, analysis/interpretation fixtures and shared seal audits all pass with successor bindings.",
           "required": true,
           "state": "pending",
           "evidence": "",
@@ -906,7 +930,7 @@
           "id": "w05-gate-03",
           "weekId": "week-05",
           "position": 3,
-          "criterion": "The October 18 schedule, storage and availability report passes and authorizes selection; otherwise no sweep starts.",
+          "criterion": "The measured dependency/schedule/storage/availability ledger passes, including revalidation and all remaining work with slack, before immutable successor selection authorization; otherwise no sweep starts.",
           "required": true,
           "state": "pending",
           "evidence": "",
@@ -943,7 +967,7 @@
           "weekId": "week-06",
           "position": 1,
           "title": "Verify selection authorization",
-          "details": "Check the unchanged v3 digest, complete pilot/corruption/analysis evidence, historical seal audit and measured capacity decision before the first selection job.",
+          "details": "Verify the admitted completion-release digest, fresh pilot/cache/corruption evidence, actual report rehearsal, shared seal and measured resource decision. Freeze the complete 27-slot matrix and objective failure/retry ledger before the first selection job.",
           "expectedOutput": "A verified immutable selection authorization and exact 27-run attempt matrix.",
           "required": true,
           "estimateMinutes": 60,
@@ -988,7 +1012,7 @@
           "weekId": "week-06",
           "position": 4,
           "title": "Maintain the attempt and capacity ledger",
-          "details": "Retain successes, partial outputs and failures. Retry only identical infrastructure-failed attempts from scratch; record updated measured bytes and remaining-work forecasts.",
+          "details": "Classify failures from logs/integrity evidence before ranking under the fixed four-category policy. Retain every attempt and retry lineage. Permit one automatic evidenced infrastructure retry with identical settings; further retries need documented diagnosis/remedy and renewed capacity. Numerical failure is not a retry lottery.",
           "expectedOutput": "A current immutable attempt ledger with all failures and current capacity checks.",
           "required": true,
           "estimateMinutes": 60,
@@ -1080,7 +1104,7 @@
           "weekId": "week-07",
           "position": 2,
           "title": "Reproduce candidate ranking",
-          "details": "Within each arm rank eligible three-seed candidates by mean epoch-20 clean top-1, then mean MRR, then lower learning rate, using unrounded metrics. Report unequal numbers of eligible candidates.",
+          "details": "Within each arm rank eligible three-seed candidates by mean epoch-20 clean top-1, then mean MRR, then lower learning rate, using unrounded metrics. Report unequal numbers of eligible candidates. Publish all 27 slots and nine candidate means/ineligibility reasons, retry lineage, actual updates and costs. An endpoint rate winner does not expand the grid.",
           "expectedOutput": "An independently reproducible candidate table with tie and eligibility decisions.",
           "required": true,
           "estimateMinutes": 90,
@@ -1095,7 +1119,7 @@
           "weekId": "week-07",
           "position": 3,
           "title": "Lock the selected configurations",
-          "details": "Bind the three selected rates, full evidence, attempt provenance and timestamp to the unchanged protocol. If any arm has no valid candidate, stop and document the amendment.",
+          "details": "Bind all three selected rates, complete candidate/attempt evidence and timestamp to the unchanged admitted successor digest. If an arm has no eligible three-seed candidate, stop for a documented amendment.",
           "expectedOutput": "A timestamped selection lock for all three recipes, or an explicit blocker.",
           "required": true,
           "estimateMinutes": 90,
@@ -1431,7 +1455,7 @@
           "weekId": "week-10",
           "position": 1,
           "title": "Audit the evaluator end to end",
-          "details": "Verify hand-ranked metrics, deterministic ties, both query definitions, cache subset identity, all-head projection and the expected 180-cell completeness rules using permitted fixtures and development data.",
+          "details": "Independently repeat the preselection full-command rehearsal against the locked final implementation and actual nine-head set. Verify metrics, ties, ordered primary/official subsets, role bindings, v3 report dispatch and exact 180-cell missing/duplicate rejection on permitted evidence.",
           "expectedOutput": "An independent evaluator and completeness-verifier report.",
           "required": true,
           "estimateMinutes": 150,
@@ -1475,8 +1499,8 @@
           "id": "w10-task-04",
           "weekId": "week-10",
           "position": 4,
-          "title": "Prepare report and figure templates",
-          "details": "Rehearse clean/corrupted accuracy, degradation, conditional intervals, seed/cell/leave-one-action-out tables and costs from development or fixture records. Mark examples as non-final.",
+          "title": "Independently verify the existing report templates",
+          "details": "Audit the templates already tested before selection: clean/corrupted accuracy, degradation and Delta identity, conditional intervals, all seed/cell/LOAO tables, cost and fixed claim cases. Reproduce from permitted fixture/development ranks; do not design a new analysis from final outcomes.",
           "expectedOutput": "Reproducible report/figure templates ready for locked final results.",
           "required": true,
           "estimateMinutes": 60,
@@ -1690,7 +1714,7 @@
           "weekId": "week-12",
           "position": 2,
           "title": "Extract the final novel conditions",
-          "details": "Encode one clean gallery and the novel query union for clean plus nine corruptions. Export two immutable role-specific query caches per condition and verify that primary rows are the exact ordered subset of exact-official rows.",
+          "details": "Encode one clean gallery and the novel query union for clean plus nine corruptions. Export two immutable role-specific query caches per condition and verify that primary rows are the exact ordered subset of exact-official rows. Verify ten query-condition encodings plus one gallery encoding yield 21 role-specific pre-head files, with no repeated encoding per head.",
           "expectedOutput": "Authorized deterministic caches for both query definitions with complete corruption and source provenance.",
           "required": true,
           "estimateMinutes": 90,
@@ -1705,7 +1729,7 @@
           "weekId": "week-12",
           "position": 3,
           "title": "Evaluate all heads and cells",
-          "details": "Apply all nine final heads to the clean gallery and every query role/condition. Produce top-1, MRR, R@5 and per-query ranks for three methods × three seeds × ten conditions × two query definitions.",
+          "details": "Apply all nine final heads to the clean gallery and every query role/condition. Produce top-1, MRR, R@5 and per-query ranks for three methods × three seeds × ten conditions × two query definitions. Reuse nine clean gallery projections; retain all 180 role-specific query projections and integrity checks.",
           "expectedOutput": "180 unique finite result cells and their checkpoint-bound per-query evidence.",
           "required": true,
           "estimateMinutes": 120,
@@ -1797,7 +1821,7 @@
           "weekId": "week-13",
           "position": 1,
           "title": "Compute the locked primary analysis",
-          "details": "Run 10,000 within-action performance-cluster bootstrap replicates with fixed seeds/actions and query-weighted multiplicities. Report Delta and its 95% percentile interval; claim smaller degradation only if the upper bound is below zero.",
+          "details": "Run 10,000 within-action performance-cluster bootstrap replicates with fixed seeds/actions and query-weighted multiplicities. Report Delta and its 95% percentile interval; claim smaller degradation only if the upper bound is below zero. Use the pretested v3 report dispatch; an interval containing zero is inconclusive, not equivalence or absence of an effect.",
           "expectedOutput": "A reproducible conditional primary estimate/interval and positive, null or contrary conclusion.",
           "required": true,
           "estimateMinutes": 180,
@@ -1812,7 +1836,7 @@
           "weekId": "week-13",
           "position": 2,
           "title": "Publish complete descriptive results",
-          "details": "Show clean and absolute corrupted accuracy, Contextual-minus-Contrastive corrupted differences, every seed/cell effect, SupCon, exact-official results and 20 leave-one-action-out sensitivities with a fixed gallery.",
+          "details": "Show clean and absolute corrupted accuracy, Contextual-minus-Contrastive corrupted differences, every seed/cell effect, SupCon, exact-official results and 20 leave-one-action-out sensitivities with a fixed gallery. Show the clean/corrupted gap decomposition beside Delta in percentage points and per-1,000-query descriptive scale; no new practical-effect threshold. Keep residual participant dependence and fixed-seed/action/gallery conditioning beside the interval.",
           "expectedOutput": "All prespecified tables and curves, including sign changes and conditional limits.",
           "required": true,
           "estimateMinutes": 120,
@@ -1870,7 +1894,7 @@
           "id": "w13-gate-02",
           "weekId": "week-13",
           "position": 2,
-          "criterion": "The confirmatory statement follows the upper-bound-below-zero rule; absolute accuracy and recipe-level/conditional limitations accompany it.",
+          "criterion": "The prespecified interval rule and interpretation cases are followed; the Delta identity, absolute accuracy, full-recipe attribution and conditional/dependence limitations accompany every primary claim.",
           "required": true,
           "state": "pending",
           "evidence": "",
@@ -2127,6 +2151,36 @@
       "purpose": "Published source for supervised contrastive learning; v3 declares the single-view temperature-0.07 pose adaptation as a descriptive comparator.",
       "verifiedAt": "2026-09-29",
       "version": 1
+    },
+    {
+      "id": "source-search-reporting",
+      "title": "Show Your Work: Improved Reporting of Experimental Results",
+      "authors": "Dodge et al.",
+      "year": 2019,
+      "canonicalUrl": "https://aclanthology.org/D19-1224/",
+      "purpose": "Supports equal search-budget disclosure and reporting all development trials, eligibility and compute.",
+      "verifiedAt": "2026-10-09",
+      "version": 1
+    },
+    {
+      "id": "source-benchmark-variance",
+      "title": "Accounting for Variance in Machine Learning Benchmarks",
+      "authors": "Bouthillier et al.",
+      "year": 2021,
+      "canonicalUrl": "https://proceedings.mlsys.org/paper_files/paper/2021/file/0184b0cd3cfb185989f858a1d9f5c1eb-Paper.pdf",
+      "purpose": "Motivates explicit sources of variability and conditional uncertainty; does not validate this exact bootstrap assumption.",
+      "verifiedAt": "2026-10-09",
+      "version": 1
+    },
+    {
+      "id": "source-natural-shift",
+      "title": "Measuring Robustness to Natural Distribution Shifts in Image Classification",
+      "authors": "Taori et al.",
+      "year": 2020,
+      "canonicalUrl": "https://proceedings.neurips.cc/paper/2020/hash/d8330f857a17c53d217014ee776bfd50-Abstract.html",
+      "purpose": "Image evidence motivates limiting synthetic-stress claims; it does not establish pose robustness.",
+      "verifiedAt": "2026-10-09",
+      "version": 1
     }
   ],
   "weekSources": [
@@ -2324,6 +2378,48 @@
       "sourceId": "source-plan-v3",
       "purpose": "Use the final frozen one-shot v3 plan for current Week 3 implementation, auxiliary preparation and immutable design-freeze readiness; retain existing links as historical evidence.",
       "priority": "required",
+      "version": 1
+    },
+    {
+      "weekId": "week-05",
+      "sourceId": "source-search-reporting",
+      "purpose": "Supports equal search-budget disclosure and reporting all development trials, eligibility and compute.",
+      "priority": "recommended",
+      "version": 1
+    },
+    {
+      "weekId": "week-13",
+      "sourceId": "source-search-reporting",
+      "purpose": "Supports equal search-budget disclosure and reporting all development trials, eligibility and compute.",
+      "priority": "recommended",
+      "version": 1
+    },
+    {
+      "weekId": "week-05",
+      "sourceId": "source-benchmark-variance",
+      "purpose": "Motivates explicit sources of variability and conditional uncertainty; does not validate this exact bootstrap assumption.",
+      "priority": "recommended",
+      "version": 1
+    },
+    {
+      "weekId": "week-13",
+      "sourceId": "source-benchmark-variance",
+      "purpose": "Motivates explicit sources of variability and conditional uncertainty; does not validate this exact bootstrap assumption.",
+      "priority": "recommended",
+      "version": 1
+    },
+    {
+      "weekId": "week-05",
+      "sourceId": "source-natural-shift",
+      "purpose": "Image evidence motivates limiting synthetic-stress claims; it does not establish pose robustness.",
+      "priority": "recommended",
+      "version": 1
+    },
+    {
+      "weekId": "week-13",
+      "sourceId": "source-natural-shift",
+      "purpose": "Image evidence motivates limiting synthetic-stress claims; it does not establish pose robustness.",
+      "priority": "recommended",
       "version": 1
     }
   ]
