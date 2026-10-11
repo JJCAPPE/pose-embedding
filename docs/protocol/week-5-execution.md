@@ -86,6 +86,10 @@ limited Thanksgiving-week availability, and reported no SCC access limits.
 These are future planning bounds, not hours worked. Budget no guaranteed hours
 for November 23–29; identify any weeks that need the authorized contingency.
 SCC jobs use ordinary queued access; no reserved GPU time is claimed.
+The researcher subsequently requested, **“Leave actual time unreported,”** and
+confirmed 5 hours weekly as normal availability. Keep actual minutes at the
+existing unreported value; do not convert future availability into hours worked
+or repeatedly request actual time.
 
 Target the final lock review before Thanksgiving, retaining November 29 as the
 hard lock deadline. Novel evaluation must finish by December 6, with December
@@ -313,6 +317,59 @@ source, scientific setting, original artifact or approved budget is changed.
 There is no running GPU job at this diagnostic checkpoint. Other independent
 Week 5 work may continue; all scientific gates remain pending.
 
+The synthetic diagnostic job **8028141** was queued at 23:18:42 UTC. Reviewed
+tools were transferred and byte-verified under
+`study-v3/operations/week5-gpu-tools/20261011T231839Z/`; the `tools.json` SHA-256
+is `9e7aaee8832cb6fa5481f16eb50d44c802f5deff8eb80ccfc9010f3248dd4ad0`.
+Diagnostic output is allocated a new immutable directory at
+`study-v3/operations/week5-gpu-diagnostic/20261011T231839Z/`. No hardware outcome
+is claimed at submission; cache revalidation remains blocked.
+
+The seven operational helpers and four test files are archived separately in
+`scripts/operations/` and `tests/unit/`, with transferred source bytes preserved.
+All 52 design and five scientific hashes remain unchanged. The local 110-test
+operational suite, supplementary geometry self-check, Ruff/format checks and
+workspace verification passed. These software checks do not substitute for the
+allocated diagnostic. The [runbook](scc-v3-runbook.md#week-5-execution-r1-successor)
+routes all four GPU modes through the external controller only after independent
+verification of its required diagnostic receipt; CPU validation keeps the
+original frozen commands.
+
+### Allocated diagnostic passed; new cache attempt submitted
+
+Diagnostic **8028141** completed on `ece@scc-j04` with four slots: scheduler
+`failed=0`, `exit_status=0`, 35 seconds wall time, from 23:20:08 to 23:20:43 UTC.
+Independent verification at 23:23:22.796524 UTC checked all 58 evidence hashes,
+both dataset seals and all 12 RAM/storage samples. Parent PID 786130 remained
+CUDA-uninitialized; holder PID 786171 blocked the held-context probe, then both
+sequential probes succeeded. This reproduces the failed controller's mechanism
+and verifies the short-lived-context remedy without using scientific data.
+
+The diagnostic summary in the directory above has SHA-256
+`b608b95a18ff02ceee2467f3e7025dce8e57f04dcafd65406a2515b156b51395`.
+Independent verification and accounting are retained under
+`study-v3/operations/week5-launches/20261011T232314Z/`, including
+`diagnostic-verification.json`. The reviewed controller SHA-256 is
+`cbf13de9bda43b78bef8d3005bf2ccadb225c0daad5bc27b91e9329ee911e7ac`.
+
+New cache job **8028152** was submitted at 23:23:23 UTC using that controller
+and exact diagnostic binding; its launch receipt is in the same directory.
+At submission it was queued, with no actual allocation or cache result inferred.
+Task 02 resumes in progress. Attempt 8028119 remains preserved; all scientific
+gates remain pending. The next prerequisite after successful accounting is
+independent validation of all five fresh caches before the paired pilots.
+
+The reviewed admission helpers were separately transferred as revision 2 under
+`study-v3/operations/week5-admission-tools/20261011T232448Z/`, with `tools.json`
+SHA-256 `f71d7efe1634ad8b823be191dca8389c8dee144c5457da0a990d55a63bd33ce5`.
+This binds `pose-week5-admission-template-r2.py`,
+`pose-week5-run-admission-r2.py`, the unchanged scheduler wrapper, two test files
+and five planning drafts with measurements still null. The earlier bundle is
+preserved. The 110 new local checks comprise 57 admission and 53 GPU/diagnostic
+tests. No candidate or admission job was launched. The persistent status link
+now points to this bundle and records cache job 8028152, still queued at the
+23:24:48 UTC observation.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -383,16 +440,16 @@ supplementary checks and independently verified the actual dependence tables.
 Task 03 is complete. The fixed geometry panel passed independent verification
 and exact fresh-process repeats; the fresh five-cache job was submitted.
 
-**Next:** Verify the controller correction in an allocated synthetic check;
-then verify fresh caches and complete pilots, development corruptions,
+**Next:** Verify new cache attempt 8028152 and its independent cache validator;
+then complete pilots, development corruptions,
 full-query damage telemetry and timing. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
-**Open issues:** The first cache attempt failed before parity or cache creation;
-the verified controller context conflict is awaiting a tested remedy. Full Week 5 evidence and selection
-authorization are unfinished.
-Actual researcher minutes remain unreported. Technical completion and formal
+**Open issues:** Fresh cache results and the remaining Week 5 admission evidence
+are unfinished; the failed first attempt is preserved after its allocated remedy
+test passed. Actual researcher minutes remain unreported at the researcher's
+explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.

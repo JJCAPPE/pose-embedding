@@ -144,9 +144,21 @@ Retain `$HOME/pose-embed-scc/WEEK5-STATUS.txt` in that session with the current
 step, immutable release, job IDs/logs, artifact paths, blockers and next command;
 copy each meaningful status into the operation evidence before updating it.
 
-The successor wrapper is CPU-only unless the submission explicitly requests
-the L40S resources below. It serializes operations using an advisory lock and
-starts one scientific subprocess at a time. It writes immutable attempts under
+Use the frozen successor wrapper for the CPU stages below and the reviewed
+external controller for `caches`, `pilot`, `corruptions` and `timing`. The
+original GPU invocation failed on an exclusive-process SCC GPU: its persistent
+monitoring parent initialized CUDA before the scientific child. Preserve that
+failed attempt and release `731938a`; do not use that parent GPU path again.
+The external controller keeps its parent CUDA-uninitialized and performs actual
+GPU allocation/memory probes in short-lived children that exit before each
+scientific stage. It requires a hash-bound, passing allocated diagnostic first.
+Allocated diagnostic job 8028141 passed independent verification: a held CUDA
+context blocked its probe, then two sequential probes passed with a
+CUDA-uninitialized parent. Its evidence permits the corrected cache invocation;
+it does not establish cache or scientific admission success.
+
+Both controllers serialize operations using the same advisory lock and start
+one scientific subprocess at a time. They write immutable attempts under
 `study-v3/operations/` and scientific output under
 `study-v3/revisions/execution-r1/attempts/`. Each command, log, status and resource
 sample is retained. Every 60 seconds it records system RAM, child-process-group
@@ -154,6 +166,28 @@ RSS, `nvidia-smi`, filesystem free bytes and project quota. A failed monitor,
 reserve breach, or allocated-RAM breach terminates the child process group and
 retains the failure. Scheduler TERM/HUP also cleans up the child group; after
 an uncatchable kill, an absent outcome is an incomplete attempt, never success.
+
+The reviewed external GPU tools are retained at
+`study-v3/operations/week5-gpu-tools/20261011T231839Z/`, with `tools.json`
+SHA-256 `9e7aaee8832cb6fa5481f16eb50d44c802f5deff8eb80ccfc9010f3248dd4ad0`.
+Their source is archived in `scripts/operations/`; invoke the verified transferred
+copies from the clean frozen checkout, without copying them into that release.
+The 52 design and five scientific hashes remain unchanged. Set
+`V3_GPU_CONTROLLER` and `V3_GPU_QSUB` to the exact transferred paths verified
+against that manifest. After successful diagnostic accounting and independent
+receipt verification, set `V3_GPU_DIAGNOSTIC` to its passed summary and
+`V3_GPU_DIAGNOSTIC_SHA256` to its reviewed SHA-256. The controller rehashes the
+summary and its complete evidence chain before launch; a queued job, synthetic
+unit test or unverified file is not a passing receipt. The diagnostic itself is
+synthetic, creates no scientific cache and does not authorize selection.
+
+```bash
+V3_GPU_TOOLS="$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-gpu-tools/20261011T231839Z"
+V3_GPU_CONTROLLER="$V3_GPU_TOOLS/pose-week5-run-gpu.py"
+V3_GPU_QSUB="$V3_GPU_TOOLS/pose-week5-gpu.qsub"
+V3_GPU_DIAGNOSTIC="$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-gpu-diagnostic/20261011T231839Z/summary.json"
+V3_GPU_DIAGNOSTIC_SHA256=b608b95a18ff02ceee2467f3e7025dce8e57f04dcafd65406a2515b156b51395
+```
 
 Before each submission set `V3_REMAINING_PEAK_BYTES` from the current itemized
 remaining forecast. It is an upper bound held conservatively during that job;
@@ -198,9 +232,14 @@ environment file; save a separate successor environment and its hash.
 
 ```bash
 export POSE_EMBED_MANIFEST_SET="$POSE_EMBED_ARTIFACT_ROOT/study-v3/revisions/execution-r1/manifests/manifest-set.json"
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
-  -l gpus=1,gpu_type=L40S,gpu_c=7.0,gpu_memory=16G \
-  scripts/study_v3_execution.qsub caches \
+: "${V3_GPU_CONTROLLER:?Set the verified transferred controller path}"
+: "${V3_GPU_QSUB:?Set the verified transferred scheduler wrapper path}"
+: "${V3_GPU_DIAGNOSTIC:?Require the independently verified passed diagnostic}"
+: "${V3_GPU_DIAGNOSTIC_SHA256:?Set the reviewed diagnostic summary SHA-256}"
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
+  "$V3_GPU_CONTROLLER" caches \
+  --diagnostic-receipt "$V3_GPU_DIAGNOSTIC" \
+  --diagnostic-sha256 "$V3_GPU_DIAGNOSTIC_SHA256" \
   --remaining-peak-bytes "$V3_REMAINING_PEAK_BYTES" \
   --recorded-by "researcher-authorized Week 5 execution"
 ```
@@ -252,9 +291,10 @@ outcome before submitting the next. Repeat this exact command with `contextual`
 and `supcon`; do not submit the three jobs concurrently.
 
 ```bash
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
-  -l gpus=1,gpu_type=L40S,gpu_c=7.0,gpu_memory=16G \
-  scripts/study_v3_execution.qsub pilot --method contrastive \
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
+  "$V3_GPU_CONTROLLER" pilot --method contrastive \
+  --diagnostic-receipt "$V3_GPU_DIAGNOSTIC" \
+  --diagnostic-sha256 "$V3_GPU_DIAGNOSTIC_SHA256" \
   --cache-dir "$V3_CACHES" --remaining-peak-bytes "$V3_REMAINING_PEAK_BYTES" \
   --recorded-by "researcher-authorized Week 5 execution"
 ```
@@ -279,15 +319,17 @@ gallery projections are also retained with scientific sidecars. No scores
 select a condition, head, recipe, threshold or retry.
 
 ```bash
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
-  -l gpus=1,gpu_type=L40S,gpu_c=7.0,gpu_memory=16G \
-  scripts/study_v3_execution.qsub corruptions --cache-dir "$V3_CACHES" \
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
+  "$V3_GPU_CONTROLLER" corruptions --cache-dir "$V3_CACHES" \
+  --diagnostic-receipt "$V3_GPU_DIAGNOSTIC" \
+  --diagnostic-sha256 "$V3_GPU_DIAGNOSTIC_SHA256" \
   --pilot-dirs "$V3_CONTRASTIVE" "$V3_CONTEXTUAL" "$V3_SUPCON" \
   --remaining-peak-bytes "$V3_REMAINING_PEAK_BYTES" \
   --recorded-by "researcher-authorized Week 5 execution"
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
-  -l gpus=1,gpu_type=L40S,gpu_c=7.0,gpu_memory=16G \
-  scripts/study_v3_execution.qsub timing --cache-dir "$V3_CACHES" \
+qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
+  "$V3_GPU_CONTROLLER" timing --cache-dir "$V3_CACHES" \
+  --diagnostic-receipt "$V3_GPU_DIAGNOSTIC" \
+  --diagnostic-sha256 "$V3_GPU_DIAGNOSTIC_SHA256" \
   --remaining-peak-bytes "$V3_REMAINING_PEAK_BYTES" \
   --recorded-by "researcher-authorized Week 5 execution"
 ```
