@@ -83,6 +83,39 @@ Login-host RAM and the GPU queue inventory are not run memory budgets. Measure
 allocated host/GPU memory, filesystem space and quota before each launch and
 periodically during work. No historical evidence was deleted.
 
+### Verified SCC software rehearsal
+
+Release [`731938a`](https://github.com/JJCAPPE/pose-embedding/commit/731938a157be575ee433d6939876f8ca0b95e459)
+was committed, synchronized and checked against SCC source hash
+`d9d683ac8b13f8362c52a435a0604c0ff06f50d5a0a8ffc61e88912e2c722a89`.
+Locked dependencies and the pinned MotionBERT upstream were verified. The work
+is available in [PR 33](https://github.com/JJCAPPE/pose-embedding/pull/33), stacked
+on the Week 4 execution branch.
+
+CPU rehearsal job **8028010**, submitted October 11 at 18:00 New York time,
+completed on `scc-pi4`: scheduler `failed=0`, `exit_status=0`, 414 seconds wall
+time. JUnit records **41 passed, zero failures/errors/skips** in 390.055 seconds.
+The real dataset seal was checked before the rehearsal at 22:02:54.822 UTC and
+after it at 22:09:29.945 UTC; both were sealed. Novel data and opening records
+used by the tests were isolated fixtures.
+
+Evidence paths relative to the canonical artifact root:
+
+- Launch: `study-v3/operations/week5-launches/20261011T220021Z/`.
+- Operation: `study-v3/operations/20261011T220254Z-8028010-rehearsal/`, containing
+  the outcome, resource records, `rehearsal.junit.xml`, and
+  `fixture-data/test_complete_v3_cli_fixture_r0/fixture-artifacts/software-rehearsal.json`.
+- Accounting and resource inspection:
+  `study-v3/operations/week5-inspection/20261011T221121Z/`.
+
+The inspection recorded 911.99 decimal GB quota free and 1,086,609,948,672
+filesystem bytes free; the rehearsal allocation had 32 GiB host memory. These
+are measurements for that checkpoint. The full campaign forecast and GPU
+admission evidence remain pending. Successor preparation job **8028032** was
+submitted next at 22:12:18 UTC;
+its result and metadata-dependence tables were not yet verified at this record.
+Task 03 stays in progress and all Week 5 gates stay pending.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -145,12 +178,14 @@ None of these software checks substitutes for SCC calibration or admission.
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
 published the active Week 5 scope; inspected SCC; recorded future availability;
-implemented and began verifying the completion path and review fixes.
+implemented and verified the completion path and review fixes; committed and
+synchronized release 731938a; passed the allocated 41-check software rehearsal
+with the real dataset seal intact.
 
-**Next:** Finish independent software/fault verification, commit and synchronize
-the clean successor, then execute allocated preparation, geometry, fresh caches,
-pilots, development corruptions and timing. Use their immutable receipts for
-the capacity decision and next-week handoff.
+**Next:** Verify the prepared successor manifests and metadata-dependence tables,
+then complete allocated geometry, fresh caches, pilots, development corruptions
+and timing. Use their immutable receipts for the capacity decision and next-week
+handoff. Software rehearsal does not replace fresh scientific admission evidence.
 
 **Open issues:** Full Week 5 evidence and selection authorization are unfinished.
 Actual researcher minutes remain unreported. Technical completion and formal
