@@ -69,6 +69,16 @@ lint, workspace checks and the production build passed. Live browser checks
 rendered the reflection, task evidence and protocol without page errors; Journey
 returned HTTP 200 and the private export redirected to sign-in.
 
+The cache-controller blocker (`ea69163`) was published through guarded migration
+`20261011230509` and deployment `dpl_3yoY1PBA3tAqRVBhVUNBrNEbuuuD`. At 23:09
+UTC, live page/export and health verified Week 5 version 9 active, task 02
+version 6 blocked, task 03 still done, and all gates pending. All other weeks
+and source links were unchanged; the public fallback matched and private export
+still redirected to sign-in. Fourteen database checks, 22 tracker unit tests,
+typecheck, focused lint, workspace checks and the production build passed. The
+browser rendered the failure evidence and protocol status without page errors;
+Journey remained available. This is an interim blocker record, not closure.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
@@ -282,13 +292,18 @@ accounting and run the independent cache validator before pilots or admission.
 ### Verified controller blocker; correction pending
 
 The saved `nvidia-smi.txt` at 23:00:10 UTC and resource record `002-0000` confirm
-GPU 0 L40S in `E. Process` (exclusive-process) mode, with the sole compute
-process being parent Python PID 81091 (426 MiB). The frozen parent calls
+GPU 0 L40S in `E. Process` (exclusive-process) mode, with sole compute entry
+Python PID 81091 (426 MiB). The frozen parent calls
 `torch.cuda.mem_get_info` and retains that CUDA context while launching parity.
 The child's initial workspace/upstream/protocol checks passed, but parity could
-not acquire the exclusive GPU. Independent review confirmed this operational
-failure mechanism. Diagnosis and failed accounting are preserved under
+not acquire the exclusive GPU. Source and resource evidence strongly support
+this operational failure mechanism; attribution of the listed GPU PID to the
+parent remains inferred until the allocated reproduction/remedy check. Diagnosis
+and failed accounting are preserved under
 `study-v3/operations/week5-cache-failure/20261011T230352Z/`.
+Its `accounting.txt` records scheduler `failed=0`, `exit_status=1`, 80 seconds
+wall time, from 22:59:35 to 23:00:55 UTC; the child command's exit status was 2.
+The scheduler completed the allocation but the scientific command did not pass.
 
 Task 02 is temporarily blocked. An external controller correction is being
 prepared with identical scientific commands, a short-lived GPU preflight child
