@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import pytest
 import torch
 
@@ -9,6 +11,68 @@ from pose_embed.losses.contextual import (
     GreaterThanSTE,
     contextual_similarity,
 )
+from pose_embed.losses.pairwise import (
+    PairwiseContrastiveLoss,
+    SupervisedContrastiveLoss,
+)
+
+
+def test_hand_calculated_contrastive_value_and_embedding_backward():
+    # Four active positive hinges average 0.9; four active negative hinges
+    # average 0.4. Only the orthogonal positives have a nonzero tangent gradient.
+    values = torch.tensor(
+        [[1.0, 0.0], [1.0, 0.0], [0.0, 1.0], [0.0, 1.0]],
+        dtype=torch.float64,
+        requires_grad=True,
+    )
+    labels = torch.tensor([0, 1, 0, 1])
+    loss = PairwiseContrastiveLoss(positive_margin=0.9, negative_margin=0.6)(
+        values, labels
+    )
+    assert float(loss.detach()) == pytest.approx(13 / 10)
+    loss.backward()
+    expected = torch.tensor(
+        [[0, -1 / 2], [0, -1 / 2], [-1 / 2, 0], [-1 / 2, 0]],
+        dtype=torch.float64,
+    )
+    torch.testing.assert_close(values.grad, expected, atol=1e-12, rtol=1e-12)
+
+
+def test_inactive_contrastive_hinges_have_zero_loss_and_gradient():
+    values = torch.tensor(
+        [[1.0, 0.0], [1.0, 0.0], [0.0, 1.0], [0.0, 1.0]],
+        dtype=torch.float64,
+        requires_grad=True,
+    )
+    loss = PairwiseContrastiveLoss(positive_margin=0.9, negative_margin=0.6)(
+        values, torch.tensor([0, 0, 1, 1])
+    )
+    assert float(loss.detach()) == 0
+    loss.backward()
+    torch.testing.assert_close(values.grad, torch.zeros_like(values))
+
+
+def test_hand_calculated_supcon_value_and_embedding_backward():
+    # Each anchor has three collinear and four orthogonal alternatives;
+    # its three positives contain one collinear and two orthogonal rows.
+    # D=3*exp(1/T)+4, L=log(D)-1/(3T). The tangent gradient includes both
+    # anchor and candidate roles: 2*(4/D-2/3)/(8T)=(1/D-1/6)/T.
+    values = (
+        torch.eye(2, dtype=torch.float64).repeat_interleave(4, dim=0).requires_grad_()
+    )
+    labels = torch.tensor([0, 1, 0, 1, 0, 1, 0, 1])
+    temperature = 0.07
+    denominator = 3 * math.exp(1 / temperature) + 4
+    loss = SupervisedContrastiveLoss(temperature=temperature)(values, labels)
+    assert float(loss.detach()) == pytest.approx(
+        math.log(denominator) - 1 / (3 * temperature), abs=1e-12, rel=1e-12
+    )
+    loss.backward()
+    tangent = (1 / denominator - 1 / 6) / temperature
+    expected = torch.tensor(
+        [[0, tangent]] * 4 + [[tangent, 0]] * 4, dtype=torch.float64
+    )
+    torch.testing.assert_close(values.grad, expected, atol=1e-12, rtol=1e-12)
 
 
 def test_comparison_backward_uses_constant_alpha_including_ties():

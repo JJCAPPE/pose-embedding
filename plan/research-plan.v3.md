@@ -1,10 +1,17 @@
 # Final v3 plan: frozen one-shot pose robustness
 
-Date: **2026-09-29**. Delivery: **2026-12-18**. Status: **final planning
+Original decision: **2026-09-29**. Execution amendment: **2026-10-09**. Delivery: **2026-12-18**. Status: **final planning
 decision; implementation and measured campaign gates remain to be completed**.
 This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-frozen-one-shot-v3.md)
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
+
+The October 9 researcher-authorized amendment adopts the specifications below
+before selection or novel opening. Scientific settings remain fixed; completing
+currently disabled stages requires a successor execution release and new
+provenance bindings. Preserve the September release, Week 4 closure and all
+original evidence. Sections 5–10 govern the remaining work; they do not assert
+that the new implementation, capacity checks or deployment have happened.
 
 Following the [final prospectus](../docs/proposal/2026/kulis_pose_sequence_retrieval_prospectus.pdf),
 the December study asks whether a **full contextual training recipe reduces
@@ -25,7 +32,7 @@ result completes the scientific objective.
 | Paired seeds | 7, 17, 29 |
 | Duration | **20 epochs for every pilot, selection run, and final run** |
 | Selection | Three learning rates per arm, each evaluated with all three seeds; clean development only |
-| Required campaign | Three engineering pilots + 27 selection runs + nine fresh final heads |
+| Required campaign | Three valid engineering pilots under the completion release + 27 selection runs + nine fresh final heads; retain the three original Week 4 pilots separately |
 | Novel evaluation | One clean gallery; clean plus nine corruptions; primary and exact-official queries; 180 result cells |
 | Uncertainty | Conditional, within-action performance-cluster bootstrap; fixed seeds/actions/anchors |
 | Optional control | **Omitted from this December study**, before any new pilot or selection score |
@@ -44,6 +51,15 @@ experimental result. Do not add it after viewing scores. The 26-method v2
 benchmark, encoder fine-tuning, Multi-Similarity, extra datasets, alternative
 batch sizes, and real pose-estimator shifts are future studies. Preserve their
 existing code and evidence; do not describe this study as completing v2.
+
+The retained transfer recipe follows the base paper's cross-dataset appendix
+rather than a new pose-specific search. Physical batches preserve its within-batch
+neighborhood operation. Frozen-backbone transfer also has precedent in
+[MotionBERT, Section 4.6/Table 4](https://arxiv.org/html/2210.06551#S4.SS6).
+Neither paper establishes optimal pose epochs, seed count or a useful-effect
+threshold. Keep the declared budget and report uncertainty instead of inventing
+such guarantees. Complete candidate and cost reporting follows
+[Dodge et al.](https://aclanthology.org/D19-1224/).
 
 ## 2. Evidence and integration base
 
@@ -92,6 +108,17 @@ must be documented separately and must expose only authorized auxiliary IDs to
 preprocessing, diagnostics, or model code. If the historical audit discovers
 actual novel representations, scores, or outcome-informed decisions, halt:
 a fresh namespace cannot restore a sealed confirmatory test.
+
+October 8 supersedes the initial feasibility uncertainty with verified clean
+caches and three valid pilots on release
+`2897f4fe4c1fb1857432a0e92a7391dde68307f5`. The dated
+[Week 4 record](https://github.com/JJCAPPE/pose-embedding/blob/033e1e3/docs/protocol/week-4-execution.md)
+reports successful independent validation and 1,008.48 decimal GB of quota free
+at one inspection. These observations are not future reservations. Historical
+root retirement was resolved through dated evidence and researcher confirmation;
+retain that resolution instead of recreating empty roots. Audit active roots
+and the retirement receipts at later gates. Original release evidence does not
+authorize a successor release automatically.
 
 ## 3. Dataset and fixed episode
 
@@ -262,6 +289,23 @@ or partial output. A verified implementation defect requires a dated
 result-blind correction and rerunning every affected comparison, not only the
 unfavorable arm. Parameter changes require a new declared protocol/grid.
 
+Before selection freeze an attempt ledger with exactly 27 matrix slots and
+separate attempt IDs. Classify failures using logs and integrity evidence before
+ranking scores:
+
+| Reason | Evidence and treatment |
+| --- | --- |
+| Infrastructure | Scheduler/node termination or verified filesystem/service interruption, with logs/accounting; resolve the cause and restart identical inputs from scratch in a new attempt. One automatic retry is allowed; further retries require a recorded cause/remedy and refreshed capacity, never an accuracy criterion. |
+| Numerical | Nonfinite loss/gradient/parameters or the fixed collapse check fails; retain the failure and make the candidate ineligible until a documented correction. Repeated launches cannot shop for a passing seed. |
+| Implementation/provenance | Wrong updates, pairing, formula, IDs or hashes; block the affected stage, identify every affected comparison and apply the release/revalidation policy. |
+| Unresolved | Preserve evidence and block eligibility; do not relabel an unexplained failure as infrastructure to obtain another draw. |
+
+The selection table contains every slot, attempt/retry lineage, eligibility
+reason, updates, initialization/batch hashes, unrounded clean metrics and costs.
+Show all nine three-seed candidate means or explicit ineligibility. An endpoint
+rate winning means best among the tested rates; it does not expand the grid.
+Poor accuracy alone never invalidates a numerically valid run.
+
 ## 5. Nested corruptions
 
 Corrupt **only queries**, after the complete deterministic preprocessing above
@@ -291,14 +335,40 @@ record the contributing IDs/count/hash and value, and freeze it before pilots.
 Do not recompute it from validation, all-100 final training, or novel queries.
 If no positive training fallback exists, the preselection gate fails.
 
-Geometry audits use a fixed development panel selected before viewing scores.
+Freeze a development-primary geometry panel before corrupted scoring. For each
+of the 20 development actions choose the two smallest
+`SHA256("protocol-v3|geometry-panel-v1|" + sample_id)` values, breaking ties by
+sample ID: 40 base rows. Add at most eight sentinels from that same query set:
+minimum-positive and maximum observed support; minimum-positive and maximum
+second-person support; minimum and maximum valid own torso scale; an observed
+row with invalid own scale; and an all-missing row. Resolve ties by the same
+hash/ID order, deduplicate, and record absent categories without substitution.
+Freeze the sorted ID list, selection-code hash and manifest hash outside Git.
+This 40–48-row panel is an engineering coverage choice, not a power sample.
+Constructed fixtures cover absent categories, boundary frames and degenerate
+scales without changing the real-data set.
 Verify unchanged shapes, exact mask counts and nesting, one shared jitter
 field, severity-zero identity, missingness preservation, boundary frames,
 two-person behavior, own-scale failure/fallback, and deterministic repeats in
 fresh processes. Record nominal damage and newly masked previously observed
 joint-frame/person observations, including zero-effective-damage cases.
-Report fallback frequency; never drop a troublesome novel query or redraw its
-corruption. A nonfinite source/artifact defect stops the relevant gate rather
+Repeat the panel's complete clean-plus-nine-condition tensor generation in
+two fresh processes under the pinned environment and require exact array/output
+hash agreement, alongside the invariant checks. Retain per-case results and
+fail the gate on any violation; do not use a model-accuracy acceptance floor.
+During the already-required full 18,929-row passes, record geometry summaries
+for every row, not just the panel. Observed support means clean confidence > 0
+at a person/frame/joint location. For masks report newly zeroed observed count,
+original observed count and their ratio; a zero denominator is recorded as
+undefined, not zero. For jitter report per-coordinate RMS displacement
+`sqrt(sum_observed(dx**2 + dy**2) / (2 * N_observed)) / scale`, using the actual
+own/fallback torso scale and unchanged confidence. No observed locations yields
+an undefined value, counted separately.
+Summarize min, median, 95th percentile and max over finite per-row values
+(using NumPy linear quantiles for median/p95),
+undefined counts, zero-damage counts and fallback count/fraction of all queries.
+These summaries describe damage, not exclusion or severity-calibration rules.
+Never drop a troublesome novel query or redraw its corruption. A nonfinite source/artifact defect stops the relevant gate rather
 than silently excluding a sample.
 
 By October 18, run all nine full-size development query corruption paths and
@@ -372,12 +442,47 @@ per-cell differences, seed variation, and sensitivities are descriptive:
 no additional superiority tests, cherry-picked winning cells, or causal
 attribution uniquely to contextual neighborhoods.
 
+Before selection produce a metadata-only development table, by action, of query
+count, performance-group count, views per group, distinct performers and the
+largest performer's share of groups. Produce its novel counterpart from the
+already-permitted metadata manifests before opening, without loading poses.
+This documents residual participant dependence; it does not make groups
+independent or replace the declared resampling unit. Keep the conditioning and
+exchangeability caveat beside the primary interval, not only in an appendix.
+[Benchmark variance research](https://proceedings.mlsys.org/paper_files/paper/2021/file/0184b0cd3cfb185989f858a1d9f5c1eb-Paper.pdf)
+supports disclosing sources of variation; three seeds do not justify population
+inference over arbitrary training runs.
+
+Build and test the report template before selection. In percentage points,
+show clean accuracy, mean corrupted accuracy, drop, their contextual-minus-
+contrastive differences and Delta with its interval in one table. Check the
+identity `Delta = clean accuracy gap - mean corrupted accuracy gap`. Report
+all cells/seeds separately as already required. Use these fixed interpretations:
+
+| Outcome | Permitted wording |
+| --- | --- |
+| Upper Delta bound < 0, mean corrupted gap > 0 | Evidence of smaller degradation; higher corrupted accuracy is descriptive. |
+| Upper Delta bound < 0, mean corrupted gap <= 0 | Evidence of smaller degradation without higher absolute corrupted accuracy. |
+| Interval includes zero | Inconclusive for the declared claim; not evidence of equivalence or no effect. |
+| Lower Delta bound > 0 | Results favor greater contextual degradation under this mixture. |
+
+Do not invent a smallest meaningful effect from these papers. Give effect sizes
+in percentage points and their descriptive per-1,000-query scale (1 point = 10
+correct retrievals per 1,000 under the declared mixture), without a new pass
+threshold, equivalence test or deployment recommendation. The complete recipe
+comparison cannot isolate contextual neighborhoods from its margins/regularizer.
+Synthetic stress does not establish natural-camera robustness; that caution is
+consistent with [Taori et al.](https://proceedings.neurips.cc/paper/2020/hash/d8330f857a17c53d217014ee776bfd50-Abstract.html),
+whose evidence concerns image benchmarks, not these pose recipes.
+
 ## 7. Concrete architecture work
 
 The committed architecture already retains the frozen pipeline next to the
 separate v2 benchmark. Extend that path rather than route this study through
-v2 fine-tuning. These are required changes, not claims that the current CLI
-already supports v3.
+v2 fine-tuning. The table below retains the September 29 implementation inventory;
+several capabilities are now complete. Its gap descriptions refer to that
+original base. The completion-release subsection identifies the remaining work;
+do not rewrite verified v3 operators or analysis merely to repeat this table.
 
 | Work package | Existing modules and concrete change | Acceptance check |
 | --- | --- | --- |
@@ -388,14 +493,66 @@ already supports v3.
 | E. Corruption/analysis/report | Version the operators in `corruptions/pose.py`; add fixed fallback evidence. Add a v3 engineering-evaluation mode for declared corrupted development cells, explicitly ineligible for selection; retain the clean-only selection evaluator. Extend `evaluation/analysis.py` from globally pooled groups to within-action resampling. Update runner/report schema and completeness verification for v3. | Hand-ranked fixtures, unequal-view cluster weights, fixed-seed bootstrap, LOAO with fixed gallery, 180 unique authorized rows, and figures reproducing from ranks. |
 | F. SCC and tracker | Add a v3 Grid Engine launcher with clean-release checks, external logs, quotas, immutable attempts, and complete measured timing. Add a guarded tracker migration plus matching app fallback/protocol deployment after the scientific bundle is settled. | Job exits/logs bound; no login-node compute; tracker preserves live versions/progress/RLS/ownership; public loaders expose only safe plan/progress fields. |
 
+### Completion release before selection
+
+Adopt one coordinated completion release. The current final-training guard in
+`training/runner.py`, novel-role guard in `motionbert_features.py`, final-lock
+guard in `protocol.py`, selection authorizer, corrupted-development evaluator
+and report dispatch all need completion and testing. The training/extractor
+files are already in the design's frozen hash set. Do not add bypass wrappers,
+remove validation or edit the original locks to keep old artifacts eligible.
+
+Use the immutable successor prefix `study-v3/revisions/execution-r1/` for its
+locks, manifests and attempts, under the same canonical artifact root. Keep
+`study-v3/locks/` and all prior attempts unchanged. Bind predecessor protocol
+and design hashes, successor full protocol/config hashes, release commit,
+changed-file list and regeneration matrix in a dated amendment receipt. Retain
+one shared dataset opening ledger and access lock across every revision/version;
+a new prefix must not create a new test seal. No mutable current-release alias
+or caller-selected ledger may authorize a scientific operation.
+
+The successor full digest may change for provenance/path bindings. A reviewed
+field comparison must show identical scientific choices, including IDs/order,
+recipes, duration/grid, corruption seed prefix and operators, fallback value,
+metrics, bootstrap and claim rule. Preserve original fallback measurement and
+identity evidence; regenerate protocol-bound manifests without recomputing or
+reselecting them. Any scientific difference requires a separate explicit
+amendment before running, not classification as a path-only change.
+
+| Change class | Required evidence before selection |
+| --- | --- |
+| Documentation, scheduling or report presentation only | Applicable checks and content review; no relabeling or automatic invalidation of scientific artifacts. |
+| This completion release: frozen training/extraction/provenance interfaces | Fresh parity, both full 95,001-row repeat extractions, all five bound clean caches and all three complete pilots; independent validation/accounting under the successor bindings. Retain original evidence separately. |
+| Corruption/evaluation/analysis implementation | Hand-derived fixtures, nine complete development paths, fresh-process geometry checks and actual v3 report dispatch. Recompute affected downstream artifacts; any bound-code change also follows the preceding row. |
+| Later scientific or bound-code correction | New dated release/digest, impact inventory and regeneration of every affected comparison; no mixed-release campaign or silent reuse. |
+
+Before freezing this release, rehearse its real command path on fixture data:
+selection authorization and ranking, fresh final training, complete final-run
+lock, atomic opening, novel-role extraction, projection, retrieval and v3
+report. Synthetic final roles must remain scientifically ineligible. Opening, concurrency
+and crash fixtures use a temporary synthetic dataset registry and artifact root,
+never production roots or the real opening ledger. Assert that real opening
+records remain absent or unchanged after rehearsal. Require
+exactly 180 unique cells, missing/duplicate rejection, ordered primary/official
+subset equality, unequal-view bootstrap fixtures, the interpretation identity,
+tamper/cross-release rejection, authorization before loader invocation,
+concurrent/partial-opening recovery and denial of old/new training after
+opening. A unit test of an unused analysis function is insufficient: exercise
+`report.py` through to the v3 analysis. Retain the independent November audit.
+
+Complete this dependency work first in Week 5, then revalidate caches/pilots,
+then run development corruptions and capacity measurements. October 18 remains
+a gate, not permission to compress checks if implementation takes longer.
+
 Finish and commit the extractor, preprocessing, corruption operators, config,
 dependency, and artifact validation interfaces **before fresh scientific cache
 creation**. Current
 cache provenance binds those code paths and the dependency lock; a later
 correction may require fresh parity/extraction. Do not weaken a digest check
 to keep using an invalidated cache. The October 18 gate adds evidence and
-selection authorization against the **unchanged protocol digest**; it does not
-edit the protocol under existing pilot artifacts. A correction to that digest
+selection authorization against the **unchanged successor protocol digest**
+after its fresh evidence passes; it does not edit the protocol under existing
+pilot artifacts. A correction to that digest
 or cache-affecting code requires regenerating affected caches and rerunning
 affected pilots before the gate passes. Schedule this work and retain
 superseded artifacts in the capacity ledger.
@@ -421,12 +578,29 @@ gallery plus ten query conditions, with batching/sharding as recorded.
 
 The current projector and artifact revalidation include CPU projection and
 repeated hashing. Include their wall time and temporary memory in measurements;
-do not assume the GPU extraction rate predicts end-to-end evaluation.
+do not assume the GPU extraction rate predicts end-to-end evaluation. Record
+hashing, loading, preprocessing, encoding, projection, artifact revalidation,
+retrieval and serialization separately, with host/GPU peaks and saved bytes.
+
+Enforce reuse counts in the campaign manifest: nine development corruption
+encodings shared by three pilot heads; one novel gallery plus ten query-condition
+encodings; 21 final pre-head files (ten official, ten primary, one gallery);
+nine reusable gallery projections and 180 role-specific query projections.
+Keep immutable role-specific files and existing validation. Do not replace CPU
+projection with GPU arithmetic, change precision, memoize validation or omit
+hash checks as part of this amendment. Optimize measured orchestration/I/O
+reuse first. Start with one scientific subprocess at a time on the validated
+L40S. Group fresh subprocess runs only when measured queue/setup savings justify
+it and the complete group fits the allocation; preserve independent seeds,
+attempts, manifests and failure handling. No unmeasured concurrent GPU jobs.
 
 ## 8. Capacity gates
 
 The fixed campaign has the following head-update count under the existing
-sampler. Counts are not GPU-hour estimates.
+sampler. Counts are not GPU-hour estimates. The main table counts the accepted campaign;
+the three retained predecessor pilots add 142,560 historical updates. With the
+three successor pilots, 42 complete training runs would be retained before other
+retries/fixtures, totaling 2,102,580 updates across releases.
 
 | Stage | Runs | Updates per run | Total updates |
 | --- | ---: | ---: | ---: |
@@ -473,6 +647,26 @@ final heads and locks by November 29, full novel evaluation by December 6,
 and preserve December 7–18 for analysis/delivery. Do not launch overlapping
 jobs beyond the demonstrated GPU, host-memory, or storage budget.
 
+October 8 pilot scheduler seconds were 502/525/415 and training-stage seconds
+286.739518/323.617977/254.941551 (Contrastive/Contextual/SupCon). A provisional
+head-job estimate is `sum(9*S + 3*(S + T*(59380/47520 - 1)))`, where S is a
+pilot's scheduler time and T its training time: 4.987 allocated hours, or
+6.23 with 25% slack. Completion-release regeneration adds a measured baseline
+of 5,644 cache-job seconds plus 1,442 pilot-job seconds: another 2.46 hours
+with slack. The combined **8.69 allocated hours is not a campaign capacity
+pass**. CPU validation, nine development corruptions, novel extraction,
+projection/report work, queues, retries and software/researcher time are extra.
+Replace these estimates with successor measurements and the slower required
+full-size timing before authorization. Do not multiply the slack twice.
+
+The Week 5 work ledger must separate implementation/review, release revalidation,
+corruption audit, analysis/report verification and resource/availability planning.
+Existing tracker minutes are inherited estimates, not measured forecasts or
+researcher availability. Re-estimate each package before the go/no-go decision;
+retain the deadline only if their dependencies and 25% slack fit. Set scheduler
+wall limits from complete measured jobs plus slack and scheduler granularity,
+rather than copying the pilot launcher's 12-hour request by default.
+
 Storage uses bytes, not ambiguous GB labels. Let
 
 ```text
@@ -481,8 +675,11 @@ required = 200 * 2**30 + 1.25 * forecast_remaining_peak_bytes
 pass iff available >= required.
 ```
 
-The initial planning envelope is **100 decimal GB of incremental space,
-including slack**, while retaining the 200 GiB reserve. It deliberately keeps
+The September 29 planning envelope was **100 GB** incremental including slack.
+The amended campaign-wide envelope is **120 decimal GB including slack**,
+while retaining the 200 GiB reserve. It includes retained predecessor evidence
+and the planned completion-release regeneration; it is not 120 GB of new work
+on top of files already present. It deliberately keeps
 the role-specific files expected by the existing architecture. The following
 uncompressed payload estimates include float32 features, int64 labels, and
 20-character Unicode sample IDs; compression is not credited.
@@ -496,36 +693,35 @@ uncompressed payload estimates include float32 features, int64 labels, and
 | 180 role-specific final query projections and nine reusable clean gallery projections | 28.1768 |
 | 48 head checkpoints: 12 pilot snapshots + 27 development + nine final | 3.4229 |
 | Conservatively bounded physical batch-plan files | 1.0666 |
-| **Planned payload subtotal** | **67.8763** |
+| 27 development corruption query projections: three pilot heads × nine conditions | 4.2318 |
+| Additional completion-release five clean caches and three pilot directories, approximately | 12.8060 |
+| **Planned payload subtotal across both releases** | **84.9141** |
 | Metadata, per-query results, retained failures, and temporary-file allowance | **10.0000** |
-| Subtotal and allowance multiplied by 1.25 | **97.3454** |
-| **Rounded incremental capacity requirement** | **100.0000** |
+| Subtotal and allowance multiplied by 1.25 | **118.6426** |
+| **Rounded campaign-wide envelope** | **120.0000** |
 
-The roughly 4.14 million development/final per-query result rows are covered
-by the allowance, not assumed free. Pilot epoch-zero diagnostics do not retain
+The original roughly 4.14 million development/final per-query result rows,
+511,083 development-corruption rows and successor pilot records are covered by
+the allowance, not assumed free. Pilot epoch-zero diagnostics do not retain
 another full embedding cache; compute their summaries in memory. At epoch 20,
 retain one checkpoint artifact per pilot and reference it from both the epoch
 record and completion record rather than copying it. The 10 GB allowance is
 bounded, not permission for unlimited failed attempts. Replace estimates with
 actual bytes at the October gate, including all new artifacts already created.
 
-**The observed quota does not pass this initial gate.** Reserve plus the
-100 GB envelope requires **314.7484 GB free**, versus 272.80 GB observed:
-approximately **41.95 GB more accessible space** is needed. Obtain additional
-quota or a documented, authorized artifact allocation before committing the
-full campaign. If capacity is provided at a new canonical root, preserve and
-register old roots, copy/verify required immutable inputs without relabeling,
-and account for the transfer and duplicate storage. Do not treat filesystem
-free space beyond the project quota as usable capacity. A reduced-storage
-architecture would be a separately verified implementation change, not an
-assumption in this plan.
-
+The September 29 reading failed the original 100 GB envelope by about 41.95 GB;
+retain it as historical evidence. The October 8 observation of 1,008.48 GB quota
+free is newer but also not a reservation. Remeasure both quota and filesystem
+space and apply the remaining-peak formula; request additional authorized
+capacity only if that current calculation fails. If a new canonical root is
+necessary, register and verify transfers without relabeling or deleting old
+evidence. Filesystem space beyond quota is not usable capacity.
 The peak forecast includes all yet-to-be-created retained checkpoints,
 intermediate pilot weights, batch plans, clean/corrupted pre-head caches,
 primary/official duplicates, projected embeddings, ranks, logs, failed attempts,
 immutable output staging, and reports. Already present files are reflected in
 the current free-space reading, not counted twice. After work begins, use the
-remaining measured forecast rather than demanding the initial 100 GB again.
+remaining measured forecast rather than demanding the 120 GB envelope again.
 Retain original v1/v2
 artifacts; deleting evidence is not a capacity remedy. Recheck before each
 large job and before opening, and stop new work if the reserve would be crossed.
@@ -534,8 +730,9 @@ unmargined peak work** under this formula; it does not reserve that amount.
 
 **October 18 go/no-go:** all three objectives mathematically verified; three
 complete, valid 20-epoch pilots; unchanged fixed development episode; nested
-corruptions and fallback validated; full development extraction/projection/
-scoring verified; analysis tested; every historical seal audit resolved; and
+corruptions and fallback validated; completion release and end-to-end fixture
+rehearsal passed; successor cache/pilot validation complete; full development extraction/projection/scoring verified;
+analysis/report template tested; every historical seal audit resolved; and
 the complete measured schedule/storage/availability forecast passes. Otherwise
 stop before the sweep and record a result-blind amendment. Do not reduce a
 single method's budget, discard seeds/cells, or claim a completed comparison.
@@ -544,7 +741,8 @@ single method's budget, discard seeds/cells, or claim a completed comparison.
 
 Keep `POSE_EMBED_DATA_ROOT` for licensed inputs and a stable absolute
 `POSE_EMBED_ARTIFACT_ROOT` for all scientific records. Resolve all v3 outputs
-under its `study-v3/` namespace and locks below that namespace. The shared
+under its `study-v3/` namespace and the explicit immutable revision described
+in Section 7. Retain predecessor lock paths without overwriting them. The shared
 dataset-level opening record remains at the canonical root and binds the
 source inventory/physical-source hashes and the historical-root audit. Neither
 a caller-selected ledger nor a different study namespace bypasses it.
@@ -557,10 +755,10 @@ Use a staged lock sequence to avoid circular prerequisites:
    grid, hashes, and the omitted control decision. It authorizes auxiliary
    engineering only. Freeze all cache-affecting code in the release.
 2. **By October 18, before selection:** append an immutable selection
-   authorization binding that same protocol digest to corruption/analysis
+   authorization binding the successor protocol digest used by its fresh pilots to corruption/analysis
    verification, pilot records, the complete run matrix/manifests, and the
-   capacity decision. The scientific protocol is unchanged. There are no
-   final checkpoint hashes yet; this is not a test-opening lock.
+   capacity decision. Scientific settings are unchanged; the new provenance digest
+   is explicit. There are no final checkpoint hashes yet; this is not a test-opening lock.
 3. **After selection/final training:** selected configs and timestamps; nine
    final checkpoint/run-manifest hashes, seeds, initializations/batches,
    source/checkpoint/input-contract bindings, code/dependency hashes, exact
@@ -590,10 +788,10 @@ and label any necessary corrected analysis as a post-opening deviation.
 | --- | --- | --- |
 | Sep 29–Oct 4 | Clean implementation base; complete v3 protocol/pilot specification, corruption operators/fallback, versioned validators, shared seals, source access separation, pilot instrumentation | Cache-affecting code/config frozen before extraction; historical artifacts untouched; old/v3 protocol and seal tests pass; no novel representation/outcome access |
 | Oct 5–11 | Loss value/backward fixtures, paired sampler/init checks, learnable-fixture checks, fresh parity/caches, three full 20-epoch pilots | Every pilot complete with four checkpoint/score records and diagnostic/timing evidence; source/extractor code hashes stable |
-| Oct 12–18 | Nested corruption/fallback audit, nine full development conditions, analysis fixtures, allocation/availability/storage report | All October go/no-go requirements pass before selection; otherwise record blocker/amendment |
+| Oct 12–18 | Complete successor interfaces and full fixture/report rehearsal; fresh bound caches/pilots; fixed geometry panel, nine development conditions, dependency and capacity ledger | New release/evidence bindings, analysis/report, allocation, current storage and researcher availability pass before selection; otherwise record blocker/amendment |
 | Oct 19–Nov 1 | 27 clean-development selection runs and selected rates | Complete attempt ledger; three valid seeds per selected candidate; exact ranking rule reproduced |
 | Nov 2–15 | Nine fresh all-100-action final heads | Paired 20-epoch runs, immutable checkpoints, complete source/config/code provenance |
-| Nov 16–29 | Independent evaluator/run-set/lock audit; report skeleton, figure templates and reproduction checks on development data | All nine heads locked; exact 180-cell matrix and query lists fixed; current capacity/seal checks pass; Thanksgiving retained for recovery |
+| Nov 16–29 | Independent repeat of evaluator/run-set/lock audit; audit the report/figure templates already rehearsed before selection | All nine heads locked; exact 180-cell matrix and query lists fixed; current capacity/seal checks pass; Thanksgiving retained for recovery |
 | Nov 30–Dec 6 | One authorized novel extraction/evaluation campaign | 180 unique finite provenance-valid cells; per-query ranks reproduce every metric; all operational attempts retained |
 | Dec 7–13 | Conditional interval, absolute-score/degradation curves, per-seed/LOAO tables, cost/limitations, report/poster draft | All analysis and figures regenerate from locked records; claims follow the prespecified rule |
 | Dec 14–18 | Independent reproduction smoke test, final report/poster and permitted archive; tracker reconciliation | Deliverables complete, limitations explicit, no licensed data/checkpoints/private records in Git |
