@@ -308,11 +308,14 @@ def test_core_report_recertification_requires_full_provenance_validator(
     assert observed == {"result_count": 180}
 
 
+@pytest.mark.parametrize("protocol_version", [1, 3])
 def test_exact_final_report_writes_analysis_and_source_bound_curve(
     protocol_path: Path,
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    protocol_version: int,
 ) -> None:
+    protocol_path = protocol_path.with_name(f"protocol.v{protocol_version}.yaml")
     seeds = (7, 17, 29)
     conditions = (
         "clean",
@@ -382,6 +385,7 @@ def test_exact_final_report_writes_analysis_and_source_bound_curve(
                 mrr=sum(reciprocal_ranks) / len(reciprocal_ranks),
                 r_at_5=1.0,
                 query_count=len(sample_ids),
+                gallery_count=20,
                 per_query=per_query,
             ),
             telemetry=RuntimeTelemetry(
@@ -458,6 +462,21 @@ def test_exact_final_report_writes_analysis_and_source_bound_curve(
     )
 
     destination = tmp_path / "report"
+    if protocol_version == 3:
+        with pytest.raises(ValueError, match="exactly 180 authorized final cells"):
+            build_report(
+                list(result_by_path)[:-1],
+                tmp_path / "incomplete-report",
+                protocol_path=protocol_path,
+            )
+        assert not (tmp_path / "incomplete-report").exists()
+
+        def reject_legacy_analysis(*args: object, **kwargs: object) -> None:
+            pytest.fail("v3 report dispatched to the legacy bootstrap")
+
+        monkeypatch.setattr(
+            report_module, "primary_robustness_analysis", reject_legacy_analysis
+        )
     summary = build_report(
         result_by_path,
         destination,
@@ -485,6 +504,24 @@ def test_exact_final_report_writes_analysis_and_source_bound_curve(
         summary["figures"][0]["source_curves_sha256"] == summary["curve_data"]["sha256"]
     )
     assert "curves_sha256=" in figure_path.read_text(encoding="utf-8")
+    analysis = json.loads(analysis_path.read_text(encoding="utf-8"))
+    if protocol_version == 3:
+        assert analysis["schema_version"] == 3
+        assert analysis["bootstrap"]["method"] == (
+            "paired_percentile_performance_cluster_within_action"
+        )
+        assert analysis["bootstrap"]["replicates"] == 10_000
+        assert len(analysis["leave_one_action_out"]["rows"]) == 20
+        assert analysis["delta_from_accuracy_gaps"] == -1
+        markdown = (destination / "summary.md").read_text(encoding="utf-8")
+        assert "exchangeable performance groups" in markdown
+        assert "higher corrupted accuracy is descriptive" in markdown
+        assert "| contextual minus contrastive | 0.0000 | 100.0000 | -100.0000 |" in (
+            markdown
+        )
+        assert "not an estimate of real-world corruption prevalence" in markdown
+    else:
+        assert analysis["schema_version"] == 1
 
 
 def test_report_marks_complete_only_for_exact_authorized_180_rows(

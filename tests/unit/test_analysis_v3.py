@@ -8,6 +8,7 @@ import pytest
 
 from pose_embed.evaluation.analysis import (
     leave_one_action_out_v3,
+    metadata_dependence_table_v3,
     primary_robustness_analysis_v3,
     within_action_cluster_bootstrap_v3,
 )
@@ -154,9 +155,101 @@ def test_v3_full_analysis_uses_ranks_fixed_gallery_and_descriptive_tables() -> N
     assert all(row.metrics.gallery_count == 20 for row in results)
     assert analysis["bootstrap"]["seeds_resampled"] is False
     assert analysis["bootstrap"]["actions_resampled"] is False
+    assert analysis["absolute_top1"]["contextual"] == {
+        "clean": 1.0,
+        "mean_corrupted": pytest.approx(0.95),
+        "drop": pytest.approx(0.05),
+    }
+    assert analysis["delta_from_accuracy_gaps"] == analysis["estimate"]
+    assert "Inconclusive" in analysis["interpretation"]
+    assert "not evidence of equivalence" in analysis["interpretation"]
+    assert len(analysis["dependence_by_action"]) == 20
 
 
-@pytest.mark.parametrize("mutation", ["gallery", "queries", "protocol", "duplicate"])
+@pytest.mark.parametrize(
+    ("ranks", "delta", "gap", "wording"),
+    [
+        ((1, 1, 1, 2), -1, 1, "higher corrupted accuracy is descriptive"),
+        ((2, 2, 1, 2), -1, 0, "without higher absolute corrupted accuracy"),
+        ((1, 2, 1, 1), 1, -1, "greater contextual degradation"),
+        ((1, 1, 1, 1), 0, 0, "Inconclusive"),
+    ],
+)
+def test_v3_interpretation_preserves_absolute_accuracy_and_delta_identity(
+    ranks, delta, gap, wording
+) -> None:
+    results = _matrix()
+    for result in results:
+        rank = ranks[
+            2 * (result.method == "contrastive") + (result.condition != "clean")
+        ]
+        for row in result.metrics.per_query:
+            row.rank = rank
+    analysis = primary_robustness_analysis_v3(
+        results, seeds=(7, 17, 29), corruption_conditions=CONDITIONS
+    )
+    gaps = analysis["absolute_top1"]["contextual_minus_contrastive"]
+    assert gaps["mean_corrupted"] == gap
+    assert gaps["clean"] - gaps["mean_corrupted"] == delta
+    assert gaps["drop"] == analysis["delta_from_accuracy_gaps"] == delta
+    assert analysis["estimate"] == delta
+    assert analysis["claim_supported"] == (delta < 0)
+    assert wording in analysis["interpretation"]
+    assert "exchangeable performance groups" in analysis["conditioning_caveat"]
+    assert "cannot isolate contextual" in analysis["recipe_caveat"]
+
+
+def test_metadata_dependence_counts_groups_without_equating_views_or_performers():
+    ids = [_id(2, 1, camera) for camera in (1, 2, 3)] + [
+        _id(2, 1).replace("R001", "R002"),
+        _id(2, 2),
+        _id(8, 2),
+    ]
+    table = metadata_dependence_table_v3(ids)
+    assert table == metadata_dependence_table_v3(ids[::-1])
+    assert table[0] == {
+        "action": 2,
+        "query_count": 5,
+        "performance_group_count": 3,
+        "views_per_group": [{"views": 1, "groups": 2}, {"views": 3, "groups": 1}],
+        "distinct_performers": 2,
+        "largest_performer_share_of_groups": 2 / 3,
+    }
+    assert table[1]["action"] == 8
+    assert table[1]["largest_performer_share_of_groups"] == 1
+    for invalid in ([], ids + [ids[0]], [ids[0].lower()]):
+        with pytest.raises(ValueError):
+            metadata_dependence_table_v3(invalid)
+
+
+def test_v3_zero_crossing_interval_is_inconclusive_not_equivalence():
+    results = _matrix()
+    for result in results:
+        result.metrics.per_query = tuple(
+            SimpleNamespace(
+                sample_id=_id(action, performer),
+                label=action,
+                rank=2
+                if result.condition != "clean"
+                and performer == (1 if result.method == "contextual" else 2)
+                else 1,
+            )
+            for action in range(1, 121, 6)
+            for performer in (1, 2)
+        )
+    analysis = primary_robustness_analysis_v3(
+        results, seeds=(7, 17, 29), corruption_conditions=CONDITIONS
+    )
+    assert analysis["bootstrap"]["lower"] < 0 < analysis["bootstrap"]["upper"]
+    assert analysis["claim_supported"] is False
+    assert "Inconclusive" in analysis["interpretation"]
+    assert "not evidence of equivalence or no effect" in analysis["interpretation"]
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["gallery", "queries", "protocol", "duplicate", "seed", "condition", "mode"],
+)
 def test_v3_full_analysis_rejects_unpaired_or_redefined_cells(mutation: str) -> None:
     results = _matrix()
     if mutation == "gallery":
@@ -165,6 +258,12 @@ def test_v3_full_analysis_rejects_unpaired_or_redefined_cells(mutation: str) -> 
         results[-1].metrics.per_query = results[-1].metrics.per_query[::-1]
     elif mutation == "protocol":
         results[-1].protocol_sha256 = "d" * 64
+    elif mutation == "seed":
+        results[-1].seed = 31
+    elif mutation == "condition":
+        results[-1].condition = "frame_mask:41"
+    elif mutation == "mode":
+        results[-1].mode = "development"
     else:
         results.append(results[-1])
     with pytest.raises(ValueError):

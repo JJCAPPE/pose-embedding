@@ -24,9 +24,21 @@ None of these requirements can be replaced by publishing the plan.
 
 The live tracker was updated through a guarded, version-checked migration on
 October 11: Week 5 active, execution/report task in progress, all gates pending.
-Production deployment `dpl_96ZkhYkk7TFng7tmyBY2aPFvwv5E` was verified through the
+Initial deployment `dpl_96ZkhYkk7TFng7tmyBY2aPFvwv5E` was verified through the
 live public export, protocol source, health endpoint and browser. Closed-week
 history, private ownership, RLS and the existing production Journey were retained.
+
+The progress milestone (`41fe0a6`) was then published as deployment
+`dpl_24eUzUGHsNx8SZSfcaLHgA81Ntk5`: Week 5 version 5 active, task 03 version 6
+in progress, all gates pending. Independent public health/export reads confirmed
+that state at 21:48 UTC. The private export redirected to login; all other weeks
+and existing evidence links were unchanged. Review found stale static protocol
+copy still describing Week 3 as pending. Deployment
+`dpl_F4ZiW8JNdJA8xtETqu55M4p2axhM` corrected it with stable stage-gate guidance
+and a pointer to the live status row; live page/export and Journey checks passed. Local
+security advisors passed. Hosted advisors reported existing Auth settings for
+leaked-password protection and MFA, with no RLS/table/function findings; those
+Auth settings were preserved.
 
 ## Researcher availability and schedule
 
@@ -102,18 +114,32 @@ Review identified and corrected these implementation problems:
 - Initial evaluation timing began before its opening event and could fail later
   report chronology checks. Scientific evaluation timing now begins after opening.
 
-Fresh opening capacity evidence is being integrated immediately before the
-shared opening event. Archival reads and recovery must retain the original
-bound receipt instead of requiring future hardware to reproduce an old opening.
+Fresh opening capacity evidence is now recorded immediately before the shared
+opening event. It verifies the running SCC job, assigned host/slots/GPU, current
+RAM/VRAM, quota/free space and remaining dated evaluation/delivery capacity.
+Archival reads and crash recovery retain that bound receipt without probing
+current hardware. Twelve resource tests and five opening-boundary tests pass.
+The successful novel extraction, official-to-primary export and archival
+validation path also passed in an isolated, explicitly non-scientific rehearsal;
+no real novel input or opening was accessed.
 
 Focused regression tests cover these boundaries. Complete suite, command
 rehearsal and SCC validation results will be recorded before software admission;
 unit tests alone do not establish a valid scientific release or GPU result.
-The latest broad run recorded 1,070 passing tests, 38 environment-dependent skips
-and one stale rehearsal assertion, subsequently corrected. Final verification
-remains pending. The tracker milestone passed 14 database tests, 22 unit tests,
-22 desktop/mobile browser tests, lint, typecheck, production build and security
-advisors; no scientific completion was inferred from those checks.
+The complete Python suite passed **1,131 tests** in 234.45 seconds, with two
+skipped licensed AVSL source-parity checks for the historical v2 method outside
+v3 scope. The pinned MotionBERT source was fetched and checked locally.
+Ruff checks/formatting and workspace verification passed. The final isolated
+opening check also verifies actual scheduler wall time remaining; 35 targeted
+resource/opening/lock/rehearsal tests passed after that final change. Earlier failed development runs were test failures, including a
+stale rehearsal assertion and a concurrent test-file import during construction;
+no SCC scientific attempt or novel opening resulted.
+
+The tracker milestone passed 14 database tests, 22 unit tests, 22 desktop/mobile
+browser tests, lint, typecheck and a production build. Local security advisors
+passed; the hosted Auth advisories above remain distinct. The stable static-copy
+correction additionally passed four focused protocol/accessibility browser checks.
+None of these software checks substitutes for SCC calibration or admission.
 
 ## Reflection
 

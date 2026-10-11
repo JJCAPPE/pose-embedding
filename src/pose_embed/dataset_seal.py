@@ -21,6 +21,7 @@ LEGACY_OPENINGS = (
     "locks/test-opening.v1.json",
     "benchmark-v2/locks/test-opening.json",
     "study-v3/locks/test-opening.v3.json",
+    "study-v3/revisions/execution-r1/locks/test-opening.v3.json",
 )
 
 
@@ -205,9 +206,12 @@ def validate_registered_source_inventory(source_inventory_sha256: str) -> None:
 def require_no_v3_opening(*, require_registry: bool = False) -> None:
     """Legacy authorized final readers cannot bypass v3 or unreadable openings."""
     for root in registered_roots(required=require_registry):
-        path = root / LEGACY_OPENINGS[2]
-        if path.exists() or path.is_symlink():
-            raise ValueError("legacy source access is forbidden after v3 test opening")
+        for relative in LEGACY_OPENINGS[2:]:
+            path = root / relative
+            if path.exists() or path.is_symlink():
+                raise ValueError(
+                    "legacy source access is forbidden after v3 test opening"
+                )
         path = root / OPENING
         if path.exists() or path.is_symlink():
             record = _read_object(path, "dataset opening record")
@@ -293,11 +297,7 @@ def record_dataset_opening(*, version: str, authorization: dict[str, Any]) -> di
     destination = root / OPENING
     identity = {"protocol_version": version, "authorization": authorization}
     if destination.exists() or destination.is_symlink():
-        record = _read_object(destination, "dataset opening record")
-        _validate_opening_record(record)
-        if {key: record.get(key) for key in identity} != identity:
-            raise ValueError("dataset was opened under a different authorization")
-        return record
+        return validate_dataset_opening(version=version, authorization=authorization)
     # Called while holding the exclusive dataset-access lock, after all locks verify.
     require_dataset_unopened(require_registry=True)
     record = {
@@ -307,6 +307,19 @@ def record_dataset_opening(*, version: str, authorization: dict[str, Any]) -> di
     }
     _validate_opening_record(record)
     write_immutable_json(destination, record)
+    return record
+
+
+def validate_dataset_opening(*, version: str, authorization: dict[str, Any]) -> dict:
+    """Read an existing common event without completing or creating an opening."""
+    registered_roots(required=True)
+    record = _read_object(canonical_artifact_root() / OPENING, "dataset opening record")
+    _validate_opening_record(record)
+    if (
+        record["protocol_version"] != version
+        or record["authorization"] != authorization
+    ):
+        raise ValueError("dataset was opened under a different authorization")
     return record
 
 

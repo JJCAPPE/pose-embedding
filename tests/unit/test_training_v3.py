@@ -19,6 +19,7 @@ from pose_embed.training.runner import (
     check_learnable_fixture,
     train_head,
     validate_engineering_pilot,
+    validate_v3_training_run,
 )
 
 
@@ -181,6 +182,56 @@ def test_pilot_pairing_across_objectives(tmp_path, protocol_path):
     assert all(value["updates"] == 20 for value in summaries)
     assert "reciprocal_counts" in summaries[2]["diagnostics"][0]
     assert "empty_complement_count" in summaries[2]["diagnostics"][0]
+
+
+def test_selection_endpoint_remains_distinct_from_pilot(tmp_path, protocol_path):
+    inputs = _inputs(tmp_path, protocol_path)
+    root = tmp_path / "selection"
+    summary = train_head(
+        **{**inputs, "stage": "development_selection"}, output_dir=root
+    )
+    assert summary["selection_eligible"] is True
+    assert summary["final_eligible"] is False
+    assert set(summary["epoch_records"]) == {"epoch-020.json"}
+    assert validate_v3_training_run(root, stage="development_selection") == summary
+    with pytest.raises(ValueError, match="stage/eligibility"):
+        validate_engineering_pilot(root)
+
+
+def test_final_fixture_has_no_development_scores(tmp_path, protocol_path):
+    inputs = _inputs(tmp_path, protocol_path)
+    manifest = tmp_path / "final.jsonl"
+    rows = [
+        json.loads(line)
+        for line in Path(inputs["manifest_path"]).read_text().splitlines()
+    ]
+    manifest.write_text(
+        "\n".join(json.dumps(row | {"split": "final_train"}) for row in rows) + "\n"
+    )
+    features = tmp_path / "final.npz"
+    extract_fixture_features(
+        tmp_path / "train-poses.npz",
+        features,
+        protocol_path=protocol_path,
+        manifest_path=manifest,
+        role="training",
+        split="final_train",
+        embedding_dimension=32,
+    )
+    root = tmp_path / "final"
+    summary = train_head(
+        inputs["config_path"],
+        features,
+        root,
+        protocol_path=protocol_path,
+        manifest_path=manifest,
+        allow_fixture=True,
+        stage="final_training",
+    )
+    assert summary["final_eligible"] is True
+    assert summary["selection_eligible"] is False
+    assert summary["epoch_records"] == {}
+    assert validate_v3_training_run(root, stage="final_training") == summary
 
 
 @pytest.mark.parametrize(

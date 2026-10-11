@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import os
 import re
 import resource
@@ -79,6 +80,23 @@ def validate_selected_manifest(
             != manifests["development-validation.jsonl"]
         ):
             raise ValueError("development episode belongs to a different source bundle")
+    elif protocol.protocol_id == "protocol-v3" and split in {
+        "novel_anchor",
+        "novel_query_primary",
+        "novel_query_official",
+    }:
+        expected_role = (
+            "gallery_clean"
+            if split == "novel_anchor"
+            else ("query_corrupted" if role == "query_corrupted" else "query_clean")
+        )
+        if (
+            role != expected_role
+            or records != manifests[split.replace("_", "-") + ".jsonl"]
+        ):
+            raise ValueError(
+                "novel extraction requires its exact locked role/identities"
+            )
     else:
         raise ValueError(
             "Week 3 MotionBERT extraction permits only clean auxiliary data"
@@ -89,7 +107,10 @@ def validate_selected_manifest(
 
 
 def extraction_condition(protocol, *, role, split, family, severity) -> str:
-    if split.startswith("novel"):
+    if split.startswith("novel") and (
+        protocol.protocol_id != "protocol-v3"
+        or "execution-r1" not in protocol.test_access.design_lock_relative_path
+    ):
         raise ValueError(
             "novel extraction requires the complete final v3 authorization"
         )
@@ -104,7 +125,8 @@ def extraction_condition(protocol, *, role, split, family, severity) -> str:
     }
     if (
         role != "query_corrupted"
-        or split != "development_validation"
+        or split
+        not in {"development_validation", "novel_query_primary", "novel_query_official"}
         or family not in levels
         or severity not in levels[family]
     ):
@@ -141,8 +163,7 @@ def _source_paths(inputs: VerifiedMotionBERTInputs) -> list[Path]:
     ]
 
 
-@guarded_auxiliary
-def extract_motionbert_features(
+def _extract_motionbert_features(
     input_path: str | Path,
     output_path: str | Path,
     *,
@@ -180,6 +201,10 @@ def extract_motionbert_features(
         raise ValueError(
             "Week 3 MotionBERT extraction permits only clean auxiliary data"
         )
+    if split == "novel_query_primary":
+        raise ValueError(
+            "encode official queries once, then export their primary subset"
+        )
     condition = extraction_condition(
         protocol,
         role=role,
@@ -192,14 +217,19 @@ def extract_motionbert_features(
         from pose_embed.protocol_v3 import require_v3_design
 
         require_v3_design(protocol)
-        require_path_within(destination, scientific.root / "study-v3", label="v3 cache")
+        revision_root = (
+            scientific.root / protocol.test_access.resolved_protocol_relative_path
+        ).parent.parent
+        require_path_within(destination, revision_root, label="v3 cache")
     if (scientific.root / "benchmark-v2/locks/test-opening.json").exists():
         raise ValueError("legacy extraction is forbidden after benchmark v2 opening")
     resolved_device = torch.device(device)
     if resolved_device.type not in {"cpu", "cuda"}:
         raise ValueError("MotionBERT supports explicit cpu or cuda devices")
     configure_deterministic_inference()
-    inputs = load_motionbert_inputs(protocol_path, manifest_set_path)
+    inputs = load_motionbert_inputs(
+        protocol_path, manifest_set_path, novel=split.startswith("novel")
+    )
     destination = require_path_within(
         destination, inputs.artifact_root, label="MotionBERT cache"
     )
@@ -236,6 +266,7 @@ def extract_motionbert_features(
         and condition != "clean"
     )
     fallback_sample_ids: list[str] = []
+    geometry_rows: list[dict] = []
 
     def synchronize() -> None:
         if resolved_device.type == "cuda":
@@ -267,18 +298,32 @@ def extract_motionbert_features(
                         for pose, row in zip(poses, batch, strict=True)
                         if torso_scale_v3(torch.from_numpy(pose)) is None
                     )
-                poses = np.stack(
-                    [
-                        apply_corruption_v3(
-                            torch.from_numpy(pose),
-                            family=corruption_family,
-                            severity=corruption_severity,
-                            sample_id=row.sample_id,
-                            fallback_scale=protocol.preparation.fallback_value,
-                        ).numpy()
-                        for pose, row in zip(poses, batch, strict=True)
-                    ]
-                )
+                from pose_embed.geometry_v3 import geometry_damage
+
+                corrupted = []
+                for pose, row in zip(poses, batch, strict=True):
+                    clean = torch.from_numpy(pose)
+                    changed = apply_corruption_v3(
+                        clean,
+                        family=corruption_family,
+                        severity=corruption_severity,
+                        sample_id=row.sample_id,
+                        fallback_scale=protocol.preparation.fallback_value,
+                    )
+                    own_scale = torso_scale_v3(clean)
+                    scale = (
+                        own_scale
+                        if own_scale is not None
+                        else protocol.preparation.fallback_value
+                    )
+                    geometry_rows.append(
+                        {
+                            "sample_id": row.sample_id,
+                            **geometry_damage(clean, changed, corruption_family, scale),
+                        }
+                    )
+                    corrupted.append(changed.numpy())
+                poses = np.stack(corrupted)
                 timings["corruption"] = (
                     timings.get("corruption", 0.0) + time.perf_counter() - tick
                 )
@@ -339,6 +384,14 @@ def extract_motionbert_features(
         provenance_inputs.append(
             inputs.artifact_root / protocol.preparation.fallback_evidence.relative_path
         )
+    if split.startswith("novel"):
+        provenance_inputs.extend(
+            [
+                scientific.test_opening_ledger,
+                scientific.root / "locks/dataset-opening.json",
+                scientific.protocol_lock,
+            ]
+        )
     provenance = capture_provenance(
         command="features extract --backend motionbert",
         configuration={
@@ -352,6 +405,13 @@ def extract_motionbert_features(
         started_at=started_at,
     )
     provenance["motionbert"] = {"bindings": bindings, "paths": paths}
+    if geometry_rows:
+        from pose_embed.geometry_v3 import summarize_geometry
+
+        provenance["geometry"] = {
+            "rows": geometry_rows,
+            "summary": summarize_geometry(geometry_rows),
+        }
     if v3_jitter:
         provenance["jitter_fallback"] = {
             "schema_version": 1,
@@ -441,6 +501,14 @@ def extract_motionbert_features(
     }
 
 
+@functools.wraps(_extract_motionbert_features)
+def extract_motionbert_features(*args, **kwargs):
+    if str(kwargs.get("split", "")).startswith("novel"):
+        # Novel loading performs full authorization and atomic opening itself.
+        return _extract_motionbert_features(*args, **kwargs)
+    return guarded_auxiliary(_extract_motionbert_features)(*args, **kwargs)
+
+
 def validate_motionbert_cache(
     sidecar: FeatureSidecar, protocol: ProtocolConfig, manifest_path: str | Path
 ) -> None:
@@ -453,6 +521,24 @@ def validate_motionbert_cache(
         from pose_embed.protocol_v3 import require_v3_design
 
         require_v3_design(protocol)
+        if sidecar.split.startswith("novel"):
+            from pose_embed.protocol_v3 import require_v3_final_authorization
+            from pose_embed.test_access import validate_recorded_test_opening
+
+            require_v3_final_authorization(protocol)
+            paths = resolve_scientific_paths(protocol)
+            validate_recorded_test_opening(protocol)
+            for bound in (
+                paths.test_opening_ledger,
+                paths.root / "locks/dataset-opening.json",
+                paths.protocol_lock,
+            ):
+                if sidecar.provenance.get("inputs", {}).get(str(bound)) != sha256_file(
+                    bound
+                ):
+                    raise ValueError(
+                        "novel cache lacks unchanged opening authorization"
+                    )
     if sidecar.condition == "clean":
         family, severity = None, 0.0
     else:
@@ -476,6 +562,21 @@ def validate_motionbert_cache(
         raise ValueError("MotionBERT cache lacks verified source/parity provenance")
     if protocol.protocol_id == "protocol-v3" and family == "coordinate_jitter":
         _validate_jitter_fallback_provenance(sidecar, protocol)
+    if (
+        protocol.protocol_id == "protocol-v3"
+        and "execution-r1" in protocol.test_access.resolved_protocol_relative_path
+        and sidecar.condition != "clean"
+    ):
+        from pose_embed.geometry_v3 import summarize_geometry
+
+        geometry = sidecar.provenance.get("geometry", {})
+        rows = geometry.get("rows", [])
+        if tuple(row.get("sample_id") for row in rows) != sidecar.sample_ids or (
+            geometry.get("summary") != summarize_geometry(rows)
+        ):
+            raise ValueError(
+                "v3 geometry telemetry differs from the complete query rows"
+            )
     paths = details["paths"]
     try:
         artifact_root = resolve_scientific_paths(protocol).root

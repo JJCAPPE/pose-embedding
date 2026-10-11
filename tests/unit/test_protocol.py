@@ -318,7 +318,11 @@ def test_final_run_set_code_hashes_cover_all_scientific_surfaces(
     expected_paths = {
         path.relative_to(repository_root).as_posix()
         for path in package_root.rglob("*.py")
-    } | {"configs/benchmark-campaign.v2.json", "configs/benchmark-secondary.v2.json"}
+    } | {
+        "configs/benchmark-campaign.v2.json",
+        "configs/benchmark-secondary.v2.json",
+        "docs/protocol/v3-report-template.md",
+    }
     assert len(declared_paths) == len(set(declared_paths))
     assert set(declared_paths) == expected_paths
 

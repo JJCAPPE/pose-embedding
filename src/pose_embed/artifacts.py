@@ -306,6 +306,10 @@ def validate_feature_artifact(
 
         validate_motionbert_cache(sidecar, protocol, manifest_path)
     artifact_array = _validate_archive(artifact, sidecar)
+    if protocol.protocol_id == "protocol-v3" and sidecar.backend == "motionbert":
+        from pose_embed.novel_subset_v3 import validate_primary_subset
+
+        validate_primary_subset(artifact, sidecar, protocol)
     if sidecar.head_checkpoint_sha256 is not None:
         provenance_inputs = sidecar.provenance.get("inputs")
         assert isinstance(provenance_inputs, dict)

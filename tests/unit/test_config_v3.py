@@ -255,4 +255,9 @@ def test_design_freezes_pilot_math_and_evaluator_before_caches():
         str(path.relative_to(ROOT))
         for path in (ROOT / "src/pose_embed/losses").glob("*.py")
     } <= paths
-    assert "src/pose_embed/protocol_v3_campaign.py" not in paths
+    assert {
+        "src/pose_embed/protocol_v3_campaign.py",
+        "src/pose_embed/report.py",
+        "src/pose_embed/geometry_v3.py",
+        "src/pose_embed/novel_subset_v3.py",
+    } <= paths

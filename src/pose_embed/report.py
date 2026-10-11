@@ -23,6 +23,7 @@ from pose_embed.evaluation.analysis import (
     complete_core_curve_data,
     complete_core_error_data,
     primary_robustness_analysis,
+    primary_robustness_analysis_v3,
 )
 from pose_embed.evaluation.metrics import evaluate_one_shot
 from pose_embed.evaluation.result import EvaluationResult, ResultMetrics
@@ -92,14 +93,20 @@ def _primary_analysis_payload(
     protocol = load_protocol(protocol_path)
     scientific_paths = resolve_scientific_paths(protocol)
     plan = load_evaluation_plan(scientific_paths.evaluation_plan)
-    analysis = primary_robustness_analysis(
-        results,
-        seeds=plan.seeds,
-        corruption_conditions=plan.conditions[1:],
-        bootstrap_replicates=protocol.analysis.bootstrap_replicates,
-        confidence_level=protocol.analysis.confidence_level,
-    )
-    payload = analysis.as_dict()
+    if protocol.schema_version == 3:
+        payload = primary_robustness_analysis_v3(
+            results,
+            seeds=plan.seeds,
+            corruption_conditions=plan.conditions[1:],
+        )
+    else:
+        payload = primary_robustness_analysis(
+            results,
+            seeds=plan.seeds,
+            corruption_conditions=plan.conditions[1:],
+            bootstrap_replicates=protocol.analysis.bootstrap_replicates,
+            confidence_level=protocol.analysis.confidence_level,
+        ).as_dict()
     payload.update(
         {
             "protocol_sha256": results[0].protocol_sha256,
@@ -1189,6 +1196,10 @@ def build_report(
         )
         expected_rows, authorized_keys = validator(results, protocol_path=protocol_path)
         complete = matrix_keys == authorized_keys and len(matrix_keys) == expected_rows
+        if load_protocol(protocol_path).schema_version == 3 and (
+            modes != {"final"} or expected_rows != 180 or not complete
+        ):
+            raise ValueError("v3 report requires exactly 180 authorized final cells")
         if modes == {"final"} and complete:
             core_artifacts = _core_report_artifacts(
                 results,
@@ -1280,6 +1291,56 @@ def build_report(
                 "A negative effect means contextual training degraded less. This does",
                 "not imply higher overall retrieval when clean accuracy differs.",
                 "",
+            ]
+        )
+        if primary_analysis["schema_version"] == 3:
+            markdown.extend(
+                [
+                    primary_analysis["conditioning_caveat"],
+                    "",
+                    primary_analysis["interpretation"],
+                    "",
+                    primary_analysis["recipe_caveat"],
+                    "",
+                    "In this aggregate table, accuracy is percent; drops, differences",
+                    "and the interval are percentage points. The nine cells are a",
+                    "synthetic stress mixture,",
+                    "not an estimate of real-world corruption prevalence.",
+                    "",
+                    "| Recipe / difference | Clean | Mean corrupted | Drop / Delta | "
+                    "95% conditional interval |",
+                    "|---|---:|---:|---:|---|",
+                ]
+            )
+            for method, values in primary_analysis["absolute_top1"].items():
+                interval_text = (
+                    f"[{100 * bootstrap['lower']:.4f}, {100 * bootstrap['upper']:.4f}]"
+                    if method == "contextual_minus_contrastive"
+                    else "—"
+                )
+                markdown.append(
+                    f"| {method.replace('_', ' ')} | {100 * values['clean']:.4f} | "
+                    f"{100 * values['mean_corrupted']:.4f} | "
+                    f"{100 * values['drop']:.4f} | {interval_text} |"
+                )
+            markdown.extend(
+                [
+                    "",
+                    "Verified identity: Delta = clean accuracy gap − mean corrupted "
+                    "accuracy gap = "
+                    f"{100 * primary_analysis['delta_from_accuracy_gaps']:.4f} "
+                    "percentage points.",
+                    f"On the descriptive per-1,000-query scale, Delta is "
+                    f"{1000 * primary_analysis['estimate']:.4f} correct-retrieval drop "
+                    "difference. No practical-effect or equivalence threshold "
+                    "is imposed.",
+                    "SupCon, official queries, cell differences, seed variation and "
+                    "sensitivities are descriptive; they add no superiority tests.",
+                    "",
+                ]
+            )
+        markdown.extend(
+            [
                 "| Seed | Condition | Contextual clean | Contextual corrupted | "
                 "Contextual drop | Contrastive clean | Contrastive corrupted | "
                 "Contrastive drop | Effect |",
@@ -1295,6 +1356,21 @@ def build_report(
                 f"{cell['contrastive_clean_top1']:.4f} | "
                 f"{cell['contrastive_corrupted_top1']:.4f} | "
                 f"{cell['contrastive_drop']:.4f} | {cell['effect']:.4f} |"
+            )
+        if primary_analysis["schema_version"] == 3:
+            loao = primary_analysis["leave_one_action_out"]
+            markdown.extend(
+                [
+                    "",
+                    "Seed, cell and all 20 leave-one-action-out effects, plus the "
+                    "metadata-only dependence table, are retained in "
+                    "primary-analysis.json.",
+                    "Leave-one-action-out removes query rows only and preserves all "
+                    "20 gallery anchors and original ranks.",
+                    f"Its descriptive range is [{100 * loao['minimum']:.4f}, "
+                    f"{100 * loao['maximum']:.4f}] percentage points; omitted actions "
+                    f"that change the effect sign: {loao['sign_changes']}.",
+                ]
             )
         markdown.extend(
             [

@@ -132,28 +132,39 @@ negative result completes the scientific objective.
 
 ## Staged authorization and remaining calendar
 
-The typed design gate is implemented for Week 3. The selection authorization,
-180-cell evaluation plan, nine-run final set and final-lock schemas/templates
-are declared now. They do not authorize execution by their existence. Selection
-and novel execution remain fail closed until later independent evidence audits
-implement and verify the complete measured cross-bindings. Those later campaign
-authorizers are isolated from the frozen cache-producing interface; they must
-bind unchanged design/code inputs and never weaken historical artifact checks.
+The original Week 3/4 design gate authorizes auxiliary engineering only.
+[Decision 0006](../decisions/0006-v3-execution-completion-amendment.md) requires
+completion of the full execution path in one successor release under
+`study-v3/revisions/execution-r1/`, retaining the original release and evidence.
+Its new design lock binds the predecessor and explicitly compares unchanged
+scientific fields. The same dataset seal protects both releases and all
+historical protocol versions. New interfaces or passing fixtures do not grant
+selection, final-training or novel access by their existence.
 
 1. Before fresh caches/pilots: resolve preparation; audit all historical roots;
    freeze complete design/pilot protocol and cache-affecting release.
-2. October 5–11: fresh parity, two final-training extraction repeats, the three
-   other clean caches, loss/backward/learnable fixtures, and three full pilots.
-3. By October 18: all nine development corruption paths, analysis fixtures,
-   complete pilot/capacity/seal evidence, allocation calendar and researcher
-   availability. Append selection authorization against the unchanged protocol.
+2. Preserve the completed Week 4 release and its parity, five caches and three
+   full pilots. Before successor admission, rerun fresh parity, both full
+   final-training extraction repeats, the other three caches and all three
+   complete pilots under the new digest; independently validate their evidence.
+3. By October 18: complete the fixture-to-report rehearsal, deterministic
+   40–48-row development geometry panel and two-process replay, all nine full
+   development encodings and 27 pilot-head projections/results, and measured
+   capacity/seal evidence. Bind the allocation calendar, researcher availability
+   and exact attempt/failure rules. Only the complete measured admission may
+   append selection authorization against the fixed successor protocol.
 4. After clean selection and nine fresh final heads: selected configurations,
    complete checkpoint/attempt bindings and exact final matrix; independently
    audit before the researcher-controlled final lock and atomic dataset opening.
 
 Storage uses `available >= 200*2**30 + 1.25*remaining_peak_bytes`, with available
-space the smaller of filesystem and project-quota remainder. The initial
-100-decimal-GB envelope already includes slack. Preserve every historical and
+space the smaller of filesystem and project-quota remainder. The amended
+120-decimal-GB campaign envelope includes retained predecessor and planned
+successor artifacts plus slack; existing files already reduce current free
+space and must not be counted again as remaining work. The original 100 GB
+envelope remains historical. Preserve every historical and
 failed artifact; deleting evidence is not a storage remedy. Existing caches
 establish historical feasibility only. No current document, template or passed
-unit test asserts that GPU pilots, capacity or researcher availability exist.
+unit test asserts that successor GPU pilots or measured capacity exist. Record
+the researcher's confirmed normal and contingency availability separately from
+actual work logs and verify the complete dated schedule before admission.

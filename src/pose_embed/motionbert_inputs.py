@@ -149,6 +149,7 @@ def load_motionbert_inputs(
     *,
     load_annotations: bool = True,
     require_clean: bool = True,
+    novel: bool = False,
 ) -> VerifiedMotionBERTInputs:
     """Verify the adopted complete bundle and hash before any deserialization."""
     from pose_embed.dataset_seal import (
@@ -158,20 +159,28 @@ def load_motionbert_inputs(
     )
 
     protocol = load_protocol(protocol_path)
-    if protocol.protocol_id == "protocol-v3":
+    if novel:
+        if protocol.protocol_id != "protocol-v3":
+            raise ValueError("novel MotionBERT access requires protocol-v3")
+        from pose_embed.test_access import open_final_test_once
+
+        if require_clean:
+            require_clean_repository()
+        open_final_test_once(protocol, protocol_sha256=protocol_digest(protocol))
+    elif protocol.protocol_id == "protocol-v3":
         require_dataset_unopened(require_registry=True)
     else:
         require_no_v3_opening()
         if require_clean:
             registered_roots(required=True)
     scientific = resolve_scientific_paths(protocol)
-    if scientific.test_opening_ledger.exists():
+    if not novel and scientific.test_opening_ledger.exists():
         raise ValueError("Week 3 extraction is forbidden after novel-test opening")
     raw_root = os.environ.get("POSE_EMBED_DATA_ROOT")
     if not raw_root or not Path(raw_root).is_absolute():
         raise ValueError("POSE_EMBED_DATA_ROOT must be an absolute path")
     data_root = Path(raw_root).resolve()
-    if require_clean:
+    if require_clean and not novel:
         require_clean_repository()
     bundle_path = Path(manifest_set_path).resolve()
     if not bundle_path.is_relative_to(scientific.root):
@@ -194,7 +203,7 @@ def load_motionbert_inputs(
         ):
             raise ValueError(f"verified {prefix} source differs from the protocol")
     annotations = None
-    if load_annotations and protocol.protocol_id == "protocol-v3":
+    if load_annotations and protocol.protocol_id == "protocol-v3" and not novel:
         from pose_embed.preparation_v3 import load_auxiliary_annotations
 
         annotations = load_auxiliary_annotations(protocol, inventory, scientific.root)

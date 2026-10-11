@@ -60,7 +60,9 @@ test("protocol publishes the v3 planning direction and pending capacity gate", a
   await expect(page.getByRole("heading", { name: "The rules before the result." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Actions only you can complete" })).toBeVisible();
   await expect(page.getByText("Capacity is a gate, not a completed result")).toBeVisible();
-  await expect(page.getByText(/100 GB of incremental storage/)).toBeVisible();
+  await expect(page.getByText(/^The amended plan budgets 120 decimal GB including slack/)).toBeVisible();
+  await expect(page.getByText(/Verified successor evidence and measured capacity are required/)).toBeVisible();
+  await expect(page.getByText(/The current planning status below records verified progress/)).toBeVisible();
   await expect(page.getByText(/7, 17, 29/).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Read the final v3 plan" })).toHaveAttribute("href", "/protocol/plan");
   await expect(page.getByText("26 declared configurations:", { exact: false })).toHaveCount(0);
