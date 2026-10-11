@@ -186,8 +186,7 @@ completion-release, command/report rehearsal, interpretation and actual metadata
 requirements are complete. This technical task completion does not pass the
 scientific admission gate, which still requires fresh caches, pilots and the
 other Week 5 evidence. Geometry job **8028081** was queued at 22:44:39 UTC;
-its invariants and full-query damage summaries remain unverified. All three
-Week 5 gates remain pending.
+its later outcome is recorded below. All three Week 5 gates remain pending.
 
 ### Geometry invocation correction
 
@@ -205,6 +204,48 @@ transferred bytes match SHA-256
 see the [exact SCC command](scc-v3-runbook.md#week-5-execution-r1-successor).
 The path-contract self-check passed locally. This is an invocation correction,
 not a scientific amendment or evidence that the actual geometry run passed.
+
+### Verified geometry and fresh-cache submission
+
+Geometry job **8028081** completed on `scc-ne7`: scheduler `failed=0`,
+`exit_status=0`, 614 seconds wall time. Independent verification at 22:57:18 UTC
+confirmed 40 base queries, 43 total selected rows, nine conditions and 430
+tensors, with exact repeats across two fresh processes. The absent
+`invalid_own_scale` and `all_missing` categories have existing executed fixture
+coverage. The original training-only fallback was not re-estimated. Both seal
+checks and all 14 RAM/storage resource samples passed.
+
+The operation is `study-v3/operations/20261011T224733Z-8028081-geometry/`;
+its validation receipt SHA-256 is
+`a73168245cce41b9eee1ffbbc0922a80ceb5091a0f3a0a5bb6fd57446f2b9f32`.
+The summary is
+`study-v3/revisions/execution-r1/locks/geometry/20261011T224733Z-8028081-geometry/summary.json`,
+SHA-256 `89a44f1ae55cac79715dcd1e33a545e2f290d17f6e5faa9243d48325bd4fb6c9`.
+Accounting and independent geometry verification are under
+`study-v3/operations/week5-launches/20261011T225707Z/`.
+
+Fresh five-cache L40S job **8028119** was submitted at 22:57:19 UTC, with its
+launch receipt in the same directory. Its cache outcome is not yet verified.
+Task 02 is in progress; task 01 remains in progress until all nine full-query
+damage summaries pass. All scientific gates remain pending.
+
+The active `finish-pose-embed-week-5` thread heartbeat continues the remaining
+Week 5 work every 15 minutes. Allocated jobs retain resource samples every 60
+seconds. The persistent SCC handoff remains
+`$HOME/pose-embed-scc/WEEK5-STATUS.txt` in `remote`. Continuation covers the
+remaining Week 5 evidence and capacity decision only; it does not launch
+selection, final training or novel-test work.
+
+Reviewed candidate-assembly helpers, their tests and an explicitly nonauthorizing
+planning draft were transferred and byte-verified under
+`study-v3/operations/week5-admission-tools/20261011T225931Z/`.
+The bound `tools.json` SHA-256 is
+`495e5db62e7258f082b6a88f524dc140ebec35ca7605b42817663757a412ab4d`.
+The assembler passed 32 local tests and its monitored wrapper passed 19. The
+draft leaves measurements null; no candidate or admission job was submitted.
+The persistent status link points to this directory's `status.txt`, preserving
+the current cache step. At 22:59:31 UTC, cache job 8028119 was still queued;
+an actual GPU allocation is not inferred from submission.
 
 ## Implementation and verification in progress
 
@@ -273,10 +314,11 @@ synchronized release 731938a; passed the allocated 41-check software rehearsal
 with the real dataset seal intact; verified successor preparation job 8028032,
 including exact manifest identity and unchanged scientific settings; passed 84
 supplementary checks and independently verified the actual dependence tables.
-Task 03 is complete.
+Task 03 is complete. The fixed geometry panel passed independent verification
+and exact fresh-process repeats; the fresh five-cache job was submitted.
 
-**Next:** Complete allocated geometry, fresh caches, pilots, development
-corruptions and timing. Include the
+**Next:** Verify fresh caches, then complete pilots, development corruptions,
+full-query damage telemetry and timing. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not

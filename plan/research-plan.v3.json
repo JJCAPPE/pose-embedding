@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-10-11T22:45:23Z",
+  "generatedAt": "2026-10-11T22:58:27Z",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -53,7 +53,7 @@
       },
       {
         "label": "Current planning status",
-        "value": "Week 3 preparation remains complete as dated September 29 evidence. On October 8, dated cleanup records and researcher confirmation resolved retirement of two historical roots without recovering or recreating artifacts; the original registry, audit and scientific locks remain unchanged. All 46 focused numerical/source checks and three full-size synthetic L40S learnable fixtures passed; reduced-dimension software fixtures verified paired initialization and batch plans. Week 4 is closed: all five fresh v3 caches passed independent validation job 7969962, and independent validator 7971490 passed the three complete 20-epoch engineering pilots with paired provenance, complete checkpoint/score records and health/resource checks. Week 5 is active: release 731938a was verified and synchronized to SCC, and CPU rehearsal job 8028010 passed 41 checks with no failures or skips while preserving the real dataset seal. Preparation job 8028032 verified eight byte-identical successor manifests and unchanged scientific settings. Supplementary job 8028071 passed 84 checks and independently verified actual development/novel metadata tables without loading novel poses or outcomes; task 03 is complete. Geometry job 8028081 is queued, with no passing result yet. The other three tasks and all Week 5 scientific gates remain unfinished. Repeated validation and complete report costs must enter the measured capacity forecast; feasibility remains unverified. The researcher confirmed up to 5 hours weekly normally and 10 if necessary, with limited Thanksgiving availability; budget no guaranteed hours that week. SCC uses ordinary queued access without a reservation. Full-campaign measured capacity is required before selection, and final-test authorization remains closed. Pilot accuracy is ineligible for learning-rate selection. Actual researcher time remains unreported."
+        "value": "Week 3 preparation remains complete as dated September 29 evidence. On October 8, dated cleanup records and researcher confirmation resolved retirement of two historical roots without recovering or recreating artifacts; the original registry, audit and scientific locks remain unchanged. All 46 focused numerical/source checks and three full-size synthetic L40S learnable fixtures passed; reduced-dimension software fixtures verified paired initialization and batch plans. Week 4 is closed: all five fresh v3 caches passed independent validation job 7969962, and independent validator 7971490 passed the three complete 20-epoch engineering pilots with paired provenance, complete checkpoint/score records and health/resource checks. Week 5 is active: release 731938a was verified and synchronized to SCC, and CPU rehearsal job 8028010 passed 41 checks with no failures or skips while preserving the real dataset seal. Preparation job 8028032 verified eight byte-identical successor manifests and unchanged scientific settings. Supplementary job 8028071 passed 84 checks and independently verified actual development/novel metadata tables without loading novel poses or outcomes; task 03 is complete. Geometry job 8028081 passed independent verification: 43 selected rows including the 40 base queries, nine conditions and exact repeats in two fresh processes; full-query damage telemetry remains pending. Fresh five-cache L40S job 8028119 was submitted, with no cache outcome claimed. Tasks 01 and 02 are in progress, task 04 is pending, and all Week 5 scientific gates remain unfinished. Repeated validation and complete report costs must enter the measured capacity forecast; feasibility remains unverified. The researcher confirmed up to 5 hours weekly normally and 10 if necessary, with limited Thanksgiving availability; budget no guaranteed hours that week. SCC uses ordinary queued access without a reservation. Full-campaign measured capacity is required before selection, and final-test authorization remains closed. Pilot accuracy is ineligible for learning-rate selection. Actual researcher time remains unreported."
       },
       {
         "label": "Measured capacity prerequisite",
@@ -833,12 +833,12 @@
         "Current quota and remaining peak bytes must pass; dated capacity readings and prior GPU access are not reservations."
       ],
       "advisorPrompt": "Do all October 18 validity, seal, storage, runtime and researcher-availability criteria pass without changing the declared study?",
-      "reflection": "Done: Verified release 731938a on SCC, the 41-check full command rehearsal, successor preparation with eight byte-identical manifests, and supplementary job 8028071 with 84 passing checks and independently verified development/novel metadata tables. The real dataset seal remained intact; task 03 is complete. Next: Complete geometry job 8028081, fresh caches and pilots, all nine development corruption paths and measured timing, then verify the full capacity forecast. Open issues: The remaining three tasks and all three scientific gates are unfinished. Repeated validation and whole-report costs must fit the dated calendar; feasibility is not yet established. Availability remains up to 5 hours weekly normally, 10 if necessary; budget no guaranteed Thanksgiving hours. Actual researcher time remains unreported. No selection, final training or novel-test opening is authorized.",
+      "reflection": "Done: Completed task 03 through the verified completion release, 41-check command rehearsal, 84 supplementary checks and actual metadata tables. Geometry job 8028081 passed: 40 base queries, 43 selected rows, nine conditions, 430 tensors and exact repeats in two fresh processes. Dataset seals remained intact. Next: Verify fresh-cache job 8028119, then run the paired pilots, all nine development corruption paths and measured timing before the capacity decision. Open issues: Geometry task 01 still needs full-query damage telemetry; task 02 is in progress and all three scientific gates remain pending. The dated calendar must include repeated validation and complete report costs. Availability remains up to 5 hours weekly normally, 10 if necessary; budget no guaranteed Thanksgiving hours. Actual researcher time remains unreported. The continuing Week 5 work does not authorize selection, final training or novel-test opening.",
       "plannedMinutes": 300,
       "actualMinutes": 0,
       "state": "active",
       "closedAt": null,
-      "version": 7,
+      "version": 8,
       "tasks": [
         {
           "id": "w05-task-01",
@@ -850,10 +850,10 @@
           "required": true,
           "estimateMinutes": 90,
           "state": "in_progress",
-          "completionNote": "Geometry job 8028081 was queued at 22:44:39 UTC using the unchanged frozen CLI with its required locks/geometry destination. The queued job is not a passing result. Panel invariants, repeats and all nine full-query damage summaries remain to be verified.",
+          "completionNote": "Geometry job 8028081 passed independent verification at 22:57:18 UTC: 40 base queries, 43 total selected rows, nine conditions, 430 tensors and exact repeats across two fresh processes. The absent invalid-own-scale and all-missing cases have executed fixture coverage. The original training fallback was preserved; both dataset seals and all 14 resource samples passed. This task remains in progress until all nine full-query damage summaries are verified. See the Week 5 execution record.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 5
+          "version": 6
         },
         {
           "id": "w05-task-02",
@@ -864,11 +864,11 @@
           "expectedOutput": "Fresh successor admission receipts, nine complete corruption paths, 27 head projections and measured stage-level runtime/memory/bytes.",
           "required": true,
           "estimateMinutes": 90,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
+          "state": "in_progress",
+          "completionNote": "Fresh five-cache L40S job 8028119 was submitted at 22:57:19 UTC against frozen release 731938a and the verified successor bindings. No cache outcome is claimed. Fresh parity/repeat extraction, independent cache and complete-pilot validation, all nine development conditions, 27 head projections and capacity measurements remain required.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 4
+          "version": 5
         },
         {
           "id": "w05-task-03",
