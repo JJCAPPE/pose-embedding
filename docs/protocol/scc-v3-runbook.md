@@ -353,7 +353,7 @@ then retains 27 query projections and 27 engineering results. Three clean
 gallery projections are also retained with scientific sidecars. No scores
 select a condition, head, recipe, threshold or retry.
 
-The reviewed corruption launcher is staged, **not submitted**, under
+The reviewed corruption launcher was staged before submission under
 `study-v3/operations/week5-corruption-launch-tools/20261012T160355Z/`:
 
 - `pose-week5-launch-corruptions.py`: SHA-256
@@ -364,13 +364,12 @@ The reviewed corruption launcher is staged, **not submitted**, under
   `c9c28703aa9fc40edc724d1b93e5f03e815906ff2f040657cb36507a5f025a6d`.
 
 Four focused guard tests and independent review passed. The launcher requires
-the future independently passed **8035829** completion receipt from verifier
+the independently passed **8035829** completion receipt from verifier
 `a3a8a73847bf2969eb886d456e68bf657ba27362402a30cd9dc62ca003feb4aa`,
 rehashes its metadata evidence, and rechecks the current pilots, caches, geometry,
 release, locks, dependencies, GPU diagnostic, seal and resource reserve. Prior
-or uncertain corruption submissions block this one-off command. Keep the
-following command held until the actual receipt path and hash are verified;
-staging is not a passing pilot result or permission to bypass this gate.
+or uncertain corruption submissions block this one-off command. The following
+command records the already executed submission; **do not rerun it**.
 
 ```bash
 cd "$POSE_EMBED_RELEASE"
@@ -392,6 +391,33 @@ at approximately 16:27:50 UTC. Its launch record is
 `study-v3/operations/week5-launches/20261012T162658Z/launch.json`
 (SHA-256 `530ed00fc8d258d7c3bf4797fe81f4c38690aff988853490f0f70ea37f96470c`).
 Do not duplicate that submission; inspect its existing intent and scheduler state.
+
+The completion checker was staged, without execution, at
+`study-v3/operations/week5-corruption-verification-tools/20261012T165607Z/`.
+`pose-week5-verify-corruptions.py` has SHA-256
+`379bc89bf063f933dd2fde4e078156c603d6eb00210ab8fdee1c1ff361e1345f`;
+`test_pose_week5_verify_corruptions.py` has SHA-256
+`9452ba1322ebb748a09592d19ef1c9520a8a05169431005669230b8b4f8de806`;
+`tools.json` has SHA-256
+`2f9cfc2f707c54412c87fe11baee6b6184f898a92b545af798e77084120a3c06`.
+Seven focused tests and independent review passed. The checker binds job
+8035983 and operation `20261012T162852Z-8035983-corruptions`, checks all 135
+commands, 67 GPU preflights, complete output metadata, prerequisite receipts,
+resources, seals and accounting, and preserves a fresh verification receipt.
+It only reads metadata and checks archive sizes; full admission validation
+(full A), including scientific tensor hashes and numerical replay in an
+allocation, remains mandatory. **Hold this command until successful terminal
+accounting and a complete operation outcome exist.** Clear `PYTHONOPTIMIZE` so
+assertions execute, and disable bytecode writes to retained tool directories:
+
+```bash
+cd "$POSE_EMBED_RELEASE"
+env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
+  .venv/bin/python3.11 \
+  "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-corruption-verification-tools/20261012T165607Z/pose-week5-verify-corruptions.py" \
+  --launch-receipt "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-launches/20261012T162658Z/launch.json" \
+  --launch-sha256 530ed00fc8d258d7c3bf4797fe81f4c38690aff988853490f0f70ea37f96470c
+```
 
 Before timing, independently review successful corruption accounting, immutable
 operation/outcome, all command and GPU-preflight outcomes, resource samples and
