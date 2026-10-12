@@ -427,16 +427,36 @@ the fixed conditions, seed 7, methods and input bindings. Check all nine full-qu
 geometry summaries and jitter fallback denominators. Scientific archive hashing
 and replay stay inside allocations. No accuracy or loss-improvement floor is a
 completion criterion. Submit timing only after this review and a fresh
-allocation, duplicate-attempt and resource check:
+allocation, duplicate-attempt and resource check.
+
+The guarded timing launcher was staged, **not executed or submitted**, under
+`study-v3/operations/week5-timing-launch-tools/20261012T170831Z/`:
+
+- `pose-week5-launch-timing.py`: SHA-256
+  `4ce08cfe34bae6ebea2ba7145fe253fdf1b56f8db4231f9ba34f8aa6302ad6c7`;
+- `test_pose_week5_launch_timing.py`: SHA-256
+  `4bf1a2986568bc93f07a8f94974735b1830c3eb07d28bbac44334e54cf66d785`;
+- `tools.json`: SHA-256
+  `7b5d934b4c7900242aa393550f8ae1f706c48cfae0a03df561ed89889ea4b726`.
+
+Twelve focused tests and independent review passed. The launcher requires the
+actual passed corruption receipt from the checker above and its verified hash,
+rehashes retained metadata, checks archive sizes, and rechecks existing pilot,
+cache, geometry, source, lock, dependency, diagnostic, seal and storage bindings.
+Prior or uncertain timing submissions block it. It requests the unchanged
+L40S, four CPU slots, 32 GiB RAM and 12-hour allocation with
+`avx2,cpu_arch=sapphirerapids,cpu_type=Gold-6426Y`. The 84 GB remaining-peak bound
+is conservative, not a measured campaign forecast. **Keep this command held
+until the actual corruption receipt passes independent review.** Staging and
+metadata review do not authorize selection; full A and capacity remain pending.
 
 ```bash
-qsub -l avx2,cpu_arch=sapphirerapids,cpu_type=Gold-6426Y \
-  -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
-  "$V3_GPU_CONTROLLER" timing --cache-dir "$V3_CACHES" \
-  --diagnostic-receipt "$V3_GPU_DIAGNOSTIC" \
-  --diagnostic-sha256 "$V3_GPU_DIAGNOSTIC_SHA256" \
-  --remaining-peak-bytes "$V3_REMAINING_PEAK_BYTES" \
-  --recorded-by "researcher-authorized Week 5 execution"
+cd "$POSE_EMBED_RELEASE"
+env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
+  .venv/bin/python3.11 \
+  "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-timing-launch-tools/20261012T170831Z/pose-week5-launch-timing.py" \
+  --corruption-verification "${V3_CORRUPTION_VERIFICATION:?Set the independently passed 8035983 receipt}" \
+  --corruption-verification-sha256 "${V3_CORRUPTION_VERIFICATION_SHA256:?Set its verified SHA-256}"
 ```
 
 Timing keeps all 95,001
