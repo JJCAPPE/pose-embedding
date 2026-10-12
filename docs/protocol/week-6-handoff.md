@@ -1,22 +1,26 @@
 # Week 6 handoff: October 19 to 25, 2026
 
-Prepared during Week 5 execution. **Week 5 scientific admission is held after a measured-profile capacity no-go.**
+Prepared during Week 5 execution. **Week 5 scientific admission remains held
+while the authorized ADR0007 successor is implemented and verified.**
 Read the [Week 5 execution record](week-5-execution.md),
 [incoming handoff](week-5-handoff.md), [canonical plan](../../plan/research-plan.v3.md),
-[ADR0006](../decisions/0006-v3-execution-completion-amendment.md) and
+[ADR0006](../decisions/0006-v3-execution-completion-amendment.md),
+[ADR0007](../decisions/0007-safe-validation-reuse-and-stage-capacity.md) and
 [SCC runbook](scc-v3-runbook.md). This handoff does not authorize selection.
 
 | Operational handoff field | Current status |
 | --- | --- |
-| Admitted successor release and protocol/design hashes | Pending final verification and SCC admission |
+| Admitted successor release and protocol/design hashes | execution-r2 implementation/review/freeze pending; no admitted successor |
 | Fresh cache/pilot/corruption/geometry/analysis receipts | Follow the Week 5 execution record; admission incomplete |
-| Capacity report and immutable selection authorization | Measured-profile no-go; full forecast incomplete; selection held |
+| Capacity report and immutable selection authorization | Prior measured-profile no-go retained; authorized CPU/GPU amendment and fresh capacity evidence pending; selection held |
 | SCC jobs, logs and next command | Read `$HOME/pose-embed-scc/WEEK5-STATUS.txt` through `remote`; replace pending fields with verified results before transition |
 
 ## Admission before the first selection job
 
 Verify the unchanged design and predecessor binding under
-`study-v3/revisions/execution-r1/`, preserving original Week 4 evidence. Require
+`study-v3/revisions/execution-r2/`, preserving original and execution-r1 evidence.
+Apply the complete ADR0007 regeneration inventory; retain source/identity/fallback
+evidence through validated bindings without adopting old caches or pilots. Require
 fresh parity, five clean caches including both complete 95,001-row repeats,
 three complete paired pilots and independent validation.
 Require the fixed geometry panel, all nine 18,929-query corruption encodings,
@@ -88,9 +92,10 @@ actions and paired fixed update plans. Component measurement 8038699 passed all 
 independent verification: P=778.274100575014 seconds exceeds the measured-profile
 necessary bound of 305.840707965 seconds. The largest report's `452P` component
 with 25% slack forecasts 122.145796 hours against the shared 48-hour limit.
-This is a profile-specific no-go, not a universal hardware bound. A researcher
-decision on a result-blind amendment or a verified faster compatible runtime is
-required; full admission remains incomplete and held. Neither timing nor this
+This is a profile-specific no-go, not a universal hardware bound. The researcher
+authorized ADR0007 for bounded numerical validation reuse and separate CPU/GPU
+capacity accounting. Successor implementation, regeneration and renewed measured
+capacity remain pending; full admission remains incomplete and held. Neither timing nor this
 diagnostic authorizes Week 6.
 Native initialization replay also requires measured compatible CPU hardware and
 runtime. A generic CPU request, or even a requested feature, is not sufficient:

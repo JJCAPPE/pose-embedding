@@ -3,9 +3,11 @@
 Started October 11, 2026 (America/New_York), before the October 12–18 calendar
 week, at the researcher's direction. **Week 5 remains open. The measured runtime
 profile failed a necessary capacity condition; further admission work is held
-for a researcher decision. No scientific admission is complete.** The [incoming handoff](week-5-handoff.md),
+while the approved validation/capacity successor is implemented and verified.
+No scientific admission is complete.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
+and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
 ## Starting evidence and scope
@@ -1237,23 +1239,56 @@ No scientific arrays were read and no further job was submitted.
 This is a **measured-profile no-go**, not a failure of the three pilot checks.
 Full scientific admission A, corrupted-artifact numerical replay and the complete
 capacity ledger remain unfinished and are held. No optimistic capacity receipt
-was created to reach an A timer. The current plan forbids validation memoization
-under the adopted amendment and requires a result-blind amendment after a failed
+was created to reach an A timer. At this no-go checkpoint, the then-current plan forbade validation memoization
+under ADR0006 and required a result-blind amendment after a failed
 go/no-go. A longer CPU allocation alone cannot repair the shared opening-GPU
 maximum-job constraint.
 
-The consequential choice is to authorize a narrowly scoped implementation
+Before the later ADR0007 authorization recorded below, the consequential choice
+was to authorize a narrowly scoped implementation
 amendment proposal, retain release `731938a` and identify a demonstrably faster
 compatible runtime for renewed measurement, or retain the blocked study.
 The recommended proposal would examine safe reuse of complete validation proofs
 within one unchanged command input snapshot and job limits appropriate to CPU
-and GPU stages. It is **not adopted or implemented**. It must retain exact
+and GPU stages. It was **not yet adopted or implemented at this checkpoint**. The proposal had
+to retain exact
 numerical/provenance checks, tamper invalidation, fresh independent recertification,
 the shared seal and full opening authorization; all recipes, epochs, physical
 batches, paired seeds, 27 selection slots, nine final heads and 180 cells stay
 fixed. Any approved change needs its own successor release, impact/regeneration
 inventory, tests and renewed measured admission. No code, artifact, lock or
 scientific budget has been changed by recording this blocker.
+
+## Authorized result-blind engineering amendment: October 12
+
+The researcher explicitly approved safe validation reuse and separate CPU/GPU
+time accounting while preserving every scientific check and budget.
+[ADR0007](../decisions/0007-safe-validation-reuse-and-stage-capacity.md) records
+that authorization, its mutation model and the required regeneration inventory.
+The decision follows the verified runtime no-go above; it uses no novel outcome
+or pilot accuracy criterion. The no-go and all `731938a` evidence remain intact.
+
+The authorized successor is `study-v3/revisions/execution-r2/`. It may reuse only
+successful deterministic numerical proof markers inside one guarded command,
+rehashing full transitive contents on every hit and keeping dynamic decisions
+fresh. Separate CPU/GPU capacity evidence must count each whole command in its
+allocation class, including CPU/I/O overhead inside a GPU job. No capacity gain
+or implementation pass is asserted by this authorization.
+
+Implementation/review, a new immutable freeze, full fixture/report rehearsal,
+fresh parity/five caches/three pilots, geometry/corruption evidence, successor
+timing, full A and a new measured capacity decision remain required. Original
+source/identity/fallback evidence and byte-identical manifests may be retained
+only through validated bindings; old caches, pilots and sidecars remain original
+evidence and cannot be relabeled. The former 120 GB planning estimate must be
+replaced by an actual retained/remaining inventory including the extra generation;
+the 200 GiB reserve and 25% remaining-work slack remain mandatory.
+
+Tasks 01 and 03 retain their verified execution-r1 history. Task 02 remains in
+progress, task 04 remains blocked by incomplete measured capacity, and all gates
+remain pending. Actual time remains unreported. The researcher requested hourly
+status polling; in-job resource recording remains unchanged. No selection,
+final training or novel opening is authorized by this engineering decision.
 
 ## Implementation and verification in progress
 
@@ -1349,14 +1384,14 @@ geometry summaries. Resident timing 8038355 passed independent completion
 review, fixed resident/optimization counts and paired update plans. Full
 scientific admission replay remains pending. The three-call P diagnostic then
 passed independent verification and established the measured-profile capacity
-no-go described above.
+no-go described above. The researcher then authorized ADR0007; its successor
+implementation and measured admission remain pending.
 
-**Next:** Obtain the researcher decision on the measured-profile no-go. A narrow,
-result-blind implementation amendment proposal is recommended; retaining the
-frozen release requires evidence for a sufficiently faster compatible runtime.
-Before any eventual admission, finish full A and corrupted-artifact replay,
-refresh seals and measure the complete dependency/capacity ledger. No further
-scientific job is authorized by this handoff.
+**Next:** Complete and independently review the researcher-authorized ADR0007
+implementation. Freeze execution-r2 only after its required tests pass, regenerate
+the declared evidence, then finish full A and corrupted-artifact replay, refresh
+seals and measure the complete CPU/GPU dependency/capacity ledger. Passing this
+engineering amendment does not authorize selection, final training or opening.
 
 **Open issues:** P passed independent verification but fails the measured-profile
 capacity condition. Task 04 is blocked, task 02 remains in progress, and all

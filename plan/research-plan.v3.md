@@ -1,6 +1,7 @@
 # Final v3 plan: frozen one-shot pose robustness
 
-Original decision: **2026-09-29**. Execution amendment: **2026-10-09**. Delivery: **2026-12-18**. Status: **final planning
+Original decision: **2026-09-29**. Execution amendments: **2026-10-09** and
+**2026-10-12**. Delivery: **2026-12-18**. Status: **final planning
 decision; implementation and measured campaign gates remain to be completed**.
 This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-frozen-one-shot-v3.md)
 records the change of direction from v2. It does not constitute a final-test
@@ -12,6 +13,12 @@ currently disabled stages requires a successor execution release and new
 provenance bindings. Preserve the September release, Week 4 closure and all
 original evidence. Sections 5–10 govern the remaining work; they do not assert
 that the new implementation, capacity checks or deployment have happened.
+
+The October 12 researcher-authorized [ADR0007](../docs/decisions/0007-safe-validation-reuse-and-stage-capacity.md)
+permits command-local reuse of successful numerical validation with complete
+content rehashing, and separate CPU/GPU capacity accounting. It requires a fresh
+`execution-r2` release and regeneration; implementation and measured admission
+remain pending. Preserve the measured no-go and all `execution-r1` evidence.
 
 Following the [final prospectus](../docs/proposal/2026/kulis_pose_sequence_retrieval_prospectus.pdf),
 the December study asks whether a **full contextual training recipe reduces
@@ -495,6 +502,10 @@ do not rewrite verified v3 operators or analysis merely to repeat this table.
 
 ### Completion release before selection
 
+The following completion-release requirements record the October 9 amendment
+for `execution-r1`. The October 12 subsection below defines its authorized
+successor; neither changes or relabels the original release.
+
 Adopt one coordinated completion release. The current final-training guard in
 `training/runner.py`, novel-role guard in `motionbert_features.py`, final-lock
 guard in `protocol.py`, selection authorizer, corrupted-development evaluator
@@ -586,21 +597,52 @@ Enforce reuse counts in the campaign manifest: nine development corruption
 encodings shared by three pilot heads; one novel gallery plus ten query-condition
 encodings; 21 final pre-head files (ten official, ten primary, one gallery);
 nine reusable gallery projections and 180 role-specific query projections.
-Keep immutable role-specific files and existing validation. Do not replace CPU
-projection with GPU arithmetic, change precision, memoize validation or omit
-hash checks as part of this amendment. Optimize measured orchestration/I/O
-reuse first. Start with one scientific subprocess at a time on the validated
+Keep immutable role-specific files and existing validation. The October 9
+amendment prohibited memoized validation; that prohibition remains part of the
+immutable `731938a`/`execution-r1` evidence. The October 12 exception below
+authorizes only bounded numerical proof reuse in a new successor. CPU projection
+arithmetic, precision and all content hash checks remain unchanged. Optimize
+measured orchestration/I/O reuse first. Start with one scientific subprocess at a time on the validated
 L40S. Group fresh subprocess runs only when measured queue/setup savings justify
 it and the complete group fits the allocation; preserve independent seeds,
 attempts, manifests and failure handling. No unmeasured concurrent GPU jobs.
 
+### October 12 validation and capacity successor
+
+The researcher authorized [ADR0007](../docs/decisions/0007-safe-validation-reuse-and-stage-capacity.md)
+after measured P=778.274100575014 seconds made the prior profile's repeated
+report component with slack 122.145796 hours against the shared 48-hour opening
+limit. Preserve that no-go; it does not prove all hardware infeasible.
+
+Within one guarded command, a new `execution-r2` release may reuse only complete
+successful deterministic numerical proofs. Each hit must rehash every transitive
+bound file and match validator/options, role, protocol/design/source/runtime
+identities. Reuse never substitutes for fresh seal, authorization, timestamp,
+attempt inventory, resource or calendar decisions. No stat-only trust, persisted
+proof cache, failed/partial result reuse or cross-command reuse is permitted.
+Store successful numerical proof markers only, not mutable result objects.
+Independent recertification
+starts fresh, and changed content/options fail closed or force full validation.
+
+Use the same canonical artifact root and shared seal, new predecessor-bound
+locks and explicit scientific-field equality. Follow ADR0007's regeneration
+inventory: retain original source/identity/fallback evidence through validated
+bindings and byte-identical manifest rebinding; regenerate parity, five caches,
+three complete pilots, panel/repeat evidence, nine development paths/projections,
+report rehearsal and successor timing/admission receipts. Preserve original and
+`execution-r1` artifacts without a cross-release adoption wrapper. Freeze and
+verify the complete successor before scientific execution; passing software
+checks alone cannot authorize selection or opening.
+
 ## 8. Capacity gates
 
 The fixed campaign has the following head-update count under the existing
-sampler. Counts are not GPU-hour estimates. The main table counts the accepted campaign;
-the three retained predecessor pilots add 142,560 historical updates. With the
-three successor pilots, 42 complete training runs would be retained before other
-retries/fixtures, totaling 2,102,580 updates across releases.
+sampler. Counts are not GPU-hour estimates. The main table counts the accepted
+campaign. The original and execution-r1 pilot sets add six retained historical
+runs and 285,120 updates. With execution-r2 engineering regeneration, 45 complete
+training runs would be retained before other retries/fixtures, totaling
+2,245,140 updates across releases. The earlier two-generation estimate was
+42 runs and 2,102,580 updates; preserve it as historical planning evidence.
 
 | Stage | Runs | Updates per run | Total updates |
 | --- | ---: | ---: | ---: |
@@ -629,9 +671,12 @@ Before selection, create an immutable capacity report that includes:
   timing-only engineering outside the 39 scientific runs; record its extra
   steps/bytes, and make its weights ineligible for selection or final results.
   No novel inputs or scores are needed.
-- A dated GPU allocation calendar specifying access windows, job limits,
-  queue allowance, and planned concurrency. An empty queue or prior access
-  is not an allocation commitment.
+- A dated CPU/GPU allocation calendar specifying resource-class windows,
+  complete-job limits and queue/setup allowance. Under ADR0007, schema-2 capacity
+  evidence separates CPU/GPU maximum-job, remaining pre-opening and remaining
+  evaluation time; every window declares its class. CPU/I/O within a GPU job
+  stays in that complete GPU wall time. Preserve global non-overlap and one
+  scientific subprocess; an empty queue or prior access is not a reservation.
 - Researcher-confirmed available hours against the work packages and final
   analysis. The inherited 77 planned hours in Weeks 4–14 and zero recorded
   actual minutes are not evidence of remaining availability or no past work.
@@ -646,6 +691,12 @@ then add the allocation calendar's queue/setup delays. Apply the same minimum
 final heads and locks by November 29, full novel evaluation by December 6,
 and preserve December 7–18 for analysis/delivery. Do not launch overlapping
 jobs beyond the demonstrated GPU, host-memory, or storage budget.
+
+At opening, compare actual GPU allocation time remaining with the complete
+GPU-job bound, while still requiring sufficient CPU and GPU evaluation windows
+and researcher delivery time. Reject scalar/unclassified predecessor receipts
+as successor evidence. Independent report/recertification compute remains due
+by December 6; separate accounting does not create later compute capacity.
 
 October 8 pilot scheduler seconds were 502/525/415 and training-stage seconds
 286.739518/323.617977/254.941551 (Contrastive/Contextual/SupCon). A provisional
@@ -676,7 +727,7 @@ pass iff available >= required.
 ```
 
 The September 29 planning envelope was **100 GB** incremental including slack.
-The amended campaign-wide envelope is **120 decimal GB including slack**,
+The October 9 campaign-wide planning envelope was **120 decimal GB including slack**,
 while retaining the 200 GiB reserve. It includes retained predecessor evidence
 and the planned completion-release regeneration; it is not 120 GB of new work
 on top of files already present. It deliberately keeps
@@ -699,6 +750,12 @@ uncompressed payload estimates include float32 features, int64 labels, and
 | Metadata, per-query results, retained failures, and temporary-file allowance | **10.0000** |
 | Subtotal and allowance multiplied by 1.25 | **118.6426** |
 | **Rounded campaign-wide envelope** | **120.0000** |
+
+This table is the pre-`execution-r2` estimate. ADR0007 adds a retained fresh
+engineering generation; inventory all actual retained bytes, successor outputs
+and remaining temporary peaks before admission. No new numeric envelope or
+capacity pass is inferred here. The current-space/reserve equation above remains
+mandatory, and no historical evidence may be deleted to fit the plan.
 
 The original roughly 4.14 million development/final per-query result rows,
 511,083 development-corruption rows and successor pilot records are covered by

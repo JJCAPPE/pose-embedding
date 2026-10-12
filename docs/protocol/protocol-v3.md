@@ -137,7 +137,11 @@ The original Week 3/4 design gate authorizes auxiliary engineering only.
 completion of the full execution path in one successor release under
 `study-v3/revisions/execution-r1/`, retaining the original release and evidence.
 Its new design lock binds the predecessor and explicitly compares unchanged
-scientific fields. The same dataset seal protects both releases and all
+scientific fields. The October 12 authorized
+[ADR0007](../decisions/0007-safe-validation-reuse-and-stage-capacity.md) requires
+another immutable successor, `study-v3/revisions/execution-r2/`, after the
+measured execution-r1 capacity no-go. Both earlier releases and their evidence
+remain unchanged. The same dataset seal protects all releases and all
 historical protocol versions. New interfaces or passing fixtures do not grant
 selection, final-training or novel access by their existence.
 
@@ -157,11 +161,37 @@ selection, final-training or novel access by their existence.
    complete checkpoint/attempt bindings and exact final matrix; independently
    audit before the researcher-controlled final lock and atomic dataset opening.
 
+ADR0007 permits successful deterministic numerical validation proof reuse only
+inside one guarded command. Every hit fully rehashes transitive bound contents
+and matches validator/options and protocol/design/source/runtime identities.
+Dynamic seals, authorization/time, attempt inventories and resource/calendar
+checks stay fresh. Independent recertification starts empty; changed inputs,
+failed/partial checks and mutable caller inputs cannot yield stale success.
+Store successful proof markers only; do not cache mutable result objects.
+No cross-command or persistent proof cache is authorized. The precise acceptance
+and mutation tests are in ADR0007; implementation remains subject to review.
+
+The successor must freshly regenerate parity, five caches/two full repeats,
+three complete pilots, panel/repeat evidence, nine corrupted development paths
+and projections/results, full report rehearsal and timing/admission evidence.
+Retain original source/identity/fallback bytes and byte-identical ordered
+manifests only through validated bindings. Do not relabel predecessor sidecars,
+reuse prior heads as successor pilots/finals, or mix release artifacts.
+
+Successor capacity uses schema-2 CPU/GPU job-duration and remaining-work maps
+with classified dated windows. Count all CPU/I/O overhead inside a GPU command
+as GPU allocation time. Require both classes to fit, one subprocess and global
+non-overlap, slack, queues, resources, storage and deadlines. Fresh opening
+checks the actual GPU job against the GPU bound and still checks both remaining
+evaluation calendars. Old scalar receipts are historical, not auto-converted
+admission. This authorization creates no new gate pass or novel access.
+
 Storage uses `available >= 200*2**30 + 1.25*remaining_peak_bytes`, with available
-space the smaller of filesystem and project-quota remainder. The amended
-120-decimal-GB campaign envelope includes retained predecessor and planned
-successor artifacts plus slack; existing files already reduce current free
-space and must not be counted again as remaining work. The original 100 GB
+space the smaller of filesystem and project-quota remainder. The October 9
+120-decimal-GB planning envelope covered the earlier generations. Inventory all
+retained bytes and execution-r2 additional peaks before admission; no new numeric
+envelope or capacity pass is assumed. In the forecast, existing files already
+reduce current free space and must not be counted again as remaining work. The original 100 GB
 envelope remains historical. Preserve every historical and
 failed artifact; deleting evidence is not a storage remedy. Existing caches
 establish historical feasibility only. No current document, template or passed
