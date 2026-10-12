@@ -164,6 +164,18 @@ passed. Private export redirects to sign-in; Journey returned HTTP 200 and no
 browser errors occurred. PR 33 remains a draft stacked on PR 31. The Week 6
 handoff now explicitly preserves unreported time instead of requesting it again.
 
+The SupCon-execution/independent-validator checkpoint (`ece0f1a`) was published
+through guarded migration `20261012150708` and deployment
+`dpl_BAbHiASDezr2RtkEpoXrqhrXLkxC`. At **October 12 15:10:18 UTC**, live
+health/export and browser checks verified Week 5 version 17 active, task 02
+version 14 in progress, task 03 version 8 done and all gates pending. Actual
+time remains unreported. All other weeks and source links are unchanged; the
+fallback and protocol match the public export. Fifteen database assertions,
+22 tracker tests, typecheck, focused lint, workspace checks and production builds
+passed. Private export redirects to sign-in; Journey returned HTTP 200 and no
+browser errors occurred. PR 33 remains a draft stacked on PR 31; no independent
+three-pilot validation outcome is claimed at this checkpoint.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
@@ -734,6 +746,8 @@ and filesystem free space 1,042,645,254,144 bytes; the conservative 84-GB
 remaining-peak bound passed the required reserve check.
 
 Launch: `study-v3/operations/week5-launches/20261012T150600Z/launch.json`.
+The launch SHA-256, verified at 15:08:09 UTC, is
+`386ad185a04f22d217f6ec9d6a09c87feb4a75afe765efbaa47b55f316d81791`.
 The reviewed one-off CPU launcher is retained under
 `study-v3/operations/week5-launch-tools/20261012T150400Z/`, source SHA-256
 `337f2f598fdb86f58d9d3cfabb70729fa21e445f6d3b94407b8e3cef03b32800`;
