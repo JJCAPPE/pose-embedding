@@ -988,6 +988,88 @@ select a head, condition, recipe, threshold or retry. Inspect this job and its
 preserved launch intent; do not duplicate the submission. Task 02 remains in
 progress, all gates remain pending and no campaign admission is authorized.
 
+### Corruption execution accepted; full-query geometry task complete
+
+Corruption job **8035983** completed at **October 12 18:28:39.920098 UTC**;
+terminal accounting records `failed=0`, `exit_status=0`, **7,190 wall seconds**
+and end time 18:28:40 UTC on `scc-j01`. Independent completion review at
+**18:30:49.548448 UTC** passed **927 evidence bindings**, all **135 commands**,
+**67 GPU preflights**, **358 RAM/storage samples** and both dataset seals.
+Nine 18,929-row encodings, 27 query projections, three clean gallery projections
+and 27 engineering results are retained: **39 archives / 9,833,359,944 bytes**.
+The receipt is
+`study-v3/operations/week5-corruption-verification/20261012T183049Z/verification.json`,
+SHA-256 `4b071bc3a900aa347171998b5dd224885391d019b604763f6d55a5a50af50bd5`.
+Checker SHA-256 is
+`379bc89bf063f933dd2fde4e078156c603d6eb00210ab8fdee1c1ff361e1345f`.
+This is an execution/metadata completion review: full scientific archive hashing
+and numerical admission replay remain required in an allocation. No tensor
+hashing or numerical replay was performed on the login node.
+
+Task 01 is complete on this verified evidence. The previously verified fixed
+40-base/43-total panel, two-process exact repeats and absent-category fixtures
+are now joined by all nine complete, ordered full-query damage records and
+independently recomputed summaries. Every condition has **18,929 finite rows,
+zero undefined rows and zero zero-damage rows**, with **38,605,963 originally
+observed joint-frame/person locations**. Each jitter condition used fallback
+**0 / 18,929 = 0**. The frozen training-only value **0.6601371765136719** and
+original evidence binding remain unchanged; zero observed use is not permission
+to remove the fallback or its fixture coverage.
+
+The damage quantiles below are rounded for display; exact per-row values and
+NumPy-linear summaries remain in the bound sidecars. These describe synthetic
+damage, not accuracy, exclusion rules or calibrated real-world prevalence.
+
+| Condition | Minimum | Median | P95 | Maximum | Newly masked observed locations |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| coordinate_jitter:0.01 | 0.00952559998 | 0.00999750451 | 0.0101852938 | 0.0104900056 | 0 |
+| coordinate_jitter:0.025 | 0.0238140002 | 0.024993762 | 0.0254632356 | 0.0262250163 | 0 |
+| coordinate_jitter:0.05 | 0.0476280007 | 0.0499875245 | 0.0509264712 | 0.0524500322 | 0 |
+| frame_mask:10 | 0.0552486188 | 0.1 | 0.1 | 0.134228188 | 3,861,686 |
+| frame_mask:25 | 0.158227848 | 0.25 | 0.25 | 0.32885906 | 9,654,334 |
+| frame_mask:40 | 0.278481013 | 0.4 | 0.4 | 0.510067114 | 15,446,557 |
+| joint_mask:3 | 0.176470588 | 0.176470588 | 0.176470588 | 0.176470588 | 6,812,817 |
+| joint_mask:6 | 0.352941176 | 0.352941176 | 0.352941176 | 0.352941176 | 13,625,634 |
+| joint_mask:8 | 0.470588235 | 0.470588235 | 0.470588235 | 0.470588235 | 18,167,512 |
+
+The maximum sampled process-group RSS was 3,288,424,448 bytes; accounting peak
+RSS was 3,635,044,352 bytes. Recorded minima were 254,516,006,912 bytes system
+available RAM, 855,980,000,000 bytes quota remaining and 1,026,178,416,640 bytes
+filesystem free. All recorded resource checks passed. Task 02 stays in progress;
+resident timing, allocated full admission replay and measured capacity remain
+pending, and all scientific gates remain pending. No selection/final/novel stage
+is authorized by this engineering completion.
+
+A separate periodic-GPU metadata audit rechecked all 358 original resource
+records against the accepted corruption receipt. Allocated device 3 peaked at
+**4,257 MiB / 46,068 MiB reported total**; every `nvidia-smi` status was zero and
+usage stayed within the reported total. The unchanged resource files are bound
+by `study-v3/operations/week5-corruption-gpu-verification/20261012T183538Z/verification.json`,
+SHA-256 `28260ab09bf83d602a2deb7ee6af350a3886b9ce600235ce2cd37bcff8083d6e`.
+This adds resource evidence without changing gate status.
+
+### Resident timing submitted; no timing outcome yet
+
+Guarded timing launcher `4ce08cfe34bae6ebea2ba7145fe253fdf1b56f8db4231f9ba34f8aa6302ad6c7`
+ran once with the passed corruption receipt and submitted **8038355** at
+**October 12 18:32:58.249374 UTC**. The job was **queued at approximately
+18:34 UTC**, with no allocation or completion claimed. Its launch record is
+`study-v3/operations/week5-launches/20261012T183252Z/launch.json`, SHA-256
+`26761143b4926c7d50d28cc1a2ad4cd1a69b638a3df008d1b5e73eb49cdd49d3`.
+The unchanged request is four CPU slots, 32 GiB, 12 hours and one L40S with
+AVX2/Sapphire Rapids/Gold 6426Y CPU constraints. Prelaunch quota remaining was
+**855,690,000,000 bytes**, filesystem free **1,026,165,833,728 bytes**; the
+84-GB additional-peak bound and reserve passed. No future allocation is inferred.
+
+Timing retains all 95,001 source rows resident while optimizing only the locked
+80 development-training actions. The approved three methods, paired seed/batches
+and 20-epoch duration remain fixed; no final head is produced or admitted.
+Inspect existing job/launch intent instead of resubmitting. Hold the staged
+`85af5ae65f64695240255fa686365e4d120be6b594142c18daee8804e567072b`
+completion checker until this actual job finishes successfully and terminal
+accounting is available. Full admission replay and the capacity decision remain
+separate requirements, with every scientific gate still pending.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -1055,7 +1137,8 @@ synchronized release 731938a; passed the allocated 41-check software rehearsal
 with the real dataset seal intact; verified successor preparation job 8028032,
 including exact manifest identity and unchanged scientific settings; passed 84
 supplementary checks and independently verified the actual dependence tables.
-Task 03 is complete. The fixed geometry panel passed independent verification
+Task 03 is complete. Task 01 is now complete after full-query geometry
+summary/fallback verification; the fixed panel passed independent verification
 and exact fresh-process repeats. The allocated controller remedy passed after
 the preserved first cache failure; the fresh attempt passed parity and was
 independently verified extracting caches on the assigned L40S. Both full-size
@@ -1074,11 +1157,13 @@ resource, seal and accounting checks passed. Retry 8035829 subsequently passed
 its allocated AVX2/FMA and three exact native initialization checks; the unchanged
 full validator passed all three fixed pilots, numerical replays and pairing.
 Independent completion review accepted all 122 evidence bindings, accounting,
-resource records and seals.
+resource records and seals. Corruption job 8035983 completed all nine encodings,
+27 query projections, three clean galleries and 27 engineering results; its
+execution/metadata review accepted all 927 evidence bindings and full-query
+geometry summaries. Full scientific admission replay remains pending.
 
-**Next:** Verify submitted corruption job 8035983 across all nine development
-conditions and 27 projections/results, then finish full-query damage telemetry,
-resident timing and the capacity decision. Include complete validation costs and
+**Next:** Verify submitted resident timing job 8038355, then complete allocated
+full scientific admission hashing/numerical replay and the capacity decision. Include complete validation costs and
 the narrower CPU queue pool in the forecast. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
@@ -1086,9 +1171,8 @@ for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
 **Open issues:** The original independent three-pilot validation failed; its
-compatible-runtime retry passed and both attempts remain preserved. Corruption
-outcomes, full-query telemetry, resident timing and measured admission evidence
-remain pending; the failed first attempt is preserved after its allocated remedy
+compatible-runtime retry passed and both attempts remain preserved. Resident timing,
+full scientific admission replay and measured capacity remain pending; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.

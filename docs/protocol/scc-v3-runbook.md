@@ -392,7 +392,7 @@ at approximately 16:27:50 UTC. Its launch record is
 (SHA-256 `530ed00fc8d258d7c3bf4797fe81f4c38690aff988853490f0f70ea37f96470c`).
 Do not duplicate that submission; inspect its existing intent and scheduler state.
 
-The completion checker was staged, without execution, at
+The corruption completion checker was staged at
 `study-v3/operations/week5-corruption-verification-tools/20261012T165607Z/`.
 `pose-week5-verify-corruptions.py` has SHA-256
 `379bc89bf063f933dd2fde4e078156c603d6eb00210ab8fdee1c1ff361e1345f`;
@@ -406,9 +406,13 @@ commands, 67 GPU preflights, complete output metadata, prerequisite receipts,
 resources, seals and accounting, and preserves a fresh verification receipt.
 It only reads metadata and checks archive sizes; full admission validation
 (full A), including scientific tensor hashes and numerical replay in an
-allocation, remains mandatory. **Hold this command until successful terminal
-accounting and a complete operation outcome exist.** Clear `PYTHONOPTIMIZE` so
-assertions execute, and disable bytecode writes to retained tool directories:
+allocation, remains mandatory. The command below subsequently executed after
+successful terminal accounting and passed at October 12 18:30:49.548448 UTC,
+binding 927 evidence files. Its receipt is
+`study-v3/operations/week5-corruption-verification/20261012T183049Z/verification.json`,
+SHA-256 `4b071bc3a900aa347171998b5dd224885391d019b604763f6d55a5a50af50bd5`.
+This is a historical invocation, not a request to rerun it. It clears
+`PYTHONOPTIMIZE` so assertions execute and disables bytecode writes:
 
 ```bash
 cd "$POSE_EMBED_RELEASE"
@@ -429,7 +433,7 @@ and replay stay inside allocations. No accuracy or loss-improvement floor is a
 completion criterion. Submit timing only after this review and a fresh
 allocation, duplicate-attempt and resource check.
 
-The guarded timing launcher was staged, **not executed or submitted**, under
+The guarded timing launcher was staged under
 `study-v3/operations/week5-timing-launch-tools/20261012T170831Z/`:
 
 - `pose-week5-launch-timing.py`: SHA-256
@@ -446,17 +450,19 @@ cache, geometry, source, lock, dependency, diagnostic, seal and storage bindings
 Prior or uncertain timing submissions block it. It requests the unchanged
 L40S, four CPU slots, 32 GiB RAM and 12-hour allocation with
 `avx2,cpu_arch=sapphirerapids,cpu_type=Gold-6426Y`. The 84 GB remaining-peak bound
-is conservative, not a measured campaign forecast. **Keep this command held
-until the actual corruption receipt passes independent review.** Staging and
-metadata review do not authorize selection; full A and capacity remain pending.
+is conservative, not a measured campaign forecast. It was executed once with
+the passed corruption receipt above and submitted **8038355** at October 12
+**18:32:58.249374 UTC**. The job was queued at approximately 18:34 UTC.
+**Do not rerun this one-off launcher.** Inspect the existing job and preserved
+launch intent first. Full A and measured capacity remain pending.
 
 ```bash
 cd "$POSE_EMBED_RELEASE"
 env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
   .venv/bin/python3.11 \
   "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-timing-launch-tools/20261012T170831Z/pose-week5-launch-timing.py" \
-  --corruption-verification "${V3_CORRUPTION_VERIFICATION:?Set the independently passed 8035983 receipt}" \
-  --corruption-verification-sha256 "${V3_CORRUPTION_VERIFICATION_SHA256:?Set its verified SHA-256}"
+  --corruption-verification "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-corruption-verification/20261012T183049Z/verification.json" \
+  --corruption-verification-sha256 4b071bc3a900aa347171998b5dd224885391d019b604763f6d55a5a50af50bd5
 ```
 
 Timing keeps all 95,001
@@ -495,14 +501,18 @@ validation, loading and training durations must fit within the recorded internal
 wall time. This is metadata verification: archive contents are not read or
 hashed on login, and full A remains pending. **Hold the command until the timing
 job has completed successfully and its actual launch receipt/hash are verified.**
+The actual queued job is 8038355, with launch receipt
+`study-v3/operations/week5-launches/20261012T183252Z/launch.json`, SHA-256
+`26761143b4926c7d50d28cc1a2ad4cd1a69b638a3df008d1b5e73eb49cdd49d3`.
+These launch bindings do not establish completion.
 
 ```bash
 cd "$POSE_EMBED_RELEASE"
 env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
   .venv/bin/python3.11 \
   "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-timing-verification-tools/20261012T173820Z/pose-week5-verify-timing.py" \
-  --launch-receipt "${V3_TIMING_LAUNCH_RECEIPT:?Set the actual timing launch.json path}" \
-  --launch-sha256 "${V3_TIMING_LAUNCH_SHA256:?Set its verified SHA-256}"
+  --launch-receipt "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-launches/20261012T183252Z/launch.json" \
+  --launch-sha256 26761143b4926c7d50d28cc1a2ad4cd1a69b638a3df008d1b5e73eb49cdd49d3
 ```
 
 The Week 4 cache job took 94 minutes 4 seconds, independent cache validation
