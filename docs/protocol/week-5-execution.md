@@ -115,6 +115,18 @@ sign-in; Journey returned HTTP 200 and no browser errors occurred. PR 33 remains
 a concise draft stacked on PR 31. Three development caches and independent
 five-cache validation remain pending at this checkpoint.
 
+The completed-extraction/validator-launch checkpoint (`cc481c9`) was published
+through guarded migration `20261012134927` and deployment
+`dpl_FuGpwCEfJaDDHw3fA2FeCGkSsNK8`. At **October 12 13:53:23 UTC**, live
+health/export and browser checks verified Week 5 version 13 active, task 02
+version 10 in progress, task 03 version 8 done and all gates pending. Actual
+time remains unreported. All other weeks and source links are unchanged, and
+the fallback and protocol match the public export. Fifteen database assertions,
+22 tracker tests, typecheck, focused lint, workspace checks and production builds
+passed. Private export redirects to sign-in; Journey returned HTTP 200 and no
+browser errors occurred. PR 33 remains a concise draft stacked on PR 31. The
+independent cache validator remains pending in this published checkpoint.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
