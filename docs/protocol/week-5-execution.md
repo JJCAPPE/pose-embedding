@@ -802,6 +802,45 @@ valid independent verification before advancing. Task 02 is blocked, all gates
 remain pending, and corruption/timing continuation is held. No research recipe,
 seed, batch, metric or scientific claim has been changed in response.
 
+### Synthetic initialization diagnostic and pre-retry runtime requirement
+
+Synthetic-only job **8035737** completed successfully in **17 scheduler wall
+seconds** on the same failing `scc-pi4` host. Its Intel E5-2650 v2 (Ivy Bridge)
+CPU lacks AVX2/FMA. Three native `DEFAULT` and three explicit baseline `DEFAULT`
+initializations all produced SHA-256
+`d09429fb578c782281dc032258ba707213494ec78f2f704aba28097fdcd40d69`,
+instead of the locked
+`035a3e5e57569c0ae765b797f705b3a9f70353a6832fcb757c7622ebfa9b3284`.
+RNG state was identical. The diagnostic used a synthetic full-size head only:
+no dataset tensors, saved heads or GPU were used. This confirms a runtime
+initialization difference on that CPU. A local arithmetic diagnostic supports
+CPU-dispatch/FMA rounding as an explanation; compatible full pilot validation
+has not yet passed.
+
+Independent verification bound all **27 evidence files**, five passing resource
+records, both dataset seals and successful accounting. The verification is
+`study-v3/operations/week5-init-verification/20261012T153404Z/verification.json`,
+SHA-256 `5e5de4bb155e6b22ea486416549d4a080207872e902e1a33ad5173b17ff01cad`;
+its verifier SHA-256 is
+`f02bc38a76f674c6bf55136e84c0df60a5eff0cc4fc8c0b646224e4a6d4dc94b`.
+The diagnostic summary SHA-256 is
+`9d480bc546a4983d42bf8eadde080452a7309e8dccdda2e583e0e651b4786072`.
+The original failed validator and separate post-failure seal remain unchanged.
+
+Before the affected retry, the [SCC runbook](scc-v3-runbook.md) now requires the
+reviewed allocation wrapper: request AVX2, inspect actual CPU flags, and verify
+the exact locked initialization with native CPU dispatch before invoking the
+unchanged full validator. The transferred wrapper bundle is
+`study-v3/operations/week5-cpu-retry-tools/20261012T153900Z/`, with `tools.json`
+SHA-256 `797e180b1be91171e018961d11238e2468411195fbcaef2520bb0ad46bdf0d9d`.
+Eleven guard tests and independent review passed. No retry submission is claimed
+at this checkpoint. This is an allocation/runtime requirement, with **no change
+to frozen scientific source, checks, tolerances, seeds, physical batches or
+20-epoch duration**. The narrower eligible CPU queue pool must enter the dated
+capacity forecast; no future allocation or feasibility is inferred. Task 02
+remains blocked, all scientific gates remain pending, and corruption/timing
+work remains held until full independent pilot validation passes.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -882,9 +921,14 @@ execution/metadata checks. Contextual completed with matching initialization
 and batch-plan metadata. SupCon also completed with matching metadata, and
 independent CPU validation of the three-pilot set failed at initialization
 reproduction. The failure and a separate post-failure seal check are preserved.
+Synthetic diagnostic 8035737 confirmed the failing CPU runtime produces a
+different native initialization hash with identical RNG state; all evidence,
+resource, seal and accounting checks passed.
 
-**Next:** Diagnose the initialization mismatch with isolated fixtures and
-reviewed source/platform evidence. Keep corruption and timing work held until
+**Next:** Use the reviewed runtime wrapper to require an AVX2-capable allocated
+CPU and exact native locked initialization before retrying the unchanged full
+validator. Include the narrower CPU queue pool in the forecast. Keep corruption
+and timing work held until
 independent pilot validation passes. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
@@ -892,7 +936,8 @@ for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
 **Open issues:** Independent three-pilot validation failed and task 02 is blocked;
-the cause and further Week 5 admission evidence remain unresolved; the failed first attempt is preserved after its allocated remedy
+compatible-runtime full validation and further Week 5 admission evidence
+remain pending; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.

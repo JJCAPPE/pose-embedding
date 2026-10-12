@@ -304,13 +304,41 @@ directories (the method subdirectory under each new scientific attempt), then
 independently validate complete budgets, all snapshot artifacts, fixtures,
 input identities and cross-arm pairing:
 
+The unrestricted CPU submission failed in preserved attempt 8035576 because
+its native initialization differed from the lock. Synthetic diagnostic 8035737
+confirmed the difference on the same Ivy Bridge host without AVX2/FMA, using
+three native and three baseline repetitions with identical RNG state. Before
+retry, use the reviewed runtime wrapper below: its allocation requests AVX2,
+then checks actual CPU flags and exact native locked initialization
+`035a3e5e57569c0ae765b797f705b3a9f70353a6832fcb757c7622ebfa9b3284`
+before invoking the unchanged full validator. A requested resource or forced
+dispatch setting cannot substitute for that native reproduction check. This
+preserves source, checks, tolerances, seeds, physical batches and duration.
+Include the narrower eligible CPU queue pool in the dated capacity forecast.
+
+The transferred bundle's `tools.json` SHA-256 is
+`797e180b1be91171e018961d11238e2468411195fbcaef2520bb0ad46bdf0d9d`;
+Python wrapper SHA-256 is
+`79acbae9fe8aac4f80149a00cb48029b72370753a9bc85e6fd1edcea87ae603f`
+and qsub wrapper SHA-256 is
+`786553498785508a1ac59d169b0327c2f5d190bd4556f420849a529f20faefdb`.
+Verify these immutable bytes, source/dependencies, seals, capacity and absence
+of active or duplicate attempts before a single submission. The reviewed
+administrative launcher performs these checks. This direct invocation records
+the allocated wrapper interface; do not blindly rerun it after a submission.
+Inspect scheduler state and preserved launch intent first.
+
 ```bash
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" scripts/study_v3_execution.qsub \
-  validate-pilots --cache-dir "$V3_CACHES" \
-  --pilot-dirs "$V3_CONTRASTIVE" "$V3_CONTEXTUAL" "$V3_SUPCON" \
-  --remaining-peak-bytes "$V3_REMAINING_PEAK_BYTES" \
-  --recorded-by "researcher-authorized Week 5 execution"
+qsub -terse -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
+  "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-cpu-retry-tools/20261012T153900Z/pose-week5-retry-pilot-validation.qsub" \
+  "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-cpu-retry-tools/20261012T153900Z/pose-week5-retry-pilot-validation.py" \
+  --diagnostic-verification "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-init-verification/20261012T153404Z/verification.json" \
+  --diagnostic-verification-sha256 5e5de4bb155e6b22ea486416549d4a080207872e902e1a33ad5173b17ff01cad
 ```
+
+No retry or full validation result is established by publishing this command.
+Wait for independent verification of the preserved accounting, native-hash
+preflight, full validation, resource records and seals before corruption work.
 
 Use the three validated epoch-20 pilot heads for all nine complete development
 conditions. The launcher extracts each 18,929-row corrupted encoder cache once,
