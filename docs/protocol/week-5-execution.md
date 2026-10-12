@@ -590,6 +590,54 @@ checks passed before launch.
 The persistent SCC status points to this launch record. No pilot result is
 claimed; task 02 remains in progress and all scientific gates remain pending.
 
+### Contrastive execution checked; Contextual pilot submitted
+
+Contrastive engineering pilot **8035278** completed on `scc-j07` from
+**October 12 14:12:08 to 14:20:13 UTC**: scheduler `failed=0`, `exit_status=0`,
+485 wall seconds. The fixed run records 20 epochs and 47,520 updates. Inspection
+at **14:22:15 UTC** checked execution and metadata, including hashes/presence of
+21 diagnostic records, five epoch records and required artifacts. The frozen
+trainer ran its health guards; this inspection did not independently replay
+numerical health checks or verify checkpoint tensor content. The receipt marks
+`scientific_use_allowed=false` and full allocated three-pilot validation pending.
+No pilot accuracy is used to choose scientific settings.
+
+Operation: `study-v3/operations/20261012T141227Z-8035278-pilot/`.
+The run is the `contrastive/` subdirectory of the corresponding revision attempt.
+The compact metadata check is retained at
+`study-v3/operations/week5-pilot-verification/20261012T142215Z/contrastive-metadata-verification.json`,
+SHA-256 `34fab419ae0ed9fa3627eea5c8bef49becc475fa3b8eac1470ce3cfa3035e1ce`.
+It binds run manifest `15a733d5aa87d7e4a26cee172586ea6e7e11a9e068cee843bf874e9bab2da9fa`,
+metrics `86548e7acfcee76bfae95b0c6cccea589352f4ffe7e0790fffc90081ceb1716b`
+and accounting `b2a61a144c9b1c4cc3556f1854bc9a204989efa6bec888482a64e53b9634ccff`.
+The reviewed metadata helper passed six offline checks; its exact source hash is
+bound in the receipt. Outer command/resource/seal and diagnostic-binding checks
+passed separately through the existing reviewed operation validator.
+Nineteen resource files passed. Run telemetry records 386.14067 seconds
+(440.8384832230222 seconds for the complete scientific command), peak host
+memory 4,711,288,832 bytes, peak GPU allocation 3,286,354,944 bytes and reserved
+GPU memory 3,420,454,912 bytes. Retained checkpoints total 285,255,316 bytes.
+
+**Contextual engineering pilot 8035452** was submitted at
+**14:27:05.178539 UTC** and was queued with four slots at launch. It preserves
+seed 7, 20 epochs, physical P=8/K=4, the verified caches, external controller and
+exact passed diagnostic binding. Prelaunch checks reverified clean release
+`731938a`, the 52 bound source files, locked dependencies, protocol/manifests,
+cache validation, Contrastive accounting/metadata, seals, no running jobs and
+absence of a duplicate Contextual attempt. Quota free space was 872.83 decimal
+GB and filesystem free space 1,044,566,245,376 bytes; the conservative 84-GB
+remaining-peak bound passed the required reserve check.
+
+The launch is retained at
+`study-v3/operations/week5-launches/20261012T142651Z/launch.json`.
+Its SHA-256 is `ae858b487789ffadb79401440df3e59ffa534a9e2bd2fe2e84bda011ed5d9235`.
+The reviewed one-off helper is preserved at
+`study-v3/operations/week5-launch-tools/20261012T142648Z/launch-contextual.py`,
+SHA-256 `b351836631c0c5167341070d385804423a9c9cf42e4dead69da3942279fd71fd`;
+four offline duplicate-guard checks and peer review passed before launch.
+No Contextual outcome is claimed. Task 02 remains in progress, all scientific
+gates remain pending and full independent three-pilot validation is still required.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -665,18 +713,19 @@ extractions are now retained with a passed allocated repeatability receipt and
 independently checked sidecar bindings. All five cache commands subsequently
 completed successfully with retained accounting, resource and seal evidence;
 independent CPU cache validation passed all five archives and repeatability.
-The first Contrastive engineering pilot has been submitted.
+The Contrastive engineering pilot completed its fixed run and passed
+execution/metadata checks; the paired Contextual pilot has been submitted.
 
-**Next:** Verify Contrastive engineering pilot 8035278, then the paired
-Contextual and SupCon pilots and independent pilot validation. Complete development corruptions,
+**Next:** Verify Contextual engineering pilot 8035452, then complete the paired
+SupCon pilot and independent three-pilot validation. Complete development corruptions,
 full-query damage telemetry and timing. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
-**Open issues:** The three successor pilots and remaining Week 5 admission
-evidence are unfinished; the failed first attempt is preserved after its allocated remedy
+**Open issues:** The remaining successor pilots, independent pilot validation
+and further Week 5 admission evidence are unfinished; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.
