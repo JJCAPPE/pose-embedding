@@ -83,6 +83,14 @@ checkpoint-to-projection replay, scoring, serialization and report regeneration.
 Use the [verified validation call-count audit](week-5-capacity-validation-audit.md)
 when forecasting repeated checks and the indivisible report commands; runtime
 feasibility still requires measurements.
+Native initialization replay also requires measured compatible CPU hardware and
+runtime. A generic CPU request, or even a requested feature, is not sufficient:
+verify actual CPU flags and exact native reproduction of the locked initialization
+before the unchanged full validator. Preserve every validation check and failed
+attempt; include the narrower compatible CPU queue pool in the forecast. See the
+[recorded diagnostic and retry](week-5-execution.md) and
+[reviewed allocation procedure](scc-v3-runbook.md). This requirement does not
+authorize any future experiment.
 Include fresh extraction, failed attempts, repeats, queues and review. Use the
 slower pilot/full-size estimate per arm with at least 25% compute and researcher
 slack. Each unsplit job must fit its usable window and scheduler limit. Start

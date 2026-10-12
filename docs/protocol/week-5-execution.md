@@ -204,6 +204,22 @@ typecheck, focused lint, local/hosted builds, workspace and runbook shell checks
 The staging inventory preserved all 81 unrelated production files, including
 Journey. No scientific source or original attempt was modified.
 
+The compatible-runtime retry checkpoint was committed and pushed as `ecbe3a0`.
+Guarded migration `20261012154836_record_week_five_runtime_validation_retry.sql`
+(SHA-256 `b7ea3fa5c9039830c265f1b2b0ad82daa3c2c9d7443b25d7157a7dcb2c462f80`) applied successfully.
+Deployment `dpl_14spStLnAPhxB2tybVz2f2ohvQkQ` was promoted and the public
+health/export/rendered-page checks passed at **October 12 15:52:45.491 UTC**.
+Week 5 v20 remained active; task 02 v17 returned to in progress; all gates
+remained pending, actual time remained unreported and no full validation pass
+was claimed. Fallback/protocol matched the export; all 13 other weeks, links
+and closed history were unchanged. Journey returned 200, no browser errors
+occurred and private export remained sign-in protected. Verification passed
+15 guarded database assertions, 22 tracker tests, typecheck, focused lint,
+local/hosted builds, workspace and runbook shell checks. The staged production
+inventory preserved all 81 unrelated files. The Week 6 handoff also records
+native-runtime compatibility and the narrower CPU queue pool without authorizing
+future experiments. Scientific source and preserved attempts remain unchanged.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
