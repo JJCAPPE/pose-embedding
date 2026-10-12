@@ -176,6 +176,19 @@ passed. Private export redirects to sign-in; Journey returned HTTP 200 and no
 browser errors occurred. PR 33 remains a draft stacked on PR 31; no independent
 three-pilot validation outcome is claimed at this checkpoint.
 
+The pilot-validation blocker (`ed60772`) was published through guarded
+migration `20261012151758` and deployment `dpl_88mYXZxPspai1JMcjZyVFGCNFG2Q`.
+At **October 12 15:22:20 UTC**, live health/export and browser checks verified
+Week 5 version 18 active, task 02 version 15 blocked, task 03 version 8 done and
+all scientific gates pending. Actual time remains unreported. All other weeks
+and source links are unchanged; the fallback and protocol match the public
+export. Fifteen database assertions, 22 tracker tests, typecheck, focused lint,
+workspace checks and production builds passed. The seed-state test was updated
+to the verified blocked state. Private export redirects to sign-in; Journey
+returned HTTP 200 and no browser errors occurred. PR 33 remains a draft stacked
+on PR 31. The initialization cause remains unconfirmed; corruption and timing
+work remain held while the preserved failure is diagnosed.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
