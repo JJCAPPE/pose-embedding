@@ -486,7 +486,7 @@ bindings, positive measured loading/validation/training durations and host/GPU
 memory peaks. These measurements inform capacity; they do not authorize
 selection, final training or novel opening.
 
-The timing completion checker was staged, **not executed**, under
+The timing completion checker ran successfully for job 8038355. Its tools are under
 `study-v3/operations/week5-timing-verification-tools/20261012T173820Z/`:
 
 - `pose-week5-verify-timing.py`: SHA-256
@@ -502,12 +502,14 @@ verifies terminal accounting, commands, resources, seals and allocated GPU
 identity; and checks all 60 batch plans and fixed timing records. Sequential
 validation, loading and training durations must fit within the recorded internal
 wall time. This is metadata verification: archive contents are not read or
-hashed on login, and full A remains pending. **Hold the command until the timing
-job has completed successfully and its actual launch receipt/hash are verified.**
+hashed on login, and full A remains pending. Its passed receipt was written at
+October 12 18:59:21.217675 UTC under
+`study-v3/operations/week5-timing-verification/20261012T185854Z/verification.json`,
+SHA-256 `29974c7287b0f36e75dd92c78e6099e16ce7bc652fc631fe021d95061b04ad0c`.
 The actual job is 8038355, with launch receipt
 `study-v3/operations/week5-launches/20261012T183252Z/launch.json`, SHA-256
 `26761143b4926c7d50d28cc1a2ad4cd1a69b638a3df008d1b5e73eb49cdd49d3`.
-These launch bindings do not establish completion.
+The following command is the retained completed invocation.
 
 ```bash
 cd "$POSE_EMBED_RELEASE"
@@ -518,8 +520,10 @@ env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
   --launch-sha256 26761143b4926c7d50d28cc1a2ad4cd1a69b638a3df008d1b5e73eb49cdd49d3
 ```
 
-The read-only pilot-validator component diagnostic is staged, **not executed or
-submitted**, at `study-v3/operations/week5-p-component-tools/20261012T184957Z/`.
+The read-only pilot-validator component diagnostic was submitted as job
+**8038699** at October 12 19:01:02.227712 UTC and observed queued at
+19:01:56.931301 UTC. Its outcome is pending. The immutable tools are at
+`study-v3/operations/week5-p-component-tools/20261012T184957Z/`.
 Thirteen focused tests and independent review passed. Retained tool hashes are:
 
 - `tools.json`: `0725e043737a6ceed921c1369c6d053c3acf01f7ef3975b94d9e4d74639233f1`;
@@ -527,10 +531,8 @@ Thirteen focused tests and independent review passed. Retained tool hashes are:
 - `pose-week5-measure-pilots.qsub`: `95834d5d2879606526bf16a7b9ed2347a25491d4b2de7deaa6be859744c06ebe`;
 - `test_pose_week5_measure_pilots.py`: `57d4343e292d11434720a9bcd4580c719ad014ddfba702fc5e876b5bef4338a0`.
 
-**Hold this submission** until the actual passed timing receipt from checker
-`85af5ae65f64695240255fa686365e4d120be6b594142c18daee8804e567072b`
-and its trusted SHA-256 are available. The reviewed administrative launcher is
-staged, **not executed or submitted**, under
+The reviewed administrative launcher **already ran once; do not resubmit it**.
+It used the passed timing receipt above. Its immutable tools are under
 `study-v3/operations/week5-p-component-launch-tools/20261012T185617Z/`:
 
 - `pose-week5-launch-p-component.py`: `983b3e3dd37c58f399e1370e1284b977ca14b0f53bc2bf188212fc56246677f1`;
@@ -553,8 +555,8 @@ cd "$POSE_EMBED_RELEASE"
 env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
   .venv/bin/python3.11 \
   "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-p-component-launch-tools/20261012T185617Z/pose-week5-launch-p-component.py" \
-  --timing-verification "${V3_TIMING_VERIFICATION:?Set the actual independently passed timing receipt}" \
-  --timing-verification-sha256 "${V3_TIMING_VERIFICATION_SHA256:?Set its trusted SHA-256}"
+  --timing-verification "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-timing-verification/20261012T185854Z/verification.json" \
+  --timing-verification-sha256 29974c7287b0f36e75dd92c78e6099e16ce7bc652fc631fe021d95061b04ad0c
 ```
 
 The fresh immutable operation retains per-method timings, runtime/native CPU
@@ -568,6 +570,32 @@ and coupled GPU-opening limit even to remain feasible; omitted T/V/report costs
 make that necessary condition stricter. Passing this component alone does not
 establish capacity or scientific admission. Keep full A, dated resources/queues,
 remaining-work forecasts and every scientific gate separate.
+
+The actual component launch is
+`study-v3/operations/week5-launches/20261012T190054Z/launch.json`, SHA-256
+`134c93fa90316d483a22580e04d698ff5506ed904db082e3bb23e7a941315261`.
+The completion verifier is staged, **not executed**, under
+`study-v3/operations/week5-p-component-verification-tools/20261012T190028Z/`:
+
+- `pose-week5-verify-pilot-component.py`: `7f1609d3ea7dc9cffc5c74d9a765db64268c179302782698bd3400c0cff1c92a`;
+- `test_pose_week5_verify_pilot_component.py`: `90d9a1bd77ad1cf94894282edb49bba68cfdfcc9434c6b870dd17a490b29ea51`;
+- `tools.json`: `3cadd8a95bd9779eb9d25c27e50ab620952afc8e61cb067bd36431f52c002dc0`.
+
+Twenty-two focused and 23 reused tests plus independent review passed.
+**Hold this verifier until job 8038699 is terminal with successful accounting.**
+It checks retained metadata, runtime identity, per-method measurements, resources,
+seals and exact launch bindings; it does not replay scientific tensors on login
+or establish full A/capacity. Preserve any failed result without retrying the
+one-off submission.
+
+```bash
+cd "$POSE_EMBED_RELEASE"
+env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
+  .venv/bin/python3.11 \
+  "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-p-component-verification-tools/20261012T190028Z/pose-week5-verify-pilot-component.py" \
+  --launch-receipt "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-launches/20261012T190054Z/launch.json" \
+  --launch-sha256 134c93fa90316d483a22580e04d698ff5506ed904db082e3bb23e7a941315261
+```
 
 The Week 4 cache job took 94 minutes 4 seconds, independent cache validation
 about 6 minutes 16 seconds, and each pilot roughly 8–9 scheduler minutes. The

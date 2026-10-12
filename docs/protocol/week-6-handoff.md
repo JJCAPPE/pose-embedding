@@ -83,6 +83,10 @@ checkpoint-to-projection replay, scoring, serialization and report regeneration.
 Use the [verified validation call-count audit](week-5-capacity-validation-audit.md)
 when forecasting repeated checks and the indivisible report commands; runtime
 feasibility still requires measurements.
+Resident timing 8038355 passed with 95,001 resident rows, 80 optimization
+actions and paired fixed update plans. Component-measurement job 8038699 is
+queued; its P-only result, full admission replay and measured capacity remain
+pending. Neither timing nor the queued diagnostic authorizes Week 6.
 Native initialization replay also requires measured compatible CPU hardware and
 runtime. A generic CPU request, or even a requested feature, is not sufficient:
 verify actual CPU flags and exact native reproduction of the locked initialization

@@ -1109,6 +1109,47 @@ correction updates task 01 to this actual receipt-write timestamp, preserving
 the original applied migration and its audit trail. The verified geometry
 result and pending admission gates are unchanged.
 
+## Accepted resident timing and queued component measurement — October 12
+
+Timing job **8038355** completed at 18:54:55.877214 UTC; terminal accounting
+reported success and 1,147 seconds. Independent checker `85af5ae6…` wrote its
+passed receipt at **18:59:21.217675 UTC** (its `recorded_at` is the review start):
+`study-v3/operations/week5-timing-verification/20261012T185854Z/verification.json`,
+SHA-256 `29974c7287b0f36e75dd92c78e6099e16ce7bc652fc631fe021d95061b04ad0c`.
+It verified 138 metadata bindings, five commands, two allocated GPU preflights,
+29 resource records, both seals and all 60 paired batch plans. Each arm retained
+95,001 resident rows while optimizing 76,013 rows from 80 actions for 59,380
+updates. No head was saved or made eligible for selection/final use.
+
+Internal wall time was 1,122.070329 seconds; the complete command took
+1,124.818611962 seconds. Training took 346.0708438 seconds for Contrastive,
+406.2501320 for Contextual and 319.7583118 for SupCon; loading took 2.0954758
+and artifact validation 26.7996596 seconds. Peak host RSS was 5,076,500,480
+bytes, allocated GPU memory 3,947,458,048 bytes and reserved GPU memory
+4,078,960,640 bytes. Separate review of all 29 periodic GPU samples passed,
+with peak usage 4,465 of 46,068 MiB:
+`study-v3/operations/week5-timing-gpu-verification/20261012T190036Z/verification.json`,
+SHA-256 `b36d5406ce0671481e003a47ef781e409fe8d50d3ed32863fb94ab5287f74e0b`.
+These are retained engineering measurements, not full scientific admission.
+
+The guarded administrative launcher `983b3e3d…` then submitted read-only
+component-measurement job **8038699** at **19:01:02.227712 UTC**, observed queued
+at 19:01:56.931301 UTC with four CPU slots and no operation yet. Its immutable
+launch is `study-v3/operations/week5-launches/20261012T190054Z/launch.json`,
+SHA-256 `134c93fa90316d483a22580e04d698ff5506ed904db082e3bb23e7a941315261`.
+Fresh quota remaining was 854,970,000,000 bytes and filesystem free space
+1,025,398,276,096 bytes. The launcher has run once; do not resubmit it.
+The [runbook](scc-v3-runbook.md) retains the held completion-verifier command
+bound to this launch. Its 22 focused and 23 reused tests and independent review
+passed; this does not establish the pending job's result.
+
+This diagnostic isolates only the three unchanged pilot-validator calls in
+Contextual → Contrastive → SupCon report order. Its measured P is separate
+from full A and is not a universal hardware lower bound. Full allocated
+admission hashing/numerical replay and the measured capacity decision remain
+pending. Tasks 01 and 03 remain complete, task 02 remains in progress and every
+scientific gate remains pending; actual researcher time remains unreported.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -1199,9 +1240,11 @@ Independent completion review accepted all 122 evidence bindings, accounting,
 resource records and seals. Corruption job 8035983 completed all nine encodings,
 27 query projections, three clean galleries and 27 engineering results; its
 execution/metadata review accepted all 927 evidence bindings and full-query
-geometry summaries. Full scientific admission replay remains pending.
+geometry summaries. Resident timing 8038355 passed independent completion
+review, fixed resident/optimization counts and paired update plans. Full
+scientific admission replay remains pending.
 
-**Next:** Verify submitted resident timing job 8038355, then complete allocated
+**Next:** Verify queued component-measurement job 8038699, then complete allocated
 full scientific admission hashing/numerical replay and the capacity decision. Include complete validation costs and
 the narrower CPU queue pool in the forecast. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
@@ -1210,8 +1253,8 @@ for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
 **Open issues:** The original independent three-pilot validation failed; its
-compatible-runtime retry passed and both attempts remain preserved. Resident timing,
-full scientific admission replay and measured capacity remain pending; the failed first attempt is preserved after its allocated remedy
+compatible-runtime retry passed and both attempts remain preserved. Component
+measurement, full scientific admission replay and measured capacity remain pending; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.
