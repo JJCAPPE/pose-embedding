@@ -2,7 +2,8 @@
 
 The frozen implementation repeatedly validates complete evidence when a later
 command consumes it. These calls must enter the capacity forecast. **The call
-counts below are verified; a capacity failure has not been measured.** No
+counts below are verified. The October 12 P measurement now rejects the
+necessary capacity condition on the measured runtime profile.** No
 scientific run, authorization or novel opening follows from this audit.
 
 Audited source: `731938a157be575ee433d6939876f8ca0b95e459`. Source line references
@@ -105,10 +106,11 @@ The current opening preflight also applies the same campaign-wide
 actual L40S allocation. A longer CPU report window alone cannot resolve this
 shared limit. Even at BU's 48-hour GPU maximum, the report pair's larger command
 requires F below `172800 / 1.25 / 452 = 305.84070796` seconds, before other
-overhead or elapsed allocation time. This is another necessary bound, not a
-measured capacity failure; no frozen source has been changed.
+overhead or elapsed allocation time. This necessary bound is applied to the measured P component below; no frozen
+source has been changed.
 
-Measure complete real admission validation on SCC, including pilot CPU replay,
+Before any eventual admission after the blocker is resolved, measure complete
+real admission validation on SCC, including pilot CPU replay,
 corruption validation, hashing, archive loading and geometry. Use measured
 epoch-20 replay and full-size source validation to forecast T and V conservatively;
 label future final/novel estimates as forecasts until those stages can be
@@ -123,3 +125,54 @@ schema admits evaluation compute windows only through December 6; it has no
 separate December 7–18 compute bucket. Budget the report pair before December 6
 under that schema, while protecting later researcher time for interpretation
 and delivery. Do not silently omit report compute or count unavailable windows.
+
+## October 12 measured-profile no-go
+
+Allocated diagnostic **8038699** on Sapphire Rapids Gold-6426Y (`scc-ke2`, four
+CPU threads/slots, native PyTorch 2.9.1+cu128, NumPy 2.4.6) passed the three
+unchanged pilot validators in persisted report order. The sum was
+**P = 778.274100575014 seconds**. Independent completion verification passed
+1,276 metadata bindings, 17 resource samples, both seals, accounting and actual
+native runtime/call-order checks; the [execution record](week-5-execution.md#verified-component-measurement-and-capacity-no-go--october-12)
+retains its exact receipt/hash and chronology. Neither setup nor the synthetic
+native preflight is inside P. This is not a controlled cold-cache benchmark.
+
+| Component forecast using this measured profile | Before slack | With 25% slack |
+| --- | ---: | ---: |
+| Pilot component of largest indivisible report, `452P` | 97.716637 h | **122.145796 h** |
+| Pilot component of complete remaining successful path, `2101P` | 454.209413 h | 567.761766 h |
+
+The first row already exceeds the shared **48-hour** GPU-opening maximum by
+**2.544704 times**, before other A/T/V/report work. BU's published GPU/OMP limits
+were rechecked on October 12; the sources above still specify 48/720 hours.
+Because the frozen capacity and opening checks share one maximum-job value,
+requesting a longer CPU report job does not resolve the opening constraint.
+
+These are dated measured-profile component forecasts, not measured full A, F,
+report durations, a complete feasible calendar, or universal hardware bounds.
+They do not establish that every compatible runtime would fail. A replacement
+profile would have to improve P by more than 2.544704 times merely to leave room
+for omitted costs, and must pass all exact reconstruction checks; no such profile
+or allocation is claimed. The 36 configured compatible queue instances are not
+reservations. Queue/setup/retries and report completion before December 6 remain
+in the eventual complete forecast. Availability remains five researcher hours
+weekly normally, ten when needed, and zero guaranteed Thanksgiving hours;
+actual time is unreported.
+
+**Decision: no-go on the measured profile.** Hold full A and selection rather
+than fabricate a passed capacity candidate. Full A and corrupted-artifact
+numerical replay remain mandatory for any future admission, but a full A run
+is not needed to establish this conservative rejection. Record a researcher
+choice before changing the frozen implementation. Current plan Section 7
+explicitly prohibits memoizing validation under the adopted amendment, and
+Section 8 requires a result-blind amendment after a failed measured go/no-go.
+
+The recommended next step is a scoped amendment proposal for validation-proof
+reuse within a command and per-stage CPU/GPU wall-time accounting, with an
+explicit mutation/threat model, fresh independent recertification, complete
+checks and all scientific settings/seals preserved. It is not an adopted design
+or permission to implement a cache or waive validation. An approved proposal
+needs a successor release, affected-evidence regeneration inventory and renewed
+measured capacity. Alternatives are a specifically identified compatible faster
+runtime with new evidence, or retaining the blocked-study record. All prior
+attempts remain preserved; technical completion and weekly closure are not claimed.

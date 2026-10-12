@@ -1,6 +1,6 @@
 # Week 6 handoff: October 19 to 25, 2026
 
-Prepared during Week 5 execution. **Week 5 scientific admission remains pending.**
+Prepared during Week 5 execution. **Week 5 scientific admission is held after a measured-profile capacity no-go.**
 Read the [Week 5 execution record](week-5-execution.md),
 [incoming handoff](week-5-handoff.md), [canonical plan](../../plan/research-plan.v3.md),
 [ADR0006](../decisions/0006-v3-execution-completion-amendment.md) and
@@ -10,7 +10,7 @@ Read the [Week 5 execution record](week-5-execution.md),
 | --- | --- |
 | Admitted successor release and protocol/design hashes | Pending final verification and SCC admission |
 | Fresh cache/pilot/corruption/geometry/analysis receipts | Follow the Week 5 execution record; admission incomplete |
-| Capacity report and immutable selection authorization | Pending |
+| Capacity report and immutable selection authorization | Measured-profile no-go; full forecast incomplete; selection held |
 | SCC jobs, logs and next command | Read `$HOME/pose-embed-scc/WEEK5-STATUS.txt` through `remote`; replace pending fields with verified results before transition |
 
 ## Admission before the first selection job
@@ -84,9 +84,14 @@ Use the [verified validation call-count audit](week-5-capacity-validation-audit.
 when forecasting repeated checks and the indivisible report commands; runtime
 feasibility still requires measurements.
 Resident timing 8038355 passed with 95,001 resident rows, 80 optimization
-actions and paired fixed update plans. Component-measurement job 8038699 is
-queued; its P-only result, full admission replay and measured capacity remain
-pending. Neither timing nor the queued diagnostic authorizes Week 6.
+actions and paired fixed update plans. Component measurement 8038699 passed all three unchanged validators and
+independent verification: P=778.274100575014 seconds exceeds the measured-profile
+necessary bound of 305.840707965 seconds. The largest report's `452P` component
+with 25% slack forecasts 122.145796 hours against the shared 48-hour limit.
+This is a profile-specific no-go, not a universal hardware bound. A researcher
+decision on a result-blind amendment or a verified faster compatible runtime is
+required; full admission remains incomplete and held. Neither timing nor this
+diagnostic authorizes Week 6.
 Native initialization replay also requires measured compatible CPU hardware and
 runtime. A generic CPU request, or even a requested feature, is not sufficient:
 verify actual CPU flags and exact native reproduction of the locked initialization

@@ -1,8 +1,9 @@
 # Week 5 execution record
 
 Started October 11, 2026 (America/New_York), before the October 12–18 calendar
-week, at the researcher's direction. **Work is active; no Week 5 gate or
-scientific admission is complete.** The [incoming handoff](week-5-handoff.md),
+week, at the researcher's direction. **Week 5 remains open. The measured runtime
+profile failed a necessary capacity condition; further admission work is held
+for a researcher decision. No scientific admission is complete.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 govern this work.
@@ -1164,6 +1165,79 @@ admission hashing/numerical replay and the measured capacity decision remain
 pending. Tasks 01 and 03 remain complete, task 02 remains in progress and every
 scientific gate remains pending; actual researcher time remains unreported.
 
+## Verified component measurement and capacity no-go — October 12
+
+Job **8038699** ran from 19:08:04 to 19:22:00 UTC on `neuro-pub@scc-ke2`
+(Sapphire Rapids, Gold-6426Y), with four CPU slots, 32 GiB and no GPU.
+Accounting passed (`failed=0`, `exit_status=0`, 836 seconds). The unchanged
+validator passed all three complete calls in persisted report order:
+
+| Call | Measured seconds |
+| --- | ---: |
+| Contextual | 266.806532714 |
+| Contrastive | 256.642679657 |
+| SupCon | 254.824888204 |
+| **P: sum of all three calls** | **778.274100575** |
+
+Independent checker `7f1609d3…` passed **1,276 metadata bindings**, two monitored
+commands, 17 resource samples, both seals, exact accounting, native initialization
+and runtime/call-order checks. Its receipt is
+`study-v3/operations/week5-p-component-verification/20261012T193150Z/verification.json`,
+SHA-256 `cd21652427c8918473b97ec7a58a31db4ebd3e94b5582f6c65f8912f9e898c9b`.
+Review began at 19:31:50.483463 UTC; the passed receipt was written at
+**19:32:11.651357 UTC**. Peak scheduler RSS was **4,601,929,728 bytes**;
+periodic samples observed up to 2,300,039,168 bytes. All three validators ran
+inside the allocation; no scientific tensor/checkpoint hashing or replay ran
+on login. No new head or selection authorization was produced.
+
+The [capacity audit](week-5-capacity-validation-audit.md) derives the required
+necessary condition: P must be below **305.840707965 seconds** to leave any
+room for the other work within the shared 48-hour maximum, with 25% slack.
+Measured-profile scaling of the largest report's pilot component alone is
+`452 × P × 1.25 = 122.145796 hours`, **2.544704 times** that maximum. The remaining
+successful path's `2101P` component forecasts 454.209413 hours before slack,
+or 567.761766 hours with slack. These are component forecasts on this measured
+runtime profile, not measured complete report/A/F durations or universal
+hardware lower bounds. Other validation, report work, queue/setup and retries
+are additional. The prior inclusive validator duration was not substituted for P.
+
+The immutable no-go record is
+`study-v3/operations/week5-capacity-blocker/20261012T204735Z/no-go.json`,
+SHA-256 `bf813d94f1c19ae66ed84e74dcffff10e3d96730dd8e4717e9cf877806475a4a`.
+At **20:47:35 UTC**, the administrative recorder rechecked the clean frozen
+source, current SCC registered-root seals and unchanged bound historical
+external audit records; this is not a new local-machine seal observation.
+No user jobs remained. Fresh quota remaining was **853,660,000,000 bytes** and
+filesystem free space **1,023,988,989,952 bytes**. The existing conservative
+84 GB operational bound plus reserve still fits; that does not establish a
+complete campaign storage forecast. The separate seal receipt SHA-256 is
+`302073fa4814d8911d207c13b08bede062de2398c95ac93ae2a8e960750835fb`.
+The reviewed metadata-only recorder is preserved under
+`week5-capacity-blocker-tools/20261012T204720Z/`, source SHA-256
+`96c8f31576c562719522ad5e19367a0f7f2ac81667abce2ac7bc5178964120d2`.
+No scientific arrays were read and no further job was submitted.
+
+This is a **measured-profile no-go**, not a failure of the three pilot checks.
+Full scientific admission A, corrupted-artifact numerical replay and the complete
+capacity ledger remain unfinished and are held. No optimistic capacity receipt
+was created to reach an A timer. The current plan forbids validation memoization
+under the adopted amendment and requires a result-blind amendment after a failed
+go/no-go. A longer CPU allocation alone cannot repair the shared opening-GPU
+maximum-job constraint.
+
+The consequential choice is to authorize a narrowly scoped implementation
+amendment proposal, retain release `731938a` and identify a demonstrably faster
+compatible runtime for renewed measurement, or retain the blocked study.
+The recommended proposal would examine safe reuse of complete validation proofs
+within one unchanged command input snapshot and job limits appropriate to CPU
+and GPU stages. It is **not adopted or implemented**. It must retain exact
+numerical/provenance checks, tamper invalidation, fresh independent recertification,
+the shared seal and full opening authorization; all recipes, epochs, physical
+batches, paired seeds, 27 selection slots, nine final heads and 180 cells stay
+fixed. Any approved change needs its own successor release, impact/regeneration
+inventory, tests and renewed measured admission. No code, artifact, lock or
+scientific budget has been changed by recording this blocker.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -1256,19 +1330,20 @@ resource records and seals. Corruption job 8035983 completed all nine encodings,
 execution/metadata review accepted all 927 evidence bindings and full-query
 geometry summaries. Resident timing 8038355 passed independent completion
 review, fixed resident/optimization counts and paired update plans. Full
-scientific admission replay remains pending.
+scientific admission replay remains pending. The three-call P diagnostic then
+passed independent verification and established the measured-profile capacity
+no-go described above.
 
-**Next:** Verify queued component-measurement job 8038699, then complete allocated
-full scientific admission hashing/numerical replay and the capacity decision. Include complete validation costs and
-the narrower CPU queue pool in the forecast. Include the
-[repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
-the measured forecast, including whole-report costs. Use the immutable receipts
-for the capacity decision and next-week handoff. Software rehearsal does not
-replace fresh scientific admission evidence.
+**Next:** Obtain the researcher decision on the measured-profile no-go. A narrow,
+result-blind implementation amendment proposal is recommended; retaining the
+frozen release requires evidence for a sufficiently faster compatible runtime.
+Before any eventual admission, finish full A and corrupted-artifact replay,
+refresh seals and measure the complete dependency/capacity ledger. No further
+scientific job is authorized by this handoff.
 
-**Open issues:** The original independent three-pilot validation failed; its
-compatible-runtime retry passed and both attempts remain preserved. Component
-measurement, full scientific admission replay and measured capacity remain pending; the failed first attempt is preserved after its allocated remedy
-test passed. Actual researcher minutes remain unreported at the researcher's
-explicit request. Technical completion and formal
-weekly closure have not been claimed; all selection/final/novel gates remain shut.
+**Open issues:** P passed independent verification but fails the measured-profile
+capacity condition. Task 04 is blocked, task 02 remains in progress, and all
+scientific gates remain unresolved. The prior failed validator and its successful
+compatible-runtime retry remain preserved. Actual researcher minutes remain
+unreported by explicit request. Week 5 cannot close while required scientific
+gates are unresolved; all selection/final/novel authorization remains shut.

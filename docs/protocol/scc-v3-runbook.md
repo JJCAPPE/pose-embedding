@@ -522,7 +522,9 @@ env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
 
 The read-only pilot-validator component diagnostic was submitted as job
 **8038699** at October 12 19:01:02.227712 UTC and observed queued at
-19:01:56.931301 UTC. Its outcome is pending. The immutable tools are at
+19:01:56.931301 UTC. It subsequently completed successfully at 19:22 UTC;
+its verified P measurement rejects the measured-profile capacity condition.
+The immutable tools are at
 `study-v3/operations/week5-p-component-tools/20261012T184957Z/`.
 Thirteen focused tests and independent review passed. Retained tool hashes are:
 
@@ -574,7 +576,7 @@ remaining-work forecasts and every scientific gate separate.
 The actual component launch is
 `study-v3/operations/week5-launches/20261012T190054Z/launch.json`, SHA-256
 `134c93fa90316d483a22580e04d698ff5506ed904db082e3bb23e7a941315261`.
-The completion verifier is staged, **not executed**, under
+The completion verifier **ran successfully once** from
 `study-v3/operations/week5-p-component-verification-tools/20261012T190028Z/`:
 
 - `pose-week5-verify-pilot-component.py`: `7f1609d3ea7dc9cffc5c74d9a765db64268c179302782698bd3400c0cff1c92a`;
@@ -582,7 +584,7 @@ The completion verifier is staged, **not executed**, under
 - `tools.json`: `3cadd8a95bd9779eb9d25c27e50ab620952afc8e61cb067bd36431f52c002dc0`.
 
 Twenty-two focused and 23 reused tests plus independent review passed.
-**Hold this verifier until job 8038699 is terminal with successful accounting.**
+The command below is historical; do not rerun it or the completed job blindly.
 It checks retained metadata, runtime identity, per-method measurements, resources,
 seals and exact launch bindings; it does not replay scientific tensors on login
 or establish full A/capacity. Preserve any failed result without retrying the
@@ -596,6 +598,22 @@ env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
   --launch-receipt "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-launches/20261012T190054Z/launch.json" \
   --launch-sha256 134c93fa90316d483a22580e04d698ff5506ed904db082e3bb23e7a941315261
 ```
+
+The passed verification is
+`study-v3/operations/week5-p-component-verification/20261012T193150Z/verification.json`,
+SHA-256 `cd21652427c8918473b97ec7a58a31db4ebd3e94b5582f6c65f8912f9e898c9b`.
+It was written October 12 at 19:32:11.651357 UTC after checking 1,276 metadata
+bindings, two commands, 17 resource samples, both seals and successful accounting
+(`failed=0`, `exit_status=0`, 836 seconds). P=778.274100575014 seconds is above
+305.840707965 seconds. All three validators passed; the measured capacity
+condition did not. See the [dated audit](week-5-capacity-validation-audit.md#october-12-measured-profile-no-go).
+
+**Current next step is a researcher decision, not a launch.** Keep full A,
+selection, final training and novel opening held. Do not submit an r2 candidate
+with a fabricated passed capacity receipt. A result-blind amendment proposal or
+new evidence for an identified faster compatible runtime must precede affected
+work; neither has been authorized by this record. Keep the SCC status current
+and preserve the SSH session and every completed/failed attempt.
 
 The Week 4 cache job took 94 minutes 4 seconds, independent cache validation
 about 6 minutes 16 seconds, and each pilot roughly 8–9 scheduler minutes. The
