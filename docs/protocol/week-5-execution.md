@@ -438,6 +438,47 @@ Task 02 remains in progress and all scientific gates remain pending. The next
 step is successful accounting and complete five-cache validation before pilots;
 the Week 5-only heartbeat continues the monitored work.
 
+### Full-size repeated extraction passed; development caches pending
+
+At **October 12 00:33:27.473756 UTC**, independent inspection verified the
+sidecar and input bindings for two retained 95,001 × 8,704 float32 extractions
+in job **8028152**. The allocated repeatability command reports `status=passed`,
+`identical_arrays=true` and `identical_npz=true` across separate processes
+2173794 and 3268119. Both archives record SHA-256
+`43209789c08e8a5e461f72ec5bbeb9bf986bb862e6b828dc0c0b446ad684ee8d`
+and 3,315,915,790 bytes. Independent inspection rehashed the sidecars and
+checked the release, protocol, lock, parity, manifest and sample-order bindings;
+it did not reread the full archives on the login host. Independent five-cache
+validation remains a later allocated command.
+
+The first extraction ended October 11 at 23:57:10 UTC after
+1,791.0110672899755 seconds; the second ended October 12 at 00:27:12 UTC after
+1,798.3135285119643 seconds. Both recorded peak GPU memory of 3,896,508,416 bytes;
+peak host memory was 6,908,186,624 and 6,904,946,688 bytes respectively. All 76
+monitor samples passed RAM/storage checks. At 00:32:46.696124 UTC, child RSS was
+3,134,291,968 bytes against 34,359,738,368 allocated; quota free space was
+905.56 decimal GB and filesystem free space 1,079,706,124,288 bytes.
+
+The repeatability receipt SHA-256 is
+`d50dc4ad2a19ff12c12888215ed9ba0cc3c1eea53d96272f1a1681b247d3ab70`.
+The sidecar hashes are
+`4f647f8f822b01a0f3b8a0c82e9a0c40838d824036c2bbd0c3bac36e0f59c8dc`
+and `b45c76a84dafbf42e251147fee957a1252d0edd890b5fac3f46ae150dbf51744`.
+The compact verification is retained at
+`study-v3/operations/week5-inspection/20261012T003326Z/repeat-progress-verification.json`,
+SHA-256 `04e07a8fc983f3158e0e5db792827099bc66f256f4d45047b3ca12011b885c9d`;
+the persistent SCC status link points to that checkpoint. The job remained
+running with three development caches and independent validation pending.
+Task 02 remains in progress, all scientific gates remain pending, and no
+scientific admission or weekly closure is claimed.
+
+After successful cache-job accounting, the separate CPU `validate-caches` job
+writes `validation.json`, `validation-repeatability.json` and
+`validation-quota.txt` under its new
+`study-v3/operations/<stamp>-<job>-validate-caches/` directory. Read those
+receipts there; the wrapper's scientific-output directory is unused for this
+validation step.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -508,7 +549,9 @@ supplementary checks and independently verified the actual dependence tables.
 Task 03 is complete. The fixed geometry panel passed independent verification
 and exact fresh-process repeats. The allocated controller remedy passed after
 the preserved first cache failure; the fresh attempt passed parity and was
-independently verified extracting caches on the assigned L40S.
+independently verified extracting caches on the assigned L40S. Both full-size
+extractions are now retained with a passed allocated repeatability receipt and
+independently checked sidecar bindings; development caches remain pending.
 
 **Next:** Verify new cache attempt 8028152 and its independent cache validator;
 then complete pilots, development corruptions,
