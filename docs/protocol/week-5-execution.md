@@ -756,6 +756,39 @@ Task 02 remains in progress and all scientific gates remain pending. Verify the
 allocated outcome, accounting, complete three-pilot receipt, resources and seals
 before corruption work; retain all original pilot attempts.
 
+### Independent pilot validation failed; initialization mismatch unresolved
+
+Independent pilot-validator **8035576** failed at **October 12
+15:11:23.328668 UTC**. Command 002 exited 1 with
+`ValueError: locked initialization hash cannot be reproduced`.
+Scheduler accounting records `failed=0`, `exit_status=1` and 113 wall seconds.
+The failed validation took 67.278541 seconds with peak RSS 996,483,072 bytes;
+all eight resource files passed RAM/storage checks. No active jobs remained
+when the failure was inspected. The three pilot execution/metadata receipts
+remain valid records, but full independent three-pilot validation has failed.
+
+The failed operation is
+`study-v3/operations/20261012T150934Z-8035576-validate-pilots/`.
+Its `validation.json` SHA-256 is
+`c30e021a6d2f5de0c55fa36d410cd2e726fb006b0ec936a06d32bab6bb7dc96e`.
+The original operation has **no seal-after receipt**. A separately retained
+post-failure seal check passed, SHA-256
+`34295455fded9b7bbcee92a57d1d4571e51d37c4f4e4606421b372b0839c905d`;
+the original attempt was not backfilled or rewritten. The independent failure
+audit is retained at
+`study-v3/operations/week5-pilot-validation-failure/20261012T151648Z/failure-audit.json`,
+SHA-256 `abcb612681e6ef18b22ca9f62b97a8011a69492a44d6ae4e68d27e580290b23d`.
+
+The cause remains unconfirmed. CPU arithmetic dispatch is under investigation;
+source inspection confirms that both the originally generated and rebuilt heads
+are initialized on CPU. Week 4's validator lacked this new initialization
+reproduction check, so its previous pass does not validate the new check.
+The next step is an isolated synthetic initialization diagnostic on the failing
+host with reviewed source/platform evidence. Preserve all attempts and require
+valid independent verification before advancing. Task 02 is blocked, all gates
+remain pending, and corruption/timing continuation is held. No research recipe,
+seed, batch, metric or scientific claim has been changed in response.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -834,17 +867,19 @@ independent CPU cache validation passed all five archives and repeatability.
 The Contrastive engineering pilot completed its fixed run and passed
 execution/metadata checks. Contextual completed with matching initialization
 and batch-plan metadata. SupCon also completed with matching metadata, and
-independent CPU validation of the three-pilot set has been submitted.
+independent CPU validation of the three-pilot set failed at initialization
+reproduction. The failure and a separate post-failure seal check are preserved.
 
-**Next:** Verify independent three-pilot validator 8035576. Complete development corruptions,
-full-query damage telemetry and timing. Include the
+**Next:** Diagnose the initialization mismatch with isolated fixtures and
+reviewed source/platform evidence. Keep corruption and timing work held until
+independent pilot validation passes. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
-**Open issues:** Independent three-pilot validation and further Week 5
-admission evidence remain unfinished; the failed first attempt is preserved after its allocated remedy
+**Open issues:** Independent three-pilot validation failed and task 02 is blocked;
+the cause and further Week 5 admission evidence remain unresolved; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.
