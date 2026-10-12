@@ -856,6 +856,40 @@ capacity forecast; no future allocation or feasibility is inferred. Task 02
 remains blocked, all scientific gates remain pending, and corruption/timing
 work remains held until full independent pilot validation passes.
 
+### Compatible-runtime preflight passed; full pilot validation retry running
+
+Retry **8035829** was submitted at **October 12 15:44:10.970322 UTC** and
+started at **15:46:06 UTC** on `w@scc-wg4`, with four CPU slots, 32 GiB,
+12 hours and no GPU. The allocated CPU has actual AVX2/FMA flags and its native
+AVX2 runtime reproduced the exact locked initialization
+`035a3e5e57569c0ae765b797f705b3a9f70353a6832fcb757c7622ebfa9b3284`
+in all three full-size repetitions. Independent verification passed the
+preflight command, three resource files and both seals. The preflight operation
+is `study-v3/operations/20261012T154626Z-8035829-pilot-validation-preflight/`;
+its native receipt SHA-256 is
+`ac7d383de62bbf778708312966c9bff8ba97d807e62f9b0cb17d070981874422`.
+
+The independent preflight metadata receipt is
+`study-v3/operations/week5-runtime-verification/20261012T154801Z/verification.json`,
+SHA-256 `29a26154ed7309be908007fa6cc382f0773eda63764d23deb0aff06182625b5d`.
+Launch evidence is
+`study-v3/operations/week5-launches/20261012T154408Z/launch.json`, SHA-256
+`7a7f9c2a1cf58bcf4178ff8befb8430418dba1669542711fd48d8f19b1e7bf5f`.
+The reviewed administrative launcher was used once; inspect its preserved intent
+and the existing job before considering any later action. Do not resubmit it.
+The current full-validation resource preflight passed with 244,574,945,280 bytes
+host memory available, 868,540,000,000 bytes quota remaining and
+1,039,960,899,584 bytes filesystem free. The assigned job budget remains 32 GiB.
+
+The **unchanged full validator is running**, at
+`study-v3/operations/20261012T154645Z-8035829-validate-pilots/`.
+Its final accounting, tensor/numerical validation, resources and seals have not
+yet been accepted. Task 02 returns to in progress, preserving failed attempt
+8035576 and its separately recorded post-failure seal. Corruption/timing work
+remains held until full validation passes; all scientific gates stay pending.
+No frozen source, checks, tolerances, seeds, physical batches or duration changed.
+The narrower eligible CPU queue pool remains a capacity-planning requirement.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -938,21 +972,22 @@ independent CPU validation of the three-pilot set failed at initialization
 reproduction. The failure and a separate post-failure seal check are preserved.
 Synthetic diagnostic 8035737 confirmed the failing CPU runtime produces a
 different native initialization hash with identical RNG state; all evidence,
-resource, seal and accounting checks passed.
+resource, seal and accounting checks passed. Retry 8035829 subsequently passed
+its allocated AVX2/FMA and three exact native initialization checks; the unchanged
+full validator is running.
 
-**Next:** Use the reviewed runtime wrapper to require an AVX2-capable allocated
-CPU and exact native locked initialization before retrying the unchanged full
-validator. Include the narrower CPU queue pool in the forecast. Keep corruption
-and timing work held until
+**Next:** Verify the unchanged full pilot validator 8035829, including accounting,
+resource records and both seals. Include the narrower CPU queue pool in the
+forecast. Keep corruption and timing work held until
 independent pilot validation passes. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
-**Open issues:** Independent three-pilot validation failed and task 02 is blocked;
-compatible-runtime full validation and further Week 5 admission evidence
-remain pending; the failed first attempt is preserved after its allocated remedy
+**Open issues:** The original independent three-pilot validation failed; its
+compatible-runtime retry is in progress and has not passed. Full validation and
+further Week 5 admission evidence remain pending; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.

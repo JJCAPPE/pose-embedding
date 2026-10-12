@@ -336,7 +336,12 @@ qsub -terse -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
   --diagnostic-verification-sha256 5e5de4bb155e6b22ea486416549d4a080207872e902e1a33ad5173b17ff01cad
 ```
 
-No retry or full validation result is established by publishing this command.
+Retry 8035829 was submitted October 12 at 15:44:10.970322 UTC and its actual
+AVX2/FMA flags plus three exact native locked-hash repetitions passed. Its
+unchanged full validator is running at this checkpoint; do not resubmit the
+command above. Inspect the existing job and retained launch intent at
+`study-v3/operations/week5-launches/20261012T154408Z/` first. A passed native
+preflight is not a full validation result.
 Wait for independent verification of the preserved accounting, native-hash
 preflight, full validation, resource records and seals before corruption work.
 
