@@ -139,6 +139,19 @@ passed. Private export redirects to sign-in; Journey returned HTTP 200 and no
 browser errors occurred. PR 33 remains a concise draft stacked on PR 31. The
 first Contrastive pilot has a dated queued launch, with no pilot result claimed.
 
+The Contrastive-execution/Contextual-launch checkpoint (`3dbf30d`) was published
+through guarded migration `20261012142756` and deployment
+`dpl_4P8zAYocHF1hZF1JsA9hejHmRPiT`. The single deployment waited in Vercel's
+queue before building; no duplicate deployment or cancellation was used. At
+**October 12 14:38:12 UTC**, live health/export and browser checks verified
+Week 5 version 15 active, task 02 version 12 in progress, task 03 version 8 done
+and all gates pending. Actual time remains unreported. All other weeks and
+source links are unchanged; the fallback and protocol match the public export.
+Fifteen database assertions, 22 tracker tests, typecheck, focused lint, workspace
+checks and production builds passed. Private export redirects to sign-in;
+Journey returned HTTP 200 and no browser errors occurred. PR 33 remains a draft
+stacked on PR 31; full independent pilot validation remains pending.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
