@@ -220,6 +220,33 @@ inventory preserved all 81 unrelated files. The Week 6 handoff also records
 native-runtime compatibility and the narrower CPU queue pool without authorizing
 future experiments. Scientific source and preserved attempts remain unchanged.
 
+The accepted-pilot/corruption-submission checkpoint was committed and pushed as
+`ff722b5`. Guarded migration
+`20261012162733_record_week_five_pilot_acceptance_corruption_launch.sql`
+(SHA-256 `486d3ba667510b128b948d66ae50d1a88bb139f239fe1d259c5a3b686dea323e`) applied successfully.
+Deployment `dpl_EptFraWeVJBvm9vfYiNsp8w83UX9` was promoted; public
+health/export/rendered-page verification passed at **October 12 16:32:05.451 UTC**.
+Week 5 v21 remained active, task 02 v18 remained in progress, actual time
+remained unreported and all scientific gates stayed pending. Fallback/protocol
+matched the export; all 13 other weeks, links and closed history were unchanged.
+Journey returned 200, the browser reported no errors and private export remained
+sign-in protected. Checks passed 15 guarded database assertions, 22 tracker tests,
+typecheck, focused lint, local/hosted builds, workspace and runbook shell checks.
+The production inventory preserved all 81 unrelated files.
+
+A later SCC observation confirms job **8035983** started at **16:28:49 UTC** on
+`ece@scc-j01`, operation
+`study-v3/operations/20261012T162852Z-8035983-corruptions/`.
+At **16:31:47 UTC**, 23 resource samples and five allocated-GPU preflights had
+passed. The actual L40S used CUDA-visible device 3, with 47,162,982,400 free
+bytes out of 47,695,921,152 in the latest probe. Maximum sampled RSS was
+351,244,288 bytes; system available RAM was at least 255,471,804,416 bytes,
+quota remaining 868.54 decimal GB and filesystem free at least
+1,039,952,510,976 bytes. The job had no final outcome. This dated running
+observation supplements the earlier queued checkpoint; it does not establish
+corruption completion or admission. SCC status and continuation retain the
+active job and require verified results before timing.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
