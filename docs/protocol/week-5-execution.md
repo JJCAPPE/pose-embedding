@@ -152,6 +152,18 @@ checks and production builds passed. Private export redirects to sign-in;
 Journey returned HTTP 200 and no browser errors occurred. PR 33 remains a draft
 stacked on PR 31; full independent pilot validation remains pending.
 
+The Contextual-execution/SupCon-launch checkpoint (`7267c9b`) was published
+through guarded migration `20261012145015` and deployment
+`dpl_6vxCMTG9TgxugpPQ6hdzfe9v1kYG`. At **October 12 14:56:10 UTC**, live
+health/export and browser checks verified Week 5 version 16 active, task 02
+version 13 in progress, task 03 version 8 done and all gates pending. Actual
+time remains unreported. All other weeks and source links are unchanged; the
+fallback and protocol match the public export. Fifteen database assertions,
+22 tracker tests, typecheck, focused lint, workspace checks and production builds
+passed. Private export redirects to sign-in; Journey returned HTTP 200 and no
+browser errors occurred. PR 33 remains a draft stacked on PR 31. The Week 6
+handoff now explicitly preserves unreported time instead of requesting it again.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
@@ -685,6 +697,14 @@ The reviewed helper is preserved at
 SHA-256 `b072e5df19f59b027895247b375b1acec6ecd568c046d2056bf2e8ffd3e3ca83`.
 No SupCon outcome is claimed. Task 02 remains in progress, all gates remain
 pending, and independent three-pilot validation is required before corruption work.
+
+SupCon job 8035533 subsequently started at **14:52:42 UTC** on `ece@scc-j08`
+with four slots, 32 GiB host memory and one L40S (`CUDA_VISIBLE_DEVICES=0`).
+Its operation is `study-v3/operations/20261012T145244Z-8035533-pilot/`; the run
+is `supcon/` in the corresponding revision attempt. The allocated GPU preflight
+passed at 14:52:58 UTC with 47,163,047,936 bytes free of 47,695,921,152 total.
+The 14:53 UTC resource observation passed RAM/storage checks. This is a dated
+allocation observation; no SupCon completion or pilot admission is inferred.
 
 ## Implementation and verification in progress
 
