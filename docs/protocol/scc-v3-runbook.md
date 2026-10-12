@@ -477,6 +477,34 @@ bindings, positive measured loading/validation/training durations and host/GPU
 memory peaks. These measurements inform capacity; they do not authorize
 selection, final training or novel opening.
 
+The timing completion checker was staged, **not executed**, under
+`study-v3/operations/week5-timing-verification-tools/20261012T173820Z/`:
+
+- `pose-week5-verify-timing.py`: SHA-256
+  `85af5ae65f64695240255fa686365e4d120be6b594142c18daee8804e567072b`;
+- `test_pose_week5_verify_timing.py`: SHA-256
+  `379a249ef8e473eb61380d2cf3373018fb2d9d9887badd0bd4063a5280d26ca7`;
+- `tools.json`: SHA-256
+  `1a11fea592894967c5577eff161e90bfc3d52a562fc2573cef9aa23fe9341240`.
+
+Twelve focused tests and independent review passed. The checker binds the actual
+launch to the reviewed launcher, release, controller and corruption receipt;
+verifies terminal accounting, commands, resources, seals and allocated GPU
+identity; and checks all 60 batch plans and fixed timing records. Sequential
+validation, loading and training durations must fit within the recorded internal
+wall time. This is metadata verification: archive contents are not read or
+hashed on login, and full A remains pending. **Hold the command until the timing
+job has completed successfully and its actual launch receipt/hash are verified.**
+
+```bash
+cd "$POSE_EMBED_RELEASE"
+env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
+  .venv/bin/python3.11 \
+  "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-timing-verification-tools/20261012T173820Z/pose-week5-verify-timing.py" \
+  --launch-receipt "${V3_TIMING_LAUNCH_RECEIPT:?Set the actual timing launch.json path}" \
+  --launch-sha256 "${V3_TIMING_LAUNCH_SHA256:?Set its verified SHA-256}"
+```
+
 The Week 4 cache job took 94 minutes 4 seconds, independent cache validation
 about 6 minutes 16 seconds, and each pilot roughly 8–9 scheduler minutes. The
 clean query extraction took about 6 minutes 49 seconds, so nine corrupted
