@@ -992,8 +992,9 @@ progress, all gates remain pending and no campaign admission is authorized.
 
 Corruption job **8035983** completed at **October 12 18:28:39.920098 UTC**;
 terminal accounting records `failed=0`, `exit_status=0`, **7,190 wall seconds**
-and end time 18:28:40 UTC on `scc-j01`. Independent completion review at
-**18:30:49.548448 UTC** passed **927 evidence bindings**, all **135 commands**,
+and end time 18:28:40 UTC on `scc-j01`. The passed independent completion receipt was written at
+**18:31:21.614571 UTC**, after review started at
+**18:30:49.548448 UTC**. The review passed **927 evidence bindings**, all **135 commands**,
 **67 GPU preflights**, **358 RAM/storage samples** and both dataset seals.
 Nine 18,929-row encodings, 27 query projections, three clean gallery projections
 and 27 engineering results are retained: **39 archives / 9,833,359,944 bytes**.
@@ -1069,6 +1070,20 @@ Inspect existing job/launch intent instead of resubmitting. Hold the staged
 completion checker until this actual job finishes successfully and terminal
 accounting is available. Full admission replay and the capacity decision remain
 separate requirements, with every scientific gate still pending.
+
+A later allocation observation confirms timing job **8038355** started at
+**18:35:49 UTC** on `ece-long@scc-j01`, operation
+`study-v3/operations/20261012T183551Z-8038355-timing/`. Its actual L40S used
+CUDA-visible device 3; eleven initial resource checks and all corresponding
+`nvidia-smi` exit statuses passed at approximately 18:36 UTC. No final outcome
+was present. This supplements the earlier dated queued observation.
+
+The first tracker milestone used the corruption receipt's `recorded_at` as
+completion time. Inspection confirmed that field marks review start; the passed
+immutable receipt was written at **18:31:21.614571 UTC**. A separate guarded
+correction updates task 01 to this actual receipt-write timestamp, preserving
+the original applied migration and its audit trail. The verified geometry
+result and pending admission gates are unchanged.
 
 ## Implementation and verification in progress
 

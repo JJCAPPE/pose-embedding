@@ -407,8 +407,9 @@ resources, seals and accounting, and preserves a fresh verification receipt.
 It only reads metadata and checks archive sizes; full admission validation
 (full A), including scientific tensor hashes and numerical replay in an
 allocation, remains mandatory. The command below subsequently executed after
-successful terminal accounting and passed at October 12 18:30:49.548448 UTC,
-binding 927 evidence files. Its receipt is
+successful terminal accounting; its passed receipt was written October 12 at
+18:31:21.614571 UTC, binding 927 evidence files. The receipt recorded_at marks
+review start (18:30:49.548448 UTC), not completion. Its receipt is
 `study-v3/operations/week5-corruption-verification/20261012T183049Z/verification.json`,
 SHA-256 `4b071bc3a900aa347171998b5dd224885391d019b604763f6d55a5a50af50bd5`.
 This is a historical invocation, not a request to rerun it. It clears
@@ -452,7 +453,9 @@ L40S, four CPU slots, 32 GiB RAM and 12-hour allocation with
 `avx2,cpu_arch=sapphirerapids,cpu_type=Gold-6426Y`. The 84 GB remaining-peak bound
 is conservative, not a measured campaign forecast. It was executed once with
 the passed corruption receipt above and submitted **8038355** at October 12
-**18:32:58.249374 UTC**. The job was queued at approximately 18:34 UTC.
+**18:32:58.249374 UTC**. The job was queued at approximately 18:34 UTC, then started at 18:35:49 UTC
+on `ece-long@scc-j01`; eleven initial resource checks passed. Its outcome
+remains pending.
 **Do not rerun this one-off launcher.** Inspect the existing job and preserved
 launch intent first. Full A and measured capacity remain pending.
 
@@ -501,7 +504,7 @@ validation, loading and training durations must fit within the recorded internal
 wall time. This is metadata verification: archive contents are not read or
 hashed on login, and full A remains pending. **Hold the command until the timing
 job has completed successfully and its actual launch receipt/hash are verified.**
-The actual queued job is 8038355, with launch receipt
+The actual job is 8038355, with launch receipt
 `study-v3/operations/week5-launches/20261012T183252Z/launch.json`, SHA-256
 `26761143b4926c7d50d28cc1a2ad4cd1a69b638a3df008d1b5e73eb49cdd49d3`.
 These launch bindings do not establish completion.
