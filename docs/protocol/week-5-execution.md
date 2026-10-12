@@ -103,6 +103,18 @@ had no page errors and the preserved Journey returned HTTP 200. PR 33 remains
 a draft stacked on PR 31. This is an ongoing handoff: five-cache completion,
 independent validation and the remaining Week 5 work are still pending.
 
+The full-size repeatability checkpoint (`aad4449`) was published through guarded
+migration `20261012003353` and deployment `dpl_12mfXmcvKYkUDThmyYZoWsopWana`.
+At **October 12 00:37:12 UTC**, live health/export and browser checks confirmed
+Week 5 version 12 active, task 02 version 9 in progress, task 03 version 8 done,
+all three gates pending and actual time unreported. All other weeks and source
+links are unchanged; the fallback and protocol match the public export. Fifteen
+database assertions, 22 tracker tests, typecheck, focused lint, workspace checks
+and local/hosted production builds passed. Private export still redirects to
+sign-in; Journey returned HTTP 200 and no browser errors occurred. PR 33 remains
+a concise draft stacked on PR 31. Three development caches and independent
+five-cache validation remain pending at this checkpoint.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
