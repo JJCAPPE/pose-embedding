@@ -17,8 +17,8 @@
     {
       "id": "manual-gpu",
       "dueDate": "2026-10-18",
-      "title": "Complete the dated GPU and researcher schedule",
-      "details": "The researcher confirmed up to 5 hours weekly normally and 10 if necessary, with limited Thanksgiving time; budget no guaranteed hours for November 23 to 29. Build a dated ordinary-queue L40S calendar with job limits, queue/setup allowance and explicit contingency weeks. Apply at least 25% slack to remaining compute and researcher work; prior GPU access is not a reservation.",
+      "title": "Complete the dated CPU/GPU and researcher schedule",
+      "details": "The researcher confirmed up to 5 hours weekly normally and 10 if necessary, with limited Thanksgiving time; budget no guaranteed hours for November 23 to 29. Under decision 0007, build a dated ordinary-queue CPU/GPU calendar with separate resource classes, complete-job limits, queue/setup allowance and explicit contingency weeks. Count all CPU and I/O overhead inside a GPU allocation in its GPU job time. Apply at least 25% slack to remaining compute and researcher work; prior access is not a reservation.",
       "whyManual": "Availability is confirmed, but the dated allocation calendar and measured workload must still establish feasibility; actual researcher time remains unreported.",
       "weekTaskId": "w05-task-04"
     },
@@ -26,13 +26,13 @@
       "id": "manual-capacity-v3",
       "dueDate": "2026-10-18",
       "title": "Verify current remaining capacity",
-      "details": "Remeasure quota and filesystem space for the October 18 decision. Use 200 GiB reserve plus 1.25 times remaining peak bytes, including completion-release regeneration, projections, failures and staging; existing files count once. The campaign-wide envelope is 120 decimal GB including slack. October 8 observed 1,008.48 GB quota free; neither that nor September shortfalls establish current capacity. Request additional authorized allocation only if the current calculation fails.",
+      "details": "Remeasure quota and filesystem space for the October 18 decision. Use 200 GiB reserve plus 1.25 times remaining peak bytes, including fresh execution-r2 regeneration, projections, failures and staging; existing files count once. The October 9 estimate was 120 decimal GB including slack, before the authorized execution-r2 regeneration. A fresh inventory of all retained evidence and execution-r2 additional peak storage is pending; the historical estimate does not establish successor capacity. October 8 observed 1,008.48 GB quota free; neither that nor September shortfalls establish current capacity. Request additional authorized allocation only if the current calculation fails.",
       "whyManual": "Any additional quota or artifact allocation requires institutional authorization; current measurements determine whether it is needed.",
       "weekTaskId": "w05-task-04"
     }
   ],
   "protocol": {
-    "bindingSource": "plan/research-plan.v3.md and decision 0004 define the scientific v3 scope; decision 0006 (October 9) amends upcoming execution, verification and reporting. Scientific settings remain fixed. Complete one successor release with new provenance bindings and fresh admission evidence before selection. Original locks, Week 4 evidence and closed history remain unchanged. Planning documents are not executable authorization or final-test locks.",
+    "bindingSource": "plan/research-plan.v3.md and decision 0004 define the scientific v3 scope; decision 0006 (October 9) amended execution, verification and reporting. Decision 0007 (October 12) records researcher authorization for command-local validation reuse and separate CPU/GPU time accounting in execution-r2, with full fresh successor regeneration and no cross-release artifact adoption. Scientific settings remain fixed. Successor implementation review, release freeze, regeneration, full admission and measured capacity remain pending before selection. Original locks, prior releases, evidence and closed history remain unchanged. Planning documents are not executable authorization or final-test locks.",
     "successDefinition": "Complete the three-recipe study faithfully: nine verified final heads, all 180 declared result cells, reproducible conditional analysis and descriptive results, and a report with costs, failures and limitations. A positive, null or negative contextual result is successful. A failed capacity or validity gate requires an honest blocked-study record and result-blind amendment; it is not a completed empirical comparison.",
     "lockedDecisions": [
       {
