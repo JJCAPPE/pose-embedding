@@ -338,12 +338,14 @@ qsub -terse -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
 
 Retry 8035829 was submitted October 12 at 15:44:10.970322 UTC and its actual
 AVX2/FMA flags plus three exact native locked-hash repetitions passed. Its
-unchanged full validator is running at this checkpoint; do not resubmit the
-command above. Inspect the existing job and retained launch intent at
-`study-v3/operations/week5-launches/20261012T154408Z/` first. A passed native
-preflight is not a full validation result.
-Wait for independent verification of the preserved accounting, native-hash
-preflight, full validation, resource records and seals before corruption work.
+unchanged full validator subsequently passed and independent completion review
+verified all 122 evidence bindings, accounting, native preflight, full numerical
+validation, resources and seals. The acceptance receipt is
+`study-v3/operations/week5-pilot-validation-verification/20261012T162541Z/verification.json`,
+SHA-256 `3716107eecbe3561c29c87d7f547f569816ad8e8a359b4f412434d4a71a25a7d`.
+Do not resubmit the command above. Inspect the retained launch intent at
+`study-v3/operations/week5-launches/20261012T154408Z/` and existing accounting
+first. A passed pilot validator does not establish complete campaign admission.
 
 Use the three validated epoch-20 pilot heads for all nine complete development
 conditions. The launcher extracts each 18,929-row corrupted encoder cache once,
@@ -384,6 +386,12 @@ This invokes the unchanged reviewed GPU controller with
 GPU hosts. Later admission recomputes CPU projections with exact array equality;
 AVX2 or a matching model name alone does not establish that replay will pass.
 Use compatible native CPU/BLAS settings and retain actual runtime evidence.
+
+Job 8035983 was submitted October 12 at 16:27:02.731983 UTC and was queued
+at approximately 16:27:50 UTC. Its launch record is
+`study-v3/operations/week5-launches/20261012T162658Z/launch.json`
+(SHA-256 `530ed00fc8d258d7c3bf4797fe81f4c38690aff988853490f0f70ea37f96470c`).
+Do not duplicate that submission; inspect its existing intent and scheduler state.
 
 Before timing, independently review successful corruption accounting, immutable
 operation/outcome, all command and GPU-preflight outcomes, resource samples and

@@ -906,6 +906,61 @@ remains held until full validation passes; all scientific gates stay pending.
 No frozen source, checks, tolerances, seeds, physical batches or duration changed.
 The narrower eligible CPU queue pool remains a capacity-planning requirement.
 
+### Independent three-pilot validation accepted
+
+Allocated retry **8035829** completed successfully: scheduler accounting records
+`failed=0`, `exit_status=0`, **2,007 wall seconds**, start October 12
+15:46:07 UTC and end 16:19:34 UTC on `scc-wg4`. The full validator completed at
+16:19:33.493679 UTC. All three arms passed their fixed **20 epochs / 47,520
+updates**, complete saved snapshots, numerical projection/health/rank replays
+and cross-arm pairing. The compatible Broadwell runtime reproduced locked
+initialization without changing scientific source, validation checks,
+tolerances, seeds, batches or duration. Failed attempt 8035576 remains preserved.
+
+The allocated `validation.json` SHA-256 is
+`c576f7840438c50486615635fe0583d99ddc2d851a56a86b200ad24d7b0e4dcb`.
+Its complete validation telemetry is **1,935.639018 seconds**, with command wall
+1,940.4239999730198 seconds and peak process RSS **4,667,924,480 bytes**.
+These inclusive measurements include standalone setup and checks; they are not
+an isolated lower bound on repeated admission or final-authorization calls.
+
+The independent completion review at **16:25:41.428722 UTC** checked all **122
+bound evidence files**, scheduler accounting, 39 full-validation resource
+samples, three native-preflight resource samples and both seals for each phase.
+Its receipt is
+`study-v3/operations/week5-pilot-validation-verification/20261012T162541Z/verification.json`,
+SHA-256 `3716107eecbe3561c29c87d7f547f569816ad8e8a359b4f412434d4a71a25a7d`;
+verifier SHA-256 is
+`a3a8a73847bf2969eb886d456e68bf657ba27362402a30cd9dc62ca003feb4aa`.
+Tensor and numerical checks ran in the allocated job; the login-node review
+verified their preserved receipts and bindings rather than rereading tensors.
+This accepts independent pilot validation, **not campaign admission**. Further
+corruption, full-query telemetry, resident timing and capacity evidence remain
+required. Task 02 remains in progress and all scientific gates remain pending.
+
+### Corruption job submitted; results pending
+
+Corruption job **8035983** was submitted at **October 12 16:27:02.731983 UTC**
+and remained queued at approximately **16:27:50 UTC**; no allocation, scientific
+operation or result was present at that observation. Its reviewed launcher bound
+the accepted pilot receipt, original release 731938a, all 52 source hashes,
+locks/manifests/dependencies, cache validation, fixed geometry and the 58-file
+GPU diagnostic. Dataset seals, absence of active/duplicate jobs and the storage
+reserve passed before submission. The request is four CPU slots, 32 GiB,
+12 hours and one L40S, with compatible AVX2/Sapphire Rapids/Gold 6426Y CPU
+requirements. Requested resources are not evidence of an actual allocation.
+
+Launch evidence is
+`study-v3/operations/week5-launches/20261012T162658Z/launch.json`, SHA-256
+`530ed00fc8d258d7c3bf4797fe81f4c38690aff988853490f0f70ea37f96470c`.
+Prelaunch quota remaining was **868,540,000,000 bytes** and filesystem free space
+was **1,039,960,899,584 bytes**; the conservative 84-GB additional-peak estimate
+and 200-GiB reserve passed. The fixed work is all nine development corruption
+conditions, 27 query projections and 27 engineering results. No result may
+select a head, condition, recipe, threshold or retry. Inspect this job and its
+preserved launch intent; do not duplicate the submission. Task 02 remains in
+progress, all gates remain pending and no campaign admission is authorized.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -990,20 +1045,23 @@ Synthetic diagnostic 8035737 confirmed the failing CPU runtime produces a
 different native initialization hash with identical RNG state; all evidence,
 resource, seal and accounting checks passed. Retry 8035829 subsequently passed
 its allocated AVX2/FMA and three exact native initialization checks; the unchanged
-full validator is running.
+full validator passed all three fixed pilots, numerical replays and pairing.
+Independent completion review accepted all 122 evidence bindings, accounting,
+resource records and seals.
 
-**Next:** Verify the unchanged full pilot validator 8035829, including accounting,
-resource records and both seals. Include the narrower CPU queue pool in the
-forecast. Keep corruption and timing work held until
-independent pilot validation passes. Include the
+**Next:** Verify submitted corruption job 8035983 across all nine development
+conditions and 27 projections/results, then finish full-query damage telemetry,
+resident timing and the capacity decision. Include complete validation costs and
+the narrower CPU queue pool in the forecast. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
 **Open issues:** The original independent three-pilot validation failed; its
-compatible-runtime retry is in progress and has not passed. Full validation and
-further Week 5 admission evidence remain pending; the failed first attempt is preserved after its allocated remedy
+compatible-runtime retry passed and both attempts remain preserved. Corruption
+outcomes, full-query telemetry, resident timing and measured admission evidence
+remain pending; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.
