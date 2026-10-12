@@ -271,6 +271,20 @@ local/hosted builds, workspace and runbook shell checks passed. Seed-progress
 expectations now reflect the verified additional task completion. All 81 unrelated
 production files were preserved. No frozen scientific source or artifact changed.
 
+The accepted-timing/component-queue checkpoint (`a6ed904`) was published through
+migration `20261012190124` and promoted deployment
+`dpl_DdBqG5niwEnham7vjwC5QwypnAzY`. Verification at October 12 **19:08:45 UTC**
+confirmed Week 5 version 24 active, task 02 version 21 in progress, tasks 01/03
+done with their existing completion timestamps, task 04 pending, all three gates
+pending and actual time unreported. The [public export](https://pose-embed-tracker.vercel.app/api/export?format=json)
+exactly matched the repository fallback and protocol; all 13 other weeks and
+source links were unchanged. The page/reflection/evidence and protocol rendered
+without browser errors, Journey returned 200, and private export redirected to
+sign-in. Fifteen database guards, 22 tracker tests, lint/typecheck, local and
+production builds, workspace verification and all 19 runbook shell fences passed.
+Production staging preserved all 81 unrelated source files. PR 33 remains a draft;
+no component result, full admission, capacity approval or weekly closure is claimed.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
