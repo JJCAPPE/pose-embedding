@@ -189,6 +189,21 @@ returned HTTP 200 and no browser errors occurred. PR 33 remains a draft stacked
 on PR 31. The initialization cause remains unconfirmed; corruption and timing
 work remain held while the preserved failure is diagnosed.
 
+The pre-retry diagnostic/runtime record was committed and pushed as `9333c4a`.
+Guarded migration `20261012153919_record_week_five_initialization_diagnostic.sql`
+(SHA-256 `ca98fc6c1c606ee51afae7c6faa553fbc9cde1d9f9b775b1c5ff4c5b89099ac5`) applied successfully.
+Deployment `dpl_ANXCC3c8j3tpxspxomPg6HHpZ9gQ` was promoted and the live
+health/export/page checks passed at **October 12 15:43:31.745 UTC**:
+Week 5 v19 remained active, task 02 v16 remained blocked, actual time remained
+unreported and all scientific gates remained pending. The fallback and protocol
+matched the public export; all 13 other weeks, source links and closed history
+were unchanged. The rendered reflection/task/protocol passed, Journey returned
+200, no browser errors occurred, and the private export still redirected to
+sign-in. Verification passed 15 guarded database assertions, 22 tracker tests,
+typecheck, focused lint, local/hosted builds, workspace and runbook shell checks.
+The staging inventory preserved all 81 unrelated production files, including
+Journey. No scientific source or original attempt was modified.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
