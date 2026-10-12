@@ -247,6 +247,30 @@ observation supplements the earlier queued checkpoint; it does not establish
 corruption completion or admission. SCC status and continuation retain the
 active job and require verified results before timing.
 
+The geometry/timing milestone was committed as `3edb81c`; its timestamp
+correction and active-allocation observation were committed as `69d0abb`.
+Both were pushed. Guarded migration
+`20261012183312_record_week_five_geometry_completion_timing_launch.sql`
+(SHA-256 `f374c2a2162021150a14b2ae10d8eefbdbb3151c7d790bcbd8da3f2782ee1cc4`)
+and follow-up `20261012183739_correct_week_five_geometry_receipt_timestamp.sql`
+(SHA-256 `833b287551da98fca5b7ec5908339a58530b291f8f0e9fdeeca1dd3693140017`)
+applied without rewriting the first migration. Its initial build
+`dpl_7C92S9d82FHBnpErYk1ymMkj9b8r` was not promoted.
+
+Corrected deployment `dpl_5wHjdwAK2BThb5USr3MpMYFazUKh` was promoted and
+public health/export/rendered-page checks passed at **October 12 18:41:37.265 UTC**.
+Week 5 v23 remained active; task 01 v8 was done at the actual receipt-write time
+**18:31:21.614571 UTC**, task 02 v20 remained in progress, task 03 remained done,
+and every scientific gate remained pending. Actual time remained unreported.
+Fallback/protocol matched the public export; all 13 other weeks, source links
+and closed history were unchanged. The rendered reflection, both completed-task
+evidence sections and active task note passed; Journey returned 200, no browser
+errors occurred and private export remained sign-in protected. Each migration
+passed 17 guarded database assertions; 22 tracker tests, typecheck, focused lint,
+local/hosted builds, workspace and runbook shell checks passed. Seed-progress
+expectations now reflect the verified additional task completion. All 81 unrelated
+production files were preserved. No frozen scientific source or artifact changed.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
