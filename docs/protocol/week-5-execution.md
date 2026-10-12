@@ -538,6 +538,46 @@ verify accounting, `validation.json`, `validation-repeatability.json`,
 `validation-quota.txt` and seals before launching the paired pilots. Task 02
 remains in progress and all scientific gates remain pending.
 
+### Independent five-cache validation passed; Contrastive pilot submitted
+
+Independent CPU validator **8034547** passed on `scc-pi6` with four slots.
+Scheduler accounting records `failed=0`, `exit_status=0`, 776 wall seconds and
+`maxvmem=16.958G`, from **October 12 13:51:46 to 14:04:42 UTC**. Its operation is
+`study-v3/operations/20261012T135208Z-8034547-validate-caches/`. All five full
+archive hashes/content checks and exact repeatability passed, as did all three
+command outcomes, 18 RAM/storage samples and both dataset seals. The validator
+recorded 698.095403 seconds and peak process RSS of 8,711,143,424 bytes; these
+are distinct from scheduler virtual-memory accounting.
+
+The independently checked receipt hashes are:
+
+- `validation.json`: `286f5508d1fb1fcb1c917e29a19bdd84fa179912a41d101f63a806adf24aa04c`.
+- `validation-repeatability.json`: `cc26902fce1743008776b49e1c803ab96881c96d802020d9c14ec1fba6c85ac4`.
+- Accounting: `b56a0ada66e98d6c5cf5f2926e07c2541982f622154c6bbacdbfa16adb77b6ed`.
+
+At **14:07:24.097639 UTC**, the guarded launch check reconciled those receipts
+and reverified source release `731938a`, protocol, manifests, locks, dependencies,
+seals and resources. The compact receipt is
+`study-v3/operations/week5-launches/20261012T140710Z/cache-validation-verification.json`,
+SHA-256 `55c68d8b5b68e508038f28d9167539396a92ef35e99eef62d2c6bf0497103adb`.
+Full archive checks ran in the CPU allocation; the login-side reconciliation
+read their receipts. Scientific admission remains false.
+
+The **Contrastive engineering pilot 8035278** was submitted at
+**14:07:25.982651 UTC** and remained queued at the launch checkpoint. The launch
+receipt in the same directory has SHA-256
+`06d921b20c863f5810571ed4b5eba6d49d4fdf535e5d33a820c932a2dd63fd6f`.
+The scheduler request was verified as 12 hours, four slots with 8 GB per slot,
+and one L40S with at least 16 GB GPU memory; this is a request, not an observed
+allocation. The command uses the reviewed external controller and its exact
+passed diagnostic binding with the verified caches. Current quota free space
+was 873.72 decimal GB and filesystem free space 1,045,522,546,688 bytes.
+The reviewed one-off launch helper is retained under
+`study-v3/operations/week5-launch-tools/20261012T140643Z/`; its 17 offline guard
+checks passed before launch.
+The persistent SCC status points to this launch record. No pilot result is
+claimed; task 02 remains in progress and all scientific gates remain pending.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -612,18 +652,19 @@ independently verified extracting caches on the assigned L40S. Both full-size
 extractions are now retained with a passed allocated repeatability receipt and
 independently checked sidecar bindings. All five cache commands subsequently
 completed successfully with retained accounting, resource and seal evidence;
-independent CPU cache validation has been submitted.
+independent CPU cache validation passed all five archives and repeatability.
+The first Contrastive engineering pilot has been submitted.
 
-**Next:** Verify independent CPU cache-validator job 8034547;
-then complete pilots, development corruptions,
+**Next:** Verify Contrastive engineering pilot 8035278, then the paired
+Contextual and SupCon pilots and independent pilot validation. Complete development corruptions,
 full-query damage telemetry and timing. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
-**Open issues:** Independent five-cache validation and the remaining Week 5
-admission evidence are unfinished; the failed first attempt is preserved after its allocated remedy
+**Open issues:** The three successor pilots and remaining Week 5 admission
+evidence are unfinished; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.
