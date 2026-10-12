@@ -127,6 +127,18 @@ passed. Private export redirects to sign-in; Journey returned HTTP 200 and no
 browser errors occurred. PR 33 remains a concise draft stacked on PR 31. The
 independent cache validator remains pending in this published checkpoint.
 
+The independent-cache-validation/first-pilot checkpoint (`e26f18d`) was published
+through guarded migration `20261012140817` and deployment
+`dpl_fn4o7PypbskdZ6R1WCykuXPiKAJV`. At **October 12 14:11:55 UTC**, live
+health/export and browser checks verified Week 5 version 14 active, task 02
+version 11 in progress, task 03 version 8 done and all gates pending. Actual
+time remains unreported. All other weeks and source links are unchanged; the
+fallback and protocol match the public export. Fifteen database assertions,
+22 tracker tests, typecheck, focused lint, workspace checks and production builds
+passed. Private export redirects to sign-in; Journey returned HTTP 200 and no
+browser errors occurred. PR 33 remains a concise draft stacked on PR 31. The
+first Contrastive pilot has a dated queued launch, with no pilot result claimed.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
