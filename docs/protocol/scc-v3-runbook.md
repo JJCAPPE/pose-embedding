@@ -351,21 +351,53 @@ then retains 27 query projections and 27 engineering results. Three clean
 gallery projections are also retained with scientific sidecars. No scores
 select a condition, head, recipe, threshold or retry.
 
+The reviewed corruption launcher is staged, **not submitted**, under
+`study-v3/operations/week5-corruption-launch-tools/20261012T160355Z/`:
+
+- `pose-week5-launch-corruptions.py`: SHA-256
+  `a3530454c45e172bd9b8d7e222fa0bc18ba1189d0d162c4251dc51742480c444`;
+- `test_pose_week5_launch_corruptions.py`: SHA-256
+  `61ce601c8f87596d54b1bf27cf22274bfb0dadb7640ba4b9eafcb6f103e2dd92`;
+- `tools.json`: SHA-256
+  `c9c28703aa9fc40edc724d1b93e5f03e815906ff2f040657cb36507a5f025a6d`.
+
+Four focused guard tests and independent review passed. The launcher requires
+the future independently passed **8035829** completion receipt from verifier
+`a3a8a73847bf2969eb886d456e68bf657ba27362402a30cd9dc62ca003feb4aa`,
+rehashes its metadata evidence, and rechecks the current pilots, caches, geometry,
+release, locks, dependencies, GPU diagnostic, seal and resource reserve. Prior
+or uncertain corruption submissions block this one-off command. Keep the
+following command held until the actual receipt path and hash are verified;
+staging is not a passing pilot result or permission to bypass this gate.
+
 ```bash
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
-  "$V3_GPU_CONTROLLER" corruptions --cache-dir "$V3_CACHES" \
-  --diagnostic-receipt "$V3_GPU_DIAGNOSTIC" \
-  --diagnostic-sha256 "$V3_GPU_DIAGNOSTIC_SHA256" \
-  --pilot-dirs "$V3_CONTRASTIVE" "$V3_CONTEXTUAL" "$V3_SUPCON" \
-  --remaining-peak-bytes "$V3_REMAINING_PEAK_BYTES" \
-  --recorded-by "researcher-authorized Week 5 execution"
+cd "$POSE_EMBED_RELEASE"
+env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
+  .venv/bin/python3.11 \
+  "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-corruption-launch-tools/20261012T160355Z/pose-week5-launch-corruptions.py" \
+  --pilot-validation-verification "${V3_PILOT_VALIDATION_VERIFICATION:?Set the independently passed 8035829 receipt}" \
+  --pilot-validation-verification-sha256 "${V3_PILOT_VALIDATION_VERIFICATION_SHA256:?Set its verified SHA-256}"
 ```
 
-Wait for the corruption job to finish, then inspect its scheduler accounting and
-immutable outcome before submitting timing.
+This invokes the unchanged reviewed GPU controller with
+`avx2,cpu_arch=sapphirerapids,cpu_type=Gold-6426Y`, matching the recorded pilot
+GPU hosts. Later admission recomputes CPU projections with exact array equality;
+AVX2 or a matching model name alone does not establish that replay will pass.
+Use compatible native CPU/BLAS settings and retain actual runtime evidence.
+
+Before timing, independently review successful corruption accounting, immutable
+operation/outcome, all command and GPU-preflight outcomes, resource samples and
+both seals. Require nine complete 18,929-row encodings, 27 paired query
+projections, three clean gallery projections and 27 engineering results with
+the fixed conditions, seed 7, methods and input bindings. Check all nine full-query
+geometry summaries and jitter fallback denominators. Scientific archive hashing
+and replay stay inside allocations. No accuracy or loss-improvement floor is a
+completion criterion. Submit timing only after this review and a fresh
+allocation, duplicate-attempt and resource check:
 
 ```bash
-qsub -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
+qsub -l avx2,cpu_arch=sapphirerapids,cpu_type=Gold-6426Y \
+  -o "$POSE_EMBED_ARTIFACT_ROOT/logs" "$V3_GPU_QSUB" \
   "$V3_GPU_CONTROLLER" timing --cache-dir "$V3_CACHES" \
   --diagnostic-receipt "$V3_GPU_DIAGNOSTIC" \
   --diagnostic-sha256 "$V3_GPU_DIAGNOSTIC_SHA256" \
@@ -382,6 +414,14 @@ updates are outside the 39 scientific runs. Batch plans, configuration hashes,
 load/validation/train times and memory peaks are retained; no head is saved or
 made eligible for selection/final use. Count its actual bytes and time in the
 capacity ledger.
+
+The new `study-v3/revisions/execution-r1/attempts/TIMESTAMP-JOB-timing/`
+directory must retain `attempt.json`, `timing.json`, `outcome.json` and, for each
+method, `timing.json` plus 20 `batch-plan-NNN.json` files. Verify 59,380 updates
+per arm, paired initialization and all 20 batch hashes, exact config/input/source
+bindings, positive measured loading/validation/training durations and host/GPU
+memory peaks. These measurements inform capacity; they do not authorize
+selection, final training or novel opening.
 
 The Week 4 cache job took 94 minutes 4 seconds, independent cache validation
 about 6 minutes 16 seconds, and each pilot roughly 8–9 scheduler minutes. The

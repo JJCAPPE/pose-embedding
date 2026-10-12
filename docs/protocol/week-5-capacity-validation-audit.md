@@ -26,6 +26,16 @@ other bookkeeping costs also remain. They are not an instruction to add
 overlapping inclusive timings twice. There is no memoization of these complete
 validator calls.
 
+The standalone CPU `validate-pilots` duration, D, is not an isolated measurement
+of A or F. Its receipt includes the three mandatory pilot-validator calls, P,
+plus script setup, design/cache hashing and fixture checks. Command wall time
+also includes process overhead; scheduler wall time additionally includes the
+native-initialization preflight and environment setup. Therefore D is an
+inclusive operational measurement, **not a proven lower bound on A or F**.
+Do not subtract guessed overhead or multiply D as though it were P. Measure
+complete A later on the intended compatible CPU/BLAS profile; if P is needed
+separately, time its three actual validator calls inside an allocation.
+
 ## Exact operation counts
 
 | Remaining operation | Heavy validator calls |
