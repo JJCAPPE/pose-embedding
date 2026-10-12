@@ -529,19 +529,30 @@ Thirteen focused tests and independent review passed. Retained tool hashes are:
 
 **Hold this submission** until the actual passed timing receipt from checker
 `85af5ae65f64695240255fa686365e4d120be6b594142c18daee8804e567072b`
-and its trusted SHA-256 are available. The root operator must first recheck
-source/dependencies, receipt/tool bindings, seals, current storage/reserve,
-scheduler state and absence of active, duplicate or uncertain submissions.
-Inspect preserved launch intent before any retry. This requests four compatible
-CPU slots, 32 GiB and 12 hours without a GPU; actual allocation/native locked
-initialization are checked inside the job.
+and its trusted SHA-256 are available. The reviewed administrative launcher is
+staged, **not executed or submitted**, under
+`study-v3/operations/week5-p-component-launch-tools/20261012T185617Z/`:
+
+- `pose-week5-launch-p-component.py`: `983b3e3dd37c58f399e1370e1284b977ca14b0f53bc2bf188212fc56246677f1`;
+- `test_pose_week5_launch_p_component.py`: `dd97cf1e9fee192bc5cbab0ec8dfa6225096a96afc05a34b51af9acfe7b90ce3`;
+- `tools.json`: `b725e23aae98498def43999c7c1d1b3183e639b1747355e9a4946849493194a4`.
+
+Fourteen focused tests, two independent reruns, review, Ruff and compilation
+checks passed. This launcher automates the root operator's fresh source,
+dependency, metadata/receipt/tool, seal, storage/reserve and scheduler checks,
+then preserves an immutable submission intent. Active, duplicate or uncertain
+submissions block it; inspect retained intent before any retry. Login-node work
+is limited to metadata, source and administrative checks. **Never call the
+allocated diagnostic's `prerequisites` or `require_v3_design` on login**: they
+hash scientific PKL/checkpoint files and must run inside the allocation.
+The job requests four compatible CPU slots, 32 GiB and 12 hours without a GPU;
+actual allocation and native locked initialization are checked there.
 
 ```bash
 cd "$POSE_EMBED_RELEASE"
-V3_P_COMPONENT_TOOLS="$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-p-component-tools/20261012T184957Z"
-qsub -terse -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
-  "$V3_P_COMPONENT_TOOLS/pose-week5-measure-pilots.qsub" \
-  "$V3_P_COMPONENT_TOOLS/pose-week5-measure-pilots.py" \
+env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
+  .venv/bin/python3.11 \
+  "$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-p-component-launch-tools/20261012T185617Z/pose-week5-launch-p-component.py" \
   --timing-verification "${V3_TIMING_VERIFICATION:?Set the actual independently passed timing receipt}" \
   --timing-verification-sha256 "${V3_TIMING_VERIFICATION_SHA256:?Set its trusted SHA-256}"
 ```
