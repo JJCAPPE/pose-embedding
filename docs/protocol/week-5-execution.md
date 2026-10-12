@@ -286,6 +286,23 @@ production builds, workspace verification and all 19 runbook shell fences passed
 Production staging preserved all 81 unrelated source files. PR 33 remains a draft;
 no component result, full admission, capacity approval or weekly closure is claimed.
 
+The measured-profile no-go checkpoint (`2e6f69a`) was published through guarded
+migration `20261012204312` and promoted deployment
+`dpl_CjNMpvuZD41kQiSRDBhjJ1oRaBUb`. Live verification at **2026-10-12T20:50:26.908Z**
+confirmed Week 5 version 25 active, tasks 01/03 and their completion timestamps
+preserved, task 02 version 22 in progress, task 04 version 5 blocked, and all
+three gates pending. Gate 03 version 6 contains the verified no-go evidence,
+with no waiver or decision timestamp; actual researcher time remains unreported.
+The [public export](https://pose-embed-tracker.vercel.app/api/export?format=json)
+exactly matched the fallback and protocol, with all 13 other weeks and source
+links unchanged. The blocker/reflection/evidence and protocol rendered without
+browser errors, Journey returned 200, and private export redirected to sign-in.
+Nineteen guarded database tests, 22 tracker tests, lint/typecheck, local and
+production builds, workspace checks and all 19 runbook shell fences passed.
+Production staging preserved all 81 unrelated source files; PR 33 remains a
+draft. The update records an unresolved capacity blocker, not scientific
+admission, approval to amend the implementation or formal weekly closure.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
