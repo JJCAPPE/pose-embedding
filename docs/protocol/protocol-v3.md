@@ -169,7 +169,12 @@ checks stay fresh. Independent recertification starts empty; changed inputs,
 failed/partial checks and mutable caller inputs cannot yield stale success.
 Store successful proof markers only; do not cache mutable result objects.
 No cross-command or persistent proof cache is authorized. The precise acceptance
-and mutation tests are in ADR0007; implementation remains subject to review.
+and mutation tests are in ADR0007. The implementation passed independent review
+and the stable full local suite (1,373 tests, two historical AVSL skips) before
+source release `f101f0e9d9bd64275d2088deab1b0bdcfcc53620` was frozen and pushed.
+SCC installation started October 12 at 21:42:51 UTC and remains pending at this
+checkpoint; the allocated CPU rehearsal has not been submitted. Source freeze
+alone grants no scientific admission.
 
 The successor must freshly regenerate parity, five caches/two full repeats,
 three complete pilots, panel/repeat evidence, nine corrupted development paths

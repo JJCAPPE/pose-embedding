@@ -17,8 +17,13 @@ that the new implementation, capacity checks or deployment have happened.
 The October 12 researcher-authorized [ADR0007](../docs/decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 permits command-local reuse of successful numerical validation with complete
 content rehashing, and separate CPU/GPU capacity accounting. It requires a fresh
-`execution-r2` release and regeneration; implementation and measured admission
-remain pending. Preserve the measured no-go and all `execution-r1` evidence.
+`execution-r2` release and regeneration. The independently reviewed implementation
+passed the stable full local suite: 1,373 tests with two historical AVSL skips.
+Source release `f101f0e9d9bd64275d2088deab1b0bdcfcc53620` is frozen and pushed.
+SCC installation started October 12 at 21:42:51 UTC and remains pending at this
+checkpoint; no CPU rehearsal job has been submitted. Fresh successor evidence,
+full admission and measured CPU/GPU capacity remain pending. Preserve the measured
+no-go and all `execution-r1` evidence.
 
 Following the [final prospectus](../docs/proposal/2026/kulis_pose_sequence_retrieval_prospectus.pdf),
 the December study asks whether a **full contextual training recipe reduces
