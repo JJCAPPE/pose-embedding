@@ -11,7 +11,7 @@ Read the [Week 5 execution record](week-5-execution.md),
 
 | Operational handoff field | Current status |
 | --- | --- |
-| Admitted successor release and protocol/design hashes | Implementation independently reviewed; 1,373 local tests passed, two historical AVSL source-parity skips. SCC validation and scientific admission pending. |
+| Admitted successor release and protocol/design hashes | Immutable source f101f0e9d9bd64275d2088deab1b0bdcfcc53620 independently reviewed; 1,373 local tests passed, two historical AVSL source-parity skips. Separate SCC installation passed; CPU rehearsal 8044010 queued at October 12 21:49 UTC. Scientific admission pending. |
 | Fresh cache/pilot/corruption/geometry/analysis receipts | Follow the Week 5 execution record; admission incomplete |
 | Capacity report and immutable selection authorization | Prior measured-profile no-go retained; authorized CPU/GPU amendment and fresh capacity evidence pending; selection held |
 | SCC jobs, logs and next command | Read `$HOME/pose-embed-scc/WEEK5-STATUS.txt` through `remote`; replace pending fields with verified results before transition |

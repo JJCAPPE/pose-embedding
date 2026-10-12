@@ -129,9 +129,13 @@ The researcher authorized [ADR0007](../decisions/0007-safe-validation-reuse-and-
 on October 12 after the verified execution-r1 capacity no-go. The prior release,
 environments, attempts, receipts and commands below remain historical evidence.
 Do not rerun their one-off launchers or replace files in either earlier release.
-No execution-r2 release, allocated rehearsal or scientific artifact is claimed
-by this instruction section; record the actual verified commit and paths before
-submission.
+Execution-r2 source release `f101f0e9d9bd64275d2088deab1b0bdcfcc53620` passed
+independent review and 1,373 local tests (two historical AVSL source-parity skips).
+Separate SCC installation passed; CPU rehearsal `8044010` was queued at October
+12 21:49 UTC. Read the current SCC status and verify terminal accounting, all
+commands/JUnit/resources/seals before advancing. The installation and rehearsal
+launch tools have both run; never blindly resubmit. This checkpoint claims no
+regenerated scientific artifact.
 
 Freeze the reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes
 in a new clean checkout and separate locked environment. Preserve all scientific

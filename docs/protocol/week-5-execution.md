@@ -1414,6 +1414,86 @@ claimed. Full A, capacity, selection authorization and weekly closure remain
 unresolved. The live publication still records authorization with all gates
 pending and actual time unreported.
 
+## Execution-r2 release and installation handoff
+
+Release `f101f0e9d9bd64275d2088deab1b0bdcfcc53620` was committed, pushed and
+matched against the remote branch after the stable checks above. Its local full
+suite log SHA-256 is
+`6aedc075b09fd6ff0eb2ffe9f298e187e675296668b8377216e0aadfb53b8f72`.
+At October 12 21:42:51 UTC, the reviewed metadata-only installer started through
+the existing `remote:0.0` SSH connection. It creates
+`$HOME/pose-embed-scc/releases/week5-execution-r2-f101f0e9d9bd` with its own locked
+environment under the canonical artifact root. The original release/environment
+remain intact. Setup tools are retained under
+`study-v3/operations/week5-r2-setup-tools/20261012T214251Z/`:
+installer SHA `bbc8e66f1838d7b4a34ed65d4cdea16cb904062a311f0dce1fea47a698409e78`;
+held rehearsal launcher SHA
+`113780e87b0934d0b7cad4810127f67206020e77b7ba5a0c15f079bd851f983e`.
+Both passed independent review, compile checks and four fail-closed guards.
+
+The installation record under `week5-r2-installation/` must show successful
+source/dependency/upstream/workspace checks and both seal observations before
+using its digest-bound rehearsal launcher. Installation is not a scientific job.
+The held first job requests no GPU, four compatible CPU slots, 32 GiB and 12 hours;
+its wrapper retains 60-second resource monitoring. Check actual installation,
+launch intent, scheduler state, logs and outcome before proceeding; never blindly
+rerun either one-off tool. No rehearsal submission is claimed in this checkpoint.
+
+The 24 GiB additional setup/rehearsal reserve is a scoped conservative bound,
+not campaign admission: the measured old environment was 7,259,285,367 bytes,
+old fixture tree 702,476,060 bytes and upstream checkout 433,152 bytes. Twice
+the environment, four times the fixture tree and 2 GiB overhead fit below this
+bound. Current quota/filesystem reserve is checked before setup and submission.
+A fresh full retained/additional-peak inventory is still required for admission.
+Automatic chat checks are at most hourly; do not leave a turn waiting on a healthy
+process. Keep in-job monitoring intact and provide an exact EDT check-back time.
+
+## Verified installation and queued rehearsal — 21:49 UTC
+
+Separate installation completed at **21:45:32.590026 UTC**. Root checked all eight
+successful command outcomes, clean exact release, Python 3.11.15, 47 compatible
+installed packages, package import origin, the separate environment, pinned
+MotionBERT and workspace result. The installation receipt is
+`study-v3/operations/week5-r2-installation/20261012T214306Z/installation.json`,
+SHA `4e4f556773c9b6d7ab7dc9a56a589794e6b6a1d36c400a6e60f2f62fece4f96d`.
+
+The reviewed one-off launcher then submitted **8044010** at
+**21:47:02.502287 UTC**. Its launch receipt is
+`study-v3/operations/week5-r2-launches/20261012T214658Z/launch.json`, SHA
+`64c6c26a07f6b1bd5399b1cb46f7c1431b66521556bbcaec0c85cfc2da3c8618`.
+At **21:49:08.807964 UTC**, exact scheduler state was **qw**: queued, four slots,
+with no operation/resource samples yet. The scoped reserve passed with
+841,160,000,000 quota bytes and 1,008,855,941,120 filesystem bytes free.
+Both the installer and launcher have now run; inspect their immutable receipts
+and intent before any action, never blindly resubmit. No completed rehearsal,
+successor preparation or scientific admission is claimed.
+
+The current SCC pointer resolves to
+`study-v3/operations/week5-status/20261012T214908Z/status.txt`, SHA
+`6b387795746014ef33e14590c8cd23efdc58c3f1d4a958ff9b839688a10e8cb3`.
+It preserves the old status and records the actual scheduler observation and
+next gate. Verify job 8044010 accounting, command outcomes, full JUnit, source
+bindings, periodic resources and both seals before advancing to preparation.
+Next recommended check: **October 12 at 6:55 PM EDT (22:55 UTC)**. Automatic
+checks remain hourly; the remote session and in-job monitoring are preserved.
+
+The reviewed-source milestone is live through guarded migration
+`20261012214324` (SHA
+`88aa03183c09e8de2092e0fad9498e692cc6d826bcfd5f8424a7e51fc3493616`) and deployment
+`dpl_Gnx3BMDHTrdETKYvX84YdfVM2vMr`, verified at **21:47:04.730 UTC**.
+Its installation-pending wording explicitly describes the earlier 21:42
+checkpoint; the accepted installation and queued submission above are later
+operational observations. Week 5 v27 remains active, task 02 v24 in progress,
+task 04 v7 blocked, gate 03 v8 pending, all gates pending and actual time
+unreported. Root independently matched the complete public export/fallback,
+including manual actions and protocol, at **21:49:20.309720 UTC**; export SHA
+`f6593b2bfb8f4b48cce3e15cd3b8af4b2276446d5814ddaf7479821b7506e25c`.
+All 13 other weeks and links, completed-task timestamps, private ownership/RLS,
+closed history and unrelated Journey were preserved. Twenty-one database guard
+tests, 22 tracker tests, lint/typecheck, production build and live page/privacy
+checks passed. The publication commit is `5f55bb7`; source release remains
+`f101f0e`. No completion or capacity waiver was published.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -1451,12 +1531,14 @@ review, fixed resident/optimization counts and paired update plans. Full
 scientific admission replay remains pending. The three-call P diagnostic then
 passed independent verification and established the measured-profile capacity
 no-go described above. The researcher then authorized ADR0007. Its implementation
-has been independently reviewed; the stable full local suite rerun remains
-pending. No execution-r2 release is frozen or validated on SCC, and measured
-admission remains pending.
+passed independent review and the stable full local suite: 1,373 passed and two
+historical AVSL source-parity skips. The clean successor release is
+`f101f0e9d9bd64275d2088deab1b0bdcfcc53620`; SCC validation and measured admission
+remain pending. The separate installation passed, and CPU rehearsal 8044010 is
+queued as of 21:49 UTC.
 
-**Next:** Freeze and install the independently reviewed, locally verified ADR0007
-implementation in its separate execution-r2 checkout and environment, regenerate
+**Next:** Verify allocated CPU rehearsal 8044010 for release `f101f0e`, then
+complete and verify successor preparation. Regenerate
 the declared evidence, then finish full A and corrupted-artifact replay, refresh
 seals and measure the complete CPU/GPU dependency/capacity ledger. Passing this
 engineering amendment does not authorize selection, final training or opening.
