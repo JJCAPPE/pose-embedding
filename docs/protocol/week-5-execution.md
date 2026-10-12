@@ -706,6 +706,42 @@ passed at 14:52:58 UTC with 47,163,047,936 bytes free of 47,695,921,152 total.
 The 14:53 UTC resource observation passed RAM/storage checks. This is a dated
 allocation observation; no SupCon completion or pilot admission is inferred.
 
+### SupCon execution checked; independent three-pilot validator submitted
+
+SupCon engineering pilot **8035533** completed on `scc-j08` from
+**October 12 14:52:42 to 15:00:01.270723 UTC**. Scheduler accounting records
+`failed=0`, `exit_status=0` and 439 wall seconds. Execution/metadata checks
+record 20 epochs, 47,520 updates, five snapshots, 21 diagnostics, 18 passing
+resource files and both seals. Initialization, batch plan and all 20 epoch-plan
+hashes match Contextual and therefore all three pilots. Full checkpoint tensor
+and numerical validation remains pending in the separate allocated validator.
+
+The compact receipt is retained at
+`study-v3/operations/week5-pilot-verification/20261012T150130Z/supcon-metadata-verification.json`,
+SHA-256 `c0b3ef082032f4183c8649dbceff8fa9fd937b27691d08cea8eb0f04f3a4c0d7`.
+Run time was 368.018387 seconds, including 254.76661 training, 5.299794
+validation and 0.493757 checkpoint seconds. Peak host memory was 4,711,464,960
+bytes; GPU allocated/reserved peaks were 3,286,354,944 and 3,420,454,912 bytes.
+Retained checkpoints total 285,255,316 bytes.
+
+**Independent CPU pilot-validator 8035576** was submitted at
+**15:06:35.682596 UTC** and queued at launch. The frozen wrapper requests four
+8-GB slots and 12 hours, with no GPU, for the exact Contrastive, Contextual and
+SupCon runs. Source, dependencies, locks/manifests, cache validation, all three
+metadata/accounting/pairing receipts, seals, no running jobs and duplicate
+guards passed prelaunch verification. Quota free space was 871,040,000,000 bytes
+and filesystem free space 1,042,645,254,144 bytes; the conservative 84-GB
+remaining-peak bound passed the required reserve check.
+
+Launch: `study-v3/operations/week5-launches/20261012T150600Z/launch.json`.
+The reviewed one-off CPU launcher is retained under
+`study-v3/operations/week5-launch-tools/20261012T150400Z/`, source SHA-256
+`337f2f598fdb86f58d9d3cfabb70729fa21e445f6d3b94407b8e3cef03b32800`;
+14 offline checks and independent review passed. No validator result is claimed.
+Task 02 remains in progress and all scientific gates remain pending. Verify the
+allocated outcome, accounting, complete three-pilot receipt, resources and seals
+before corruption work; retain all original pilot attempts.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -783,18 +819,18 @@ completed successfully with retained accounting, resource and seal evidence;
 independent CPU cache validation passed all five archives and repeatability.
 The Contrastive engineering pilot completed its fixed run and passed
 execution/metadata checks. Contextual completed with matching initialization
-and batch-plan metadata; SupCon has been submitted.
+and batch-plan metadata. SupCon also completed with matching metadata, and
+independent CPU validation of the three-pilot set has been submitted.
 
-**Next:** Verify SupCon engineering pilot 8035533, then run independent
-three-pilot validation. Complete development corruptions,
+**Next:** Verify independent three-pilot validator 8035576. Complete development corruptions,
 full-query damage telemetry and timing. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
-**Open issues:** The SupCon pilot, independent three-pilot validation and
-further Week 5 admission evidence are unfinished; the failed first attempt is preserved after its allocated remedy
+**Open issues:** Independent three-pilot validation and further Week 5
+admission evidence remain unfinished; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.
