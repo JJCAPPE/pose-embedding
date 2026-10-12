@@ -491,6 +491,41 @@ writes `validation.json`, `validation-repeatability.json` and
 receipts there; the wrapper's scientific-output directory is unused for this
 validation step.
 
+### Five-cache extraction completed; independent validator submitted
+
+After the SSH connection was restored, inspection at **October 12 13:48:10 UTC**
+reconciled job **8028152** against retained scheduler accounting and operation
+receipts. The job ended at **01:00:59.191618 UTC** with `failed=0`,
+`exit_status=0` and 5,713 scheduler seconds (5,672.78616988397 command seconds).
+All five command outcomes, 105 RAM/storage samples and both dataset seals
+passed. The earlier disconnection did not remove the retained job evidence;
+this record does not claim active continuation through the connection gap.
+
+All five expected files and sidecar hashes were inspected, including the clean
+release, protocol, lock, parity, manifest and sample-order bindings. Recorded
+shapes are 95,001 × 8,704 for each full training repeat, 76,013 × 8,704 for
+development training, 20 × 8,704 for development gallery, and 18,929 × 8,704 for
+development queries. Full independent archive hashing and content validation
+had **not** passed at this checkpoint.
+
+The compact verification is retained at
+`study-v3/operations/week5-launches/20261012T134755Z/cache-completion-verification.json`,
+SHA-256 `5ae2cdb2f82d92801a13732212d4aebd338fc6a03b7fbcc9a65c2447ebc6c486`.
+It binds the outcome, attempt, scheduler exit, accounting, parity,
+repeatability, sidecar hashes and extraction stage measurements. Scientific
+release `731938a` and the successful/failed attempt artifacts remain unchanged.
+
+Independent CPU validator **8034547** was submitted at **13:48:11.405663 UTC**
+using the frozen scheduler wrapper and was queued at 13:48:12. Its launch JSON
+is retained in the same directory. Prelaunch quota free space was 875.6 decimal
+GB and filesystem free space 1,047,535,812,608 bytes, checked with the conservative
+84-GB remaining-peak bound. No other jobs were present before submission. The
+SCC status record now identifies this validator as pending. Its receipts belong
+in its new `study-v3/operations/<stamp>-8034547-validate-caches/` directory;
+verify accounting, `validation.json`, `validation-repeatability.json`,
+`validation-quota.txt` and seals before launching the paired pilots. Task 02
+remains in progress and all scientific gates remain pending.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -563,9 +598,11 @@ and exact fresh-process repeats. The allocated controller remedy passed after
 the preserved first cache failure; the fresh attempt passed parity and was
 independently verified extracting caches on the assigned L40S. Both full-size
 extractions are now retained with a passed allocated repeatability receipt and
-independently checked sidecar bindings; development caches remain pending.
+independently checked sidecar bindings. All five cache commands subsequently
+completed successfully with retained accounting, resource and seal evidence;
+independent CPU cache validation has been submitted.
 
-**Next:** Verify new cache attempt 8028152 and its independent cache validator;
+**Next:** Verify independent CPU cache-validator job 8034547;
 then complete pilots, development corruptions,
 full-query damage telemetry and timing. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
@@ -573,8 +610,8 @@ the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
-**Open issues:** Fresh cache results and the remaining Week 5 admission evidence
-are unfinished; the failed first attempt is preserved after its allocated remedy
+**Open issues:** Independent five-cache validation and the remaining Week 5
+admission evidence are unfinished; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.
