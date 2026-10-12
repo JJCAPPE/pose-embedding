@@ -518,6 +518,46 @@ env -u PYTHONOPTIMIZE PYTHONDONTWRITEBYTECODE=1 \
   --launch-sha256 26761143b4926c7d50d28cc1a2ad4cd1a69b638a3df008d1b5e73eb49cdd49d3
 ```
 
+The read-only pilot-validator component diagnostic is staged, **not executed or
+submitted**, at `study-v3/operations/week5-p-component-tools/20261012T184957Z/`.
+Thirteen focused tests and independent review passed. Retained tool hashes are:
+
+- `tools.json`: `0725e043737a6ceed921c1369c6d053c3acf01f7ef3975b94d9e4d74639233f1`;
+- `pose-week5-measure-pilots.py`: `d692f62235aaacc3d210b1530c3239119a7826510b25cca258ccb1465367f0c1`;
+- `pose-week5-measure-pilots.qsub`: `95834d5d2879606526bf16a7b9ed2347a25491d4b2de7deaa6be859744c06ebe`;
+- `test_pose_week5_measure_pilots.py`: `57d4343e292d11434720a9bcd4580c719ad014ddfba702fc5e876b5bef4338a0`.
+
+**Hold this submission** until the actual passed timing receipt from checker
+`85af5ae65f64695240255fa686365e4d120be6b594142c18daee8804e567072b`
+and its trusted SHA-256 are available. The root operator must first recheck
+source/dependencies, receipt/tool bindings, seals, current storage/reserve,
+scheduler state and absence of active, duplicate or uncertain submissions.
+Inspect preserved launch intent before any retry. This requests four compatible
+CPU slots, 32 GiB and 12 hours without a GPU; actual allocation/native locked
+initialization are checked inside the job.
+
+```bash
+cd "$POSE_EMBED_RELEASE"
+V3_P_COMPONENT_TOOLS="$POSE_EMBED_ARTIFACT_ROOT/study-v3/operations/week5-p-component-tools/20261012T184957Z"
+qsub -terse -o "$POSE_EMBED_ARTIFACT_ROOT/logs" \
+  "$V3_P_COMPONENT_TOOLS/pose-week5-measure-pilots.qsub" \
+  "$V3_P_COMPONENT_TOOLS/pose-week5-measure-pilots.py" \
+  --timing-verification "${V3_TIMING_VERIFICATION:?Set the actual independently passed timing receipt}" \
+  --timing-verification-sha256 "${V3_TIMING_VERIFICATION_SHA256:?Set its trusted SHA-256}"
+```
+
+The fresh immutable operation retains per-method timings, runtime/native CPU
+identity, resource samples, both seals and command/outcome evidence. It times
+only the unchanged `validate_engineering_pilot` calls in persisted report-path
+order **Contextual → Contrastive → SupCon**, separating setup from their sum P.
+This measures **P only, not full A**, and makes no controlled cold-cache or
+universal hardware-bound claim. Under the measured profile, P must be below
+`48*3600/(452*1.25) = 305.84070796` seconds for the larger indivisible report
+and coupled GPU-opening limit even to remain feasible; omitted T/V/report costs
+make that necessary condition stricter. Passing this component alone does not
+establish capacity or scientific admission. Keep full A, dated resources/queues,
+remaining-work forecasts and every scientific gate separate.
+
 The Week 4 cache job took 94 minutes 4 seconds, independent cache validation
 about 6 minutes 16 seconds, and each pilot roughly 8–9 scheduler minutes. The
 clean query extraction took about 6 minutes 49 seconds, so nine corrupted
