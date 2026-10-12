@@ -110,4 +110,5 @@ metrics and claims fixed after opening.
 At handoff, reconcile jobs/outcomes, remaining slots and resources; verify the
 live tracker and leave `remote` with release/job/log/artifact pointers and the
 next command. Record Done, Next and Open issues. Distinguish technical completion
-from formal closure and request missing researcher time information.
+from formal closure. Preserve actual time as unreported at the researcher's
+request; closure depends on required tasks and gates, not fabricated minutes.

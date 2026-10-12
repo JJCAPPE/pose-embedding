@@ -651,6 +651,41 @@ four offline duplicate-guard checks and peer review passed before launch.
 No Contextual outcome is claimed. Task 02 remains in progress, all scientific
 gates remain pending and full independent three-pilot validation is still required.
 
+### Contextual execution and pairing checked; SupCon submitted
+
+Contextual pilot **8035452** completed on `scc-j01`, starting October 12 at
+14:31:22 UTC and ending at **14:40:50.527599 UTC**. Scheduler accounting records
+`failed=0`, `exit_status=0` and 568 wall seconds. Execution/metadata checks record
+20 epochs, 47,520 updates, five epoch records, 21 diagnostics, 20 passing resource
+checks and seals. Initialization, batch plan and all 20 epoch-plan hashes match
+Contrastive. Full checkpoint tensor and numerical validation remains pending
+in the separate allocated three-pilot validator.
+
+The compact receipt is retained at
+`study-v3/operations/week5-pilot-verification/20261012T144700Z/contextual-metadata-verification.json`,
+SHA-256 `3e4ca8d5cafdf11397fa2c832a65105019b2443a3a1c1656c8f6beda350a9f35`.
+Run time was 469.532168 seconds, including 343.053875 training, 5.085005
+validation and 0.52249 checkpoint seconds. Peak host memory was 4,700,549,120
+bytes; GPU allocated/reserved peaks were 3,286,354,944 and 3,420,454,912 bytes.
+Retained checkpoints total 285,255,828 bytes. These measurements do not establish
+full scientific admission.
+
+**SupCon pilot 8035533** was submitted at **14:49:36.052186 UTC** and was queued
+at launch. Frozen source/locks, dependencies, all 58 diagnostic bindings, cache
+validation, prior Contextual accounting/metadata, seals, no running jobs and
+duplicate-attempt guards passed. Quota free space was 871,930,000,000 bytes and
+filesystem free space 1,043,601,555,456 bytes; the conservative 84-GB
+remaining-peak bound passed the reserve check. The scheduler request was
+verified as four 8-GB slots, one L40S and 12 hours; no allocation is inferred.
+
+Launch: `study-v3/operations/week5-launches/20261012T144920Z/launch.json`,
+SHA-256 `bf2014596e0f121336b2d41c531163ebacb697beafcd3c667c06fdbb1094d3ee`.
+The reviewed helper is preserved at
+`study-v3/operations/week5-launch-tools/20261012T144902Z/pose-week5-launch-supcon.py`,
+SHA-256 `b072e5df19f59b027895247b375b1acec6ecd568c046d2056bf2e8ffd3e3ca83`.
+No SupCon outcome is claimed. Task 02 remains in progress, all gates remain
+pending, and independent three-pilot validation is required before corruption work.
+
 ## Implementation and verification in progress
 
 The successor binds its original design and exact manifest bytes, permits only
@@ -727,18 +762,19 @@ independently checked sidecar bindings. All five cache commands subsequently
 completed successfully with retained accounting, resource and seal evidence;
 independent CPU cache validation passed all five archives and repeatability.
 The Contrastive engineering pilot completed its fixed run and passed
-execution/metadata checks; the paired Contextual pilot has been submitted.
+execution/metadata checks. Contextual completed with matching initialization
+and batch-plan metadata; SupCon has been submitted.
 
-**Next:** Verify Contextual engineering pilot 8035452, then complete the paired
-SupCon pilot and independent three-pilot validation. Complete development corruptions,
+**Next:** Verify SupCon engineering pilot 8035533, then run independent
+three-pilot validation. Complete development corruptions,
 full-query damage telemetry and timing. Include the
 [repeated-validation call-count audit](week-5-capacity-validation-audit.md) in
 the measured forecast, including whole-report costs. Use the immutable receipts
 for the capacity decision and next-week handoff. Software rehearsal does not
 replace fresh scientific admission evidence.
 
-**Open issues:** The remaining successor pilots, independent pilot validation
-and further Week 5 admission evidence are unfinished; the failed first attempt is preserved after its allocated remedy
+**Open issues:** The SupCon pilot, independent three-pilot validation and
+further Week 5 admission evidence are unfinished; the failed first attempt is preserved after its allocated remedy
 test passed. Actual researcher minutes remain unreported at the researcher's
 explicit request. Technical completion and formal
 weekly closure have not been claimed; all selection/final/novel gates remain shut.
