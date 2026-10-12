@@ -1,4 +1,4 @@
-"""Sequential execution-r1 operations with immutable, periodic resource records."""
+"""Sequential execution operations with immutable, periodic resource records."""
 
 from __future__ import annotations
 
@@ -19,7 +19,6 @@ from pose_embed.motionbert_reproducibility import parse_project_quota
 from pose_embed.protocol_v3 import require_v3_design
 from pose_embed.provenance import sha256_file, write_immutable_json
 
-REVISION = Path("study-v3/revisions/execution-r1")
 METHODS = ("contrastive", "contextual", "supcon")
 CONDITIONS = (
     ("coordinate_jitter", "0.01"),
@@ -47,6 +46,9 @@ def rehearsal_command(attempt):
         "-o",
         "addopts=",
         "-q",
+        "tests/unit/test_validation_proofs.py",
+        "tests/unit/test_execution_revision_v3.py",
+        "tests/unit/test_campaign_v3.py",
         "tests/unit/test_rehearsal_v3.py",
         "tests/unit/test_final_bindings_v3.py",
         "tests/unit/test_opening_faults_v3.py",
@@ -309,7 +311,18 @@ def main():
     parser.add_argument("--pilot-dirs", type=Path, nargs=3, metavar="PILOT")
     parser.add_argument("--remaining-peak-bytes", type=int, required=True)
     parser.add_argument("--recorded-by", required=True)
+    parser.add_argument(
+        "--revision", choices=("execution-r1", "execution-r2"), default="execution-r1"
+    )
     args = parser.parse_args()
+    revision = Path("study-v3/revisions") / args.revision
+    if args.revision == "execution-r2" and args.mode in {
+        "caches",
+        "pilot",
+        "corruptions",
+        "timing",
+    }:
+        parser.error("successor GPU work requires the reviewed CUDA-free controller")
     signal.signal(signal.SIGTERM, interrupted)
     signal.signal(signal.SIGHUP, interrupted)
     if not os.environ.get("JOB_ID", "").isdecimal() or not os.environ.get("TMPDIR"):
@@ -344,28 +357,30 @@ def main():
     attempt.mkdir(parents=True, exist_ok=False)
     print(f"V3_OPERATION_ATTEMPT={attempt}", flush=True)
     environment = dict(os.environ)
-    protocol = root / REVISION / "locks/protocol.v3.json"
+    protocol = root / revision / "locks/protocol.v3.json"
     bundle = Path(os.environ["POSE_EMBED_MANIFEST_SET"]).resolve().parent
     cli = [".venv/bin/pose-embed"]
     environment["POSE_EMBED_V3_PROTOCOL"] = str(protocol)
     # Scientific caches/runs must stay inside the revision namespace.
     environment["POSE_EMBED_V3_ATTEMPT"] = str(
-        root / REVISION / "attempts" / attempt.name
+        root / revision / "attempts" / attempt.name
     )
     if args.cache_dir:
         environment["POSE_EMBED_V3_CACHES"] = str(args.cache_dir.resolve())
-    output = (
-        attempt / "fixture-data"
-        if args.mode == "rehearsal"
-        else root / REVISION
-        if args.mode == "prepare"
-        else root / REVISION / "attempts" / attempt.name
-    )
+    if args.mode == "rehearsal":
+        output = attempt / "fixture-data"
+    elif args.mode == "prepare":
+        output = root / revision
+    elif args.mode == "geometry":
+        output = protocol.parent / "geometry" / attempt.name
+    else:
+        output = root / revision / "attempts" / attempt.name
     started = datetime.now(UTC)
     write_immutable_json(
         attempt / "attempt.json",
         {
             "mode": args.mode,
+            "execution_revision": args.revision,
             "started_at": started.isoformat(),
             "arguments": vars(args)
             | {
@@ -452,6 +467,8 @@ def main():
                     + [
                         "study-v3",
                         "prepare-execution",
+                        "--revision",
+                        args.revision,
                         "--historical-manifest-set",
                         str(bundle / "manifest-set.json"),
                         "--recorded-by",

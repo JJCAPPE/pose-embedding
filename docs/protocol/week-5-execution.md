@@ -305,6 +305,34 @@ Production staging preserved all 81 unrelated source files; PR 33 remains a
 draft. The update records an unresolved capacity blocker, not scientific
 admission, approval to amend the implementation or formal weekly closure.
 
+The ADR0007 authorization checkpoint was committed and pushed as `05026c0`
+before guarded migration `20261012211541` was applied. Deployment
+`dpl_EqgPvrFQCKpEKpbRDe1cVDrU5ouW` was promoted and verified at
+**2026-10-12T21:22:19.784Z**. The [live export](https://pose-embed-tracker.vercel.app/api/export?format=json)
+matched the fallback exactly: Week 5 version 26 active; task 02 version 23 in
+progress; task 04 version 6 blocked; all gates pending, including gate 03 version
+7 retaining the no-go and adopted authorization. Tasks 01/03, their completion
+timestamps, all 13 other weeks, source links and unreported time were preserved.
+The live plan source matched canonical Markdown byte-for-byte; the ADR GitHub
+evidence link resolved. The page, reflection, evidence and protocol rendered
+without errors, Journey returned 200 and private export redirected to sign-in.
+Twenty database guard tests, 22 tracker tests, lint/typecheck, local/production
+builds and workspace checks passed; 81 unrelated production source files were
+preserved. PR 33 remains a draft. This publishes authorization only: successor
+implementation verification, freeze, regeneration and measured admission remain
+pending.
+
+
+A follow-up static-plan correction was committed as `1d3e9e2` and deployed as
+`dpl_4LrQxr4LVDJEnT4KadM5mnEbDtSg`, with live health verified at
+**2026-10-12T21:27:56.749Z**. The manual capacity action now labels 120 decimal GB
+as the historical October 9 estimate and requires a fresh execution-r2 inventory;
+the schedule action and scope authority describe ADR0007's CPU/GPU accounting
+and pending successor work. No database update was needed. The live export
+matched the corrected fallback, all progress rows and versions were unchanged,
+and the rendered protocol, Week 5 evidence, Journey and private-export boundary
+passed verification. All 81 unrelated production source files remained unchanged.
+
 ## Researcher availability and schedule
 
 The researcher confirmed up to **5 hours weekly normally, 10 if necessary**, with
@@ -1348,6 +1376,44 @@ passed; the hosted Auth advisories above remain distinct. The stable static-copy
 correction additionally passed four focused protocol/accessibility browser checks.
 None of these software checks substitutes for SCC calibration or admission.
 
+## ADR0007 implementation verification — October 12
+
+The successor implements command-local success markers only for pilot numerical
+snapshot replay and trained-feature projection equality. Each reuse hashes all
+bound content again; design/source/lock, metadata/options and native runtime
+commitments are included. Live authorization, dataset state, inventory and
+resource checks remain fresh. Publication and command-exit checks reject changed
+inputs; independent recertification starts empty. No numerical algorithm,
+tolerance, RNG initialization, recipe, seed, batch, epoch or scientific budget
+changed. Explicit frozen hashes take precedence over observed/provenance hashes,
+and conflicting path aliases are rejected.
+
+Schema-2 capacity receipts and dated allocation windows account separately for
+complete CPU and GPU jobs. CPU overhead inside a GPU allocation remains GPU job
+wall time. Both resource classes, non-overlap, slack, remaining dates, memory,
+storage and opening safeguards remain mandatory. The exact original → r1 → r2
+predecessor chain and shared opening/operation locks preserve historical evidence.
+New source-bound GPU diagnostics, complete regeneration and fresh measured A are
+required; old receipts cannot admit the new release.
+
+Independent implementation and operational-adapter reviews passed. The final
+stable local suite passed **1,373 tests**, with only two skipped licensed AVSL
+source-parity checks for the historical v2 method. Forty focused proof/replay
+checks, Ruff, formatting, workspace verification and all 19 runbook shell fences
+passed. An earlier development suite found the new module missing from the shared
+scientific hash inventory; that entry was added. A second test saw source changes
+during the earlier run; both failed tests passed in the isolated 22-test protocol
+suite and the final stable full suite. No SCC computation resulted from those
+local failures. The dependency locks remain unchanged.
+
+The first successor operation is an isolated allocated CPU rehearsal, followed
+by verified preparation and the full ADR0007 regeneration inventory. Installation
+and submission receipts must identify the actual immutable commit, separate
+locked environment and current resource/seal observations before any success is
+claimed. Full A, capacity, selection authorization and weekly closure remain
+unresolved. The live publication still records authorization with all gates
+pending and actual time unreported.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -1384,11 +1450,13 @@ geometry summaries. Resident timing 8038355 passed independent completion
 review, fixed resident/optimization counts and paired update plans. Full
 scientific admission replay remains pending. The three-call P diagnostic then
 passed independent verification and established the measured-profile capacity
-no-go described above. The researcher then authorized ADR0007; its successor
-implementation and measured admission remain pending.
+no-go described above. The researcher then authorized ADR0007. Its implementation
+has been independently reviewed; the stable full local suite rerun remains
+pending. No execution-r2 release is frozen or validated on SCC, and measured
+admission remains pending.
 
-**Next:** Complete and independently review the researcher-authorized ADR0007
-implementation. Freeze execution-r2 only after its required tests pass, regenerate
+**Next:** Freeze and install the independently reviewed, locally verified ADR0007
+implementation in its separate execution-r2 checkout and environment, regenerate
 the declared evidence, then finish full A and corrupted-artifact replay, refresh
 seals and measure the complete CPU/GPU dependency/capacity ledger. Passing this
 engineering amendment does not authorize selection, final training or opening.

@@ -1,8 +1,9 @@
 # 0007: Safe validation reuse and separate CPU/GPU capacity
 
 Date: 2026-10-12. Status: researcher-authorized result-blind engineering
-amendment; implementation, successor freeze, regeneration and measured admission
-remain pending.
+amendment. The implementation passed independent review and the stable full local
+suite (1,373 passed; two historical AVSL source-parity skips). SCC installation,
+allocated validation, regeneration and measured admission remain pending.
 
 The researcher explicitly approved a result-blind amendment for safe validation
 reuse and separate CPU/GPU time accounting, preserving all scientific checks and

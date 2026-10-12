@@ -155,7 +155,7 @@ def test_probe_cleans_owned_group_after_monitor_failure(
 ):
     process = SimpleNamespace(pid=42, stdin=io.StringIO())
     stopped = []
-    monkeypatch.setattr(diagnostic, "launch", lambda *args: process)
+    monkeypatch.setattr(diagnostic, "launch", lambda *args, **kwargs: process)
     monkeypatch.setattr(
         diagnostic,
         "resource_record",
@@ -174,20 +174,32 @@ def test_probe_cleans_owned_group_after_monitor_failure(
 @pytest.mark.parametrize(
     "fault", [None, "occupied", "not_busy", "sequential", "seal_after"]
 )
+@pytest.mark.parametrize("revision", ["execution-r1", "execution-r2"])
 def test_complete_coordinator_lifecycle_retains_honest_outcome(
-    diagnostic, monkeypatch, tmp_path, fault
+    diagnostic, monkeypatch, tmp_path, fault, revision
 ):
     root = tmp_path.resolve()
+    release = diagnostic.RELEASE if revision == "execution-r1" else "2" * 40
     output = root / "study-v3/operations/fixture-only-diagnostic"
     monkeypatch.setenv("JOB_ID", "123")
     monkeypatch.setenv("NSLOTS", "4")
     monkeypatch.setenv("TMPDIR", str(root))
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0")
-    monkeypatch.setattr(sys, "argv", [diagnostic.__file__, "--output-dir", str(output)])
-    monkeypatch.setattr(diagnostic, "canonical_artifact_root", lambda: root)
     monkeypatch.setattr(
-        diagnostic, "require_clean_repository", lambda: diagnostic.RELEASE
+        sys,
+        "argv",
+        [
+            diagnostic.__file__,
+            "--output-dir",
+            str(output),
+            "--expected-release",
+            release,
+            "--revision",
+            revision,
+        ],
     )
+    monkeypatch.setattr(diagnostic, "canonical_artifact_root", lambda: root)
+    monkeypatch.setattr(diagnostic, "require_clean_repository", lambda: release)
     monkeypatch.setattr(diagnostic.socket, "gethostname", lambda: "scc-fixture")
     monkeypatch.setattr(diagnostic.signal, "signal", lambda *args: None)
     monkeypatch.setattr(diagnostic, "dataset_access", nullcontext)
@@ -273,7 +285,8 @@ def test_complete_coordinator_lifecycle_retains_honest_outcome(
 
     holder = FakeProcess("holder")
 
-    def launch(path, role):
+    def launch(path, role, **kwargs):
+        assert kwargs == {"expected_release": release, "revision": revision}
         roles.append(role)
         process = holder if role == "holder" else FakeProcess(role)
         if role == "holder":
@@ -294,6 +307,12 @@ def test_complete_coordinator_lifecycle_retains_honest_outcome(
     else:
         diagnostic.main()
     result = diagnostic.read(output / "summary.json")
+    assert (
+        result["source_release"] == release and result["execution_revision"] == revision
+    )
+    assert result["execution_sources_sha256"] == diagnostic.execution_binding(
+        release, revision
+    )
     assert result["status"] == ("failed" if fault else "passed")
     assert result["scientific_use_allowed"] is False
     assert result["parent_cuda_initialized"] is False

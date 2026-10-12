@@ -1,7 +1,8 @@
 # Week 6 handoff: October 19 to 25, 2026
 
 Prepared during Week 5 execution. **Week 5 scientific admission remains held
-while the authorized ADR0007 successor is implemented and verified.**
+while the independently reviewed ADR0007 implementation moves from passed local
+verification to SCC installation and allocated validation. No successor is admitted.**
 Read the [Week 5 execution record](week-5-execution.md),
 [incoming handoff](week-5-handoff.md), [canonical plan](../../plan/research-plan.v3.md),
 [ADR0006](../decisions/0006-v3-execution-completion-amendment.md),
@@ -10,7 +11,7 @@ Read the [Week 5 execution record](week-5-execution.md),
 
 | Operational handoff field | Current status |
 | --- | --- |
-| Admitted successor release and protocol/design hashes | execution-r2 implementation/review/freeze pending; no admitted successor |
+| Admitted successor release and protocol/design hashes | Implementation independently reviewed; 1,373 local tests passed, two historical AVSL source-parity skips. SCC validation and scientific admission pending. |
 | Fresh cache/pilot/corruption/geometry/analysis receipts | Follow the Week 5 execution record; admission incomplete |
 | Capacity report and immutable selection authorization | Prior measured-profile no-go retained; authorized CPU/GPU amendment and fresh capacity evidence pending; selection held |
 | SCC jobs, logs and next command | Read `$HOME/pose-embed-scc/WEEK5-STATUS.txt` through `remote`; replace pending fields with verified results before transition |
@@ -94,8 +95,9 @@ necessary bound of 305.840707965 seconds. The largest report's `452P` component
 with 25% slack forecasts 122.145796 hours against the shared 48-hour limit.
 This is a profile-specific no-go, not a universal hardware bound. The researcher
 authorized ADR0007 for bounded numerical validation reuse and separate CPU/GPU
-capacity accounting. Successor implementation, regeneration and renewed measured
-capacity remain pending; full admission remains incomplete and held. Neither timing nor this
+capacity accounting. The implementation passed independent review and the full
+local suite. Allocated validation, regeneration, renewed measured capacity and
+full admission remain pending. Neither timing nor this
 diagnostic authorizes Week 6.
 Native initialization replay also requires measured compatible CPU hardware and
 runtime. A generic CPU request, or even a requested feature, is not sufficient:
@@ -113,16 +115,19 @@ with one scientific subprocess at a time; preserve the approved budget.
 Keep current RAM/VRAM, filesystem and quota measurements with the ledger.
 Admission requires
 `min(filesystem_free, quota_remaining) >= 200*2**30 + 1.25*remaining_peak_bytes`.
-The 120 decimal GB campaign envelope includes originals, successor artifacts and
-development projections. Existing artifacts already consume measured free space;
-forecast additional peak bytes without double counting. Preserve all evidence.
+The October 9 estimate of 120 decimal GB predates execution-r2 regeneration and
+does not establish its capacity. Inventory retained evidence and execution-r2
+additional peak bytes before admission; no successor numeric envelope is yet
+verified. Existing artifacts already consume measured free space; do not count
+them again as remaining work. Preserve all evidence.
 
 The researcher confirmed 5 hours weekly normally, up to 10 if necessary. Record
 planned contingency weeks explicitly and budget zero guaranteed hours for
 November 23 to 29. These are availability bounds, not actual minutes. SCC access
 is ordinary queued access without a claimed reservation. Target final lock
-review by November 22; November 29 remains the hard deadline. Finish novel
-evaluation by December 6 and protect December 7 to 18 for analysis/delivery.
+review by November 22; November 29 remains the hard deadline. Finish all compute,
+including novel evaluation and independent report recertification, by December 6;
+protect December 7 to 18 for analysis/delivery.
 
 Lock all nine fresh final heads trained on 95,001 auxiliary rows before novel
 opening, with complete authorization, independent audit and fresh capacity.

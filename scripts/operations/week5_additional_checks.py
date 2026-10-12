@@ -12,6 +12,7 @@ import argparse
 import fcntl
 import importlib.util
 import os
+import re
 import signal
 import sys
 from datetime import UTC, datetime
@@ -37,6 +38,31 @@ TESTS = (
     "tests/unit/test_geometry_v3.py",
     "tests/unit/test_engineering_evaluation_v3.py",
 )
+
+
+def execution_binding(expected_release, revision):
+    if re.fullmatch(r"[0-9a-f]{40}", expected_release) is None:
+        raise ValueError("a full reviewed release SHA is required")
+    release = require_clean_repository()
+    if release != expected_release:
+        raise ValueError("checkout differs from the reviewed release")
+    sources = {}
+    if revision == "execution-r2":
+        if release == "731938a157be575ee433d6939876f8ca0b95e459":
+            raise ValueError("execution-r2 requires a new reviewed release")
+        sources = {
+            name: sha256_file(name)
+            for name in (
+                "scripts/operations/week5_additional_checks.py",
+                "scripts/run_v3_execution.py",
+            )
+        }
+        if (
+            sha256_file(__file__)
+            != sources["scripts/operations/week5_additional_checks.py"]
+        ):
+            raise ValueError("successor supplementary checker differs from its release")
+    return sources
 
 
 def geometry_destination(root, protocol_relative_path, attempt):
@@ -73,6 +99,9 @@ def main():
         "--mode", choices=("additional-checks", "geometry"), default="additional-checks"
     )
     parser.add_argument("--expected-release", required=True)
+    parser.add_argument(
+        "--revision", choices=("execution-r1", "execution-r2"), default="execution-r1"
+    )
     parser.add_argument("--remaining-peak-bytes", type=int, required=True)
     parser.add_argument("--recorded-by", required=True)
     args = parser.parse_args()
@@ -85,9 +114,8 @@ def main():
         parser.error(
             "valid scheduler allocation and nonnegative byte forecast required"
         )
-    release = require_clean_repository()
-    if release != args.expected_release:
-        raise ValueError("checkout differs from the reviewed release")
+    source_hashes = execution_binding(args.expected_release, args.revision)
+    release = args.expected_release
     repository = Path.cwd().resolve()
     spec = importlib.util.spec_from_file_location(
         "frozen_v3_operations", repository / "scripts/run_v3_execution.py"
@@ -97,7 +125,7 @@ def main():
     signal.signal(signal.SIGTERM, operations.interrupted)
     signal.signal(signal.SIGHUP, operations.interrupted)
     root = canonical_artifact_root()
-    revision = root / "study-v3/revisions/execution-r1"
+    revision = root / "study-v3/revisions" / args.revision
     protocol_path = revision / "locks/protocol.v3.json"
     protocol = load_protocol(protocol_path)
     design = require_v3_design(protocol)
@@ -121,6 +149,8 @@ def main():
             "mode": args.mode,
             "started_at": datetime.now(UTC).isoformat(),
             "release_sha": release,
+            "execution_revision": args.revision,
+            "execution_sources_sha256": source_hashes,
             "launcher_sha256": sha256_file(__file__),
             "frozen_operations_sha256": sha256_file(
                 repository / "scripts/run_v3_execution.py"
@@ -273,7 +303,7 @@ def main():
                     }
                 operations.require_dataset_unopened(require_registry=True)
                 if (
-                    require_clean_repository() != release
+                    execution_binding(release, args.revision) != source_hashes
                     or current_code_hashes().model_dump() != code
                 ):
                     raise ValueError("release changed during the allocated checks")

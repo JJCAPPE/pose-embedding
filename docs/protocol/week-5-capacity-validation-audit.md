@@ -1,6 +1,8 @@
 # Week 5 capacity audit: repeated validation
 
-The frozen implementation repeatedly validates complete evidence when a later
+## Historical execution-r1 audit
+
+The execution-r1 implementation repeatedly validates complete evidence when a later
 command consumes it. These calls must enter the capacity forecast. **The call
 counts below are verified. The October 12 P measurement now rejects the
 necessary capacity condition on the measured runtime profile.** No
@@ -159,20 +161,36 @@ in the eventual complete forecast. Availability remains five researcher hours
 weekly normally, ten when needed, and zero guaranteed Thanksgiving hours;
 actual time is unreported.
 
-**Decision: no-go on the measured profile.** Hold full A and selection rather
-than fabricate a passed capacity candidate. Full A and corrupted-artifact
-numerical replay remain mandatory for any future admission, but a full A run
-is not needed to establish this conservative rejection. Record a researcher
-choice before changing the frozen implementation. Current plan Section 7
-explicitly prohibits memoizing validation under the adopted amendment, and
-Section 8 requires a result-blind amendment after a failed measured go/no-go.
+**Historical decision: no-go on the measured profile.** Full A and selection
+were held rather than fabricating a passed capacity candidate. The no-go receipt
+and the earlier prohibition on memoization remain evidence of execution-r1.
 
-The recommended next step is a scoped amendment proposal for validation-proof
-reuse within a command and per-stage CPU/GPU wall-time accounting, with an
-explicit mutation/threat model, fresh independent recertification, complete
-checks and all scientific settings/seals preserved. It is not an adopted design
-or permission to implement a cache or waive validation. An approved proposal
-needs a successor release, affected-evidence regeneration inventory and renewed
-measured capacity. Alternatives are a specifically identified compatible faster
-runtime with new evidence, or retaining the blocked-study record. All prior
-attempts remain preserved; technical completion and weekly closure are not claimed.
+## Authorized successor, October 12
+
+The researcher subsequently authorized
+[ADR0007](../decisions/0007-safe-validation-reuse-and-stage-capacity.md) for
+command-local numerical proof reuse and separate CPU/GPU capacity accounting.
+Implementation and review are in progress; no successor admission or feasible
+calendar is claimed. The predecessor evidence above is not relabeled.
+
+The amendment retains every complete A, T, V, S and F validator invocation and
+all fresh hash, provenance, seal, inventory and authorization checks. Its initial
+reuse is limited to successful pilot snapshot numerical replay and trained-feature
+projection equality within a command. Thus the historical nested **call counts
+remain useful**, but multiplying the old P by those counts does not forecast the
+successor: repeated numerical work may be reused while full content rehashing
+and other checks still recur. Fresh commands and independent recertification
+start with no proofs. Measure both first-use and repeated costs, including the
+remaining hashing and whole-command overhead, before making any capacity claim.
+
+Schema-2 receipts classify each complete job as CPU or GPU. CPU report work must
+fit dated CPU windows and complete-job limits; all CPU validation/I/O inside a
+GPU job stays in that GPU job's wall time. Both classes require nonoverlapping
+windows, queue/setup allowance, 25% slack, retained storage/reserve, the original
+deadlines and researcher availability. A longer CPU window cannot justify a GPU
+job exceeding its own allocation. Ordinary SCC access is not a reservation.
+
+The successor requires its full regeneration inventory, independent checks and
+fresh full A before selection authorization. No method, seed, epoch, physical
+batch, metric, corruption or opening safeguard is reduced. Actual time remains
+unreported; technical completion and weekly closure remain pending.

@@ -23,6 +23,7 @@ from pose_embed.protocol_v3 import (
     _bound_file,
 )
 from pose_embed.protocol_v3_campaign import (
+    RESOURCE_CLASSES,
     AllocationCalendar,
     CapacityReceipt,
     ResearcherAvailability,
@@ -30,6 +31,7 @@ from pose_embed.protocol_v3_campaign import (
     _receipt,
 )
 from pose_embed.provenance import sha256_file, write_immutable_json
+from pose_embed.validation_proofs import verify_validation_proofs
 
 GIB = 2**30
 
@@ -75,7 +77,7 @@ def _calendar_capacity(root, capacity, recorded_at):
         or recorded_at.astimezone(timezone).date() > capacity.novel_completion_date
     ):
         raise ValueError("opening capacity chronology or novel deadline differs")
-    usable_seconds = 0.0
+    usable_seconds = dict.fromkeys(RESOURCE_CLASSES, 0.0)
     for window in calendar.windows:
         if (
             window.starts_at.astimezone(timezone).date() <= capacity.final_lock_date
@@ -86,11 +88,16 @@ def _calendar_capacity(root, capacity, recorded_at):
         seconds = (
             window.ends_at - max(recorded_at, window.starts_at)
         ).total_seconds() - window.queue_allowance_seconds
-        if capacity.maximum_job_seconds * capacity.compute_slack <= min(
-            seconds, window.job_wall_limit_seconds
-        ):
-            usable_seconds += seconds
-    required_seconds = capacity.remaining_evaluation_seconds * capacity.compute_slack
+        resource = window.resource_class
+        if capacity.maximum_job_seconds_by_resource[
+            resource
+        ] * capacity.compute_slack <= min(seconds, window.job_wall_limit_seconds):
+            usable_seconds[resource] += seconds
+    required_seconds = {
+        resource: capacity.remaining_evaluation_seconds_by_resource[resource]
+        * capacity.compute_slack
+        for resource in RESOURCE_CLASSES
+    }
     delivery_hours = sum(
         hours
         for day, hours in availability.guaranteed_weekly_hours.items()
@@ -100,11 +107,17 @@ def _calendar_capacity(root, capacity, recorded_at):
         capacity.researcher_work_hours["final_analysis_delivery"]
         * capacity.researcher_slack
     )
-    if usable_seconds < required_seconds or delivery_hours < required_hours:
+    if (
+        any(
+            usable_seconds[resource] < required_seconds[resource]
+            for resource in RESOURCE_CLASSES
+        )
+        or delivery_hours < required_hours
+    ):
         raise ValueError("fresh calendar or delivery hours do not fit remaining work")
     return {
-        "usable_evaluation_seconds": usable_seconds,
-        "required_evaluation_seconds": required_seconds,
+        "usable_evaluation_seconds_by_resource": usable_seconds,
+        "required_evaluation_seconds_by_resource": required_seconds,
         "confirmed_delivery_hours": delivery_hours,
         "required_delivery_hours": required_hours,
     }
@@ -183,7 +196,10 @@ def _validate_resources(root, resources, capacity):
     if measured.tzinfo is None or measured < started:
         raise ValueError("opening scheduler runtime chronology differs")
     remaining_wall_seconds = wall_seconds - (measured - started).total_seconds()
-    if remaining_wall_seconds < capacity.maximum_job_seconds * capacity.compute_slack:
+    required_wall_seconds = (
+        capacity.maximum_job_seconds_by_resource["gpu"] * capacity.compute_slack
+    )
+    if remaining_wall_seconds < required_wall_seconds:
         raise ValueError(
             "complete opening job does not fit remaining scheduler wall time"
         )
@@ -218,6 +234,8 @@ def _validate_resources(root, resources, capacity):
     if min(resources["filesystem_free_bytes"], quota["free_bytes"]) < required_storage:
         raise ValueError("opening capacity storage reserve is insufficient")
     return {
+        "resource_class": "gpu",
+        "required_job_wall_seconds": required_wall_seconds,
         "remaining_job_wall_seconds": remaining_wall_seconds,
         "host_memory_limit_bytes": int(allocated_memory),
         "system_memory_available_bytes": int(available_memory[1]) * 1024,
@@ -236,7 +254,7 @@ def record_opening_capacity(protocol, protocol_lock_sha256) -> ArtifactBinding:
     root = resolve_scientific_paths(protocol).root
     receipt_path = _directory(protocol, root) / f"{uuid.uuid4()}.json"
     receipt = {
-        "schema_version": 1,
+        "schema_version": 2,
         "kind": "v3_fresh_opening_capacity",
         "protocol_sha256": protocol_digest(protocol),
         "protocol_lock_sha256": protocol_lock_sha256,
@@ -254,6 +272,7 @@ def record_opening_capacity(protocol, protocol_lock_sha256) -> ArtifactBinding:
         recorded_at = datetime.now(UTC)
         receipt["recorded_at"] = recorded_at.isoformat()
         receipt["calendar_summary"] = _calendar_capacity(root, capacity, recorded_at)
+        verify_validation_proofs()
         receipt["status"] = "passed"
     except BaseException as error:
         receipt["status"] = "failed"
@@ -277,7 +296,7 @@ def validate_opening_capacity(protocol, binding, protocol_lock_sha256) -> dateti
     receipt = json.loads(path.read_text())
     capacity, capacity_binding = _capacity(protocol, protocol_lock_sha256)
     if (
-        receipt.get("schema_version") != 1
+        receipt.get("schema_version") != 2
         or receipt.get("kind") != "v3_fresh_opening_capacity"
         or receipt.get("status") != "passed"
         or receipt.get("protocol_sha256") != protocol_digest(protocol)

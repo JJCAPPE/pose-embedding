@@ -155,10 +155,11 @@ def main():
         require_dataset_unopened(require_registry=True)
         require_clean_repository()
         protocol = load_protocol(args.protocol_config)
-        if protocol.test_access.resolved_protocol_relative_path != (
-            "study-v3/revisions/execution-r1/locks/protocol.v3.json"
-        ):
-            raise ValueError("timing requires the admitted execution-r1 successor")
+        if protocol.test_access.resolved_protocol_relative_path not in {
+            "study-v3/revisions/execution-r1/locks/protocol.v3.json",
+            "study-v3/revisions/execution-r2/locks/protocol.v3.json",
+        }:
+            raise ValueError("timing requires a declared execution successor")
         design = require_v3_design(protocol)
         _require_v3_runtime(protocol)
         root = canonical_artifact_root()

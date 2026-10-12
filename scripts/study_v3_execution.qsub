@@ -17,6 +17,8 @@ umask 077
 [[ -z "$(git status --porcelain)" ]] || { printf 'Clean committed release required.\n' >&2; exit 2; }
 export OMP_NUM_THREADS="${NSLOTS:-4}" MKL_NUM_THREADS="${NSLOTS:-4}"
 export OPENBLAS_NUM_THREADS="${NSLOTS:-4}" CUBLAS_WORKSPACE_CONFIG=:4096:8
+export PYTHONDONTWRITEBYTECODE=1
+unset PYTHONOPTIMIZE
 export UV_CACHE_DIR="$TMPDIR/pose-embed-uv-cache" UV_LINK_MODE=copy UV_NO_PROGRESS=1
 uv sync --locked --group dev --python 3.11
 .venv/bin/python scripts/run_v3_execution.py "$@"

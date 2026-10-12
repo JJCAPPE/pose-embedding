@@ -6,6 +6,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -46,6 +47,7 @@ def test_template_requires_actual_measurements_and_named_tests_exist(assembler):
         assert set(required) <= names
 
 
+@pytest.mark.parametrize("revision", ["execution-r1", "execution-r2"])
 @pytest.mark.parametrize(
     "fault",
     [
@@ -61,12 +63,15 @@ def test_template_requires_actual_measurements_and_named_tests_exist(assembler):
         "failed_resource",
     ],
 )
-def test_operation_binds_release_launcher_and_scheduler(assembler, tmp_path, fault):
+def test_operation_binds_release_launcher_and_scheduler(
+    assembler, tmp_path, fault, revision
+):
     path = tmp_path / "study-v3/operations/20261011T120000Z-123-rehearsal"
     save(
         path / "attempt.json",
         {
             "mode": "rehearsal",
+            "execution_revision": revision,
             "release_sha": "a" * 40,
             "launcher_sha256": assembler.sha256_file("scripts/run_v3_execution.py"),
             "output_directory": str(path / "fixture-data"),
@@ -124,10 +129,15 @@ def test_operation_binds_release_launcher_and_scheduler(assembler, tmp_path, fau
     record = {"directory": str(path), "scheduler_accounting": str(accounting)}
     if fault:
         with pytest.raises(ValueError):
-            assembler.operation(tmp_path, record, "rehearsal", "a" * 40)
+            assembler.operation(
+                tmp_path, record, "rehearsal", "a" * 40, revision=revision
+            )
     else:
         assert (
-            assembler.operation(tmp_path, record, "rehearsal", "a" * 40)["path"] == path
+            assembler.operation(
+                tmp_path, record, "rehearsal", "a" * 40, revision=revision
+            )["path"]
+            == path
         )
 
 
@@ -352,8 +362,9 @@ def test_resident_timing_binds_source_attempt_outcome_and_recipes(
         "missing_second_preflight",
     ],
 )
+@pytest.mark.parametrize("revision", ["execution-r1", "execution-r2"])
 def test_new_gpu_controller_requires_diagnostic_and_child_preflight_chain(
-    assembler, tmp_path, fault
+    assembler, tmp_path, fault, revision
 ):
     root = tmp_path.resolve()
     path = root / "study-v3/operations/fixture-123-caches"
@@ -428,6 +439,38 @@ def test_new_gpu_controller_requires_diagnostic_and_child_preflight_chain(
             ]
         },
     )
+    if revision == "execution-r2":
+        sources = {name: assembler.sha256_file(name) for name in assembler.GPU_SOURCES}
+        save(
+            receipt,
+            assembler.read(receipt)
+            | {
+                "script_sha256": sources[assembler.GPU_SOURCES[1]],
+                "execution_revision": revision,
+                "execution_sources_sha256": sources,
+            },
+        )
+        binding = assembler.bound(root, receipt)
+        save(path / "diagnostic-binding.json", binding.model_dump())
+        attempt.update(execution_revision=revision, execution_sources_sha256=sources)
+        attempt["arguments"].update(
+            expected_release="a" * 40,
+            revision=revision,
+            diagnostic_sha256=binding.sha256,
+        )
+        save(
+            preflight,
+            assembler.read(preflight)
+            | {
+                "controller_sha256": sources[assembler.GPU_SOURCES[0]],
+                "source_release": "a" * 40,
+                "execution_revision": revision,
+            },
+        )
+        save(path / "resources/allocated-gpu.json", assembler.read(preflight))
+        command = assembler.read(path / "commands/000.json")
+        command["argv"] += ["--expected-release", "a" * 40, "--revision", revision]
+        save(path / "commands/000.json", command)
     if fault == "parent":
         outcome["parent_cuda_initialized"] = True
     elif fault == "frozen_source":
@@ -461,9 +504,182 @@ def test_new_gpu_controller_requires_diagnostic_and_child_preflight_chain(
         )
     if fault:
         with pytest.raises(ValueError):
-            assembler.gpu_controller_evidence(root, path, attempt, outcome)
+            assembler.gpu_controller_evidence(
+                root, path, attempt, outcome, revision=revision
+            )
     else:
-        retained = assembler.gpu_controller_evidence(root, path, attempt, outcome)
+        retained = assembler.gpu_controller_evidence(
+            root, path, attempt, outcome, revision=revision
+        )
         assert len(retained) == 13
         assert assembler.bound(root, preflight) in retained
         assert binding in retained
+
+
+@pytest.mark.parametrize("fault", [None, "legacy_release", "dirty", "self"])
+def test_successor_assembler_binds_its_clean_tracked_release(
+    assembler, monkeypatch, fault
+):
+    release = "a" * 40
+    monkeypatch.setattr(
+        assembler,
+        "require_clean_repository",
+        lambda: "b" * 40 if fault == "dirty" else release,
+    )
+    if fault == "self":
+        monkeypatch.setattr(assembler, "__file__", "pyproject.toml")
+    expected = assembler.RELEASE if fault == "legacy_release" else release
+    if fault:
+        with pytest.raises(ValueError, match="release"):
+            assembler.execution_binding(expected, "execution-r2")
+    else:
+        assert assembler.execution_binding(expected, "execution-r2") == {
+            path: assembler.sha256_file(path) for path in assembler.EXECUTION_SOURCES
+        }
+
+
+def test_successor_template_requires_separate_complete_allocation_budgets(assembler):
+    template = assembler.input_template("a" * 40, "execution-r2")
+    assert template["inputs"]["execution_revision"] == "execution-r2"
+    assert template["inputs"]["release_sha"] == "a" * 40
+    payload = template["capacity_payload_fields"]
+    for name in (
+        "maximum_job_seconds",
+        "remaining_preopening_seconds",
+        "remaining_evaluation_seconds",
+    ):
+        assert name not in payload
+        assert payload[name + "_by_resource"] is None
+    assert assembler.CapacityReceipt.model_fields[
+        "schema_version"
+    ].annotation.__args__ == (2,)
+    names = {
+        node.name
+        for path in Path("tests").rglob("test_*.py")
+        for node in ast.walk(ast.parse(path.read_text()))
+        if isinstance(node, ast.FunctionDef)
+    }
+    assert set(assembler.REQUIRED_PROOF_TESTS) <= names
+
+
+@pytest.mark.parametrize("fault", ["legacy_revision", "legacy_output", "legacy_gpu"])
+def test_successor_operation_cannot_adopt_old_evidence(assembler, tmp_path, fault):
+    mode = "caches" if fault == "legacy_gpu" else "rehearsal"
+    path = tmp_path / f"study-v3/operations/fixture-123-{mode}"
+    save(
+        path / "attempt.json",
+        {
+            "mode": mode,
+            "release_sha": "a" * 40,
+            "execution_revision": "execution-r1"
+            if fault == "legacy_revision"
+            else "execution-r2",
+            "launcher_sha256": assembler.sha256_file("scripts/run_v3_execution.py"),
+            "output_directory": str(
+                tmp_path / "study-v3/revisions/execution-r1/attempts/old"
+            )
+            if fault == "legacy_output"
+            else str(path / "fixture-data"),
+        },
+    )
+    save(path / "outcome.json", {"status": "passed"})
+    for name in ("seal-before", "seal-after"):
+        save(path / f"{name}.json", {"status": "sealed"})
+    save(path / "commands/000.json", {"argv": ["fixture-command"]})
+    save(
+        path / "commands/000-outcome.json",
+        {"status": "passed", "exit_status": 0, "wall_time_seconds": 1},
+    )
+    for name in ("preflight", "000-preflight", "000-0000"):
+        save(
+            path / f"resources/{name}.json",
+            {"storage_passed": True, "host_memory_passed": True},
+        )
+    accounting = path / "qacct.txt"
+    accounting.write_text("jobnumber 123\nexit_status 0\nfailed 0\n")
+    with pytest.raises(ValueError, match="mode/release|launcher|canonical revision"):
+        assembler.operation(
+            tmp_path,
+            {"directory": str(path), "scheduler_accounting": str(accounting)},
+            mode,
+            "a" * 40,
+            revision="execution-r2",
+        )
+
+
+@pytest.mark.parametrize("fault", [None, "mutation", "seal", "release"])
+def test_candidate_validation_is_fresh_and_rechecks_proofs_before_publication(
+    assembler, tmp_path, monkeypatch, fault
+):
+    from pose_embed import validation_proofs as proofs
+
+    dependency = save(tmp_path / "synthetic.json", {"fixture": 1})
+    checked = []
+    arguments = dict(
+        enabled=True,
+        files={dependency: assembler.sha256_file(dependency)},
+        metadata={"fixture_only": True},
+        check=lambda: checked.append("checked"),
+    )
+
+    def numeric_check():
+        proofs.check_numerical_proof("synthetic-admission", **arguments)
+
+    def validate(*_):
+        numeric_check()
+        numeric_check()
+        if fault == "mutation":
+            save(dependency, {"fixture": 2})
+
+    def seal(**_):
+        if fault == "seal":
+            raise ValueError("seal changed")
+
+    monkeypatch.setattr(assembler, "_validate_authorization", validate)
+    monkeypatch.setattr(
+        assembler,
+        "execution_binding",
+        lambda *_: {"changed": "source"} if fault == "release" else {},
+    )
+    monkeypatch.setattr(
+        assembler, "current_code_hashes", lambda: SimpleNamespace(model_dump=lambda: {})
+    )
+    monkeypatch.setattr(assembler, "require_dataset_unopened", seal)
+    authorization = SimpleNamespace(
+        model_dump=lambda **_: {"scientific_use_allowed": False, "fixture_only": True}
+    )
+    candidate = tmp_path / "candidate.json"
+    with proofs.validation_session():
+        numeric_check()
+        if fault:
+            with pytest.raises(ValueError):
+                assembler.validate_candidate(
+                    None,
+                    authorization,
+                    candidate,
+                    release="a" * 40,
+                    revision="execution-r2",
+                    source_hashes={},
+                    code={},
+                )
+            assert not candidate.exists()
+        else:
+            elapsed, stats = assembler.validate_candidate(
+                None,
+                authorization,
+                candidate,
+                release="a" * 40,
+                revision="execution-r2",
+                source_hashes={},
+                code={},
+            )
+            assert elapsed > 0
+            assert stats["checks"] == 1 and stats["hits"] == 1
+            assert stats["rehash_seconds"] > 0 and stats["numerical_seconds"] > 0
+            assert assembler.read(candidate)["scientific_use_allowed"] is False
+        # The outer session cannot supply the independent candidate's proof.
+        assert len(checked) == 2
+        if fault == "mutation":
+            # Restore this synthetic outer dependency so its own exit remains valid.
+            save(dependency, {"fixture": 1})
+    assert proofs.validation_statistics()["checks"] == 0

@@ -41,6 +41,7 @@ from pose_embed.provenance import (
     write_immutable_json,
 )
 from pose_embed.test_access import open_final_test_once
+from pose_embed.validation_proofs import validation_command, verify_validation_proofs
 
 EvaluationMode = Literal["development", "engineering", "final", "exploratory"]
 Method = Literal["contrastive", "supcon", "contextual", "multi_similarity_with_miner"]
@@ -472,11 +473,13 @@ def _evaluate_files(
         ),
     }
     validated = EvaluationResult.model_validate(payload).model_dump(mode="json")
+    verify_validation_proofs()
     write_immutable_json(output_path, validated)
     return validated
 
 
 @wraps(_evaluate_files)
+@validation_command()
 def evaluate_files(gallery_path, query_path, output_path, **kwargs):
     if kwargs.get("mode") in {"development", "engineering"} and any(
         load_feature_sidecar(path).scientific_use_allowed

@@ -16,7 +16,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -56,7 +55,24 @@ from pose_embed.protocol_v3_campaign import (
     _validate_authorization,
 )
 from pose_embed.provenance import sha256_file, write_immutable_json
+from pose_embed.validation_proofs import (
+    validation_session,
+    verify_validation_proofs,
+)
 
+RELEASE = "731938a157be575ee433d6939876f8ca0b95e459"
+EXECUTION_SOURCES = (
+    "scripts/operations/week5_admission_controller.py",
+    "scripts/operations/week5_admission_assembler.py",
+    "scripts/operations/week5_admission.qsub",
+    "scripts/run_v3_execution.py",
+)
+GPU_SOURCES = (
+    "scripts/operations/week5_gpu_controller.py",
+    "scripts/operations/week5_gpu_context_diagnostic.py",
+    "scripts/operations/week5_gpu.qsub",
+    "scripts/run_v3_execution.py",
+)
 METHODS = ("contrastive", "contextual", "supcon")
 CACHES = (
     "final-train-first",
@@ -127,6 +143,28 @@ REQUIRED_TESTS = {
     ),
 }
 
+REQUIRED_PROOF_TESTS = (
+    "test_nested_scopes_reuse_success_but_independent_commands_start_cold",
+    "test_changed_dependencies_cannot_reuse_success",
+    "test_mid_check_mutation_is_not_published",
+)
+
+
+def execution_binding(expected_release, revision):
+    if (
+        re.fullmatch(r"[0-9a-f]{40}", expected_release) is None
+        or revision not in {"execution-r1", "execution-r2"}
+        or (revision == "execution-r1") != (expected_release == RELEASE)
+        or require_clean_repository() != expected_release
+    ):
+        raise ValueError("assembly requires its clean full release and revision")
+    if revision == "execution-r1":
+        return {}
+    sources = {name: sha256_file(name) for name in EXECUTION_SOURCES}
+    if sha256_file(__file__) != sources[EXECUTION_SOURCES[1]]:
+        raise ValueError("successor assembler differs from its tracked release")
+    return sources
+
 
 def capacity_fields():
     common = set(AnalysisReceipt.model_fields) - {
@@ -147,10 +185,11 @@ def capacity_fields():
     )
 
 
-def input_template():
+def input_template(expected_release=RELEASE, revision="execution-r1"):
     return {
         "inputs": {
-            "release_sha": "731938a157be575ee433d6939876f8ca0b95e459",
+            "release_sha": expected_release,
+            **({"execution_revision": revision} if revision != "execution-r1" else {}),
             "operations": {
                 name: {
                     "directory": "REQUIRED absolute retained operation path",
@@ -195,7 +234,9 @@ def input_template():
                 "80 optimization actions"
             ),
             "remaining_forecast": (
-                "avoid summing nested durations twice; account for repeated full "
+                "schema2 uses exact cpu/gpu maps and classified calendar windows; "
+                "each complete GPU allocation includes its CPU/I/O work. "
+                "Avoid summing nested durations twice; account for repeated full "
                 "campaign validation at every selection/final launch and every "
                 "final cache/evaluation/report consumer"
             ),
@@ -216,7 +257,21 @@ def bound(root, path):
     )
 
 
-def gpu_controller_evidence(root, path, attempt, outcome):
+def gpu_controller_evidence(root, path, attempt, outcome, *, revision="execution-r1"):
+    source_hashes = (
+        {name: sha256_file(name) for name in GPU_SOURCES}
+        if revision == "execution-r2"
+        else {}
+    )
+    controller_sha = source_hashes.get(GPU_SOURCES[0], GPU_CONTROLLER_SHA256)
+    if revision == "execution-r2" and (
+        attempt.get("execution_revision") != revision
+        or attempt.get("execution_sources_sha256") != source_hashes
+        or attempt.get("arguments", {}).get("expected_release")
+        != attempt["release_sha"]
+        or attempt.get("arguments", {}).get("revision") != revision
+    ):
+        raise ValueError("successor GPU controller release/revision/helpers differ")
     if (
         attempt.get("parent_cuda_initialized") is not False
         or outcome.get("parent_cuda_initialized") is not False
@@ -242,9 +297,13 @@ def gpu_controller_evidence(root, path, attempt, outcome):
         "parent_cuda_initialized": False,
         "sequential_probe_count": 2,
         "held_context_probe_rejected": True,
-        "script_sha256": GPU_DIAGNOSTIC_SHA256,
+        "script_sha256": source_hashes.get(GPU_SOURCES[1], GPU_DIAGNOSTIC_SHA256),
         "source_release": attempt["release_sha"],
     }
+    if revision == "execution-r2":
+        expected.update(
+            execution_revision=revision, execution_sources_sha256=source_hashes
+        )
     if any(summary.get(key) != value for key, value in expected.items()):
         raise ValueError("GPU diagnostic has not passed the reviewed reproduction")
     evidence = summary.get("evidence")
@@ -275,35 +334,47 @@ def gpu_controller_evidence(root, path, attempt, outcome):
     declared = []
     for command_path in sorted((path / "commands").glob("[0-9][0-9][0-9].json")):
         command = read(command_path)["argv"]
-        if len(command) >= 2 and command[-2] == "--gpu-preflight-output":
+        if "--gpu-preflight-output" in command:
             expected = path / "gpu-preflights" / f"{command_path.stem}.json"
-            if command[-1] != str(expected):
+            index = command.index("--gpu-preflight-output")
+            suffix = ["--gpu-preflight-output", str(expected)]
+            if revision == "execution-r2":
+                suffix += [
+                    "--expected-release",
+                    attempt["release_sha"],
+                    "--revision",
+                    revision,
+                ]
+            if command[index:] != suffix:
                 raise ValueError("GPU preflight command output escaped its own slot")
             declared.append(expected)
     if not preflights or set(preflights) != set(declared):
         raise ValueError("GPU controller lacks its exact preflight output set")
     for preflight in preflights:
         observed = read(preflight)
-        command = read(path / f"commands/{preflight.stem}.json")["argv"]
         if (
             observed.get("status") != "passed"
             or observed.get("scientific_use_allowed") is not False
-            or observed.get("controller_sha256") != GPU_CONTROLLER_SHA256
+            or observed.get("controller_sha256") != controller_sha
             or observed.get("job_id") != path.name.split("-")[-2]
             or observed.get("name") != "NVIDIA L40S"
             or observed.get("minimum_free_bytes") != 16 * 2**30
             or min(observed.get("free_bytes", 0), observed.get("total_bytes", 0))
             < 16 * 2**30
-            or command[-2:] != ["--gpu-preflight-output", str(preflight)]
         ):
             raise ValueError("GPU short-lived preflight binding differs")
+        if revision == "execution-r2" and (
+            observed.get("source_release") != attempt["release_sha"]
+            or observed.get("execution_revision") != revision
+        ):
+            raise ValueError("successor GPU preflight release/revision differs")
         retained.append(bound(root, preflight))
     if read(path / "resources/allocated-gpu.json") != read(preflights[0]):
         raise ValueError("allocated GPU evidence differs from its preflight")
     return retained
 
 
-def operation(root, record, mode, release):
+def operation(root, record, mode, release, *, revision="execution-r1"):
     if set(record) != {"directory", "scheduler_accounting"}:
         raise ValueError("each operation requires directory and scheduler_accounting")
     path = Path(record["directory"]).resolve()
@@ -314,20 +385,36 @@ def operation(root, record, mode, release):
         attempt["mode"] != mode
         or attempt["release_sha"] != release
         or outcome["status"] != "passed"
+        or (
+            revision == "execution-r2" and attempt.get("execution_revision") != revision
+        )
     ):
         raise ValueError(f"operation mode/release/completion differs: {path}")
+    supplemental_sha = (
+        sha256_file("scripts/operations/week5_additional_checks.py")
+        if revision == "execution-r2"
+        else SUPPLEMENTAL_WRAPPER_SHA256
+    )
+    controller_sha = (
+        sha256_file(GPU_SOURCES[0])
+        if revision == "execution-r2"
+        else GPU_CONTROLLER_SHA256
+    )
+    # Admission geometry requires the supplementary independent validation.json.
     launcher = (
-        SUPPLEMENTAL_WRAPPER_SHA256
+        supplemental_sha
         if mode in {"additional-checks", "geometry"}
         else sha256_file("scripts/run_v3_execution.py")
     )
     new_gpu_controller = (
-        mode in GPU_MODES and attempt["launcher_sha256"] == GPU_CONTROLLER_SHA256
+        mode in GPU_MODES and attempt["launcher_sha256"] == controller_sha
     )
-    if attempt["launcher_sha256"] != launcher and not new_gpu_controller:
+    if (attempt["launcher_sha256"] != launcher and not new_gpu_controller) or (
+        revision == "execution-r2" and mode in GPU_MODES and not new_gpu_controller
+    ):
         raise ValueError("operation launcher differs from its reviewed code")
     controller_evidence = (
-        gpu_controller_evidence(root, path, attempt, outcome)
+        gpu_controller_evidence(root, path, attempt, outcome, revision=revision)
         if new_gpu_controller
         else []
     )
@@ -383,8 +470,14 @@ def operation(root, record, mode, release):
     ):
         raise ValueError("scheduler accounting must identify this one successful job")
     output = Path(attempt["output_directory"]).resolve()
-    if not output.is_relative_to(root):
-        raise ValueError("operation output escapes canonical root")
+    permitted = (
+        root if revision == "execution-r1" else root / "study-v3/revisions" / revision
+    )
+    # Rehearsal writes isolated synthetic fixtures in its own operation directory.
+    if revision == "execution-r2" and mode == "rehearsal":
+        permitted = path
+    if not output.is_relative_to(permitted):
+        raise ValueError("operation output escapes its canonical revision")
     return {
         "path": path,
         "output": output,
@@ -530,6 +623,25 @@ def validate_resident_bindings(directory, expected_inputs, protocol_sha256):
             raise ValueError("resident timing per-method configuration binding differs")
 
 
+def validate_candidate(
+    protocol, authorization, candidate, *, release, revision, source_hashes, code
+):
+    """Independent admission starts cold; recheck dependencies before writing."""
+    with validation_session(fresh=True) as session:
+        started_validation = time.perf_counter()
+        _validate_authorization(protocol, authorization)
+        validation_seconds = time.perf_counter() - started_validation
+        if (
+            execution_binding(release, revision) != source_hashes
+            or current_code_hashes().model_dump() != code
+        ):
+            raise ValueError("release changed during assembly")
+        require_dataset_unopened(require_registry=True)
+        verify_validation_proofs()
+        write_immutable_json(candidate, authorization.model_dump(mode="json"))
+    return validation_seconds, session.statistics()
+
+
 def assemble(args):
     if not os.environ.get("JOB_ID", "").isdecimal() or not os.environ.get("TMPDIR"):
         raise ValueError(
@@ -546,17 +658,23 @@ def assemble(args):
         "researcher_confirmation",
         "seal_evidence",
     }
+    if args.revision == "execution-r2":
+        required.add("execution_revision")
     if set(supplied) != required:
         raise ValueError(
             f"input fields must be exactly {sorted(required)}; "
             "save only the template's inputs object"
         )
-    release = require_clean_repository()
-    if release != supplied["release_sha"]:
+    source_hashes = execution_binding(args.expected_release, args.revision)
+    release = args.expected_release
+    if release != supplied["release_sha"] or (
+        args.revision == "execution-r2"
+        and supplied["execution_revision"] != args.revision
+    ):
         raise ValueError("checkout differs from evidence release")
     root = canonical_artifact_root()
     protocol = load_protocol(
-        root / "study-v3/revisions/execution-r1/locks/protocol.v3.json"
+        root / "study-v3/revisions" / args.revision / "locks/protocol.v3.json"
     )
     design = require_v3_design(protocol)
     destination = Path(args.output_dir).resolve()
@@ -564,7 +682,9 @@ def assemble(args):
         root / protocol.test_access.resolved_protocol_relative_path
     ).parent.parent
     if not destination.is_relative_to(revision) or destination.exists():
-        raise ValueError("use a new immutable output directory inside execution-r1")
+        raise ValueError(
+            "use a new immutable output directory inside the bound revision"
+        )
     destination.mkdir(parents=True)
     args.created_output_dir = True
     started = datetime.now(UTC)
@@ -573,6 +693,8 @@ def assemble(args):
         {
             "started_at": started.isoformat(),
             "release_sha": release,
+            "execution_revision": args.revision,
+            "execution_sources_sha256": source_hashes,
             "script_sha256": sha256_file(__file__),
             "inputs_sha256": sha256_file(args.inputs),
             "canonical_authorization_written": False,
@@ -583,7 +705,13 @@ def assemble(args):
         if set(supplied["operations"]) != set(OPERATION_MODES):
             raise ValueError("every required distinct operation must be supplied")
         operations = {
-            name: operation(root, supplied["operations"][name], mode, release)
+            name: operation(
+                root,
+                supplied["operations"][name],
+                mode,
+                release,
+                revision=args.revision,
+            )
             for name, mode in OPERATION_MODES.items()
         }
         if len({row["path"] for row in operations.values()}) != len(operations):
@@ -632,6 +760,8 @@ def assemble(args):
         extra = operations["additional_checks"]["path"]
         supplemental = extra / "additional-checks.junit.xml"
         names = test_cases(rehearsal) | test_cases(supplemental)
+        if args.revision == "execution-r2" and not set(REQUIRED_PROOF_TESTS) <= names:
+            raise ValueError("missing executed successor proof-reuse checks")
         for check, tests in REQUIRED_TESTS.items():
             if not set(tests) <= names:
                 raise ValueError(f"missing executed test evidence for {check}")
@@ -849,7 +979,7 @@ def assemble(args):
             if path.is_file() and path != timing
         )
         capacity = CapacityReceipt(
-            **common(supporting),
+            **{**common(supporting), "schema_version": 2},
             **capacity_payload,
             allocation_calendar=bound(root, supplied["allocation_calendar"]),
             researcher_availability=bound(root, supplied["researcher_availability"]),
@@ -969,23 +1099,23 @@ def assemble(args):
             capacity_passed=True,
             novel_access_authorized=False,
         )
-        started_validation = time.perf_counter()
-        _validate_authorization(protocol, authorization)
-        validation_seconds = time.perf_counter() - started_validation
-        if (
-            require_clean_repository() != release
-            or current_code_hashes().model_dump() != code
-        ):
-            raise ValueError("release changed during assembly")
-        require_dataset_unopened(require_registry=True)
         candidate = destination / "selection-authorization.candidate.json"
-        write_immutable_json(candidate, authorization.model_dump(mode="json"))
+        validation_seconds, proof_statistics = validate_candidate(
+            protocol,
+            authorization,
+            candidate,
+            release=release,
+            revision=args.revision,
+            source_hashes=source_hashes,
+            code=code,
+        )
         write_immutable_json(
             destination / "assembly-outcome.json",
             {
                 "status": "passed",
                 "ended_at": datetime.now(UTC).isoformat(),
                 "complete_authorization_validation_seconds": validation_seconds,
+                "validation_proof_statistics": proof_statistics,
                 "candidate": bound(root, candidate).model_dump(),
                 "canonical_authorization_written": False,
             },
@@ -1012,10 +1142,22 @@ def assemble(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--inputs", required=True)
-    parser.add_argument("--output-dir", required=True)
-    parser.add_argument("--recorded-by", required=True)
+    parser.add_argument("--inputs")
+    parser.add_argument("--output-dir")
+    parser.add_argument("--recorded-by")
+    parser.add_argument("--expected-release", default=RELEASE)
+    parser.add_argument(
+        "--revision", choices=("execution-r1", "execution-r2"), default="execution-r1"
+    )
+    parser.add_argument("--input-template", action="store_true")
     args = parser.parse_args()
+    if args.input_template:
+        print(
+            json.dumps(input_template(args.expected_release, args.revision), indent=2)
+        )
+        return
+    if not all((args.inputs, args.output_dir, args.recorded_by)):
+        parser.error("inputs, new output directory and recorded-by are required")
     args.created_output_dir = False
     try:
         assemble(args)
@@ -1036,7 +1178,4 @@ def main():
 
 
 if __name__ == "__main__":
-    if sys.argv[1:] == ["--input-template"]:
-        print(json.dumps(input_template(), indent=2))
-    else:
-        main()
+    main()

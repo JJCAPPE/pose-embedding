@@ -4,6 +4,7 @@ import ast
 import importlib.util
 import json
 import os
+import subprocess
 import sys
 from contextlib import contextmanager
 from pathlib import Path
@@ -215,22 +216,36 @@ def test_real_stages_require_reviewed_diagnostic(controller, tmp_path, fault):
         "diagnostic_changed",
     ],
 )
+@pytest.mark.parametrize("revision", ["execution-r1", "execution-r2"])
 def test_controller_holds_locks_retains_failures_and_keeps_parent_cuda_free(
-    controller, tmp_path, monkeypatch, fault
+    controller, tmp_path, monkeypatch, fault, revision
 ):
     root = tmp_path.resolve()
+    release = controller.RELEASE if revision == "execution-r1" else "2" * 40
     diag = diagnostic(controller, root)
     for name, value in {
         "JOB_ID": "123",
         "NSLOTS": "4",
         "TMPDIR": str(root),
-        "POSE_EMBED_MANIFEST_SET": str(root / "bundle/manifest-set.json"),
+        "POSE_EMBED_MANIFEST_SET": str(
+            root / "study-v3/revisions" / revision / "manifests/manifest-set.json"
+        ),
     }.items():
         monkeypatch.setenv(name, value)
     monkeypatch.setattr(controller, "canonical_artifact_root", lambda: root)
-    monkeypatch.setattr(
-        controller, "require_clean_repository", lambda: controller.RELEASE
-    )
+    monkeypatch.setattr(controller, "require_clean_repository", lambda: release)
+    if revision == "execution-r2":
+        sources = controller.execution_binding(release, revision)
+        save(
+            diag,
+            controller.read(diag)
+            | {
+                "source_release": release,
+                "execution_revision": revision,
+                "execution_sources_sha256": sources,
+                "script_sha256": sources[controller.EXECUTION_SOURCES[1]],
+            },
+        )
     monkeypatch.setattr(controller, "load_protocol", lambda _: object())
     monkeypatch.setattr(controller, "require_v3_design", lambda _: None)
     initialized = [False]
@@ -280,12 +295,14 @@ def test_controller_holds_locks_retains_failures_and_keeps_parent_cuda_free(
             )
         calls.append(command)
         if "--gpu-preflight-output" in command:
-            output = Path(command[-1])
+            output = Path(command[command.index("--gpu-preflight-output") + 1])
             save(
                 output,
                 {
                     "status": "failed" if fault == "probe_failed" else "passed",
                     "controller_sha256": controller.sha256_file(controller.__file__),
+                    "source_release": release,
+                    "execution_revision": revision,
                     "free_bytes": 32 * 2**30,
                     "total_bytes": 48 * 2**30,
                 },
@@ -294,6 +311,10 @@ def test_controller_holds_locks_retains_failures_and_keeps_parent_cuda_free(
         if command[0] == "bash":
             assert command == ["bash", "scripts/study_v3.qsub", "caches"]
             assert environment["POSE_EMBED_V3_ATTEMPT"].endswith(attempt.name)
+            assert (
+                str(Path("study-v3/revisions") / revision)
+                in environment["POSE_EMBED_V3_ATTEMPT"]
+            )
             if fault == "scientific_child":
                 raise RuntimeError("synthetic child failure")
             if fault == "parent_initialized":
@@ -324,6 +345,10 @@ def test_controller_holds_locks_retains_failures_and_keeps_parent_cuda_free(
             str(diag),
             "--diagnostic-sha256",
             controller.sha256_file(diag),
+            "--expected-release",
+            release,
+            "--revision",
+            revision,
         ],
     )
     if fault:
@@ -332,6 +357,11 @@ def test_controller_holds_locks_retains_failures_and_keeps_parent_cuda_free(
     else:
         controller.main()
     attempt = next((root / "study-v3/operations").glob("*-123-caches"))
+    record = controller.read(attempt / "attempt.json")
+    assert record["release_sha"] == release and record["execution_revision"] == revision
+    assert record["execution_sources_sha256"] == controller.execution_binding(
+        release, revision
+    )
     assert controller.read(attempt / "outcome.json")["status"] == (
         "failed" if fault else "passed"
     )
@@ -347,3 +377,128 @@ def test_controller_holds_locks_retains_failures_and_keeps_parent_cuda_free(
     else:
         assert len(calls) == 5
     assert not held
+
+
+@pytest.mark.parametrize(
+    "fault", [None, "old_release", "old_revision", "helper", "script"]
+)
+def test_successor_requires_fresh_diagnostic_for_its_exact_release(
+    controller, tmp_path, monkeypatch, fault
+):
+    root, release = tmp_path.resolve(), "2" * 40
+    monkeypatch.setattr(controller, "require_clean_repository", lambda: release)
+    sources = controller.execution_binding(release, "execution-r2")
+    path = diagnostic(controller, root)
+    record = controller.read(path) | {
+        "source_release": release,
+        "execution_revision": "execution-r2",
+        "execution_sources_sha256": sources.copy(),
+        "script_sha256": sources[controller.EXECUTION_SOURCES[1]],
+    }
+    if fault == "old_release":
+        record["source_release"] = controller.RELEASE
+    if fault == "old_revision":
+        record["execution_revision"] = "execution-r1"
+    if fault == "helper":
+        record["execution_sources_sha256"]["scripts/run_v3_execution.py"] = "a" * 64
+    if fault == "script":
+        record["script_sha256"] = controller.DIAGNOSTIC_SHA256
+    save(path, record)
+    kwargs = {
+        "expected_release": release,
+        "revision": "execution-r2",
+        "source_hashes": sources,
+    }
+    if fault:
+        with pytest.raises(ValueError, match="diagnostic has not passed"):
+            controller.validate_diagnostic(
+                root, path, controller.sha256_file(path), **kwargs
+            )
+    else:
+        controller.validate_diagnostic(
+            root, path, controller.sha256_file(path), **kwargs
+        )
+
+
+@pytest.mark.parametrize(
+    "release,revision",
+    [
+        ("short", "execution-r2"),
+        ("2" * 40, "execution-r1"),
+        ("731938a157be575ee433d6939876f8ca0b95e459", "execution-r2"),
+    ],
+)
+def test_release_revision_pair_cannot_silently_relabel_historical_inputs(
+    controller, monkeypatch, release, revision
+):
+    monkeypatch.setattr(controller, "require_clean_repository", lambda: release)
+    with pytest.raises(ValueError, match="clean full release"):
+        controller.execution_binding(release, revision)
+
+
+def test_successor_controller_must_match_tracked_bytes(controller, monkeypatch):
+    release = "2" * 40
+    monkeypatch.setattr(controller, "require_clean_repository", lambda: release)
+    original = controller.sha256_file
+    monkeypatch.setattr(
+        controller,
+        "sha256_file",
+        lambda path: "a" * 64 if path == controller.__file__ else original(path),
+    )
+    with pytest.raises(ValueError, match="tracked release"):
+        controller.execution_binding(release, "execution-r2")
+
+
+@pytest.mark.parametrize(
+    "explicit,wrong", [(False, False), (True, False), (True, True)]
+)
+def test_gpu_qsub_binds_expected_release_before_environment_setup(
+    tmp_path, explicit, wrong
+):
+    wrapper = Path.cwd() / "scripts/operations/week5_gpu.qsub"
+    binary = tmp_path / "bin"
+    binary.mkdir()
+    python = tmp_path / ".venv/bin/python3.11"
+    python.parent.mkdir(parents=True)
+    files = {
+        binary / "git": (
+            '#!/bin/sh\nif [ "$1" = rev-parse ]; then '
+            'printf "%s\\n" "$FIXTURE_RELEASE"; fi\n'
+        ),
+        binary / "uv": '#!/bin/sh\ntouch "$FIXTURE_SETUP"\n',
+        python: '#!/bin/sh\nprintf "%s\\n" "$@"\n',
+    }
+    for path, text in files.items():
+        path.write_text(text)
+        path.chmod(0o755)
+    release = "2" * 40 if explicit else "731938a157be575ee433d6939876f8ca0b95e459"
+    environment = os.environ | {
+        "PATH": str(binary) + os.pathsep + os.environ["PATH"],
+        "FIXTURE_RELEASE": "3" * 40 if wrong else release,
+        "FIXTURE_SETUP": str(tmp_path / "setup"),
+        "JOB_ID": "123",
+        "NSLOTS": "4",
+        "TMPDIR": str(tmp_path),
+        "POSE_EMBED_DATA_ROOT": str(tmp_path),
+        "POSE_EMBED_ARTIFACT_ROOT": str(tmp_path),
+        "POSE_EMBED_MANIFEST_SET": str(tmp_path / "fixture.json"),
+    }
+    arguments = (["--expected-release", release] if explicit else []) + [
+        "controller.py",
+        "caches",
+    ]
+    result = subprocess.run(
+        ["bash", str(wrapper), *arguments],
+        cwd=tmp_path,
+        env=environment,
+        text=True,
+        capture_output=True,
+        timeout=10,
+    )
+    if wrong:
+        assert result.returncode == 2 and not (tmp_path / "setup").exists()
+    else:
+        assert result.returncode == 0 and (tmp_path / "setup").exists()
+        assert result.stdout.splitlines() == ["controller.py", "caches"] + (
+            ["--expected-release", release] if explicit else []
+        )

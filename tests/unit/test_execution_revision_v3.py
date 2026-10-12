@@ -1,5 +1,6 @@
 """Execution completion cannot mutate an original lock or bypass its test seal."""
 
+import json
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
 
@@ -39,7 +40,8 @@ def test_revision_paths_are_coherent_and_original_digest_unchanged():
         ProtocolV3Config.model_validate(new)
 
 
-def test_successor_binds_exact_predecessor_science_and_manifest_bytes(tmp_path):
+@pytest.mark.parametrize("depth", [1, 2])
+def test_successor_binds_exact_predecessor_science_and_manifest_bytes(tmp_path, depth):
     original, successor = revision_payload()
     protocol = ProtocolV3Config.model_validate(original)
     path = tmp_path / protocol.test_access.resolved_protocol_relative_path
@@ -78,6 +80,58 @@ def test_successor_binds_exact_predecessor_science_and_manifest_bytes(tmp_path):
         }
     )
     validate_execution_revision(revised, lock, tmp_path)
+    if depth == 2:
+        write_immutable_json(
+            tmp_path / lock.protocol_relative_path, revised.model_dump(mode="json")
+        )
+        predecessor = tmp_path / revised.test_access.design_lock_relative_path
+        write_immutable_json(predecessor, lock.model_dump(mode="json"))
+        second = deepcopy(successor)
+        for key, value in second["test_access"].items():
+            if key.endswith("_relative_path"):
+                second["test_access"][key] = value.replace(
+                    "execution-r1", "execution-r2"
+                )
+        revised = ProtocolV3Config.model_validate(second)
+        lock = lock.model_copy(
+            update={
+                "protocol_relative_path": (
+                    revised.test_access.resolved_protocol_relative_path
+                ),
+                "protocol_sha256": protocol_digest(revised),
+                "recorded_at": datetime.now(UTC),
+                "predecessor_design": ArtifactBinding(
+                    relative_path=str(predecessor.relative_to(tmp_path)),
+                    sha256=sha256_file(predecessor),
+                ),
+            }
+        )
+        validate_execution_revision(revised, lock, tmp_path)
+        skipped = lock.model_copy(
+            update={
+                "predecessor_design": ArtifactBinding(
+                    relative_path=str(prior_path.relative_to(tmp_path)),
+                    sha256=sha256_file(prior_path),
+                )
+            }
+        )
+        with pytest.raises(ValueError, match="immediate immutable predecessor"):
+            validate_execution_revision(revised, skipped, tmp_path)
+        retained = predecessor.read_bytes()
+        severed = json.loads(retained)
+        severed["predecessor_design"] = None
+        predecessor.write_text(json.dumps(severed))
+        missing_ancestor = lock.model_copy(
+            update={
+                "predecessor_design": ArtifactBinding(
+                    relative_path=str(predecessor.relative_to(tmp_path)),
+                    sha256=sha256_file(predecessor),
+                )
+            }
+        )
+        with pytest.raises(ValueError, match="requires.*predecessor"):
+            validate_execution_revision(revised, missing_ancestor, tmp_path)
+        predecessor.write_bytes(retained)
     changed = revised.model_copy(update={"title": "Changed scientific record"})
     with pytest.raises(ValueError, match="scientific design"):
         validate_execution_revision(changed, lock, tmp_path)
@@ -112,7 +166,10 @@ def test_novel_loader_never_deserializes_before_full_opening(monkeypatch, tmp_pa
     assert order == ["authorization"]
 
 
-def test_new_revision_opening_blocks_all_auxiliary_access(tmp_path, monkeypatch):
+@pytest.mark.parametrize("revision", ["execution-r1", "execution-r2"])
+def test_new_revision_opening_blocks_all_auxiliary_access(
+    tmp_path, monkeypatch, revision
+):
     from pose_embed.dataset_seal import (
         register_artifact_roots,
         require_dataset_unopened,
@@ -122,7 +179,7 @@ def test_new_revision_opening_blocks_all_auxiliary_access(tmp_path, monkeypatch)
     monkeypatch.setenv("POSE_EMBED_DATA_ROOT", str(tmp_path))
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
     register_artifact_roots([])
-    ledger = tmp_path / "study-v3/revisions/execution-r1/locks/test-opening.v3.json"
+    ledger = tmp_path / f"study-v3/revisions/{revision}/locks/test-opening.v3.json"
     ledger.parent.mkdir(parents=True)
     ledger.write_text("{}")
     with pytest.raises(ValueError, match="after test opening"):

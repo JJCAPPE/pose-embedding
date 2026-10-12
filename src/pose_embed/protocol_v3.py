@@ -40,6 +40,7 @@ class V3DesignLock(StrictModel):
     protocol_relative_path: Literal[
         "study-v3/locks/protocol.v3.json",
         "study-v3/revisions/execution-r1/locks/protocol.v3.json",
+        "study-v3/revisions/execution-r2/locks/protocol.v3.json",
     ]
     predecessor_design: ArtifactBinding | None = None
     recorded_at: datetime
@@ -159,6 +160,7 @@ def v3_design_code_hashes() -> dict[str, str]:
         "src/pose_embed/v3_commands.py",
         "src/pose_embed/protocol_v3.py",
         "src/pose_embed/artifacts.py",
+        "src/pose_embed/validation_proofs.py",
         "src/pose_embed/features.py",
         "src/pose_embed/motionbert_inputs.py",
         "src/pose_embed/motionbert_features.py",
@@ -257,7 +259,10 @@ def _validate_design_inputs(
         != protocol.test_access.resolved_protocol_relative_path
     ):
         raise ValueError("v3 design lock differs from the protocol/pilot specification")
-    if lock.predecessor_design is not None:
+    if (
+        lock.protocol_relative_path.startswith("study-v3/revisions/")
+        or lock.predecessor_design is not None
+    ):
         validate_execution_revision(protocol, lock, root)
     prep = protocol.preparation
     assets = verify_motionbert_assets(_registry_path().parents[1])
@@ -380,19 +385,37 @@ def freeze_v3_design(
 def validate_execution_revision(
     protocol: ProtocolV3Config, lock: V3DesignLock, root: Path
 ) -> None:
-    """Permit only the declared path revision, retaining the complete old design."""
+    """Permit only the declared predecessor chain and identical scientific inputs."""
+    predecessors = {
+        "study-v3/revisions/execution-r1/locks/protocol.v3.json": "study-v3/locks",
+        "study-v3/revisions/execution-r2/locks/protocol.v3.json": (
+            "study-v3/revisions/execution-r1/locks"
+        ),
+    }
+    parent = predecessors.get(lock.protocol_relative_path)
     binding = lock.predecessor_design
-    if binding is None or binding.relative_path != "study-v3/locks/design-lock.v3.json":
-        raise ValueError("execution revision requires the original immutable design")
+    if (
+        parent is None
+        or binding is None
+        or binding.relative_path != f"{parent}/design-lock.v3.json"
+    ):
+        raise ValueError(
+            "execution revision requires its immediate immutable predecessor"
+        )
     previous = V3DesignLock.model_validate_json(_bound_file(root, binding).read_text())
     prior = load_protocol(root / previous.protocol_relative_path)
     if (
-        previous.predecessor_design is not None
+        previous.protocol_relative_path != f"{parent}/protocol.v3.json"
         or protocol_digest(prior) != previous.protocol_sha256
         or previous.recorded_at >= lock.recorded_at
         or previous.artifact_root_registry_sha256 != lock.artifact_root_registry_sha256
     ):
         raise ValueError("execution revision predecessor or chronology differs")
+    if (
+        previous.protocol_relative_path != "study-v3/locks/protocol.v3.json"
+        or previous.predecessor_design is not None
+    ):
+        validate_execution_revision(prior, previous, root)
     old = prior.model_dump(mode="json")
     new = protocol.model_dump(mode="json")
     for payload in (old, new):
@@ -437,8 +460,13 @@ def require_v3_final_authorization(
         selected_configs_path,
     )
 
-    if protocol.preparation is None or "execution-r1" not in (
-        protocol.test_access.design_lock_relative_path
+    if (
+        protocol.preparation is None
+        or protocol.test_access.design_lock_relative_path
+        not in {
+            "study-v3/revisions/execution-r1/locks/design-lock.v3.json",
+            "study-v3/revisions/execution-r2/locks/design-lock.v3.json",
+        }
     ):
         raise ValueError(
             "v3 final authorization is unavailable before the measured campaign audit; "

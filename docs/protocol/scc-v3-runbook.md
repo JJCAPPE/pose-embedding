@@ -36,6 +36,7 @@ Do not infer absence from a misspelled ledger filename. The known ledger paths
 are `locks/test-opening.v1.json`, `benchmark-v2/locks/test-opening.json`,
 `study-v3/locks/test-opening.v3.json`,
 `study-v3/revisions/execution-r1/locks/test-opening.v3.json` and
+`study-v3/revisions/execution-r2/locks/test-opening.v3.json`, plus
 `locks/dataset-opening.json`.
 
 For a different host, retain an immutable audit JSON with `schema_version: 1`,
@@ -122,7 +123,64 @@ The launcher checks the bounded Week 4 increment plus reserve on every job.
 This is separate from the October 18 full-campaign allocation, availability,
 storage and measured-time gate. Selection and novel evaluation remain closed.
 
-## Week 5: execution-r1 successor
+## Week 5: authorized execution-r2 work
+
+The researcher authorized [ADR0007](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
+on October 12 after the verified execution-r1 capacity no-go. The prior release,
+environments, attempts, receipts and commands below remain historical evidence.
+Do not rerun their one-off launchers or replace files in either earlier release.
+No execution-r2 release, allocated rehearsal or scientific artifact is claimed
+by this instruction section; record the actual verified commit and paths before
+submission.
+
+Freeze the reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes
+in a new clean checkout and separate locked environment. Preserve all scientific
+settings and validate the exact original → execution-r1 → execution-r2 design
+chain. The new preparation command accepts `--revision execution-r2`; it still
+requires the adopted historical v1 manifest bundle, not a v3 rebound bundle.
+Only source/identity/fallback evidence and byte-identical ordered manifests are
+retained through validated bindings. Follow ADR0007's full fresh regeneration
+inventory. Refresh the retained/remaining byte inventory; the old 120 GB envelope
+and 84 GB operational bound are historical, not a new capacity claim.
+
+The CPU operation wrapper also accepts `--revision execution-r2`. Its original
+GPU convenience path is forbidden for execution-r2. Use the reviewed CUDA-free
+GPU controller only after a fresh allocated synthetic diagnostic binding the
+successor release and actual tool/helper hashes. The old 8028141 diagnostic does
+not establish the successor controller. Keep the inherited
+`execution-r1.operation.lock` as the common operation lock across both revisions,
+in addition to the dataset-wide access lock; changing its name would permit
+overlapping old/new operations.
+
+First run a fresh allocated software rehearsal with isolated fixture roots,
+including proof mutation/teardown and independent recertification tests, typed
+capacity/opening checks and the complete report/access-boundary path. Retain
+accounting, all commands, logs, resource samples and before/after seals. Verify
+the completed operation independently before preparation or GPU work.
+
+For the admitted geometry receipt, use the reviewed supplementary checker
+`week5_additional_checks.py --mode geometry --revision execution-r2` with the
+full expected successor release. It retains the independent geometry validation
+and `validation.json` binding consumed by the admission assembler. The generic
+CPU geometry route can produce a panel under `locks/geometry`, but its operation
+alone is not that admission receipt. Supplementary metadata tests use the same
+reviewed checker with `--mode additional-checks`.
+
+The tracked GPU and admission wrappers accept an explicit full
+`--expected-release` and `--revision execution-r2`. Admission requires new
+schema-2 CPU/GPU maps and classified calendar windows, exact successor operation
+bindings and a fresh full-A proof session. Record its observed numerical-check,
+reuse and rehash statistics, complete command wall time and independent
+recertification cost; do not multiply predecessor timings as successor measures.
+
+After a launch, inspect its initial allocation/resources once. If healthy work
+continues and no useful independent work remains, save the status and end the
+chat turn with an exact next check-back time in America/New_York. Automatic chat
+polling is at most hourly; the scheduler-side 60-second resource monitoring
+remains active. Neither a running process nor an estimated completion time is a
+passed stage. No selection, final training or novel opening is authorized here.
+
+## Week 5: historical execution-r1 successor
 
 [Decision 0006](../decisions/0006-v3-execution-completion-amendment.md) requires a
 fresh successor release and evidence. It does not authorize selection or opening.
@@ -608,12 +666,14 @@ bindings, two commands, 17 resource samples, both seals and successful accountin
 305.840707965 seconds. All three validators passed; the measured capacity
 condition did not. See the [dated audit](week-5-capacity-validation-audit.md#october-12-measured-profile-no-go).
 
-**Current next step is a researcher decision, not a launch.** Keep full A,
-selection, final training and novel opening held. Do not submit an r2 candidate
-with a fabricated passed capacity receipt. A result-blind amendment proposal or
-new evidence for an identified faster compatible runtime must precede affected
-work; neither has been authorized by this record. Keep the SCC status current
-and preserve the SSH session and every completed/failed attempt.
+**The researcher subsequently authorized ADR0007.** The current next step is
+implementation/review and a fresh immutable execution-r2 release, followed by
+allocated software rehearsal and the full regeneration inventory described above.
+The historical candidate helper called "r2" in this section is an execution-r1
+operational-tool version, not execution-r2 scientific admission. It cannot provide
+successor schema-2 evidence. Keep full A pending fresh successor prerequisites;
+selection, final training and novel opening remain held. Never fabricate a passed
+capacity receipt. Preserve the SSH session and every completed/failed attempt.
 
 The Week 4 cache job took 94 minutes 4 seconds, independent cache validation
 about 6 minutes 16 seconds, and each pilot roughly 8–9 scheduler minutes. The

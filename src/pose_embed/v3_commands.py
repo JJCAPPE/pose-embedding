@@ -45,6 +45,7 @@ def run_preparation_command(args) -> dict:
         return prepare_execution_revision(
             historical_manifest_set=args.historical_manifest_set,
             recorded_by=args.recorded_by,
+            revision=args.revision,
         )
     if args.operation == "register-roots":
         return register_artifact_roots(args.root, external_audits=args.external_audit)

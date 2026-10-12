@@ -29,6 +29,7 @@ from pose_embed.protocol import (
     verify_protocol_lock,
 )
 from pose_embed.provenance import sha256_file, write_immutable_json
+from pose_embed.validation_proofs import verify_validation_proofs
 
 
 class TestOpeningLedger(BaseModel):
@@ -235,6 +236,7 @@ def open_final_test_once(
             capacity = record_opening_capacity(protocol, lock_sha256)
         capacity_time = validate_opening_capacity(protocol, capacity, lock_sha256)
         authorization["opening_capacity"] = capacity.model_dump()
+    verify_validation_proofs()
     common = record_dataset_opening(
         version=protocol.protocol_id, authorization=authorization
     )
@@ -258,5 +260,6 @@ def open_final_test_once(
         opened_at=datetime.now(UTC),
         opening_capacity=capacity,
     )
+    verify_validation_proofs()
     write_immutable_json(destination, ledger.model_dump(mode="json"))
     return ledger

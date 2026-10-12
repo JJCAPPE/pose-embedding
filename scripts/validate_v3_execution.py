@@ -32,6 +32,10 @@ from pose_embed.provenance import (
     write_immutable_json,
 )
 from pose_embed.training.runner import validate_engineering_pilot
+from pose_embed.validation_proofs import (
+    validation_session,
+    verify_validation_proofs,
+)
 
 CACHES = (
     ("final-train-first", "final-train.jsonl", 95001, "training", "final_train"),
@@ -203,7 +207,7 @@ def main():
         "script_sha256": sha256_file(__file__),
     }
     try:
-        with dataset_access():
+        with validation_session(fresh=True) as proof_session, dataset_access():
             require_dataset_unopened(require_registry=True)
             require_clean_repository()
             protocol = load_protocol(args.protocol_config)
@@ -230,7 +234,9 @@ def main():
                         args.pilot_dirs, args.cache_dir, args.manifest_set.parent
                     )
                 )
+            verify_validation_proofs()
             receipt["status"] = "passed"
+        receipt["numerical_validation"] = proof_session.statistics()
     except Exception as error:
         receipt.update(
             status="failed", error_type=type(error).__name__, error_message=str(error)

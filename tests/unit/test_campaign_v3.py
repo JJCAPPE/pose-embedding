@@ -13,6 +13,7 @@ from pose_embed.config_v3 import ArtifactBinding
 from pose_embed.protocol import _validate_head_checkpoint, protocol_digest
 from pose_embed.protocol_v3 import V3SelectionAuthorization
 from pose_embed.protocol_v3_campaign import (
+    AllocationCalendar,
     CapacityReceipt,
     ResearcherAvailability,
     SelectionLedger,
@@ -265,7 +266,7 @@ def test_ledger_cannot_omit_preserved_selection_attempt(campaign):
 def _capacity():
     binding = {"relative_path": "evidence.json", "sha256": "a" * 64}
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "protocol_sha256": "a" * 64,
         "design_lock_sha256": "b" * 64,
         "recorded_at": datetime.now(UTC).isoformat(),
@@ -301,12 +302,12 @@ def _capacity():
         "peak_gpu_bytes": 1,
         "host_memory_limit_bytes": 2,
         "gpu_memory_limit_bytes": 2,
-        "maximum_job_seconds": 60.0,
+        "maximum_job_seconds_by_resource": {"cpu": 60.0, "gpu": 60.0},
         "retained_bytes": 1,
         "full_size_resident_rows": 95001,
         "timing_optimization_actions": 80,
-        "remaining_preopening_seconds": 60.0,
-        "remaining_evaluation_seconds": 60.0,
+        "remaining_preopening_seconds_by_resource": {"cpu": 60.0, "gpu": 60.0},
+        "remaining_evaluation_seconds_by_resource": {"cpu": 60.0, "gpu": 60.0},
         "researcher_work_hours": {
             name: 1.0
             for name in (
@@ -342,6 +343,78 @@ def test_capacity_fails_closed_for_resource_or_evidence_shortfall(field, value):
     payload[field] = value
     with pytest.raises(ValueError):
         CapacityReceipt.model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "maximum_job_seconds_by_resource",
+        "remaining_preopening_seconds_by_resource",
+        "remaining_evaluation_seconds_by_resource",
+    ],
+)
+@pytest.mark.parametrize(
+    "value",
+    [60, {"cpu": 60}, {"cpu": 60, "gpu": -1}, {"cpu": 60, "gpu": float("inf")}],
+)
+def test_capacity_requires_both_finite_resource_budgets(field, value):
+    with pytest.raises(ValueError):
+        CapacityReceipt.model_validate(_capacity() | {field: value})
+
+
+def test_old_capacity_receipts_are_not_converted():
+    payload = _capacity()
+    with pytest.raises(ValueError):
+        CapacityReceipt.model_validate(payload | {"schema_version": 1})
+    for name in (
+        "maximum_job_seconds",
+        "remaining_preopening_seconds",
+        "remaining_evaluation_seconds",
+    ):
+        payload.pop(name + "_by_resource")
+        payload[name] = 60.0
+    with pytest.raises(ValueError):
+        CapacityReceipt.model_validate(payload)
+
+
+def _calendar():
+    return {
+        "schema_version": 2,
+        "recorded_at": "2026-10-10T12:00:00Z",
+        "recorded_by": "researcher",
+        "access": "ordinary_queued_access",
+        "reserved": False,
+        "windows": [
+            {
+                "resource_class": resource,
+                "starts_at": f"{day}T{hour}:00:00Z",
+                "ends_at": f"{day}T{hour + 2}:00:00Z",
+                "job_wall_limit_seconds": 3600,
+                "queue_allowance_seconds": 3600,
+                "concurrent_scientific_processes": 1,
+            }
+            for day in ("2026-11-01", "2026-11-30")
+            for resource, hour in (("cpu", 12), ("gpu", 15))
+        ],
+    }
+
+
+def test_calendars_require_new_schema_and_classified_nonoverlapping_windows():
+    payload = _calendar()
+    AllocationCalendar.model_validate(payload)
+    with pytest.raises(ValueError):
+        AllocationCalendar.model_validate(payload | {"schema_version": 1})
+    del payload["schema_version"]
+    with pytest.raises(ValueError):
+        AllocationCalendar.model_validate(payload)
+    payload = _calendar()
+    del payload["windows"][0]["resource_class"]
+    with pytest.raises(ValueError):
+        AllocationCalendar.model_validate(payload)
+    payload = _calendar()
+    payload["windows"][1]["starts_at"] = payload["windows"][0]["starts_at"]
+    with pytest.raises(ValueError, match="overlap"):
+        AllocationCalendar.model_validate(payload)
 
 
 def test_unchanged_finite_head_is_only_allowed_when_explicit(tmp_path):
@@ -397,22 +470,7 @@ def test_conservative_researcher_hours_preserve_contingency_and_holiday():
 def test_capacity_uses_dated_queued_windows_and_preserves_delivery_hours(tmp_path):
     payload = _capacity()
     payload["recorded_at"] = "2026-10-10T12:00:00Z"
-    allocation = {
-        "recorded_at": payload["recorded_at"],
-        "recorded_by": "researcher",
-        "access": "ordinary_queued_access",
-        "reserved": False,
-        "windows": [
-            {
-                "starts_at": f"{day}T12:00:00Z",
-                "ends_at": f"{day}T14:00:00Z",
-                "job_wall_limit_seconds": 3600,
-                "queue_allowance_seconds": 3600,
-                "concurrent_scientific_processes": 1,
-            }
-            for day in ("2026-11-01", "2026-11-30")
-        ],
-    }
+    allocation = _calendar()
     availability = {
         "recorded_at": payload["recorded_at"],
         "recorded_by": "researcher",
@@ -430,6 +488,15 @@ def test_capacity_uses_dated_queued_windows_and_preserves_delivery_hours(tmp_pat
     payload["allocation_calendar"] = _binding(tmp_path, "calendar.json", allocation)
     payload["researcher_availability"] = _binding(tmp_path, "hours.json", availability)
     _validate_capacity_availability(tmp_path, CapacityReceipt.model_validate(payload))
+    allocation["windows"] = [
+        window | {"resource_class": "cpu"} for window in allocation["windows"]
+    ]
+    payload["allocation_calendar"] = _binding(tmp_path, "calendar.json", allocation)
+    with pytest.raises(ValueError, match="dated allocation windows"):
+        _validate_capacity_availability(
+            tmp_path, CapacityReceipt.model_validate(payload)
+        )
+    payload["allocation_calendar"] = _binding(tmp_path, "calendar.json", _calendar())
     with pytest.raises(ValueError, match="past allocation window"):
         _validate_capacity_availability(
             tmp_path,
@@ -442,7 +509,7 @@ def test_capacity_uses_dated_queued_windows_and_preserves_delivery_hours(tmp_pat
             tmp_path, CapacityReceipt.model_validate(payload)
         )
     payload["researcher_work_hours"]["final_analysis_delivery"] = 1
-    payload["remaining_preopening_seconds"] = 3600
+    payload["remaining_preopening_seconds_by_resource"]["cpu"] = 3600
     with pytest.raises(ValueError, match="allocation windows"):
         _validate_capacity_availability(
             tmp_path, CapacityReceipt.model_validate(payload)
@@ -460,6 +527,7 @@ def test_capacity_cannot_split_a_complete_job_across_short_windows(tmp_path):
             )
             windows.append(
                 {
+                    "resource_class": "cpu" if index % 2 == 0 else "gpu",
                     "starts_at": start.isoformat(),
                     "ends_at": (start + timedelta(seconds=10)).isoformat(),
                     "job_wall_limit_seconds": 3600,
@@ -471,6 +539,7 @@ def test_capacity_cannot_split_a_complete_job_across_short_windows(tmp_path):
         tmp_path,
         "calendar.json",
         {
+            "schema_version": 2,
             "recorded_at": payload["recorded_at"],
             "recorded_by": "researcher",
             "access": "ordinary_queued_access",

@@ -213,3 +213,47 @@ def test_v3_capacity_precedes_opening_and_partial_retry_reuses_receipt(
     assert access.open_final_test_once(protocol, protocol_sha256=digest) == first
     assert access.validate_recorded_test_opening(protocol) == first
     assert len(calls) == 1
+
+
+def test_changed_numerical_dependency_cannot_publish_opening(
+    protocol_path, tmp_path, monkeypatch
+):
+    import pose_embed.test_access as access
+    from pose_embed.dataset_seal import OPENING
+    from pose_embed.provenance import sha256_file
+    from pose_embed.validation_proofs import check_numerical_proof, validation_session
+
+    protocol = load_protocol(protocol_path)
+    digest = protocol_digest(protocol)
+    write_lock_bundle(tmp_path, digest)
+    monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(tmp_path))
+    monkeypatch.setenv("POSE_EMBED_DATA_ROOT", str(tmp_path))
+    register_artifact_roots([])
+    monkeypatch.setattr(
+        access,
+        "validate_evaluation_manifests",
+        lambda *args, **kwargs: EvaluationManifestValidation(
+            paths={},
+            source_file_count=114480,
+            source_files_sha256="a" * 64,
+            source_files_verified=True,
+        ),
+    )
+    dependency = tmp_path / "numerical-fixture.json"
+    dependency.write_text("before")
+    monkeypatch.setattr(
+        access,
+        "validate_final_run_artifacts",
+        lambda *a, **k: dependency.write_text("after!"),
+    )
+    with pytest.raises(ValueError, match="dependency"), validation_session():
+        check_numerical_proof(
+            "fixture-only",
+            enabled=True,
+            files={dependency: sha256_file(dependency)},
+            metadata={},
+            check=lambda: None,
+        )
+        open_final_test_once(protocol, protocol_sha256=digest)
+    assert not (tmp_path / OPENING).exists()
+    assert not (tmp_path / protocol.test_access.opening_ledger_relative_path).exists()

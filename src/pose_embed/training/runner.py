@@ -52,6 +52,13 @@ from pose_embed.provenance import (
     write_immutable_json,
 )
 from pose_embed.training.sampler import BalancedBatchSampler
+from pose_embed.validation_proofs import (
+    check_numerical_proof,
+    proof_reuse_allowed,
+    proof_source_bindings,
+    validation_command,
+    verify_validation_proofs,
+)
 
 TrainingStage = Literal["engineering_pilot", "development_selection", "final_training"]
 _PILOT_SNAPSHOTS = (5, 10, 15, 20)
@@ -126,6 +133,7 @@ def build_loss(config: ExperimentConfig) -> nn.Module:
     )
 
 
+@validation_command()
 def train_head(
     config_path: str | Path,
     input_path: str | Path,
@@ -399,6 +407,7 @@ def _train_head(
             development=development,
             campaign_inputs=campaign_inputs,
         )
+        verify_validation_proofs()
     except BaseException as exc:
         known_files = {}
         for candidate in sorted(destination.rglob("*")):
@@ -694,6 +703,7 @@ def _execute_training(
                 ),
             }
         )
+    verify_validation_proofs()
     write_immutable_json(destination / "metrics.json", summary)
     provenance = capture_provenance(
         command="train",
@@ -756,6 +766,7 @@ def _execute_training(
                 provenance["selected_configs_sha256"] = sha256_file(
                     selected_configs_path(locked_protocol)
                 )
+    verify_validation_proofs()
     write_immutable_json(destination / "run-manifest.json", provenance)
     return summary
 
@@ -1262,7 +1273,6 @@ def _validate_pilot_scientific_provenance(
 
 def _validate_pilot_scores(root, epoch, record, manifest) -> None:
     """Replay the bound head/cache, then reproduce exact retained-array ranks."""
-    from pose_embed.evaluation.metrics import evaluate_one_shot
     from pose_embed.protocol import _validate_head_checkpoint
 
     bindings = manifest["development_inputs"]
@@ -1335,6 +1345,44 @@ def _validate_pilot_scores(root, epoch, record, manifest) -> None:
         raise ValueError("development scoring checkpoint has wrong stage or epoch")
     head = NormalizedLinearHead(config.input_dimension, config.embedding_dimension)
     head.load_state_dict(checkpoint["state_dict"], strict=True)
+    files = {
+        **manifest["inputs"],
+        **record["projections"],
+        str(checkpoint_path): record["checkpoint_sha256"],
+        str(root / "run-manifest.json"): sha256_file(root / "run-manifest.json"),
+        str(root / f"epoch-{epoch:03d}.json"): sha256_file(
+            root / f"epoch-{epoch:03d}.json"
+        ),
+    }
+    for path in (Path(__file__), Path(__file__).parents[1] / "evaluation/metrics.py"):
+        files[str(path)] = sha256_file(path)
+    # Frozen source expectations must win over observed/provenance file hashes.
+    files.update(
+        proof_source_bindings(
+            protocols[0], scientific_use_allowed=training.scientific_use_allowed
+        )
+    )
+    check_numerical_proof(
+        "pilot-snapshot-replay-v1",
+        enabled=proof_reuse_allowed(
+            protocols[0], scientific_use_allowed=training.scientific_use_allowed
+        ),
+        files=files,
+        metadata={
+            "epoch": epoch,
+            "record": record,
+            "manifest": manifest,
+            "protocol": protocols[0].model_dump(mode="json"),
+        },
+        check=lambda: _replay_pilot_scores(
+            root, epoch, record, development, config, head
+        ),
+    )
+
+
+def _replay_pilot_scores(root, epoch, record, development, config, head) -> None:
+    from pose_embed.evaluation.metrics import evaluate_one_shot
+
     projected = {}
     for name in ("gallery", "queries"):
         path = root / f"epochs/{epoch:03d}/{name}.npz"

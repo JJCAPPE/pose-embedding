@@ -45,6 +45,7 @@ from pose_embed.protocol import (
 )
 from pose_embed.provenance import RuntimeTelemetry, sha256_file, write_immutable_json
 from pose_embed.test_access import TestOpeningLedger
+from pose_embed.validation_proofs import validation_command, verify_validation_proofs
 
 
 def _load_result(path: Path) -> EvaluationResult:
@@ -1140,6 +1141,7 @@ def _validate_exploratory_provenance(
     return len(expected_keys), expected_keys
 
 
+@validation_command()
 def build_report(
     result_paths: Iterable[str | Path],
     output_dir: str | Path,
@@ -1224,15 +1226,18 @@ def build_report(
     for output_path in output_paths:
         if output_path.exists():
             raise ValueError(f"refusing to overwrite report: {output_path}")
+    verify_validation_proofs()
     references = core_artifacts["references"] if core_artifacts is not None else {}
     if core_artifacts is not None:
         for filename, payload in core_artifacts["json"].items():
             artifact_path = destination / filename
+            verify_validation_proofs()
             write_immutable_json(artifact_path, payload)
             if sha256_file(artifact_path) != _payload_sha256(payload):
                 raise ValueError(f"written report artifact hash changed: {filename}")
         for filename, content in core_artifacts["text"].items():
             artifact_path = destination / filename
+            verify_validation_proofs()
             _write_immutable_text(artifact_path, content)
             expected_sha256 = hashlib.sha256(content.encode()).hexdigest()
             if sha256_file(artifact_path) != expected_sha256:
@@ -1260,6 +1265,7 @@ def build_report(
         "figures": references.get("figures", []),
         "results": rows,
     }
+    verify_validation_proofs()
     write_immutable_json(summary_path, summary)
     markdown = [
         "# Pose Embed validated result report",
@@ -1452,6 +1458,7 @@ def build_report(
             f"{row['query_definition']} | {row['mode']} | {row['top1']:.4f} | "
             f"{row['mrr']:.4f} | {row['r_at_5']:.4f} | {row['queries']} |"
         )
+    verify_validation_proofs()
     try:
         with report_path.open("x", encoding="utf-8", errors="strict") as stream:
             stream.write("\n".join(markdown) + "\n")
@@ -1460,6 +1467,7 @@ def build_report(
     return summary
 
 
+@validation_command(fresh=True)
 def validate_core_report_summary(
     summary_path: str | Path,
     protocol_path: str | Path,

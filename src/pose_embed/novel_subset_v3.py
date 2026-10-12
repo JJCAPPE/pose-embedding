@@ -18,8 +18,10 @@ from pose_embed.motionbert_features import write_feature_npz
 from pose_embed.protocol import resolve_scientific_paths
 from pose_embed.protocol_v3 import require_v3_design, require_v3_final_authorization
 from pose_embed.provenance import require_path_within, sha256_file, write_immutable_json
+from pose_embed.validation_proofs import validation_command, verify_validation_proofs
 
 
+@validation_command()
 def export_primary_queries(source_path, output_path, *, protocol_path):
     protocol = load_protocol(protocol_path)
     require_v3_final_authorization(protocol)
@@ -50,6 +52,7 @@ def export_primary_queries(source_path, output_path, *, protocol_path):
     with np.load(source, allow_pickle=False) as archive:
         features = np.asarray(archive["features"])[indices]
         labels = np.asarray(archive["labels"])[indices]
+    verify_validation_proofs()
     write_feature_npz(destination, features, labels, np.asarray(sample_ids))
     provenance = deepcopy(original.provenance)
     provenance["inputs"][str(primary_manifest)] = sha256_file(primary_manifest)
@@ -91,6 +94,7 @@ def export_primary_queries(source_path, output_path, *, protocol_path):
             "provenance": provenance,
         }
     )
+    verify_validation_proofs()
     write_immutable_json(sidecar_path_for(destination), sidecar.model_dump(mode="json"))
     validate_feature_artifact(
         destination, protocol=protocol, manifest_path=primary_manifest

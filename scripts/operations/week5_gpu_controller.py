@@ -32,6 +32,28 @@ RELEASE = "731938a157be575ee433d6939876f8ca0b95e459"
 REVISION = Path("study-v3/revisions/execution-r1")
 METHODS = ("contrastive", "contextual", "supcon")
 DIAGNOSTIC_SHA256 = "751259d69fcd24ca6f36439f304bc59640da80ab8b3356092204cf65ea878d73"
+EXECUTION_SOURCES = (
+    "scripts/operations/week5_gpu_controller.py",
+    "scripts/operations/week5_gpu_context_diagnostic.py",
+    "scripts/operations/week5_gpu.qsub",
+    "scripts/run_v3_execution.py",
+)
+
+
+def execution_binding(expected_release, revision):
+    if (
+        re.fullmatch(r"[0-9a-f]{40}", expected_release) is None
+        or revision not in {"execution-r1", "execution-r2"}
+        or (revision == "execution-r1") != (expected_release == RELEASE)
+        or require_clean_repository() != expected_release
+    ):
+        raise ValueError("GPU controller requires its clean full release and revision")
+    if revision == "execution-r1":
+        return {}
+    sources = {name: sha256_file(name) for name in EXECUTION_SOURCES}
+    if sha256_file(__file__) != sources[EXECUTION_SOURCES[0]]:
+        raise ValueError("successor controller differs from its tracked release")
+    return sources
 
 
 def read(path):
@@ -74,7 +96,15 @@ def validate_allocation(qstat_xml, qstat_job, *, job_id, hostname):
         raise ValueError("GPU controller requires the reviewed 12h/32GiB/L40S request")
 
 
-def validate_diagnostic(root, path, expected_sha):
+def validate_diagnostic(
+    root,
+    path,
+    expected_sha,
+    *,
+    expected_release=RELEASE,
+    revision="execution-r1",
+    source_hashes=None,
+):
     path = require_path_within(path, root, label="GPU diagnostic receipt")
     if sha256_file(path) != expected_sha:
         raise ValueError("GPU diagnostic receipt differs from the reviewed hash")
@@ -87,8 +117,16 @@ def validate_diagnostic(root, path, expected_sha):
         "sequential_probe_count": 2,
         "held_context_probe_rejected": True,
         "script_sha256": DIAGNOSTIC_SHA256,
-        "source_release": RELEASE,
+        "source_release": expected_release,
     }
+    if revision == "execution-r2":
+        if not source_hashes or set(source_hashes) != set(EXECUTION_SOURCES):
+            raise ValueError("successor diagnostic requires complete helper bindings")
+        expected.update(
+            script_sha256=source_hashes[EXECUTION_SOURCES[1]],
+            execution_revision=revision,
+            execution_sources_sha256=source_hashes,
+        )
     if any(record.get(key) != value for key, value in expected.items()):
         raise ValueError("reviewed exclusive-context diagnostic has not passed")
     evidence = record.get("evidence")
@@ -115,7 +153,7 @@ def validate_diagnostic(root, path, expected_sha):
     return {"relative_path": str(path.relative_to(root)), "sha256": expected_sha}
 
 
-def gpu_preflight(output):
+def gpu_preflight(output, *, expected_release=RELEASE, revision="execution-r1"):
     """This child alone owns CUDA; process exit releases its small context."""
     from pose_embed.models.motionbert import configure_deterministic_inference
 
@@ -125,7 +163,8 @@ def gpu_preflight(output):
     output = require_path_within(
         output, root / "study-v3/operations", label="GPU preflight output"
     )
-    if output.exists() or require_clean_repository() != RELEASE:
+    execution_binding(expected_release, revision)
+    if output.exists():
         raise ValueError("GPU preflight requires new output and the frozen release")
     record = {
         "status": "failed",
@@ -136,6 +175,8 @@ def gpu_preflight(output):
         "hostname": socket.gethostname(),
         "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
         "controller_sha256": sha256_file(__file__),
+        "source_release": expected_release,
+        "execution_revision": revision,
         "device": 0,
         "minimum_free_bytes": 16 * 2**30,
     }
@@ -205,6 +246,10 @@ def main():
     parser.add_argument("--recorded-by", required=True)
     parser.add_argument("--diagnostic-receipt", type=Path, required=True)
     parser.add_argument("--diagnostic-sha256", required=True)
+    parser.add_argument("--expected-release", default=RELEASE)
+    parser.add_argument(
+        "--revision", choices=("execution-r1", "execution-r2"), default="execution-r1"
+    )
     args = parser.parse_args()
     if (
         not os.environ.get("JOB_ID", "").isdigit()
@@ -220,8 +265,7 @@ def main():
     ):
         parser.error("valid scheduler allocation, mode inputs and diagnostic required")
     require_cuda_free_parent()
-    if require_clean_repository() != RELEASE:
-        raise ValueError("GPU controller requires the clean frozen 731938a release")
+    source_hashes = execution_binding(args.expected_release, args.revision)
     spec = importlib.util.spec_from_file_location(
         "frozen_gpu_operations", Path.cwd() / "scripts/run_v3_execution.py"
     )
@@ -235,19 +279,29 @@ def main():
     attempt = (
         root / "study-v3/operations" / f"{stamp}-{os.environ['JOB_ID']}-{args.mode}"
     )
-    attempt.mkdir(parents=True, exist_ok=False)
-    output = root / REVISION / "attempts" / attempt.name
-    protocol_path = root / REVISION / "locks/protocol.v3.json"
+    revision = Path("study-v3/revisions") / args.revision
+    output = root / revision / "attempts" / attempt.name
+    protocol_path = root / revision / "locks/protocol.v3.json"
     bundle = Path(os.environ["POSE_EMBED_MANIFEST_SET"]).resolve().parent
+    if args.revision == "execution-r2" and bundle != root / revision / "manifests":
+        raise ValueError("successor controller requires its own manifest bundle")
     environment = os.environ | {
         "POSE_EMBED_V3_PROTOCOL": str(protocol_path),
         "POSE_EMBED_V3_ATTEMPT": str(output),
     }
     if args.cache_dir:
         args.cache_dir = args.cache_dir.resolve()
+        if args.revision == "execution-r2":
+            require_path_within(
+                args.cache_dir, root / revision, label="successor caches"
+            )
         environment["POSE_EMBED_V3_CACHES"] = str(args.cache_dir)
     if args.pilot_dirs:
         args.pilot_dirs = [p.resolve() for p in args.pilot_dirs]
+        if args.revision == "execution-r2":
+            for path in args.pilot_dirs:
+                require_path_within(path, root / revision, label="successor pilot")
+    attempt.mkdir(parents=True, exist_ok=False)
     print(f"V3_OPERATION_ATTEMPT={attempt}", flush=True)
     write_immutable_json(
         attempt / "attempt.json",
@@ -262,7 +316,9 @@ def main():
                 else None,
                 "diagnostic_receipt": str(args.diagnostic_receipt),
             },
-            "release_sha": RELEASE,
+            "release_sha": args.expected_release,
+            "execution_revision": args.revision,
+            "execution_sources_sha256": source_hashes,
             "launcher_sha256": launcher_sha256,
             "frozen_operations_sha256": sha256_file("scripts/run_v3_execution.py"),
             "output_directory": str(output),
@@ -281,7 +337,12 @@ def main():
                 operations.require_dataset_unopened(require_registry=True)
                 require_v3_design(load_protocol(protocol_path))
                 diagnostic = validate_diagnostic(
-                    root, args.diagnostic_receipt, args.diagnostic_sha256
+                    root,
+                    args.diagnostic_receipt,
+                    args.diagnostic_sha256,
+                    expected_release=args.expected_release,
+                    revision=args.revision,
+                    source_hashes=source_hashes,
                 )
                 write_immutable_json(attempt / "diagnostic-binding.json", diagnostic)
                 write_immutable_json(
@@ -332,7 +393,8 @@ def main():
                     for position, command in enumerate(commands):
                         require_cuda_free_parent()
                         if (
-                            require_clean_repository() != RELEASE
+                            execution_binding(args.expected_release, args.revision)
+                            != source_hashes
                             or sha256_file(__file__) != launcher_sha256
                         ):
                             raise ValueError(
@@ -340,7 +402,12 @@ def main():
                             )
                         if position == 0 or position >= 2:
                             validate_diagnostic(
-                                root, args.diagnostic_receipt, args.diagnostic_sha256
+                                root,
+                                args.diagnostic_receipt,
+                                args.diagnostic_sha256,
+                                expected_release=args.expected_release,
+                                revision=args.revision,
+                                source_hashes=source_hashes,
                             )
                             gpu_record = (
                                 attempt / "gpu-preflights" / f"{index:03d}.json"
@@ -351,6 +418,10 @@ def main():
                                     str(Path(__file__).resolve()),
                                     "--gpu-preflight-output",
                                     str(gpu_record),
+                                    "--expected-release",
+                                    args.expected_release,
+                                    "--revision",
+                                    args.revision,
                                 ],
                                 attempt,
                                 index,
@@ -363,6 +434,9 @@ def main():
                             if (
                                 observed.get("status") != "passed"
                                 or observed.get("controller_sha256") != launcher_sha256
+                                or observed.get("source_release")
+                                != args.expected_release
+                                or observed.get("execution_revision") != args.revision
                             ):
                                 raise ValueError("GPU preflight did not pass")
                             if position == 0:
@@ -381,12 +455,18 @@ def main():
                         require_cuda_free_parent()
                         index += 1
                     if (
-                        require_clean_repository() != RELEASE
+                        execution_binding(args.expected_release, args.revision)
+                        != source_hashes
                         or sha256_file(__file__) != launcher_sha256
                     ):
                         raise ValueError("release changed during GPU work")
                     validate_diagnostic(
-                        root, args.diagnostic_receipt, args.diagnostic_sha256
+                        root,
+                        args.diagnostic_receipt,
+                        args.diagnostic_sha256,
+                        expected_release=args.expected_release,
+                        revision=args.revision,
+                        source_hashes=source_hashes,
                     )
                 finally:
                     seal = {"recorded_at": datetime.now(UTC).isoformat()}
@@ -430,7 +510,20 @@ def main():
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) == 3 and sys.argv[1] == "--gpu-preflight-output":
-        gpu_preflight(Path(sys.argv[2]))
+    if len(sys.argv) >= 3 and sys.argv[1] == "--gpu-preflight-output":
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--gpu-preflight-output", type=Path, required=True)
+        parser.add_argument("--expected-release", default=RELEASE)
+        parser.add_argument(
+            "--revision",
+            choices=("execution-r1", "execution-r2"),
+            default="execution-r1",
+        )
+        options = parser.parse_args()
+        gpu_preflight(
+            options.gpu_preflight_output,
+            expected_release=options.expected_release,
+            revision=options.revision,
+        )
     else:
         main()

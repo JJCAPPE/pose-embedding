@@ -26,6 +26,12 @@ from pose_embed.motionbert_inputs import require_clean_repository
 from pose_embed.provenance import require_path_within, sha256_file, write_immutable_json
 
 RELEASE = "731938a157be575ee433d6939876f8ca0b95e459"
+EXECUTION_SOURCES = (
+    "scripts/operations/week5_gpu_controller.py",
+    "scripts/operations/week5_gpu_context_diagnostic.py",
+    "scripts/operations/week5_gpu.qsub",
+    "scripts/run_v3_execution.py",
+)
 REMAINING_PEAK_BYTES = 84_000_000_000
 GPU_QUERY = [
     "nvidia-smi",
@@ -41,6 +47,22 @@ PROCESS_QUERY = [
 
 def read(path):
     return json.loads(Path(path).read_text())
+
+
+def execution_binding(expected_release, revision):
+    if (
+        re.fullmatch(r"[0-9a-f]{40}", expected_release) is None
+        or revision not in {"execution-r1", "execution-r2"}
+        or (revision == "execution-r1") != (expected_release == RELEASE)
+        or require_clean_repository() != expected_release
+    ):
+        raise ValueError("diagnostic requires its clean full release and revision")
+    if revision == "execution-r1":
+        return {}
+    sources = {name: sha256_file(name) for name in EXECUTION_SOURCES}
+    if sha256_file(__file__) != sources[EXECUTION_SOURCES[1]]:
+        raise ValueError("successor diagnostic differs from its tracked release")
+    return sources
 
 
 def resource_record(output, label, operations, root, process_group=None):
@@ -177,7 +199,7 @@ def require_cpu_parent():
         raise ValueError("diagnostic coordinator must never initialize CUDA")
 
 
-def worker(role, output):
+def worker(role, output, *, expected_release=RELEASE, revision="execution-r1"):
     from pose_embed.models.motionbert import configure_deterministic_inference
 
     result = {
@@ -186,6 +208,8 @@ def worker(role, output):
         "started_at": datetime.now(UTC).isoformat(),
         "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
         "script_sha256": sha256_file(__file__),
+        "source_release": expected_release,
+        "execution_revision": revision,
         "scientific_use_allowed": False,
     }
     try:
@@ -222,7 +246,7 @@ def worker(role, output):
     return 0 if result["status"] == "passed" else 1
 
 
-def launch(output, role):
+def launch(output, role, *, expected_release=RELEASE, revision="execution-r1"):
     command = [
         sys.executable,
         str(Path(__file__).resolve()),
@@ -230,6 +254,10 @@ def launch(output, role):
         role,
         "--output-dir",
         str(output),
+        "--expected-release",
+        expected_release,
+        "--revision",
+        revision,
     ]
     write_immutable_json(output / f"{role}-command.json", {"argv": command})
     with (output / f"{role}.log").open("xb") as log:
@@ -244,8 +272,10 @@ def launch(output, role):
         )
 
 
-def run_probe(output, role, operations, root):
-    process = launch(output, role)
+def run_probe(
+    output, role, operations, root, *, expected_release=RELEASE, revision="execution-r1"
+):
+    process = launch(output, role, expected_release=expected_release, revision=revision)
     try:
         resource_record(output, role + "-running", operations, root, process.pid)
         status = process.wait(timeout=60)
@@ -267,6 +297,9 @@ def main():
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--expected-release", default=RELEASE)
     parser.add_argument(
+        "--revision", choices=("execution-r1", "execution-r2"), default="execution-r1"
+    )
+    parser.add_argument(
         "--worker", choices=("holder", "held-probe", "sequential-1", "sequential-2")
     )
     args = parser.parse_args()
@@ -276,15 +309,21 @@ def main():
         or not os.environ.get("TMPDIR")
     ):
         parser.error("valid four-slot scheduler allocation required")
-    if args.worker:
-        raise SystemExit(worker(args.worker, args.output_dir))
     require_cpu_parent()
-    if args.expected_release != RELEASE or require_clean_repository() != RELEASE:
-        raise ValueError("diagnostic requires the clean frozen 731938a release")
+    source_hashes = execution_binding(args.expected_release, args.revision)
     root = canonical_artifact_root()
     output = require_path_within(
         args.output_dir, root / "study-v3/operations", label="synthetic GPU diagnostic"
     )
+    if args.worker:
+        raise SystemExit(
+            worker(
+                args.worker,
+                output,
+                expected_release=args.expected_release,
+                revision=args.revision,
+            )
+        )
     output.mkdir(parents=True, exist_ok=False)
     spec = importlib.util.spec_from_file_location(
         "frozen_diagnostic_operations", Path.cwd() / "scripts/run_v3_execution.py"
@@ -297,7 +336,9 @@ def main():
         "kind": "exclusive_process_cuda_diagnostic",
         "status": "failed",
         "scientific_use_allowed": False,
-        "source_release": RELEASE,
+        "source_release": args.expected_release,
+        "execution_revision": args.revision,
+        "execution_sources_sha256": source_hashes,
         "script_sha256": sha256_file(__file__),
         "job_id": os.environ["JOB_ID"],
         "parent_pid": os.getpid(),
@@ -328,7 +369,12 @@ def main():
                         "allocated GPU is occupied; no process interrupted"
                     )
                 require_cpu_parent()
-                holder = launch(output, "holder")
+                holder = launch(
+                    output,
+                    "holder",
+                    expected_release=args.expected_release,
+                    revision=args.revision,
+                )
                 try:
                     deadline = time.monotonic() + 60
                     ready = output / "holder-ready.json"
@@ -351,7 +397,14 @@ def main():
                             "driver evidence does not identify only the owned holder"
                         )
                     require_cpu_parent()
-                    rejected, status = run_probe(output, "held-probe", operations, root)
+                    rejected, status = run_probe(
+                        output,
+                        "held-probe",
+                        operations,
+                        root,
+                        expected_release=args.expected_release,
+                        revision=args.revision,
+                    )
                     if (
                         not busy_rejection(rejected, status)
                         or holder.poll() is not None
@@ -378,7 +431,12 @@ def main():
                 require_cpu_parent()
                 for index in (1, 2):
                     result, status = run_probe(
-                        output, f"sequential-{index}", operations, root
+                        output,
+                        f"sequential-{index}",
+                        operations,
+                        root,
+                        expected_release=args.expected_release,
+                        revision=args.revision,
                     )
                     if (
                         status != 0
@@ -392,7 +450,8 @@ def main():
                     snapshot(output, f"sequential-{index}-finished", operations, root)
                     require_cpu_parent()
                 if (
-                    require_clean_repository() != RELEASE
+                    execution_binding(args.expected_release, args.revision)
+                    != source_hashes
                     or sha256_file(__file__) != summary["script_sha256"]
                 ):
                     raise ValueError("release changed during diagnostic")

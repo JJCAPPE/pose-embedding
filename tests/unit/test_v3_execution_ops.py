@@ -19,6 +19,63 @@ def load_script(repository_root, name):
     return module
 
 
+def test_successor_preparation_dispatches_declared_revision(monkeypatch):
+    from pose_embed.v3_commands import run_preparation_command
+
+    received = {}
+    monkeypatch.setattr(
+        "pose_embed.revision_v3.prepare_execution_revision",
+        lambda **kwargs: received.update(kwargs),
+    )
+    args = _parser().parse_args(
+        [
+            "study-v3",
+            "prepare-execution",
+            "--revision",
+            "execution-r2",
+            "--historical-manifest-set",
+            "original.json",
+            "--recorded-by",
+            "fixture",
+        ]
+    )
+    run_preparation_command(args)
+    assert received == {
+        "revision": "execution-r2",
+        "historical_manifest_set": "original.json",
+        "recorded_by": "fixture",
+    }
+
+
+def test_successor_gpu_convenience_path_refuses_before_resource_access(
+    repository_root, monkeypatch, capsys
+):
+    import sys
+
+    operations = load_script(repository_root, "run_v3_execution")
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_v3_execution",
+            "caches",
+            "--revision",
+            "execution-r2",
+            "--remaining-peak-bytes",
+            "0",
+            "--recorded-by",
+            "fixture",
+        ],
+    )
+    monkeypatch.setattr(
+        operations, "resource_snapshot", lambda *a, **k: pytest.fail("resource access")
+    )
+    with pytest.raises(SystemExit) as error:
+        operations.main()
+    assert error.value.code == 2
+    assert "reviewed CUDA-free controller" in capsys.readouterr().err
+
+
 def test_rehearsal_unsets_real_roots_and_retains_fresh_fixtures(
     repository_root, tmp_path
 ):
@@ -36,6 +93,9 @@ def test_rehearsal_unsets_real_roots_and_retains_fresh_fixtures(
         tmp_path / "rehearsal.junit.xml"
     )
     assert {item for item in command if item.endswith(".py")} == {
+        "tests/unit/test_validation_proofs.py",
+        "tests/unit/test_execution_revision_v3.py",
+        "tests/unit/test_campaign_v3.py",
         "tests/unit/test_rehearsal_v3.py",
         "tests/unit/test_final_bindings_v3.py",
         "tests/unit/test_opening_faults_v3.py",
@@ -160,3 +220,54 @@ def test_monitor_failure_terminates_whole_child_group_and_preserves_evidence(
     assert (tmp_path / "resources/000-0000.json").is_file()
     assert (tmp_path / "command-000.log").is_file()
     assert (tmp_path / "commands/000-outcome.json").is_file()
+
+
+def test_successor_geometry_launch_uses_authorized_lock_descendant(
+    repository_root, tmp_path, monkeypatch
+):
+    import json
+    import sys
+
+    operations = load_script(repository_root, "run_v3_execution")
+    revision = tmp_path / "study-v3/revisions/execution-r2"
+    monkeypatch.setenv("JOB_ID", "123")
+    monkeypatch.setenv("TMPDIR", str(tmp_path))
+    monkeypatch.setenv(
+        "POSE_EMBED_MANIFEST_SET", str(revision / "manifests/manifest-set.json")
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_v3_execution",
+            "geometry",
+            "--revision",
+            "execution-r2",
+            "--remaining-peak-bytes",
+            "0",
+            "--recorded-by",
+            "fixture",
+        ],
+    )
+    monkeypatch.setattr(operations, "canonical_artifact_root", lambda: tmp_path)
+    monkeypatch.setattr(operations, "require_clean_repository", lambda: "a" * 40)
+    monkeypatch.setattr(operations, "require_dataset_unopened", lambda **k: None)
+    monkeypatch.setattr(operations, "load_protocol", lambda p: None)
+    monkeypatch.setattr(operations, "require_v3_design", lambda p: None)
+    monkeypatch.setattr(
+        operations,
+        "resource_snapshot",
+        lambda *a: {"storage_passed": True, "host_memory_passed": True},
+    )
+    commands = []
+    monkeypatch.setattr(
+        operations, "run_command", lambda command, *a: commands.append(command)
+    )
+    operations.main()
+    geometry = commands[-1]
+    destination = Path(geometry[geometry.index("--output-dir") + 1])
+    assert destination.parent == revision / "locks/geometry"
+    attempt = next((tmp_path / "study-v3/operations").glob("*-123-geometry"))
+    record = json.loads((attempt / "attempt.json").read_text())
+    assert record["output_directory"] == str(destination)
+    assert record["execution_revision"] == "execution-r2"

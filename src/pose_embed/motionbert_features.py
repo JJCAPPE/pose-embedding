@@ -42,6 +42,7 @@ from pose_embed.provenance import (
     sha256_file,
     write_immutable_json,
 )
+from pose_embed.validation_proofs import validation_command, verify_validation_proofs
 
 
 def validate_selected_manifest(
@@ -109,7 +110,11 @@ def validate_selected_manifest(
 def extraction_condition(protocol, *, role, split, family, severity) -> str:
     if split.startswith("novel") and (
         protocol.protocol_id != "protocol-v3"
-        or "execution-r1" not in protocol.test_access.design_lock_relative_path
+        or protocol.test_access.design_lock_relative_path
+        not in {
+            "study-v3/revisions/execution-r1/locks/design-lock.v3.json",
+            "study-v3/revisions/execution-r2/locks/design-lock.v3.json",
+        }
     ):
         raise ValueError(
             "novel extraction requires the complete final v3 authorization"
@@ -353,6 +358,7 @@ def _extract_motionbert_features(
             timings["pooling"] += time.perf_counter() - tick
     tick = time.perf_counter()
     sample_ids = tuple(row.sample_id for row in records)
+    verify_validation_proofs()
     write_feature_npz(
         destination,
         features,
@@ -491,6 +497,7 @@ def _extract_motionbert_features(
     )
     provenance["ended_at"] = datetime.now(UTC).isoformat()
     sidecar = sidecar.model_copy(update={"provenance": provenance})
+    verify_validation_proofs()
     write_immutable_json(sidecar_path_for(destination), sidecar.model_dump(mode="json"))
     return {
         "artifact": str(destination),
@@ -501,6 +508,7 @@ def _extract_motionbert_features(
     }
 
 
+@validation_command()
 @functools.wraps(_extract_motionbert_features)
 def extract_motionbert_features(*args, **kwargs):
     if str(kwargs.get("split", "")).startswith("novel"):
@@ -564,7 +572,11 @@ def validate_motionbert_cache(
         _validate_jitter_fallback_provenance(sidecar, protocol)
     if (
         protocol.protocol_id == "protocol-v3"
-        and "execution-r1" in protocol.test_access.resolved_protocol_relative_path
+        and protocol.test_access.resolved_protocol_relative_path
+        in {
+            "study-v3/revisions/execution-r1/locks/protocol.v3.json",
+            "study-v3/revisions/execution-r2/locks/protocol.v3.json",
+        }
         and sidecar.condition != "clean"
     ):
         from pose_embed.geometry_v3 import summarize_geometry

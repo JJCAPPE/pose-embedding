@@ -22,6 +22,7 @@ LEGACY_OPENINGS = (
     "benchmark-v2/locks/test-opening.json",
     "study-v3/locks/test-opening.v3.json",
     "study-v3/revisions/execution-r1/locks/test-opening.v3.json",
+    "study-v3/revisions/execution-r2/locks/test-opening.v3.json",
 )
 
 

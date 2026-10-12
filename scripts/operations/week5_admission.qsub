@@ -5,11 +5,14 @@
 #$ -l h_rt=12:00:00
 #$ -pe omp 4
 #$ -l mem_per_core=8G
+#$ -l no_gpu=TRUE
 #$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,POSE_EMBED_MANIFEST_SET
 # Pass the transferred wrapper path first, followed by its arguments.
 # Submit with -o pointing to the canonical artifact logs directory.
 set -euo pipefail
 umask 077
+unset PYTHONOPTIMIZE
+export PYTHONDONTWRITEBYTECODE=1
 : "${JOB_ID:?Submit through Grid Engine}"
 : "${TMPDIR:?Scheduler temporary directory required}"
 [[ ${NSLOTS:-0} == 4 ]] || { printf 'Exactly four CPU slots required.\n' >&2; exit 2; }

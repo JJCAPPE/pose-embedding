@@ -30,19 +30,22 @@ def capacity(tmp_path):
         tmp_path,
         "calendar.json",
         {
+            "schema_version": 2,
             "recorded_at": payload["recorded_at"],
             "recorded_by": "researcher",
             "access": "ordinary_queued_access",
             "reserved": False,
             "windows": [
                 {
-                    "starts_at": f"{day}T12:00:00Z",
-                    "ends_at": f"{day}T16:00:00Z",
+                    "resource_class": resource,
+                    "starts_at": f"{day}T{hour}:00:00Z",
+                    "ends_at": f"{day}T{hour + 4}:00:00Z",
                     "job_wall_limit_seconds": 7200,
                     "queue_allowance_seconds": 3600,
                     "concurrent_scientific_processes": 1,
                 }
                 for day in ("2026-11-01", "2026-11-30")
+                for resource, hour in (("gpu", 12), ("cpu", 16))
             ],
         },
     )
@@ -120,7 +123,11 @@ def test_fresh_capacity_passes_and_archival_validation_never_measures(
     binding = opening.record_opening_capacity(protocol, "a" * 64)
     receipt = json.loads((root / binding.relative_path).read_text())
     assert receipt["status"] == "passed"
-    assert receipt["calendar_summary"]["usable_evaluation_seconds"] == 7200
+    assert receipt["schema_version"] == 2
+    assert receipt["calendar_summary"]["usable_evaluation_seconds_by_resource"] == {
+        "cpu": 10800,
+        "gpu": 7200,
+    }
     assert receipt["calendar_summary"]["confirmed_delivery_hours"] == 10
 
     def forbidden(*args, **kwargs):
@@ -232,6 +239,79 @@ def test_remaining_allocated_wall_time_uses_actual_start_and_slack(tmp_path, cap
     )
 
 
+def _long_cpu_report(tmp_path, capacity):
+    payload = capacity.model_dump(mode="json")
+    payload["maximum_job_seconds_by_resource"]["cpu"] = 60 * 3600
+    payload["remaining_evaluation_seconds_by_resource"]["cpu"] = 60 * 3600
+    calendar = json.loads((tmp_path / "calendar.json").read_text())
+    report_window = calendar["windows"][-1]
+    assert report_window["resource_class"] == "cpu"
+    report_window["ends_at"] = "2026-12-04T16:00:00Z"
+    report_window["job_wall_limit_seconds"] = 96 * 3600
+    payload["allocation_calendar"] = _bind(tmp_path, "calendar.json", calendar)
+    return CapacityReceipt.model_validate(payload)
+
+
+def test_cpu_report_budget_is_preserved_without_inflating_gpu_opening(
+    tmp_path, capacity
+):
+    capacity = _long_cpu_report(tmp_path, capacity)
+    resources = opening._validate_resources(tmp_path, _resources(tmp_path), capacity)
+    assert resources["resource_class"] == "gpu"
+    assert resources["required_job_wall_seconds"] == 75
+    summary = opening._calendar_capacity(
+        tmp_path, capacity, datetime(2026, 11, 30, 13, tzinfo=UTC)
+    )
+    assert summary["required_evaluation_seconds_by_resource"] == {
+        "cpu": 75 * 3600,
+        "gpu": 75,
+    }
+    assert summary["usable_evaluation_seconds_by_resource"] == {
+        "cpu": 95 * 3600,
+        "gpu": 7200,
+    }
+
+
+@pytest.mark.parametrize("resource", ["cpu", "gpu"])
+def test_opening_cannot_borrow_the_other_resource_budget(tmp_path, capacity, resource):
+    capacity = _long_cpu_report(tmp_path, capacity)
+    payload = capacity.model_dump(mode="json")
+    # GPU excess could fit in spare CPU time, but never in its own window.
+    payload["remaining_evaluation_seconds_by_resource"][resource] = (
+        80 * 3600 if resource == "cpu" else 7200
+    )
+    with pytest.raises(ValueError, match="calendar"):
+        opening._calendar_capacity(
+            tmp_path,
+            CapacityReceipt.model_validate(payload),
+            datetime(2026, 11, 30, 13, tzinfo=UTC),
+        )
+
+
+def test_opening_cannot_move_cpu_report_compute_after_december_6(tmp_path, capacity):
+    capacity = _long_cpu_report(tmp_path, capacity)
+    calendar = json.loads((tmp_path / "calendar.json").read_text())
+    calendar["windows"][-1]["starts_at"] = "2026-12-07T00:00:00Z"
+    calendar["windows"][-1]["ends_at"] = "2026-12-11T00:00:00Z"
+    payload = capacity.model_dump(mode="json")
+    payload["allocation_calendar"] = _bind(tmp_path, "calendar.json", calendar)
+    with pytest.raises(ValueError, match="calendar"):
+        opening._calendar_capacity(
+            tmp_path,
+            CapacityReceipt.model_validate(payload),
+            datetime(2026, 11, 30, 13, tzinfo=UTC),
+        )
+
+
+def test_opening_preserves_whole_gpu_job_including_cpu_work(tmp_path, capacity):
+    payload = capacity.model_dump(mode="json")
+    payload["maximum_job_seconds_by_resource"]["gpu"] = 40000
+    with pytest.raises(ValueError, match="remaining scheduler wall time"):
+        opening._validate_resources(
+            tmp_path, _resources(tmp_path), CapacityReceipt.model_validate(payload)
+        )
+
+
 def test_archival_capacity_rejects_changed_hash_and_identity(configured):
     protocol, root = configured
     binding = opening.record_opening_capacity(protocol, "a" * 64)
@@ -248,6 +328,20 @@ def test_archival_capacity_rejects_changed_hash_and_identity(configured):
     )
     with pytest.raises(ValueError, match="GPU VRAM"):
         opening.validate_opening_capacity(protocol, tampered, "a" * 64)
+
+
+def test_archival_opening_receipt_requires_new_schema(configured):
+    protocol, root = configured
+    binding = opening.record_opening_capacity(protocol, "a" * 64)
+    path = root / binding.relative_path
+    payload = json.loads(path.read_text())
+    payload["schema_version"] = 1
+    path.write_text(json.dumps(payload))
+    binding = ArtifactBinding(
+        relative_path=binding.relative_path, sha256=sha256_file(path)
+    )
+    with pytest.raises(ValueError, match="identity"):
+        opening.validate_opening_capacity(protocol, binding, "a" * 64)
 
 
 def test_capture_rejects_login_node_before_running_commands(tmp_path, monkeypatch):

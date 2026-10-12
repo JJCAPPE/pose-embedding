@@ -16,6 +16,7 @@ from pose_embed.gpu_profile import profile_motionbert_gpu
 from pose_embed.protocol import current_code_hashes, verify_protocol
 from pose_embed.report import build_report
 from pose_embed.training import train_head
+from pose_embed.validation_proofs import validation_command
 
 DEFAULT_PROTOCOL = "configs/protocol.v1.yaml"
 
@@ -58,10 +59,13 @@ def _parser() -> argparse.ArgumentParser:
     freeze.add_argument("--manifest-set", required=True)
     freeze.add_argument("--recorded-by", required=True)
     revision = operations.add_parser(
-        "prepare-execution", help="freeze the approved execution-r1 successor"
+        "prepare-execution", help="freeze a declared execution successor"
     )
     revision.add_argument("--historical-manifest-set", required=True)
     revision.add_argument("--recorded-by", required=True)
+    revision.add_argument(
+        "--revision", choices=("execution-r1", "execution-r2"), default="execution-r1"
+    )
     geometry = operations.add_parser(
         "geometry-panel", help="verify fixed development geometry"
     )
@@ -280,6 +284,7 @@ def _print(payload: object) -> None:
     print(json.dumps(payload, indent=2, sort_keys=True, default=str))
 
 
+@validation_command(fresh=True)
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:

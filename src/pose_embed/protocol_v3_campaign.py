@@ -19,8 +19,11 @@ from pose_embed.protocol_v3 import (
     require_v3_design,
 )
 from pose_embed.provenance import sha256_file, write_immutable_json
+from pose_embed.validation_proofs import verify_validation_proofs
 
 Method = Literal["contrastive", "supcon", "contextual"]
+ResourceClass = Literal["cpu", "gpu"]
+RESOURCE_CLASSES = ("cpu", "gpu")
 CONDITIONS = (
     "coordinate_jitter:0.01",
     "coordinate_jitter:0.025",
@@ -124,6 +127,7 @@ class ResearcherAvailability(StrictModel):
 
 
 class AllocationWindow(StrictModel):
+    resource_class: ResourceClass
     starts_at: datetime
     ends_at: datetime
     job_wall_limit_seconds: int = Field(gt=0)
@@ -145,6 +149,7 @@ class AllocationWindow(StrictModel):
 
 
 class AllocationCalendar(StrictModel):
+    schema_version: Literal[2]
     recorded_at: datetime
     recorded_by: str = Field(min_length=1, pattern=r"\S")
     access: Literal["ordinary_queued_access"]
@@ -164,6 +169,7 @@ class AllocationCalendar(StrictModel):
 
 
 class CapacityReceipt(AdmissionReceipt):
+    schema_version: Literal[2]
     filesystem_free_bytes: int = Field(ge=0)
     quota_remaining_bytes: int = Field(ge=0)
     remaining_peak_bytes: int = Field(ge=0)
@@ -178,18 +184,35 @@ class CapacityReceipt(AdmissionReceipt):
     peak_gpu_bytes: int = Field(gt=0)
     host_memory_limit_bytes: int = Field(gt=0)
     gpu_memory_limit_bytes: int = Field(gt=0)
-    maximum_job_seconds: float = Field(gt=0, allow_inf_nan=False)
+    # Classify complete allocation wall time, including its CPU and I/O stages.
+    maximum_job_seconds_by_resource: dict[ResourceClass, float]
     retained_bytes: int = Field(gt=0)
     full_size_resident_rows: Literal[95001]
     timing_optimization_actions: Literal[80]
-    remaining_preopening_seconds: float = Field(gt=0, allow_inf_nan=False)
-    remaining_evaluation_seconds: float = Field(gt=0, allow_inf_nan=False)
+    remaining_preopening_seconds_by_resource: dict[ResourceClass, float]
+    remaining_evaluation_seconds_by_resource: dict[ResourceClass, float]
     researcher_work_hours: dict[str, float]
 
     @model_validator(mode="after")
     def feasible(self) -> CapacityReceipt:
         import math
 
+        for name in (
+            "maximum_job_seconds_by_resource",
+            "remaining_preopening_seconds_by_resource",
+            "remaining_evaluation_seconds_by_resource",
+        ):
+            seconds = getattr(self, name)
+            if set(seconds) != set(RESOURCE_CLASSES) or any(
+                not math.isfinite(value) or value < 0 for value in seconds.values()
+            ):
+                raise ValueError("capacity requires finite CPU and GPU job budgets")
+            if name == "maximum_job_seconds_by_resource" and any(
+                value <= 0 for value in seconds.values()
+            ):
+                raise ValueError("CPU and GPU maximum job durations must be positive")
+            if sum(seconds.values()) <= 0:
+                raise ValueError("each remaining phase requires a positive job budget")
         if (
             self.peak_host_bytes > self.host_memory_limit_bytes
             or self.peak_gpu_bytes > self.gpu_memory_limit_bytes
@@ -358,17 +381,18 @@ def _validate_capacity_availability(root, capacity, *, as_of=None):
         or availability.recorded_at > capacity.recorded_at
     ):
         raise ValueError("capacity predates its allocation or researcher evidence")
-    preopening = 0.0
-    evaluation = 0.0
+    preopening = dict.fromkeys(RESOURCE_CLASSES, 0.0)
+    evaluation = dict.fromkeys(RESOURCE_CLASSES, 0.0)
     for window in calendar.windows:
         if window.starts_at < as_of:
             raise ValueError("remaining capacity cannot count a past allocation window")
         seconds = (
             window.ends_at - window.starts_at
         ).total_seconds() - window.queue_allowance_seconds
-        if capacity.compute_slack * capacity.maximum_job_seconds > min(
-            window.job_wall_limit_seconds, seconds
-        ):
+        resource = window.resource_class
+        if capacity.compute_slack * capacity.maximum_job_seconds_by_resource[
+            resource
+        ] > min(window.job_wall_limit_seconds, seconds):
             raise ValueError(
                 "complete measured jobs do not fit usable allocation windows "
                 "and scheduler wall limits"
@@ -376,15 +400,19 @@ def _validate_capacity_availability(root, capacity, *, as_of=None):
         start_date = window.starts_at.astimezone(project_timezone).date()
         end_date = window.ends_at.astimezone(project_timezone).date()
         if end_date <= capacity.final_lock_date:
-            preopening += seconds
+            preopening[resource] += seconds
         elif (
             start_date > capacity.final_lock_date
             and end_date <= capacity.novel_completion_date
         ):
-            evaluation += seconds
-    if (
-        preopening < capacity.compute_slack * capacity.remaining_preopening_seconds
-        or evaluation < capacity.compute_slack * capacity.remaining_evaluation_seconds
+            evaluation[resource] += seconds
+    if any(
+        available[resource] < capacity.compute_slack * required[resource]
+        for available, required in (
+            (preopening, capacity.remaining_preopening_seconds_by_resource),
+            (evaluation, capacity.remaining_evaluation_seconds_by_resource),
+        )
+        for resource in RESOURCE_CLASSES
     ):
         raise ValueError("dated allocation windows do not fit remaining work and slack")
     recorded_date = as_of.astimezone(project_timezone).date()
@@ -604,6 +632,7 @@ def record_selection_authorization(
             resolve_scientific_paths(protocol).root
             / protocol.test_access.selection_authorization_relative_path
         )
+        verify_validation_proofs()
         write_immutable_json(path, authorization.model_dump(mode="json"))
     return authorization
 
@@ -830,6 +859,7 @@ def create_selected_configs(protocol, ledger: ArtifactBinding, *, recorded_by: s
             candidates=candidates,
             selected_rates=rates,
         )
+        verify_validation_proofs()
         write_immutable_json(
             selected_configs_path(protocol), selected.model_dump(mode="json")
         )

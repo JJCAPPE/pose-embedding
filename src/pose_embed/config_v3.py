@@ -350,6 +350,7 @@ class V3TestAccess(StrictModel):
         if parent not in {
             "study-v3/locks",
             "study-v3/revisions/execution-r1/locks",
+            "study-v3/revisions/execution-r2/locks",
         } or any(
             getattr(self, f"{field}_relative_path") != f"{parent}/{filename}"
             for field, filename in filenames.items()

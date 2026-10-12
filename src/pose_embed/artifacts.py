@@ -17,6 +17,11 @@ from pose_embed.config import ExperimentConfig, ProtocolConfig
 from pose_embed.data.manifest import Split, load_manifest
 from pose_embed.protocol import protocol_digest, resolve_scientific_paths
 from pose_embed.provenance import require_path_within, sha256_file
+from pose_embed.validation_proofs import (
+    check_numerical_proof,
+    proof_reuse_allowed,
+    proof_source_bindings,
+)
 
 FeatureRole = Literal["training", "gallery_clean", "query_clean", "query_corrupted"]
 FeatureBackend = Literal["fixture", "motionbert"]
@@ -401,20 +406,52 @@ def validate_feature_artifact(
             or not torch.isfinite(bias).all()
         ):
             raise ValueError("trained feature head state is invalid")
-        with torch.no_grad():
-            expected_embeddings = functional.normalize(
-                functional.linear(
-                    torch.as_tensor(base_array, dtype=torch.float32),
-                    weight.to(dtype=torch.float32),
-                    bias.to(dtype=torch.float32),
-                ),
-                dim=-1,
-            ).numpy()
-        if not np.array_equal(artifact_array, expected_embeddings):
-            raise ValueError(
-                "trained embeddings differ from deterministic head application"
-            )
+        files = {
+            **base_sidecar.provenance.get("inputs", {}),
+            **provenance_inputs,
+            str(artifact): sidecar.artifact_sha256,
+            str(sidecar_path_for(artifact)): sha256_file(sidecar_path_for(artifact)),
+            str(manifest): sidecar.manifest_sha256,
+            str(Path(__file__)): sha256_file(__file__),
+            # Frozen expectations take precedence over observed/provenance hashes.
+            **proof_source_bindings(
+                protocol, scientific_use_allowed=sidecar.scientific_use_allowed
+            ),
+        }
+        check_numerical_proof(
+            "trained-feature-projection-v1",
+            enabled=proof_reuse_allowed(
+                protocol, scientific_use_allowed=sidecar.scientific_use_allowed
+            ),
+            files=files,
+            metadata={
+                "protocol": protocol.model_dump(mode="json"),
+                "allow_fixture": allow_fixture,
+                "sidecar": sidecar.model_dump(mode="json"),
+                "base_sidecar": base_sidecar.model_dump(mode="json"),
+                "config": config.model_dump(mode="json"),
+            },
+            check=lambda: _validate_head_projection(
+                base_array, artifact_array, weight, bias
+            ),
+        )
     return sidecar
+
+
+def _validate_head_projection(base_array, artifact_array, weight, bias) -> None:
+    with torch.no_grad():
+        expected_embeddings = functional.normalize(
+            functional.linear(
+                torch.as_tensor(base_array, dtype=torch.float32),
+                weight.to(dtype=torch.float32),
+                bias.to(dtype=torch.float32),
+            ),
+            dim=-1,
+        ).numpy()
+    if not np.array_equal(artifact_array, expected_embeddings):
+        raise ValueError(
+            "trained embeddings differ from deterministic head application"
+        )
 
 
 def validate_stretch_gate_evidence(

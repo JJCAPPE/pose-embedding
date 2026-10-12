@@ -114,15 +114,32 @@ def test_candidate_path_is_new_and_command_only_runs_assembler(wrapper, tmp_path
         wrapper.candidate_directory(root, attempt)
 
 
+@pytest.mark.parametrize("revision", ["execution-r1", "execution-r2"])
 @pytest.mark.parametrize("fault", [None, "child_failure", "input_change", "signal"])
 def test_wrapper_preserves_attempts_locks_seals_and_never_publishes(
-    wrapper, tmp_path, monkeypatch, fault
+    wrapper, tmp_path, monkeypatch, fault, revision
 ):
     # Scientific validator seams are replaced only here; the fake child emits
     # an explicitly fixture-only candidate inside this temporary test root.
     root = tmp_path.resolve()
     assembler, source = inputs(wrapper, root, monkeypatch)
-    canonical = root / wrapper.REVISION / "locks/selection-authorization.v3.json"
+    release = wrapper.RELEASE if revision == "execution-r1" else "a" * 40
+    value = wrapper.read(source)
+    value.update(release_sha=release)
+    if revision == "execution-r2":
+        value["execution_revision"] = revision
+    save(source, value)
+    source_hashes = (
+        {path: wrapper.sha256_file(path) for path in wrapper.EXECUTION_SOURCES}
+        if revision == "execution-r2"
+        else {}
+    )
+    if source_hashes:
+        source_hashes[wrapper.EXECUTION_SOURCES[1]] = wrapper.sha256_file(assembler)
+    monkeypatch.setattr(wrapper, "execution_binding", lambda *_: source_hashes)
+    canonical = (
+        root / "study-v3/revisions" / revision / "locks/selection-authorization.v3.json"
+    )
     protocol = SimpleNamespace(
         test_access=SimpleNamespace(
             selection_authorization_relative_path=str(canonical.relative_to(root)),
@@ -190,6 +207,8 @@ def test_wrapper_preserves_attempts_locks_seals_and_never_publishes(
             attempt / "inputs.json",
             Path(command[command.index("--output-dir") + 1]),
             "fixture",
+            expected_release=release,
+            revision=revision,
         )
         if fault == "child_failure":
             raise RuntimeError("fixture child failed")
@@ -238,6 +257,10 @@ def test_wrapper_preserves_attempts_locks_seals_and_never_publishes(
             "10",
             "--recorded-by",
             "fixture",
+            "--expected-release",
+            release,
+            "--revision",
+            revision,
         ],
     )
     if fault:
@@ -330,3 +353,96 @@ def test_wrapper_holds_gpu_diagnostic_and_probe_bindings(
     observed.write_text("changed")
     with pytest.raises(ValueError, match="changed"):
         wrapper.verify_bindings(root, records)
+
+
+@pytest.mark.parametrize("fault", [None, "release", "legacy", "short_sha", "self"])
+def test_successor_controller_requires_clean_tracked_full_release(
+    wrapper, monkeypatch, fault
+):
+    release = "a" * 40
+    monkeypatch.setattr(wrapper, "require_clean_repository", lambda: release)
+    if fault == "self":
+        monkeypatch.setattr(wrapper, "__file__", "pyproject.toml")
+    supplied = {
+        "release": "b" * 40,
+        "legacy": wrapper.RELEASE,
+        "short_sha": "abcdef0",
+    }.get(fault, release)
+    if fault:
+        with pytest.raises(ValueError, match="release"):
+            wrapper.execution_binding(supplied, "execution-r2")
+    else:
+        assert wrapper.execution_binding(supplied, "execution-r2") == {
+            path: wrapper.sha256_file(path) for path in wrapper.EXECUTION_SOURCES
+        }
+
+
+@pytest.mark.parametrize(
+    "fault", [None, "old_revision", "old_release", "changed_assembler"]
+)
+def test_successor_inputs_require_same_revision_and_tracked_assembler(
+    wrapper, tmp_path, monkeypatch, fault
+):
+    root = tmp_path.resolve()
+    assembler, source = inputs(wrapper, root, monkeypatch)
+    value = wrapper.read(source) | {
+        "release_sha": "a" * 40,
+        "execution_revision": "execution-r2",
+    }
+    if fault == "old_revision":
+        value.pop("execution_revision")
+    elif fault == "old_release":
+        value["release_sha"] = wrapper.RELEASE
+    save(source, value)
+    arguments = dict(
+        expected_release="a" * 40,
+        revision="execution-r2",
+        assembler_sha=wrapper.sha256_file(assembler),
+    )
+    if fault == "changed_assembler":
+        assembler.write_text("changed")
+    if fault:
+        with pytest.raises(ValueError):
+            wrapper.input_bindings(
+                root, source, assembler, wrapper.sha256_file(source), 10, **arguments
+            )
+    else:
+        records = wrapper.input_bindings(
+            root, source, assembler, wrapper.sha256_file(source), 10, **arguments
+        )
+        wrapper.verify_bindings(root, records)
+
+
+def test_cpu_qsub_preserves_explicit_revision_and_disables_optimization(tmp_path):
+    script = Path("scripts/operations/week5_admission.qsub").resolve()
+    python = tmp_path / ".venv/bin/python3.11"
+    python.parent.mkdir(parents=True)
+    python.write_text(
+        "#!/usr/bin/env bash\n"
+        "[[ -z ${PYTHONOPTIMIZE+x} && $PYTHONDONTWRITEBYTECODE == 1 ]] || exit 90\n"
+        'printf "%s\\n" "$@"\n'
+    )
+    python.chmod(0o755)
+    arguments = [
+        "controller.py",
+        "--expected-release",
+        "a" * 40,
+        "--revision",
+        "execution-r2",
+    ]
+    result = subprocess.run(
+        ["bash", str(script), *arguments],
+        cwd=tmp_path,
+        env=dict(
+            os.environ,
+            JOB_ID="123",
+            TMPDIR=str(tmp_path),
+            NSLOTS="4",
+            PYTHONOPTIMIZE="1",
+        ),
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    assert result.stdout.splitlines() == arguments
+    assert "#$ -l no_gpu=TRUE" in script.read_text()

@@ -10,19 +10,33 @@
 #$ -l gpu_memory=16G
 #$ -l mem_per_core=8G
 #$ -v POSE_EMBED_DATA_ROOT,POSE_EMBED_ARTIFACT_ROOT,POSE_EMBED_MANIFEST_SET
-# Pass the reviewed transferred controller path first, then its arguments.
+# Optional --expected-release SHA, then reviewed script path and its arguments.
 set -euo pipefail
 umask 077
+unset PYTHONOPTIMIZE
+export PYTHONDONTWRITEBYTECODE=1
 : "${JOB_ID:?Submit through Grid Engine}"
 : "${TMPDIR:?Scheduler temporary directory required}"
 : "${POSE_EMBED_DATA_ROOT:?Licensed root required}"
 : "${POSE_EMBED_ARTIFACT_ROOT:?Canonical artifact root required}"
 : "${POSE_EMBED_MANIFEST_SET:?Manifest bundle required}"
 [[ ${NSLOTS:-0} == 4 ]] || { printf 'Exactly four slots required.\n' >&2; exit 2; }
+expected_release=731938a157be575ee433d6939876f8ca0b95e459
+explicit_release=false
+if [[ ${1:-} == --expected-release ]]; then
+  [[ $# -ge 3 ]] || { printf 'Release SHA and script required.\n' >&2; exit 2; }
+  expected_release=$2
+  explicit_release=true
+  shift 2
+fi
+[[ $expected_release =~ ^[0-9a-f]{40}$ ]] || { printf 'Full release SHA required.\n' >&2; exit 2; }
 [[ $# -gt 0 ]] || { printf 'Controller path and arguments required.\n' >&2; exit 2; }
-[[ -z "$(git status --porcelain)" && "$(git rev-parse HEAD)" == 731938a157be575ee433d6939876f8ca0b95e459 ]] || { printf 'Clean frozen 731938a release required.\n' >&2; exit 2; }
+[[ -z "$(git status --porcelain)" && "$(git rev-parse HEAD)" == "$expected_release" ]] || { printf 'Clean expected release required.\n' >&2; exit 2; }
 export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4
 export CUBLAS_WORKSPACE_CONFIG=:4096:8
 export UV_CACHE_DIR="$TMPDIR/pose-embed-uv-cache" UV_LINK_MODE=copy UV_NO_PROGRESS=1
 uv sync --locked --group dev --python 3.11
+if [[ $explicit_release == true ]]; then
+  exec .venv/bin/python3.11 "$@" --expected-release "$expected_release"
+fi
 exec .venv/bin/python3.11 "$@"

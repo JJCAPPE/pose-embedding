@@ -1,6 +1,6 @@
 """Run the reviewed candidate assembler under the frozen SCC resource monitor.
 
-Submit the companion CPU qsub script from the clean 731938a checkout. This
+Submit the companion CPU qsub script from the clean, explicitly bound release. This
 wrapper does not publish selection authorization. Every child uses the frozen
 60-second process-group monitor and cleanup; inputs and failures are retained.
 """
@@ -30,6 +30,12 @@ from pose_embed.provenance import require_path_within, sha256_file, write_immuta
 RELEASE = "731938a157be575ee433d6939876f8ca0b95e459"
 ASSEMBLER_SHA256 = "0dafefae1eb7c70495f65a17bd6274ac8523c4c700ee2a7ff85f6d0d79bcf7cf"
 REVISION = Path("study-v3/revisions/execution-r1")
+EXECUTION_SOURCES = (
+    "scripts/operations/week5_admission_controller.py",
+    "scripts/operations/week5_admission_assembler.py",
+    "scripts/operations/week5_admission.qsub",
+    "scripts/run_v3_execution.py",
+)
 PARAMETER_FILES = (
     "capacity_measurements",
     "capacity_methodology",
@@ -37,6 +43,22 @@ PARAMETER_FILES = (
     "researcher_availability",
     "researcher_confirmation",
 )
+
+
+def execution_binding(expected_release, revision):
+    if (
+        re.fullmatch(r"[0-9a-f]{40}", expected_release) is None
+        or revision not in {"execution-r1", "execution-r2"}
+        or (revision == "execution-r1") != (expected_release == RELEASE)
+        or require_clean_repository() != expected_release
+    ):
+        raise ValueError("admission requires its clean full release and revision")
+    if revision == "execution-r1":
+        return {}
+    sources = {name: sha256_file(name) for name in EXECUTION_SOURCES}
+    if sha256_file(__file__) != sources[EXECUTION_SOURCES[0]]:
+        raise ValueError("successor controller differs from its tracked release")
+    return sources
 
 
 def read(path):
@@ -50,10 +72,11 @@ def binding(root, path):
     return {"relative_path": str(path.relative_to(root)), "sha256": sha256_file(path)}
 
 
-def candidate_directory(root, attempt):
+def candidate_directory(root, attempt, revision="execution-r1"):
+    namespace = Path("study-v3/revisions") / revision
     destination = require_path_within(
-        root / REVISION / "gates/admission" / attempt.name,
-        root / REVISION,
+        root / namespace / "gates/admission" / attempt.name,
+        root / namespace,
         label="candidate output",
     )
     if destination.exists():
@@ -87,13 +110,25 @@ def validate_cpu_allocation(qstat_xml, qstat_job, *, job_id, hostname):
         raise ValueError("admission requires CPU-only 12h and 8G per core")
 
 
-def input_bindings(root, source, assembler, expected_sha, remaining_peak):
-    if sha256_file(assembler) != ASSEMBLER_SHA256:
+def input_bindings(
+    root,
+    source,
+    assembler,
+    expected_sha,
+    remaining_peak,
+    *,
+    expected_release=RELEASE,
+    revision="execution-r1",
+    assembler_sha=None,
+):
+    if sha256_file(assembler) != (assembler_sha or ASSEMBLER_SHA256):
         raise ValueError("assembler differs from its reviewed SHA256")
     if sha256_file(source) != expected_sha:
         raise ValueError("supplied inputs differ from the reviewed SHA256")
     value = read(source)
-    if value["release_sha"] != RELEASE:
+    if value["release_sha"] != expected_release or (
+        revision == "execution-r2" and value.get("execution_revision") != revision
+    ):
         raise ValueError("supplied inputs refer to another release")
     capacity = read(value["capacity_measurements"])
     peak = capacity["remaining_peak_bytes"]
@@ -132,9 +167,10 @@ def input_bindings(root, source, assembler, expected_sha, remaining_peak):
                 (directory / "commands").glob("[0-9][0-9][0-9].json")
             ):
                 command = read(command_path)["argv"]
-                if len(command) >= 2 and command[-2] == "--gpu-preflight-output":
+                if "--gpu-preflight-output" in command:
+                    index = command.index("--gpu-preflight-output")
                     preflight = require_path_within(
-                        command[-1],
+                        command[index + 1],
                         directory / "gpu-preflights",
                         label="GPU preflight input",
                     )
@@ -148,8 +184,16 @@ def verify_bindings(root, records):
             raise ValueError("bound operational input changed during assembly")
 
 
-def assembler_command(assembler, inputs, output, recorded_by):
-    return [
+def assembler_command(
+    assembler,
+    inputs,
+    output,
+    recorded_by,
+    *,
+    expected_release=RELEASE,
+    revision="execution-r1",
+):
+    command = [
         ".venv/bin/python3.11",
         str(assembler),
         "--inputs",
@@ -159,6 +203,9 @@ def assembler_command(assembler, inputs, output, recorded_by):
         "--recorded-by",
         recorded_by,
     ]
+    if revision != "execution-r1":
+        command += ["--expected-release", expected_release, "--revision", revision]
+    return command
 
 
 def main():
@@ -168,6 +215,10 @@ def main():
     parser.add_argument("--inputs-sha256", required=True)
     parser.add_argument("--remaining-peak-bytes", type=int, required=True)
     parser.add_argument("--recorded-by", required=True)
+    parser.add_argument("--expected-release", default=RELEASE)
+    parser.add_argument(
+        "--revision", choices=("execution-r1", "execution-r2"), default="execution-r1"
+    )
     args = parser.parse_args()
     if (
         not os.environ.get("JOB_ID", "").isdecimal()
@@ -180,10 +231,9 @@ def main():
         parser.error(
             "valid four-slot scheduler job, input SHA and byte forecast required"
         )
-    if require_clean_repository() != RELEASE:
-        raise ValueError(
-            "admission wrapper requires the clean reviewed 731938a release"
-        )
+    source_hashes = execution_binding(args.expected_release, args.revision)
+    assembler_sha = source_hashes.get(EXECUTION_SOURCES[1], ASSEMBLER_SHA256)
+    revision = Path("study-v3/revisions") / args.revision
     repository = Path.cwd().resolve()
     spec = importlib.util.spec_from_file_location(
         "frozen_admission_operations", repository / "scripts/run_v3_execution.py"
@@ -202,12 +252,14 @@ def main():
         {
             "mode": "admission-candidate",
             "started_at": datetime.now(UTC).isoformat(),
-            "release_sha": RELEASE,
+            "release_sha": args.expected_release,
+            "execution_revision": args.revision,
+            "execution_sources_sha256": source_hashes,
             "launcher_sha256": sha256_file(__file__),
             "frozen_operations_sha256": sha256_file(
                 repository / "scripts/run_v3_execution.py"
             ),
-            "expected_assembler_sha256": ASSEMBLER_SHA256,
+            "expected_assembler_sha256": assembler_sha,
             "expected_inputs_sha256": args.inputs_sha256,
             "remaining_peak_bytes": args.remaining_peak_bytes,
             "recorded_by": args.recorded_by,
@@ -221,7 +273,7 @@ def main():
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             with dataset_access():
                 operations.require_dataset_unopened(require_registry=True)
-                protocol_path = root / REVISION / "locks/protocol.v3.json"
+                protocol_path = root / revision / "locks/protocol.v3.json"
                 protocol = load_protocol(protocol_path)
                 require_v3_design(protocol)
                 code = current_code_hashes().model_dump()
@@ -230,7 +282,7 @@ def main():
                 )
                 if canonical.exists():
                     raise ValueError("canonical selection authorization already exists")
-                output = candidate_directory(root, attempt)
+                output = candidate_directory(root, attempt, args.revision)
                 write_immutable_json(
                     attempt / "seal-before.json",
                     {
@@ -262,6 +314,9 @@ def main():
                         assembler,
                         args.inputs_sha256,
                         args.remaining_peak_bytes,
+                        expected_release=args.expected_release,
+                        revision=args.revision,
+                        assembler_sha=assembler_sha,
                     )
                     write_immutable_json(
                         attempt / "input-bindings.json",
@@ -296,12 +351,20 @@ def main():
                             "MotionBERT",
                         ],
                         assembler_command(
-                            assembler, retained_inputs, output, args.recorded_by
+                            assembler,
+                            retained_inputs,
+                            output,
+                            args.recorded_by,
+                            expected_release=args.expected_release,
+                            revision=args.revision,
                         ),
                     ]
                     for index, command in enumerate(commands):
                         verify_bindings(root, records)
-                        if require_clean_repository() != RELEASE:
+                        if (
+                            execution_binding(args.expected_release, args.revision)
+                            != source_hashes
+                        ):
                             raise ValueError("release changed before monitored command")
                         operations.run_command(
                             command,
@@ -319,7 +382,8 @@ def main():
                         or completed["canonical_authorization_written"] is not False
                         or completed["candidate"] != binding(root, candidate)
                         or completed["complete_authorization_validation_seconds"] <= 0
-                        or require_clean_repository() != RELEASE
+                        or execution_binding(args.expected_release, args.revision)
+                        != source_hashes
                         or current_code_hashes().model_dump() != code
                     ):
                         raise ValueError(
@@ -357,6 +421,9 @@ def main():
                     "complete_authorization_validation_seconds"
                 ],
                 "canonical_authorization_written": False,
+                "validation_proof_statistics": completed.get(
+                    "validation_proof_statistics"
+                ),
             },
         )
     except BaseException as error:

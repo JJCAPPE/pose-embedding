@@ -1,4 +1,6 @@
-"""Create the one approved successor without replacing prior scientific evidence."""
+"""Create declared successors without replacing prior scientific evidence."""
+
+from typing import Literal
 
 from pose_embed.config import load_protocol
 from pose_embed.config_v3 import ArtifactBinding, ProtocolV3Config
@@ -12,24 +14,34 @@ from pose_embed.provenance import sha256_file, write_immutable_json
 
 @guarded_auxiliary
 def prepare_execution_revision(
-    *, historical_manifest_set: str, recorded_by: str
+    *,
+    historical_manifest_set: str,
+    recorded_by: str,
+    revision: Literal["execution-r1", "execution-r2"] = "execution-r1",
 ) -> dict:
-    """Rebind identical scientific inputs to execution-r1 and freeze its source."""
+    """Rebind identical inputs to the next declared revision and freeze its source."""
     require_clean_repository()
     root = canonical_artifact_root()
-    prior_path = root / "study-v3/locks/design-lock.v3.json"
+    predecessors = {
+        "execution-r1": "study-v3/locks",
+        "execution-r2": "study-v3/revisions/execution-r1/locks",
+    }
+    if revision not in predecessors:
+        raise ValueError("undeclared execution revision")
+    previous = predecessors[revision]
+    prior_path = root / previous / "design-lock.v3.json"
     prior = V3DesignLock.model_validate_json(prior_path.read_text())
     protocol = load_protocol(root / prior.protocol_relative_path)
     if protocol_digest(protocol) != prior.protocol_sha256:
-        raise ValueError("original protocol no longer matches its immutable design")
+        raise ValueError("predecessor protocol no longer matches its immutable design")
     payload = protocol.model_dump(mode="json")
     for field, value in payload["test_access"].items():
         if field.endswith("_relative_path"):
             payload["test_access"][field] = value.replace(
-                "study-v3/locks/", "study-v3/revisions/execution-r1/locks/", 1
+                f"{previous}/", f"study-v3/revisions/{revision}/locks/", 1
             )
     successor = ProtocolV3Config.model_validate(payload)
-    directory = root / "study-v3/revisions/execution-r1"
+    directory = root / "study-v3/revisions" / revision
     directory.mkdir(parents=True, exist_ok=False)
     draft = directory / "prepared-protocol.v3.json"
     write_immutable_json(draft, successor.model_dump(mode="json"))
