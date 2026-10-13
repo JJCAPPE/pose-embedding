@@ -2,9 +2,10 @@
 
 Started October 11, 2026 (America/New_York), before the October 12–18 calendar
 week, at the researcher's direction. **Week 5 remains open. The measured runtime
-profile failed a necessary capacity condition; further admission work is held
-while the approved validation/capacity successor is implemented and verified.
-No scientific admission is complete.** The [incoming handoff](week-5-handoff.md),
+profile failed a necessary capacity condition. The reviewed validation/capacity
+successor passed installation, rehearsal and preparation; fresh scientific
+regeneration and measured admission remain pending. No scientific admission is
+complete.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
@@ -1671,6 +1672,143 @@ Last scheduler inspection remains **08:17:32.236172 UTC**. Reconnect SSH in
 completion, geometry, regenerated scientific evidence, full A and capacity
 remain unverified. The chat ends rather than waiting for the queued process.
 
+### Transferred controller; supplementary checks accepted, October 13
+
+The authorized controller transfer paused `finish-pose-embed-week-5` through
+the automation tool, preserving its prompt and configuration. The previous
+chat was idle. The researcher had completed the existing SSH connection;
+`remote:0.0` was an authenticated idle SCC shell. No second monitor was created.
+The metadata read at **20:27:54 UTC** confirmed the old status pointer and SHA
+`d5f49bb5ef2c646de157ab1cba05cede6c0c7285fd137b884e79a14b4fad01ac`.
+No later publication-status directory existed; the publication outcome recorded
+above supersedes that pointer's pending paragraph.
+
+The permitted inspection at **20:30:20.881094 UTC**, completed at
+**20:30:32.587786 UTC**, found job **8048540** terminal. Exact accounting gives
+`failed=0`, `exit_status=0`, four `omp` slots and **87 scheduler seconds** on
+`apolkovnikov-pub@scc-h30`. Its operation completed at
+**08:31:43.006302 UTC**, not during this later inspection. The retained observation
+is `study-v3/operations/week5-status/20261013T203020Z/observation.json`, SHA
+`85a5d061bda8bdee3d9f3e0346883b85c54af6fa60055266775b738946f47de3`.
+No job was resubmitted or progress inferred during the connection gap.
+
+Independent metadata review ran from **20:42:57.604956 UTC** and wrote the passed
+receipt at **20:43:00.762966 UTC**:
+`study-v3/operations/week5-r2-additional-verification/20261013T204221Z/verification.json`,
+SHA `7703859e50361123de9054fba446c8384d423b8c549b69eab92720314c46c3d2`.
+It accepted **108 metadata bindings, 616 source bindings, three monitored
+commands, seven resource records, both operation seals and fresh review seals**.
+All **86 JUnit checks executed and passed**, with no failures, errors or skips;
+unique case identities cover the frozen source test functions. Source, locked
+environment, protocol/design/manifests, accounting chronology, resource arithmetic
+and every bound content hash passed. The two actual tables were reconstructed
+from locked metadata IDs: **18,929 development queries and 18,884 novel-primary
+queries**, each across the fixed 20 actions. Their SHA-256 values remain
+`04bad108a88c690e33f50a88ecb1ec654284cb5ed1b2980d7433d5f73a5e296e` and
+`776bbf1f4a94b1d3c75eb8a8f9eba5a443ed40aec38a5ea9943f23aa18ad0a30`.
+No novel poses/outcomes or scientific binaries were read by this login review.
+
+Reviewed administrative tools are retained at
+`study-v3/operations/week5-r2-supplementary-tools/20261013T204116Z`, tools manifest
+SHA `f467643196ce4f3e44e0ae99b002175b91d160fe15c4424588308c716b794286`.
+The verifier SHA is
+`5bbe204ce03412bfe85e0f1a582224e71f1669b3f572661af0aad34912f59791`;
+its fixed preparation-helper SHA remains
+`2e77fdd376fe50843fdd04bfd6a8a3f179e7e0019d8fc947cd26410e58a651d9`.
+All 33 focused failure-case tests, Ruff/format and independent review passed.
+The two staging errors occurred before directory creation: tmux's direct-input
+limit and the older login Python. The verified transfer used a paste buffer and
+the separate Python 3.11 environment; every staged hash matched. No scientific
+attempt, source change or credential entry resulted from those staging errors.
+
+### Fixed-panel geometry submitted; initial queued observation
+
+After supplementary acceptance, reviewed geometry tooling was staged at
+`study-v3/operations/week5-r2-geometry-tools/20261013T204527Z`, tools manifest
+SHA `f478f4fa591d3188826767632d083a3524d25f46af23bc2e1082015bcf0e72b9`.
+All 71 focused tests, Ruff/format, shell syntax and independent review passed.
+Launcher SHA `842df907bc04f2d186cb9c89cf040013af841b31ae35fd20033c517320f18293`;
+wrapper SHA `d33c65c58e3b5ca5bfd4da0b738fc6c284c7fd3b59a36601edbaf65ef6707f6b`.
+The fixed sibling helper remains
+`e2037e2eaa64ff07230a0bdb2a757de29aa93192fb406265f5036f0952ae1a81`.
+
+The new launcher requires both accepted preparation and supplementary receipts,
+fresh source/dependency/seal/quota checks, no duplicate intent/job and the common
+`execution-r1.operation.lock`. Its allocated path runs the unchanged tracked
+geometry checker with the full release and `--revision execution-r2`. Admission
+still requires that checker's `validation.json`. The additional identity receipt
+requires exact agreement with the retained **40-base/43-total panel**, all 18,929
+candidate metadata rows, sentinels, absent categories, selection code, manifest
+and original fallback evidence/value. Only the declared protocol/manifest/source
+provenance bindings may change. The original panel SHA remains
+`bbe8f3dcc839a3f178f8a66a2cddf946b38b4f1d21c1d04d12a7f31523f1fc11`;
+no new panel identity or fallback estimate is accepted. All scientific hashing
+and tensor validation stay inside the allocation.
+
+Geometry job **8070391** was submitted at **20:46:55.956765 UTC**. Launch:
+`study-v3/operations/week5-r2-launches/20261013T204651Z/launch.json`, SHA
+`a8c55f5a6054996d49cb2abab304a8b8925914a4cf0495a2f0368f84e4177452`.
+Request: four CPU slots, 32 GiB, two hours, no GPU and the compatible
+AVX2/Sapphire Rapids/Gold-6426Y profile. Log:
+`logs/pose_w5_r2_geometry.o8070391`. The launcher has run; preserve its intent
+and do not resubmit it.
+
+The geometry-only remaining peak is **1 GiB**: 35,088,000 uncompressed tensor
+bytes, 3,522,560 archive/header bytes, two copies of 3,042,766-byte panel metadata
+and 64 MiB for logs/verification, totaling 111,804,956 bytes before GiB rounding.
+Fresh quota remainder **833,220,000,000 bytes** and filesystem free
+**1,002,027,614,208 bytes** passed `200 GiB + 1.25 * remaining_peak_bytes`.
+This stage bound does not establish campaign capacity.
+
+The one initial inspection at **20:49:22.424937 UTC**, completed
+**20:49:34.991908 UTC**, found job 8070391 queued (`qw`), four slots, with no
+operation, log or resource samples yet. Retained observation:
+`study-v3/operations/week5-status/20261013T204922Z/observation.json`, SHA
+`d126dd55daf56df4c71237e8a470ea73708fb011860ab4c056861d819d53fc2a`.
+No geometry completion is claimed. Next check: **October 13, 2026 at 5:55 PM EDT
+(21:55 UTC)**; no automatic scheduler inspection before 21:49:35 UTC. Scheduler
+resource sampling remains 60 seconds. End the chat turn while queued or healthy.
+Supplementary acceptance and geometry submission grant no scientific admission;
+fresh GPU diagnostic/caches/pilots/corruptions/timing, full allocated A and
+measured typed CPU/GPU capacity remain required. All gates and unreported time
+remain unchanged.
+
+### October 13: supplementary milestone published
+
+The guarded publication updated only Week 5 reflection, task 02/task 04 notes
+and gate 03 evidence. Migration `20261013204121_record_week_five_successor_supplementary.sql`
+has SHA `cad80feb4fd8e3a47fdf5797e532fb0298add4e89bd67b035e29874403992fe2`.
+The transaction checked expected versions, omitted version payloads and verified
+returned rows: Week 5 **29→30**, task 02 **26→27**, task 04 **9→10**, gate 03
+**10→11**. States, historical task 01/03 completion timestamps, researcher time,
+all 13 other weeks, source links, ownership/RLS and remote migration history
+were preserved. A separate controller read verified the exact resulting rows.
+
+Production deployment `dpl_GQBWbraowYxxVBcwfS6d5j87uufP` was promoted to
+<https://pose-embed-tracker.vercel.app>. The publication receipt, recorded at
+**21:18:01.289325 UTC**, has SHA
+`b204e87026158dd0842c6c253edbf307feebfe85dde1e6452547ad3792751a8d`.
+Independent controller verification completed at **21:23:31.859947 UTC**:
+the complete canonical export matches the repository fallback after equivalent
+UTC/source-order normalization, with runtime envelope checked separately.
+Export SHA: `3fedf6dc33bdd88a9e81e7cb890ac38321538374cfa7aef31c542793fd429051`.
+Rendered accepted/queued/check-back text, historical task completion fields and
+protocol content passed browser verification with no page errors. Journey returned
+200; anonymous private export returned 307 to `/login?reason=sign-in` with an
+empty body; health reported Supabase `ok`. Unrelated Journey source was preserved.
+
+Verification passed 33 supplementary-verifier tests, 71 geometry-launcher tests,
+27 database guards, 22 maintained tracker tests, three Journey tests, lint,
+typecheck, default production build, workspace checks and runbook shell syntax.
+Five historical assertions in the separate website staging directory fail
+identically before and after this publication; they were preserved and are not
+counted as passed. Two pre-existing hosted Auth advisor warnings also remain
+unchanged. Scientific source/configuration/dependency locks remain frozen at
+`f101f0e9d9bd64275d2088deab1b0bdcfcc53620`; no scientific result or admission
+is inferred from publication. Geometry's latest scheduler evidence remains the
+20:49 UTC queued observation above. The next check remains October 13, 2026 at
+**5:55 PM EDT (21:55 UTC)**, with the previous heartbeat paused.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -1713,10 +1851,15 @@ historical AVSL source-parity skips. The clean successor release is
 `f101f0e9d9bd64275d2088deab1b0bdcfcc53620`. Separate installation and
 independent review of the 128-check allocated rehearsal passed. Preparation
 8045152 subsequently passed independent completion verification, including all
-eight manifest identities and predecessor/scientific equality; scientific
-regeneration and admission remain pending.
+eight manifest identities and predecessor/scientific equality. Supplementary
+8048540 then passed independent review of 86 checks, three commands, seven
+resource records, both seals, 108 metadata and 616 source bindings, and both
+actual metadata-dependence tables. Scientific regeneration and admission remain
+pending.
 
-**Next:** Verify the successor supplementary analysis and geometry, then regenerate
+**Next:** At the dated next check inspect geometry 8070391 without resubmitting;
+independently verify its accounting, commands, resources, seals, tracked
+`validation.json` and fixed-panel identity before accepting it. Then regenerate
 the remaining declared evidence. Finish full A and corrupted-artifact replay, refresh
 seals and measure the complete CPU/GPU dependency/capacity ledger. Passing this
 engineering amendment does not authorize selection, final training or opening.

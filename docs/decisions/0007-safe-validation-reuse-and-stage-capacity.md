@@ -7,7 +7,10 @@ installation and allocated rehearsal 8044010 passed independent completion
 review (128 checks, no failures or skips). Preparation 8045152 also passed
 independent review of its accounting, commands, resources, seals, eight original
 manifest identities and original → r1 → r2 scientific equality. Scientific
-regeneration and measured admission remain pending.
+regeneration and measured admission remain pending. Supplementary checks
+8048540 passed independent completion review (86 executed checks, both seals
+and reproduced metadata-only dependence tables); this grants no scientific
+admission.
 
 The researcher explicitly approved a result-blind amendment for safe validation
 reuse and separate CPU/GPU time accounting, preserving all scientific checks and

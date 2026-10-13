@@ -33,8 +33,22 @@ Receipt `week5-r2-preparation-verification/20261013T063819Z/verification.json`
 has SHA-256 `0a3823e66a97192c5665185edbb908bf5b44c6dd9b451328d95d96476a84d785`.
 The new protocol SHA-256 is
 `18f7d17fa81e7ae3a6b1e5deddf42d9eda589d96e5a13968188a8ce275bfb95f`.
-Supplementary CPU checks 8048540 were submitted October 13 at 07:58:52 UTC
-and observed queued at 08:17:32 UTC; no outcome is claimed.
+Supplementary CPU checks 8048540 completed October 13 at 08:31:43.006302 UTC
+on apolkovnikov-pub@scc-h30: 86 checks passed without skips, successful
+87-second accounting, three commands, seven resource records and both seals.
+Independent review completed at 20:43:00.762966 UTC, verifying 108 metadata
+bindings, 616 source bindings and actual locked-ID dependence tables for
+18,929 development queries and 18,884 primary novel IDs, each over 20 actions.
+Novel poses and outcomes remained unopened. Receipt
+`week5-r2-additional-verification/20261013T204221Z/verification.json` has
+SHA-256 `7703859e50361123de9054fba446c8384d423b8c549b69eab92720314c46c3d2`.
+Geometry job 8070391 was submitted at 20:46:55.956765 UTC and observed queued
+with four CPU slots at 20:49:22.424937 UTC; no operation, log or resource
+records existed and no outcome is claimed. Launch receipt
+`week5-r2-launches/20261013T204651Z/launch.json` has SHA-256
+`a8c55f5a6054996d49cb2abab304a8b8925914a4cf0495a2f0368f84e4177452`.
+Its 1-GiB bound covers geometry only. Next manual status check:
+**October 13, 2026 at 5:55 PM EDT (21:55 UTC)**; hourly polling remains in force.
 Fresh successor scientific evidence, full admission and measured CPU/GPU
 capacity remain pending. Preserve the measured no-go and all `execution-r1` evidence.
 

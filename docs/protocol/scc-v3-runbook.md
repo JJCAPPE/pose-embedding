@@ -155,17 +155,41 @@ The fresh supplementary-only bound is 1 GiB, derived from four times
 rounded up. It is not a campaign-capacity forecast. The launch reserve passed
 with 835,100,000,000 quota bytes and 1,003,713,724,416 filesystem bytes free.
 No supplementary operation, resource record or outcome existed at the initial
-observation. The installer and these one-off submission launchers have run;
-never blindly resubmit or regenerate accepted preparation.
+observation. At the transferred controller's October 13 20:30:20 UTC inspection,
+the job was terminal: four `omp` slots, failed=0/exit=0, 87 scheduler seconds on
+`apolkovnikov-pub@scc-h30`, operation completed at 08:31:43.006302 UTC.
+Independent review completed at 20:43:00.762966 UTC with 86 passing checks,
+108 metadata and 616 source bindings, three commands, seven resources, both
+seals and exact reconstruction of the two metadata tables. Receipt:
+`week5-r2-additional-verification/20261013T204221Z/verification.json`, SHA
+`7703859e50361123de9054fba446c8384d423b8c549b69eab92720314c46c3d2`.
+The installer and these one-off submission launchers have run; never blindly
+resubmit or regenerate accepted preparation.
 
-Next read `$HOME/pose-embed-scc/WEEK5-STATUS.txt`, then inspect the exact
-supplementary job. After completion retain its accounting and independently
-verify commands, resources, seals, fixture checks and actual metadata-dependence
-tables before advancing. Metadata/source checks may run on login; scientific
-hashing/replay remains allocation-only. Do not automatically inspect before
-October 13 09:17:32 UTC; recommended check-back is **October 13 at 5:20 AM EDT**.
-End the chat turn while queued or healthy running. Fresh scientific regeneration,
-full A, measured CPU/GPU capacity and every scientific gate remain pending.
+Next read `$HOME/pose-embed-scc/WEEK5-STATUS.txt` for the exact current job,
+receipt and dated next command. The previous chat's heartbeat is paused for
+controller transfer; its configuration is preserved and no second monitor was
+created. Root alone controls the authenticated idle pane. Metadata/source checks
+may run on login; scientific hashing/replay remains allocation-only. Check queued
+or healthy jobs at most hourly, using the latest dated handoff instead of older
+check-back times below, and end the turn while awaiting them. Fresh scientific
+regeneration, full A, measured CPU/GPU capacity and every scientific gate remain
+pending.
+
+Geometry **8070391** was submitted at October 13 20:46:55.956765 UTC after
+supplementary acceptance. Its initial observation at 20:49:22.424937 UTC was
+queued (`qw`), four slots, no operation/log/resources. Launch:
+`week5-r2-launches/20261013T204651Z/launch.json`, SHA
+`a8c55f5a6054996d49cb2abab304a8b8925914a4cf0495a2f0368f84e4177452`.
+Log: `logs/pose_w5_r2_geometry.o8070391`. The reviewed tools and exact fixed-panel
+postcheck are under `week5-r2-geometry-tools/20261013T204527Z`, tools SHA
+`f478f4fa591d3188826767632d083a3524d25f46af23bc2e1082015bcf0e72b9`.
+The geometry-only 1-GiB bound passed fresh reserve checks; it is not campaign
+capacity. Preserve all intents; this launcher has run. Next check:
+**October 13, 2026 at 5:55 PM EDT (21:55 UTC)**, never before 21:49:35 UTC.
+Inspect exact-job accounting, commands/resources/seals, the tracked
+`validation.json` and `fixed-panel-identity.json` before accepting completion.
+Do not resubmit while the job or an uncertain intent exists.
 
 The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
 frozen in a new clean checkout and separate locked environment. Preserve all scientific
@@ -700,9 +724,11 @@ bindings, two commands, 17 resource samples, both seals and successful accountin
 305.840707965 seconds. All three validators passed; the measured capacity
 condition did not. See the [dated audit](week-5-capacity-validation-audit.md#october-12-measured-profile-no-go).
 
-**The researcher subsequently authorized ADR0007.** The current next step is
-implementation/review and a fresh immutable execution-r2 release, followed by
-allocated software rehearsal and the full regeneration inventory described above.
+**The researcher subsequently authorized ADR0007.** At this historical checkpoint,
+the next step was implementation/review and a fresh immutable execution-r2 release,
+followed by allocated software rehearsal and the full regeneration inventory
+described above.
+For current progress and the next action, use the active execution-r2 section above.
 The historical candidate helper called "r2" in this section is an execution-r1
 operational-tool version, not execution-r2 scientific admission. It cannot provide
 successor schema-2 evidence. Keep full A pending fresh successor prerequisites;

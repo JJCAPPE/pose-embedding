@@ -170,8 +170,11 @@ and the earlier prohibition on memoization remain evidence of execution-r1.
 The researcher subsequently authorized
 [ADR0007](../decisions/0007-safe-validation-reuse-and-stage-capacity.md) for
 command-local numerical proof reuse and separate CPU/GPU capacity accounting.
-Implementation and review are in progress; no successor admission or feasible
-calendar is claimed. The predecessor evidence above is not relabeled.
+Implementation and independent review passed before source release
+`f101f0e9d9bd64275d2088deab1b0bdcfcc53620` was frozen. Separate SCC installation,
+allocated rehearsal and preparation passed independent completion review;
+scientific regeneration, admission and a measured feasible calendar remain
+pending. The predecessor evidence above is not relabeled.
 
 The amendment retains every complete A, T, V, S and F validator invocation and
 all fresh hash, provenance, seal, inventory and authorization checks. Its initial
