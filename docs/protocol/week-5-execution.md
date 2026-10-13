@@ -1635,6 +1635,42 @@ Do not automatically check again before **09:17:32 UTC**. Recommended
 check-back: **October 13, 2026 at 5:20 AM EDT (09:20 UTC)**. No supplementary
 completion or successor scientific admission is claimed.
 
+### Publication verified; SSH reconnection required
+
+Commit `ae31c8074fa3d968b5669f4eed703d2e0541903c` is pushed. Migration
+`20261013081701` (SHA
+`833fb79979266b8c37bbb6300842bee8e92deff41ec5801f5b8c4663dbe22e1c`)
+applied with exact after-row verification. Deployment
+`dpl_AiYz64avKSNuoCJdxm8vDaqc5dJ5` was promoted and verified at
+**October 13 10:18:59.728 UTC**. Root independently matched complete public
+content to the fallback at **11:01:10.052112 UTC**, including protocol/manual
+fields, equivalent UTC/source-order normalization and separate runtime-envelope
+checks. Retained formatted export SHA:
+`3716306546f1ea02bfb3cc9497689c6102af14237503e23da825800ff5beb95e`.
+Week 5 is v29, task 02 v26 in progress, task 04 v9 blocked and gate 03 v10
+pending. All scientific gates and unreported time remain unchanged. The 23
+database guards, 22 tracker tests, lint/typecheck/build/workspace and 19 runbook
+shell fences passed; other weeks/history, RLS/private ownership and Journey
+were preserved.
+
+The last confirmed SCC status is
+`study-v3/operations/week5-status/20261013T101918Z/status.txt`, SHA
+`d5f49bb5ef2c646de157ab1cba05cede6c0c7285fd137b884e79a14b4fad01ac`.
+It records accepted preparation and the dated queued supplementary observation,
+but its publication-pending paragraph is superseded by the verified result above.
+The existing SSH connection then closed with `Broken pipe`. A subsequent
+publication-status update was attempted but its remote outcome is unconfirmed;
+inspect the pointer and any new status directory after reconnecting before
+writing again. No new job was submitted and no active job was interrupted.
+The local command is `/tmp/pose-week5-r2-published-status-command.txt`; do not
+blindly resend it, particularly at the local shell prompt.
+
+Last scheduler inspection remains **08:17:32.236172 UTC**. Reconnect SSH in
+`tmux remote:0.0` before the next check, **October 13, 2026 at 9:00 AM EDT
+(13:00 UTC)**. Inspect actual job 8048540 without resubmitting. Supplementary
+completion, geometry, regenerated scientific evidence, full A and capacity
+remain unverified. The chat ends rather than waiting for the queued process.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
