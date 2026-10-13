@@ -26,8 +26,17 @@ independent completion review: 128 checks, no failures or skips, successful
 receipt `week5-r2-rehearsal-verification/20261013T002413Z/verification.json` has
 SHA-256 `963babe02eba70d34f3f9c9aa47af21145de387ca4d5a1ad6ccf9c226fb43381`.
 This fixture-only evidence does not admit scientific execution. Preparation
-job 8045152 has been submitted; its completion, fresh successor evidence, full
-admission and measured CPU/GPU capacity remain pending. Preserve the measured no-go and all `execution-r1` evidence.
+8045152 also passed independent completion review: successful 44-second
+accounting, three commands, seven resource samples, both seals, all eight
+byte-identical manifest identities and original → r1 → r2 scientific equality.
+Receipt `week5-r2-preparation-verification/20261013T063819Z/verification.json`
+has SHA-256 `0a3823e66a97192c5665185edbb908bf5b44c6dd9b451328d95d96476a84d785`.
+The new protocol SHA-256 is
+`18f7d17fa81e7ae3a6b1e5deddf42d9eda589d96e5a13968188a8ce275bfb95f`.
+Supplementary CPU checks 8048540 were submitted October 13 at 07:58:52 UTC
+and observed queued at 08:17:32 UTC; no outcome is claimed.
+Fresh successor scientific evidence, full admission and measured CPU/GPU
+capacity remain pending. Preserve the measured no-go and all `execution-r1` evidence.
 
 Following the [final prospectus](../docs/proposal/2026/kulis_pose_sequence_retrieval_prospectus.pdf),
 the December study asks whether a **full contextual training recipe reduces

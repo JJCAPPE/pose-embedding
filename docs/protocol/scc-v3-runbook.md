@@ -135,27 +135,40 @@ Separate installation and independent completion review of CPU rehearsal
 `8044010` passed: 128 checks, three commands, nine resource samples and both
 seals. Receipt `week5-r2-rehearsal-verification/20261013T002413Z/verification.json`
 has SHA `963babe02eba70d34f3f9c9aa47af21145de387ca4d5a1ad6ccf9c226fb43381`.
-Preparation `8045152` was submitted October 13 at 00:25:38 UTC and observed
-queued at 00:26:31 UTC. Its launch receipt is
-`week5-r2-launches/20261013T002535Z/launch.json`, SHA
-`18955c81a3585af137ffeb21cca334cb6c99e5f3930f36e5f8abf63f73d79d85`.
-It uses four CPU slots/32 GiB/two hours and a separately derived 1-GiB
-preparation-only reserve. No preparation completion or scientific artifact is
-claimed. The installer, rehearsal verifier and both submission launchers have
-run; never blindly resubmit. The reviewed transition tools and hashes are in
-the execution record.
+Preparation `8045152` completed October 13 at 00:31:55 UTC on scc-ke1 with
+successful 44-second accounting. Independent completion review accepted all
+three commands, seven resource samples, both seals, 73 metadata bindings,
+616 source bindings, eight byte-identical original manifests and the complete
+original → r1 → r2 scientific-equality chain. Its passed receipt was written
+at 06:39:11.971297 UTC: `week5-r2-preparation-verification/20261013T063819Z/verification.json`,
+SHA `0a3823e66a97192c5665185edbb908bf5b44c6dd9b451328d95d96476a84d785`.
+The successor protocol SHA is `18f7d17fa81e7ae3a6b1e5deddf42d9eda589d96e5a13968188a8ce275bfb95f`;
+design SHA `7750452c1110412dc0ccb5fb147018310f056b58d403f7267a7d9fe64bc64744`;
+manifest-set SHA `a2e70e344c238d58332537d95687ac22b7709396ab06c55f96b96c56acb29286`.
 
-Next read `$HOME/pose-embed-scc/WEEK5-STATUS.txt` and inspect this exact job via
-`qstat -j 8045152`; after completion retain `qacct -j 8045152` and verify every
-command/resource/seal, the original adopted manifest identities and exact
-original → r1 → r2 protocol/design/scientific-equality bindings before any
-supplementary analysis/geometry submission. Metadata/source checks may run on
-login; scientific hashing/replay remains allocation-only. Do not automatically
-inspect before October 13 01:26:31 UTC; recommended check-back is
-**October 12 at 9:30 PM EDT**. End the chat turn while queued or healthy running.
+Supplementary CPU checks `8048540` were submitted October 13 at
+07:58:52.315989 UTC and observed queued with four slots at 08:17:32.236172 UTC.
+Launch: `week5-r2-launches/20261013T075848Z/launch.json`, SHA
+`0e77ecb106c977dd9922f473b80f29fd7475d8b4f5b243d9db9b34cc92368fd8`.
+The fresh supplementary-only bound is 1 GiB, derived from four times
+140,510,037 fixture bytes plus twice 58,782,800 metadata bytes and 64 MiB,
+rounded up. It is not a campaign-capacity forecast. The launch reserve passed
+with 835,100,000,000 quota bytes and 1,003,713,724,416 filesystem bytes free.
+No supplementary operation, resource record or outcome existed at the initial
+observation. The installer and these one-off submission launchers have run;
+never blindly resubmit or regenerate accepted preparation.
 
-Freeze the reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes
-in a new clean checkout and separate locked environment. Preserve all scientific
+Next read `$HOME/pose-embed-scc/WEEK5-STATUS.txt`, then inspect the exact
+supplementary job. After completion retain its accounting and independently
+verify commands, resources, seals, fixture checks and actual metadata-dependence
+tables before advancing. Metadata/source checks may run on login; scientific
+hashing/replay remains allocation-only. Do not automatically inspect before
+October 13 09:17:32 UTC; recommended check-back is **October 13 at 5:20 AM EDT**.
+End the chat turn while queued or healthy running. Fresh scientific regeneration,
+full A, measured CPU/GPU capacity and every scientific gate remain pending.
+
+The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
+frozen in a new clean checkout and separate locked environment. Preserve all scientific
 settings and validate the exact original → execution-r1 → execution-r2 design
 chain. The new preparation command accepts `--revision execution-r2`; it still
 requires the adopted historical v1 manifest bundle, not a v3 rebound bundle.

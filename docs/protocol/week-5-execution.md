@@ -1576,6 +1576,65 @@ poll was made for this publication. Check back **October 12 at 9:30 PM EDT**
 The scientific source remains `f101f0e9d9bd64275d2088deab1b0bdcfcc53620`;
 preparation completion, regenerated evidence, full A and capacity remain pending.
 
+### Successor preparation accepted, October 13
+
+Preparation **8045152** completed on `neuro-pub@scc-ke1` at
+**00:31:55.111517 UTC**. Exact accounting records `failed=0`, `exit_status=0`,
+four CPU slots and **44 scheduler seconds**. Operation
+`study-v3/operations/20261013T003113Z-8045152-prepare` retained three successful
+commands, seven passing resource samples and both dataset seals. The hourly
+inspection at 02:02:09 UTC found the job terminal; the later acceptance review
+did not rerun preparation or scientific data processing.
+
+Independent metadata verification passed with receipt
+`study-v3/operations/week5-r2-preparation-verification/20261013T063819Z/verification.json`,
+SHA `0a3823e66a97192c5665185edbb908bf5b44c6dd9b451328d95d96476a84d785`.
+Written at **06:39:11.971297 UTC**, it checked 73 metadata bindings, exact
+accounting, commands, resource arithmetic, seals, all 616
+tracked source bindings, eight ordered manifest identities and the complete
+original → execution-r1 → execution-r2 predecessor/scientific-equality chain.
+The successor protocol digest is
+`18f7d17fa81e7ae3a6b1e5deddf42d9eda589d96e5a13968188a8ce275bfb95f`.
+Scientific binary hashing remained inside the completed preparation allocation;
+the independent login review read metadata and source only.
+
+Reviewed administrative tools are preserved under
+`study-v3/operations/week5-r2-preparation-tools/20261013T063754Z`; tools.json
+SHA `905eead907bca0428860ed3061b372524935573b644d17ceb7c5a03f89a4ccd0`.
+The executed verifier SHA is
+`2e77fdd376fe50843fdd04bfd6a8a3f179e7e0019d8fc947cd26410e58a651d9`;
+11 focused and ten existing revision tests passed, with independent/root review.
+The supplementary launcher SHA is
+`e2037e2eaa64ff07230a0bdb2a757de29aa93192fb406265f5036f0952ae1a81`
+and its thin CPU wrapper SHA is
+`b7d037082d244142df27f66e1b6059d0e3cbdc23189418e0076d55f1dce10384`;
+17 focused tests, shell syntax and independent/root review passed. The wrapper
+invokes the unchanged tracked supplementary checker from source `f101f0e` with
+explicit full release/revision bindings and the new manifest bundle. Preparation
+acceptance grants no cache/pilot/corruption completion, capacity or selection
+authorization. Every predecessor artifact remains unchanged.
+
+Supplementary CPU job **8048540** was submitted at **07:58:52.315989 UTC**:
+`study-v3/operations/week5-r2-launches/20261013T075848Z/launch.json`, SHA
+`0e77ecb106c977dd9922f473b80f29fd7475d8b4f5b243d9db9b34cc92368fd8`.
+It requests four slots, 32 GiB, two hours, no GPU and the compatible
+AVX2/Sapphire Rapids/Gold-6426Y profile. Log:
+`logs/pose_w5_r2_additional.o8048540`. The reviewed launcher has now run;
+preserve its intent and never resubmit it blindly.
+
+The separate **1-GiB supplementary-only bound** uses four times 140,510,037
+retained fixture bytes, twice 58,782,800 successor metadata bytes and 64 MiB
+for logs/tables, rounded up. This stat-only inventory read no scientific arrays.
+Quota free **835,100,000,000 bytes** and filesystem free
+**1,003,713,724,416 bytes** passed `200 GiB + 1.25 * remaining_peak_bytes`;
+this does not establish campaign capacity. The initial observation at
+**08:17:32.236172 UTC** found job 8048540 queued (`qw`), four slots, with no
+operation or resource samples yet. It is retained under
+`study-v3/operations/week5-status/20261013T081732Z`.
+Do not automatically check again before **09:17:32 UTC**. Recommended
+check-back: **October 13, 2026 at 5:20 AM EDT (09:20 UTC)**. No supplementary
+completion or successor scientific admission is claimed.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -1617,11 +1676,12 @@ passed independent review and the stable full local suite: 1,373 passed and two
 historical AVSL source-parity skips. The clean successor release is
 `f101f0e9d9bd64275d2088deab1b0bdcfcc53620`. Separate installation and
 independent review of the 128-check allocated rehearsal passed. Preparation
-8045152 is queued as of October 13 00:26 UTC; scientific admission remains pending.
+8045152 subsequently passed independent completion verification, including all
+eight manifest identities and predecessor/scientific equality; scientific
+regeneration and admission remain pending.
 
-**Next:** After the hourly interval, inspect preparation 8045152 and verify
-its accounting, manifests, predecessor equality, resources and seals. Regenerate
-the declared evidence, then finish full A and corrupted-artifact replay, refresh
+**Next:** Verify the successor supplementary analysis and geometry, then regenerate
+the remaining declared evidence. Finish full A and corrupted-artifact replay, refresh
 seals and measure the complete CPU/GPU dependency/capacity ledger. Passing this
 engineering amendment does not authorize selection, final training or opening.
 

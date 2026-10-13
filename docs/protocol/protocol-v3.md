@@ -176,8 +176,15 @@ The separate SCC installation and allocated CPU rehearsal 8044010 passed
 independent completion review: 128 checks, no failures or skips, successful
 194-second accounting, nine resource samples and intact seals. The retained
 receipt SHA-256 is `963babe02eba70d34f3f9c9aa47af21145de387ca4d5a1ad6ccf9c226fb43381`.
-Preparation job 8045152 has been submitted; its completion remains unverified.
-This fixture-only rehearsal grants no scientific admission.
+Preparation 8045152 passed independent completion review: successful 44-second
+accounting, three commands, seven resource samples, both seals, all eight
+original manifest identities and original → r1 → r2 scientific equality.
+Its receipt SHA-256 is `0a3823e66a97192c5665185edbb908bf5b44c6dd9b451328d95d96476a84d785`;
+the new protocol SHA-256 is
+`18f7d17fa81e7ae3a6b1e5deddf42d9eda589d96e5a13968188a8ce275bfb95f`.
+Supplementary CPU checks 8048540 were submitted October 13 at 07:58:52 UTC
+and observed queued at 08:17:32 UTC; their outcome remains pending.
+Preparation and fixture rehearsal grant no scientific admission.
 
 The successor must freshly regenerate parity, five caches/two full repeats,
 three complete pilots, panel/repeat evidence, nine corrupted development paths

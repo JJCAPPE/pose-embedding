@@ -2,8 +2,8 @@
 
 Prepared during Week 5 execution. **Week 5 scientific admission remains held
 after the independently reviewed ADR0007 implementation passed separate SCC
-installation and allocated software rehearsal. Preparation and scientific
-regeneration remain pending. No successor is admitted.**
+installation, allocated software rehearsal and successor preparation. Fresh
+scientific regeneration remains pending. No successor is admitted.**
 Read the [Week 5 execution record](week-5-execution.md),
 [incoming handoff](week-5-handoff.md), [canonical plan](../../plan/research-plan.v3.md),
 [ADR0006](../decisions/0006-v3-execution-completion-amendment.md),
@@ -12,8 +12,8 @@ Read the [Week 5 execution record](week-5-execution.md),
 
 | Operational handoff field | Current status |
 | --- | --- |
-| Admitted successor release and protocol/design hashes | Immutable source f101f0e9d9bd64275d2088deab1b0bdcfcc53620 independently reviewed; 1,373 local tests passed, two historical AVSL source-parity skips. Separate SCC installation and independent completion review of CPU rehearsal 8044010 passed (128 checks, nine resource samples, intact seals). Preparation 8045152 submitted; completion and scientific admission pending. |
-| Fresh cache/pilot/corruption/geometry/analysis receipts | Follow the Week 5 execution record; admission incomplete |
+| Admitted successor release and protocol/design hashes | Immutable source f101f0e9d9bd64275d2088deab1b0bdcfcc53620 independently reviewed; 1,373 local tests passed, two historical AVSL source-parity skips. Separate SCC installation and independent completion review of CPU rehearsal 8044010 passed (128 checks, nine resource samples, intact seals). Preparation 8045152 passed independent completion review, including all eight original manifest identities and original → r1 → r2 scientific equality. Successor protocol SHA-256 18f7d17fa81e7ae3a6b1e5deddf42d9eda589d96e5a13968188a8ce275bfb95f; scientific admission pending. |
+| Fresh cache/pilot/corruption/geometry/analysis receipts | Supplementary CPU checks 8048540 submitted; observed queued October 13 08:17:32 UTC. Follow the Week 5 execution record; outcome and admission incomplete |
 | Capacity report and immutable selection authorization | Prior measured-profile no-go retained; authorized CPU/GPU amendment and fresh capacity evidence pending; selection held |
 | SCC jobs, logs and next command | Read `$HOME/pose-embed-scc/WEEK5-STATUS.txt` through `remote`; replace pending fields with verified results before transition |
 
