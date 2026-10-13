@@ -10,7 +10,15 @@ manifest identities and original → r1 → r2 scientific equality. Scientific
 regeneration and measured admission remain pending. Supplementary checks
 8048540 passed independent completion review (86 executed checks, both seals
 and reproduced metadata-only dependence tables); this grants no scientific
-admission.
+admission. Geometry job 8070391 passed its tracked checker and exact
+within-revision repeats but failed the wrapper fixed-identity check
+(229 scheduler seconds; exit_status=1). Its unchanged IDs/manifests and
+differing scalar/jitter hashes require a separate diagnostic; CPU dispatch
+remains unproven. Diagnostic job 8072666 was submitted October 13 at
+22:49:45.058490 UTC after 127 local checks passed and observed queued at
+22:52:26.185888 UTC. It has no eligible scientific output; no diagnostic
+outcome, geometry acceptance or gate pass is claimed. Next manual check:
+October 13 at 8:00 PM EDT (October 14 at 00:00 UTC), under hourly polling.
 
 The researcher explicitly approved a result-blind amendment for safe validation
 reuse and separate CPU/GPU time accounting, preserving all scientific checks and

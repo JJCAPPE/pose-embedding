@@ -1809,6 +1809,118 @@ is inferred from publication. Geometry's latest scheduler evidence remains the
 20:49 UTC queued observation above. The next check remains October 13, 2026 at
 **5:55 PM EDT (21:55 UTC)**, with the previous heartbeat paused.
 
+### October 13: geometry failed; bounded runtime diagnostic submitted
+
+The next permitted inspection ran from **22:05:07.547370** to
+**22:05:19.824007 UTC**. Geometry **8070391** was terminal: scheduler failed=0,
+exit_status=1, four `omp` slots and **229 seconds** on `bpnlab-pub@scc-kc1`.
+Accounting start/end were 20:51:02/20:54:51 UTC. The tracked checker completed,
+but the external wrapper rejected fixed-panel identity. Preserve the entire
+failed attempt; its tracked completion does not establish geometry acceptance.
+Observation `week5-status/20261013T220507Z/observation.json` has SHA
+`ba56692352707522a21ceed0f31075b3297f61660e4ad1209dc4207ad3064cb6`;
+retained exact accounting SHA is
+`62f684cac707ebf57ac2e00201d95b7351f5d4bf9fd05d93621cacf038c0638c`.
+
+Metadata-only diagnosis found **2,051 of 18,929 candidate torso scales** differ
+by small float32 rounding steps. Fixed IDs, base IDs, sentinels, absent
+categories, selection code and manifest identities match. All **43 clean tensor
+hashes** match across revisions; four selected scales and all **129 jitter
+tensor hashes** differ. Mask tensors match, and each revision's two fresh-process
+repeats remain exact. These comparisons read/hash JSON receipts only; no
+scientific archive was read or hashed on login. Diagnosis
+`week5-r2-geometry-diagnosis/20261013T220749Z/diagnosis.json` has SHA
+`d9d8b549c159206754d8f8b21eaaac1e6b5f656dee54959c23611717aa70534b`;
+the clean-tensor discriminator at `20261013T221341Z/clean-tensor-discriminator.json`
+has SHA `f0dc0f44ba52c114e76b95ac044dd1ed63fd14fc62c8e1b9efd57c80f886ddcb`.
+The original node `scc-ne7` is configured as Ivy Bridge without AVX2; the
+successor node is Sapphire Rapids/Gold-6426Y. CPU dispatch is a hypothesis,
+not a verified cause or permission to relax comparisons.
+
+Reviewed external diagnostic tools were staged at
+`week5-r2-geometry-runtime-diagnostic-tools/20261013T224338Z`, tools SHA
+`b782d1823ae4d43d209f42d0b3893a7c28ec5caac1bbe0f88806c098a91b171c`.
+Worker SHA `6e2ca3e4dc21f987245f66c3882c46ae9e5a225feb30374a54b672a4d403328b`,
+parent SHA `d68157b44bdff49fc637408a22ca35a1ceb768b0acbbcf19cbd9e8717cd086fc`,
+launcher SHA `c5c12102f05a533817c03cf7ed69eae8b9c675bb4128c588eaf40b30869f8d92`
+and wrapper SHA `487c56d7d8bd892541ed9e0e7cc9229c916364734cc79a6439fa8f258470ad07`
+passed independent review, **127 focused tests** (27 worker, 60 parent, 40
+launcher), Ruff/format and shell syntax. Pre-submission review checked the actual
+diagnosis schema and metadata-only boundary. Historical
+staged-not-executed labels must not be used to rerun executed tools.
+
+Diagnostic **8072666** was submitted at **22:49:45.058490 UTC**. Launch
+`week5-r2-launches/20261013T224936Z/launch.json` has SHA
+`91358af8b0e0f3c04765c7fd9f5d4d5264c32cbb7dbaec2c5a2f7dfa917332a3`;
+immutable input SHA is
+`1b24d390cf1ec2ad8829e00b3d01c0d5fc4acc15c656a50badf3ee30369e9ce6`.
+Log: `logs/pose_w5_geometry_runtime.o8072666`. Request: four CPU slots,
+32 GiB, 30 minutes, no GPU, compatible Gold-6426Y/AVX2. It reads the failed
+archive only inside the allocation and both leases, runs native/default CPU
+dispatch in separate fresh processes on four fixed cases, and compares all
+four scales, 40 tensor hashes and 36 damage rows exactly. The failed archive is
+diagnosis input only; neither worker nor parent can produce eligible geometry.
+An unsupported hypothesis is a valid completed diagnostic.
+
+Additional peak is **1 GiB**, rounded from **67,480,406 bytes** for metadata/logs,
+two input/source-binding copies and receipts. The existing 17,675,344-byte archive
+is read-only and not copied. Fresh quota **833,030,000,000 bytes** and filesystem
+free **1,001,834,676,224 bytes** passed the reserve. This is not campaign capacity.
+One initial inspection at **22:52:26.185888 UTC**, completed **22:52:38.052404 UTC**,
+found the diagnostic queued (`qw`), four slots, no operation/log/resources and
+no accounting yet. Observation `week5-status/20261013T225226Z/observation.json`
+has SHA `6c7d3d7d3dfd2005eea7dec86adb81b38792b17746a299bdbac746c5e47ab670`.
+No diagnostic result or subsequent scheduler state is claimed. Next check:
+**October 13, 2026 at 8:00 PM EDT (October 14, 00:00 UTC)**; no automatic
+inspection before 23:52:39 UTC.
+
+The researcher explicitly approved resuming the existing hourly heartbeat in
+this chat. Its ID/name/schedule and original configuration were preserved; only
+the target, current prompt and active status changed. No second monitor exists.
+Root alone controls SCC. Before a new geometry attempt, require a reviewed
+compatibility preflight and full candidate/panel reproduction. Before a permanent
+runtime choice or full-A admission, require fresh paired initialization, complete
+pilot replay and exact projections under the eventual full-A profile. Full A
+validates geometry, pilots and projections in one process; it cannot combine
+proof authority from different profiles. Fresh r2 heads must be regenerated,
+not adopted from r1. All scientific gates remain held and time remains unreported.
+
+### Verified milestone publication and controller transfer
+
+Guarded linked-database publication advanced only evidence versions:
+Week 5 **30 → 31**, task 02 **27 → 28**, task 04 **10 → 11**, gate 03
+**11 → 12**. Root independently compared the resulting public-row projection
+with the prior rows and current fallback. Task/gate states, completed-history
+fields, researcher time, all other weeks, sources and links remain unchanged.
+Migration `20261013223908_record_week_five_geometry_failure_and_runtime_probe.sql`
+SHA `2aaaf34235c3f8d1dab76b45ed65611c42ba2b09d39c80437e982fd467309564`
+and its exact history entry were verified; prior remote history was preserved.
+
+Production deployment **dpl_ADArATdHU2DCqdiXv1ZYCUHkA3PU** was staged, verified
+and promoted to <https://pose-embed-tracker.vercel.app>. Publication receipt,
+recorded **2026-10-13 at 23:05:01.746898 UTC**, has SHA
+`3da5a84ec051e121d01d714686f01ad7efb86e176bb98c7f2006695615d9154e`.
+Root's separate complete canonical export/envelope/health/private-redirect/Journey
+check at **23:06:30.487018 UTC** passed; receipt SHA
+`eeb46c6356fa5228547bdb749c99e4919529536cc901167ed6f54aabdb13c2f7`.
+Its export SHA is
+`17d49f36619d832947d02e373cba12bd4caee695762b1040ac308f3e67642647`.
+Both staged and canonical browser checks confirmed the failed geometry, dated
+queued diagnostic, next check, existing completed-task history and protocol.
+Journey remained available; anonymous private export redirected with an empty
+body; no page errors were observed. The existing 79 staging app-source files,
+including Journey, were preserved apart from the requested protocol bundle.
+
+All **30 pgTAP guards**, **22 maintained tracker tests**, **three Journey tests**,
+lint/typecheck, default Node 24 builds, local database security/workspace checks,
+independent review and **19 runbook shell syntax checks** passed. The full
+historical staging suite retains the same five assertions failing before/after;
+its 20 other checks pass. Two inherited hosted Auth warnings are unchanged.
+No scientific source/configuration/dependency lock or primary-checkout change
+was made. Publication and heartbeat resumption grant no scientific acceptance
+or measured campaign capacity. Latest diagnostic observation remains the dated
+22:52 UTC queued snapshot; publication made no later scheduler query.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -1857,9 +1969,11 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** At the dated next check inspect geometry 8070391 without resubmitting;
-independently verify its accounting, commands, resources, seals, tracked
-`validation.json` and fixed-panel identity before accepting it. Then regenerate
+**Next:** At the dated next check inspect diagnostic 8072666 without resubmitting;
+independently verify its accounting, commands, resources, seals and exact
+native/default comparisons. Geometry 8070391 remains a preserved failed attempt.
+Confirm the complete compatible profile before a reviewed fresh geometry attempt.
+Then regenerate
 the remaining declared evidence. Finish full A and corrupted-artifact replay, refresh
 seals and measure the complete CPU/GPU dependency/capacity ledger. Passing this
 engineering amendment does not authorize selection, final training or opening.
@@ -1867,6 +1981,8 @@ engineering amendment does not authorize selection, final training or opening.
 **Open issues:** P passed independent verification but fails the measured-profile
 capacity condition. Task 04 is blocked, task 02 remains in progress, and all
 scientific gates remain unresolved. The prior failed validator and its successful
-compatible-runtime retry remain preserved. Actual researcher minutes remain
+compatible-runtime retry remain preserved. Successor geometry failed its fixed
+identity guard; a bounded CPU diagnostic is queued, with no cause or remedy yet
+verified. Actual researcher minutes remain
 unreported by explicit request. Week 5 cannot close while required scientific
 gates are unresolved; all selection/final/novel authorization remains shut.

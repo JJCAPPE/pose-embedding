@@ -167,9 +167,9 @@ The installer and these one-off submission launchers have run; never blindly
 resubmit or regenerate accepted preparation.
 
 Next read `$HOME/pose-embed-scc/WEEK5-STATUS.txt` for the exact current job,
-receipt and dated next command. The previous chat's heartbeat is paused for
-controller transfer; its configuration is preserved and no second monitor was
-created. Root alone controls the authenticated idle pane. Metadata/source checks
+receipt and dated next command. The researcher approved resuming the existing
+hourly heartbeat in the transferred chat; its original configuration is preserved
+and no second monitor was created. Root alone controls the authenticated idle pane. Metadata/source checks
 may run on login; scientific hashing/replay remains allocation-only. Check queued
 or healthy jobs at most hourly, using the latest dated handoff instead of older
 check-back times below, and end the turn while awaiting them. Fresh scientific
@@ -185,11 +185,26 @@ Log: `logs/pose_w5_r2_geometry.o8070391`. The reviewed tools and exact fixed-pan
 postcheck are under `week5-r2-geometry-tools/20261013T204527Z`, tools SHA
 `f478f4fa591d3188826767632d083a3524d25f46af23bc2e1082015bcf0e72b9`.
 The geometry-only 1-GiB bound passed fresh reserve checks; it is not campaign
-capacity. Preserve all intents; this launcher has run. Next check:
-**October 13, 2026 at 5:55 PM EDT (21:55 UTC)**, never before 21:49:35 UTC.
-Inspect exact-job accounting, commands/resources/seals, the tracked
-`validation.json` and `fixed-panel-identity.json` before accepting completion.
-Do not resubmit while the job or an uncertain intent exists.
+capacity. Preserve all intents; this launcher has run. The later 22:05 UTC
+inspection found failed=0/exit=1, 229 seconds: the tracked checker completed but
+the wrapper rejected fixed identity. Preserve geometry 8070391 as failed.
+Metadata diagnosis found 2,051 candidate scale differences; all fixed IDs and
+43 clean hashes match, while four selected scales and 129 jitter hashes differ.
+Do not weaken comparisons or rerun geometry blindly.
+
+Current diagnostic **8072666** was submitted at 22:49:45.058490 UTC and observed
+queued with four slots at 22:52:26.185888 UTC; no operation/log/resources yet.
+Launch `week5-r2-launches/20261013T224936Z/launch.json`, SHA
+`91358af8b0e0f3c04765c7fd9f5d4d5264c32cbb7dbaec2c5a2f7dfa917332a3`.
+Log: `logs/pose_w5_geometry_runtime.o8072666`. Its two fresh CPU workers compare
+native/default dispatch on four fixed cases, diagnostic only. The reviewed
+tools/input hashes and metadata-only 1-GiB reserve are in the execution record.
+Next check: **October 13, 2026 at 8:00 PM EDT (October 14, 00:00 UTC)**;
+no automatic inspection before 23:52:39 UTC. Verify exact accounting, both
+commands/resources/seals and all comparisons independently. A four-case result
+cannot accept geometry, pin the full pipeline runtime or establish capacity.
+Full A uses one process/profile for geometry, pilots and projections. Preserve
+all intents and held dependent stages; do not resubmit the diagnostic.
 
 The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
 frozen in a new clean checkout and separate locked environment. Preserve all scientific
@@ -210,11 +225,11 @@ not establish the successor controller. Keep the inherited
 in addition to the dataset-wide access lock; changing its name would permit
 overlapping old/new operations.
 
-First run a fresh allocated software rehearsal with isolated fixture roots,
-including proof mutation/teardown and independent recertification tests, typed
-capacity/opening checks and the complete report/access-boundary path. Retain
-accounting, all commands, logs, resource samples and before/after seals. Verify
-the completed operation independently before preparation or GPU work.
+The accepted software rehearsal used isolated fixture roots for proof
+mutation/teardown, independent recertification, typed capacity/opening checks
+and the complete report/access boundary. Its accounting, commands, logs,
+resources and both seals are retained. Do not regenerate accepted rehearsal or
+preparation; the next unaccepted stage is the diagnostic described above.
 
 For the admitted geometry receipt, use the reviewed supplementary checker
 `week5_additional_checks.py --mode geometry --revision execution-r2` with the

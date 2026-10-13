@@ -191,13 +191,37 @@ bindings, 616 source bindings and actual locked-ID dependence tables for
 Novel poses and outcomes remained unopened. Receipt
 `week5-r2-additional-verification/20261013T204221Z/verification.json` has
 SHA-256 `7703859e50361123de9054fba446c8384d423b8c549b69eab92720314c46c3d2`.
-Geometry job 8070391 was submitted at 20:46:55.956765 UTC and observed queued
-with four CPU slots at 20:49:22.424937 UTC; no operation, log or resource
-records existed and no outcome is claimed. Launch receipt
-`week5-r2-launches/20261013T204651Z/launch.json` has SHA-256
+Geometry job 8070391 was submitted at 20:46:55.956765 UTC and initially
+observed queued with four CPU slots at 20:49:22.424937 UTC. Its launch receipt
+`week5-r2-launches/20261013T204651Z/launch.json` retains SHA-256
 `a8c55f5a6054996d49cb2abab304a8b8925914a4cf0495a2f0368f84e4177452`.
-Its 1-GiB bound covers geometry only. Next manual status check:
-**October 13, 2026 at 5:55 PM EDT (21:55 UTC)**; hourly polling remains in force.
+The due inspection at 22:05:07.547370–22:05:19.824007 UTC found terminal
+failure: bpnlab-pub@scc-kc1, four OMP slots, 20:51:02–20:54:51 UTC,
+229 scheduler seconds, accounting failed=0/exit_status=1. The tracked checker
+and exact within-revision repeats passed, but the external wrapper rejected
+fixed cross-revision identity. No successor geometry completion is accepted.
+Metadata diagnosis found 2,051 candidate own_scale scalars differed; the fixed
+43 panel IDs, selection and manifests remained unchanged. All 43 clean tensor
+hashes matched. Four selected scales and 129 coordinate-jitter hashes differed
+across revisions; all 430 hashes were exact within each revision.
+Diagnosis `week5-r2-geometry-diagnosis/20261013T220749Z/diagnosis.json` has
+SHA-256 `d9d8b549c159206754d8f8b21eaaac1e6b5f656dee54959c23611717aa70534b`;
+discriminator `week5-r2-geometry-diagnosis/20261013T221341Z/clean-tensor-discriminator.json`
+has SHA-256 `f0dc0f44ba52c114e76b95ac044dd1ed63fd14fc62c8e1b9efd57c80f886ddcb`.
+CPU dispatch remains an unproven hypothesis. Separate native/default diagnostic
+job 8072666 was submitted October 13 at 22:49:45.058490 UTC after 127 local
+checks passed (60 parent, 27 worker, 40 launcher). Initial inspection at
+22:52:26.185888–22:52:38.052404 UTC observed queued (qw), four slots, with
+no operation, log or resource records. No diagnostic outcome is claimed.
+Launch `week5-r2-launches/20261013T224936Z/launch.json` has SHA-256
+`91358af8b0e0f3c04765c7fd9f5d4d5264c32cbb7dbaec2c5a2f7dfa917332a3`.
+Its diagnostic-only 1-GiB bound comes from 67,480,406 bytes of metadata/log/source
+bindings; the existing 17,675,344-byte archive is read only and never copied.
+Fresh quota/filesystem reserve passed; this does not establish campaign capacity.
+Next manual check: **October 13, 2026 at 8:00 PM EDT (October 14 at 00:00 UTC)**.
+Hourly polling remains in force; no automatic inspection occurs before 23:52:39 UTC. Its output can only be diagnostic metadata;
+it cannot produce eligible scientific artifacts or pass a gate. Source,
+scientific settings and tolerances remain frozen; there is no blind geometry retry.
 Preparation and fixture rehearsal grant no scientific admission.
 
 The successor must freshly regenerate parity, five caches/two full repeats,

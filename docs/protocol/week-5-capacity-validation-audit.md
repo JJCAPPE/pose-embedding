@@ -197,3 +197,25 @@ The successor requires its full regeneration inventory, independent checks and
 fresh full A before selection authorization. No method, seed, epoch, physical
 batch, metric, corruption or opening safeguard is reduced. Actual time remains
 unreported; technical completion and weekly closure remain pending.
+
+## October 13: successor geometry failure and runtime probe
+
+Successor geometry 8070391 consumed 229 scheduler wall-clock seconds and failed its
+fixed-panel identity wrapper. Keep that whole-job cost and failed attempt;
+tracked checker completion does not admit geometry. Metadata comparison found
+all 43 clean hashes unchanged but 2,051 candidate scales and 129 jitter hashes
+different. CPU dispatch remains an unproven cause.
+
+Diagnostic 8072666 was submitted at 22:49:45 UTC and observed queued at
+22:52:26 UTC. It compares native/default dispatch in two fresh CPU workers on
+four fixed cases; there is no measured result or capacity evidence yet. The
+1-GiB reserve covers 67,480,406 bytes of additional metadata/logs, with no archive
+copy; it is not a campaign forecast. Keep complete scheduler wall time, including
+setup, hashing and both commands, distinct from command-only timers.
+
+Before a permanent profile choice, require full candidate/panel reproduction
+and fresh paired initialization, complete pilot replay and exact projections
+under the same eventual full-A profile. Full A runs these validators in one
+process. New r2 heads have their own locked initialization evidence; historical
+r1 heads cannot be adopted. A successful four-case diagnostic alone cannot
+establish compatibility, scientific admission or deadline feasibility.
