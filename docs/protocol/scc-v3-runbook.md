@@ -131,11 +131,28 @@ environments, attempts, receipts and commands below remain historical evidence.
 Do not rerun their one-off launchers or replace files in either earlier release.
 Execution-r2 source release `f101f0e9d9bd64275d2088deab1b0bdcfcc53620` passed
 independent review and 1,373 local tests (two historical AVSL source-parity skips).
-Separate SCC installation passed; CPU rehearsal `8044010` was queued at October
-12 21:49 UTC. Read the current SCC status and verify terminal accounting, all
-commands/JUnit/resources/seals before advancing. The installation and rehearsal
-launch tools have both run; never blindly resubmit. This checkpoint claims no
-regenerated scientific artifact.
+Separate installation and independent completion review of CPU rehearsal
+`8044010` passed: 128 checks, three commands, nine resource samples and both
+seals. Receipt `week5-r2-rehearsal-verification/20261013T002413Z/verification.json`
+has SHA `963babe02eba70d34f3f9c9aa47af21145de387ca4d5a1ad6ccf9c226fb43381`.
+Preparation `8045152` was submitted October 13 at 00:25:38 UTC and observed
+queued at 00:26:31 UTC. Its launch receipt is
+`week5-r2-launches/20261013T002535Z/launch.json`, SHA
+`18955c81a3585af137ffeb21cca334cb6c99e5f3930f36e5f8abf63f73d79d85`.
+It uses four CPU slots/32 GiB/two hours and a separately derived 1-GiB
+preparation-only reserve. No preparation completion or scientific artifact is
+claimed. The installer, rehearsal verifier and both submission launchers have
+run; never blindly resubmit. The reviewed transition tools and hashes are in
+the execution record.
+
+Next read `$HOME/pose-embed-scc/WEEK5-STATUS.txt` and inspect this exact job via
+`qstat -j 8045152`; after completion retain `qacct -j 8045152` and verify every
+command/resource/seal, the original adopted manifest identities and exact
+original → r1 → r2 protocol/design/scientific-equality bindings before any
+supplementary analysis/geometry submission. Metadata/source checks may run on
+login; scientific hashing/replay remains allocation-only. Do not automatically
+inspect before October 13 01:26:31 UTC; recommended check-back is
+**October 12 at 9:30 PM EDT**. End the chat turn while queued or healthy running.
 
 Freeze the reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes
 in a new clean checkout and separate locked environment. Preserve all scientific

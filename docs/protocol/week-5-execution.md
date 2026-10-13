@@ -1494,6 +1494,57 @@ tests, 22 tracker tests, lint/typecheck, production build and live page/privacy
 checks passed. The publication commit is `5f55bb7`; source release remains
 `f101f0e`. No completion or capacity waiver was published.
 
+## Execution-r2 rehearsal accepted; preparation submitted
+
+The hourly inspection at **2026-10-12 23:53:05.648857 UTC** found rehearsal
+8044010 complete. It ran on `neuro-pub@scc-ke1` from 21:50:49 to 21:54:03 UTC,
+with exact-job accounting `failed=0`, `exit_status=0` and **194 seconds**.
+The isolated operation is `study-v3/operations/20261012T215109Z-8044010-rehearsal`.
+All **128 checks passed, with no failures, errors or skips**. They exercise the
+amended validation and complete fixture report; they do not admit scientific
+artifacts.
+
+Independent completion review passed at **2026-10-13 00:24:45.238807 UTC**:
+`study-v3/operations/week5-r2-rehearsal-verification/20261013T002413Z/verification.json`,
+SHA `963babe02eba70d34f3f9c9aa47af21145de387ca4d5a1ad6ccf9c226fb43381`.
+It checked **32 metadata bindings and 616 tracked source bindings**, all three
+commands, nine resource samples, exact accounting, operation and fresh review
+seals, and the fixture-only 180-cell report with nine trained fixture heads.
+Scientific arrays/checkpoints were not read or hashed by this login-node review.
+Verifier SHA `b2d7e5d3978d7fe1faa49d324014168d89101827a38170e5e4fa96188026922c`
+passed eight focused tests and independent/root reviews.
+
+Preparation **8045152** was submitted at **2026-10-13 00:25:38.993553 UTC**.
+Launch receipt `study-v3/operations/week5-r2-launches/20261013T002535Z/launch.json`
+has SHA `18955c81a3585af137ffeb21cca334cb6c99e5f3930f36e5f8abf63f73d79d85`.
+It requests four CPU slots, 32 GiB, two hours, no GPU, and the matching
+AVX2/Sapphire Rapids/Gold-6426Y profile. It uses immutable `f101f0e`, its separate
+locked environment, `prepare --revision execution-r2` and the original adopted
+`manifests/ntu-input-v2-7721684/manifest-set.json`; the frozen command checks the
+original → r1 → r2 design chain inside the allocation.
+
+The preparation-only additional bound is **1 GiB**: twice 58,822,903 bytes of
+retained predecessor manifest/lock metadata, plus 64 MiB for logs/metadata,
+rounded up. Current quota free **837,890,000,000 bytes** and filesystem free
+**1,007,052,390,400 bytes** passed `200 GiB + 1.25 * remaining_peak_bytes`.
+This is neither a measured campaign forecast nor reuse of the prior 24-GiB
+installation/rehearsal allowance. The launcher rechecked the accepted receipt,
+sources, dependencies, input metadata, seals, reserve, absent successor output
+and duplicate/uncertain submission intents. Its SHA is
+`1236411097728a2fd1a0f10a0818099dc37362aa996cb97a39998447923a9d11`;
+28 focused tests and independent/root reviews passed. Both tools are preserved
+under `study-v3/operations/week5-r2-transition-tools/20261013T002400Z`, tools.json
+SHA `2d070401b5855022b4d5d59dbc63158d05ad76123a11ecc21e0127c6c95f81a7`.
+They have now run; never blindly repeat their invocation.
+
+The one initial scheduler observation at **00:26:31.182636 UTC** found 8045152
+**queued (`qw`)**, four slots, with no operation or resource samples yet.
+The observation is retained under `study-v3/operations/week5-status/20261013T002630Z`.
+No preparation completion, regenerated scientific evidence or admission is claimed.
+Do not poll again automatically before **01:26:31 UTC**; recommended check-back:
+**October 12, 2026 at 9:30 PM EDT (October 13 01:30 UTC)**. Preserve the existing
+remote session and the allocation's 60-second resource monitoring.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -1533,12 +1584,12 @@ passed independent verification and established the measured-profile capacity
 no-go described above. The researcher then authorized ADR0007. Its implementation
 passed independent review and the stable full local suite: 1,373 passed and two
 historical AVSL source-parity skips. The clean successor release is
-`f101f0e9d9bd64275d2088deab1b0bdcfcc53620`; SCC validation and measured admission
-remain pending. The separate installation passed, and CPU rehearsal 8044010 is
-queued as of 21:49 UTC.
+`f101f0e9d9bd64275d2088deab1b0bdcfcc53620`. Separate installation and
+independent review of the 128-check allocated rehearsal passed. Preparation
+8045152 is queued as of October 13 00:26 UTC; scientific admission remains pending.
 
-**Next:** Verify allocated CPU rehearsal 8044010 for release `f101f0e`, then
-complete and verify successor preparation. Regenerate
+**Next:** After the hourly interval, inspect preparation 8045152 and verify
+its accounting, manifests, predecessor equality, resources and seals. Regenerate
 the declared evidence, then finish full A and corrupted-artifact replay, refresh
 seals and measure the complete CPU/GPU dependency/capacity ledger. Passing this
 engineering amendment does not authorize selection, final training or opening.

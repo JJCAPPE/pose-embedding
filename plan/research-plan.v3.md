@@ -20,10 +20,14 @@ content rehashing, and separate CPU/GPU capacity accounting. It requires a fresh
 `execution-r2` release and regeneration. The independently reviewed implementation
 passed the stable full local suite: 1,373 tests with two historical AVSL skips.
 Source release `f101f0e9d9bd64275d2088deab1b0bdcfcc53620` is frozen and pushed.
-SCC installation started October 12 at 21:42:51 UTC and remains pending at this
-checkpoint; no CPU rehearsal job has been submitted. Fresh successor evidence,
-full admission and measured CPU/GPU capacity remain pending. Preserve the measured
-no-go and all `execution-r1` evidence.
+The separate SCC installation and allocated CPU rehearsal 8044010 passed
+independent completion review: 128 checks, no failures or skips, successful
+194-second accounting, nine resource samples and intact seals. Verification
+receipt `week5-r2-rehearsal-verification/20261013T002413Z/verification.json` has
+SHA-256 `963babe02eba70d34f3f9c9aa47af21145de387ca4d5a1ad6ccf9c226fb43381`.
+This fixture-only evidence does not admit scientific execution. Preparation
+job 8045152 has been submitted; its completion, fresh successor evidence, full
+admission and measured CPU/GPU capacity remain pending. Preserve the measured no-go and all `execution-r1` evidence.
 
 Following the [final prospectus](../docs/proposal/2026/kulis_pose_sequence_retrieval_prospectus.pdf),
 the December study asks whether a **full contextual training recipe reduces
