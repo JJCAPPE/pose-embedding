@@ -1545,6 +1545,37 @@ Do not poll again automatically before **01:26:31 UTC**; recommended check-back:
 **October 12, 2026 at 9:30 PM EDT (October 13 01:30 UTC)**. Preserve the existing
 remote session and the allocation's 60-second resource monitoring.
 
+### Publication and hourly handoff, October 13 00:33 UTC
+
+Commit `452b3409cd88f008130d94e2d4b3cf3c79affbd0` published the accepted
+rehearsal and dated preparation submission. Guarded migration `20261013002548`
+(SHA `e5927d5c8aab95fc21fe172773876033d782ab41db9d517b3bd839bcb7ae9f80`)
+and promoted deployment `dpl_5UNdWC4A14gxqeZMntYcEZTHcTbK` passed live health
+verification at **00:30:45.224 UTC**. Week 5 is v28 active, task 02 v25 in
+progress, task 04 v8 blocked and gate 03 v9 pending. All scientific gates
+remain pending and actual researcher time remains explicitly unreported.
+
+Root independently matched the complete public content to the repository
+fallback at **00:33:21.691433 UTC**, including manual actions and protocol,
+after normalizing equivalent UTC timestamps and source/link ordering. Runtime
+export timestamps and the Supabase data-source envelope were checked separately.
+The retained formatted export SHA is
+`2ad86485487a4adf31be52833306d207f19bf461f2e89411b17d49d62937e689`.
+All 13 other weeks, links, historical task 01/03 timestamps, private ownership,
+RLS and unrelated Journey content were preserved. The 22 database guards,
+22 tracker tests, lint, typecheck, build, workspace and 19 runbook shell fences
+passed.
+
+The SCC pointer now resolves to
+`study-v3/operations/week5-status/20261013T002630Z/status.txt`, SHA
+`5badc56457760828536722b8020fabc36cf65a2fe436a2516b5460a9473928dc`.
+Its guarded update preserved the previous status and recorded the next command.
+The last scheduler inspection remains **00:26:31.182636 UTC**; no additional
+poll was made for this publication. Check back **October 12 at 9:30 PM EDT**
+(October 13 01:30 UTC), then inspect preparation 8045152 without resubmitting.
+The scientific source remains `f101f0e9d9bd64275d2088deab1b0bdcfcc53620`;
+preparation completion, regenerated evidence, full A and capacity remain pending.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
