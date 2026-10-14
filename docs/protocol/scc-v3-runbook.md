@@ -192,7 +192,7 @@ Metadata diagnosis found 2,051 candidate scale differences; all fixed IDs and
 43 clean hashes match, while four selected scales and 129 jitter hashes differ.
 Do not weaken comparisons or rerun geometry blindly.
 
-Current diagnostic **8072666** was submitted at 22:49:45.058490 UTC and observed
+Historical diagnostic **8072666** was submitted at 22:49:45.058490 UTC and observed
 queued with four slots at 22:52:26.185888 UTC; no operation/log/resources yet.
 Launch `week5-r2-launches/20261013T224936Z/launch.json`, SHA
 `91358af8b0e0f3c04765c7fd9f5d4d5264c32cbb7dbaec2c5a2f7dfa917332a3`.
@@ -206,7 +206,7 @@ cannot accept geometry, pin the full pipeline runtime or establish capacity.
 Full A uses one process/profile for geometry, pilots and projections. Preserve
 all intents and held dependent stages; do not resubmit the diagnostic.
 
-October 14 visibility checkpoint: SSH closed with `Broken pipe` and the pane
+Historical October 14 visibility checkpoint: SSH closed with `Broken pipe` and the pane
 returned to a local shell before another scheduler observation. The researcher
 must restore the existing connection; root must not type SCC commands into the
 local shell, enter credentials or create another connection. The October 13
@@ -217,6 +217,57 @@ has verified the real operation. Read the newest private handoff before resuming
 No result, remote pointer update, retry or scientific acceptance is inferred from
 the gap. The prepared verifier SHA is
 `c02d66d5b069f9987f51f1cccd0277f7ca366057cff92600743c3d9195e8e871`.
+
+Current October 14 checkpoint: the researcher restored SSH; root verified an
+authenticated idle SCC prompt at 19:37:51 UTC. The sole fresh observation at
+19:40:13–19:40:25 UTC found **8072666 failed before its parent** (exit1, four
+slots, two CPU wall-clock seconds). Its wrapper derived the helper path from
+SGE's copied script. Failure receipt
+`week5-r2-geometry-runtime-failure-verification/20261014T195626Z/verification.json`,
+SHA `c9e2d25740334923a537c36c82b0d2574f6b90a74b7d45ebf26ddc0c3aac371d`,
+independently verifies zero parent/worker/resource outputs. No CPU-dispatch
+result exists. Preserve every original record and never rerun that launcher.
+
+The new reviewed remedy is staged, **not executed**, under
+`week5-r2-geometry-runtime-diagnostic-remedy-tools/20261014T200830Z`:
+tools SHA `c6404952ea81aa28b04c2603b6b4b7190cc85c1c759ff08410ee2dd7f63c1d77`,
+input SHA `32289c531a0330f93dad42b7974022181eb494d775d6b70825a80a7a1877d716`.
+Launcher SHA `66a4a8ff9b17a4162df93a8389536d8e7ac82be7438c0c62c32ae7bc95992925`;
+wrapper SHA `88e3b44a6b455a2f980b5981f3fb4e4a601c6a044b20a0a8b5d54c628d0fb4b2`.
+It preserves the original packet except the pinned administrative failure/remedy
+record, locates helpers beside that canonical packet, and rechecks the failure
+receipt before/after the unchanged parent. All scientific code, comparisons and
+budgets remain fixed. Sixty-four checks and independent review passed.
+
+Next permitted check/launch: **October 14, 2026 at 4:41 PM EDT (20:41 UTC)**;
+no routine scheduler query before 20:40:26 UTC. Inspect the pane, read the latest
+status pointer, then execute only the new launcher once with explicit r2
+environment/release and its exact input SHA. Its fresh source/lock/seal/runtime,
+duplicate-intent/job and quota/reserve checks must pass. No new job exists yet.
+After actual submission, seal a descriptor containing the real job/launch/tool/
+input/status hashes and exact next permitted time for the newly reviewed
+metadata observer/completion verifier. The old c02 verifier is fixed to 8072666;
+it cannot verify a new job unchanged. Geometry and every successor remain held.
+
+The newly reviewed observer/completion tools are staged, unexecuted, under
+`week5-r2-geometry-runtime-remedy-control-tools/20261014T202734Z`, tools SHA
+`650418b03e6600d65decc6e1acfb0dd59fe0ad1dd152650b6537e9f4c1c9aaaa`.
+Observer SHA `18c30ef7722fd84482d786980dd1df0cdcd70d0410e2bc1dd76d853e68f6eeab`;
+verifier SHA `6001322b261f3229e1bbb2e75054b79180c9408b93dbb897338e5d6781390798`.
+Their 29/77 local checks and independent reviews passed. No real job descriptor
+or completion receipt exists yet. After actual submission, create a new immutable
+`week5-r2-geometry-runtime-remedy-launch-binding` descriptor with exactly
+`schema_version`, `kind`, `release_sha`, `execution_revision`, `job_id`, `launch`,
+`binding`, `tools`, `failure_verification`, `not_before`, `prior_status`,
+`scientific_admission_authorized` and `eligible_scientific_output`. Schema is 1;
+the five metadata descriptors contain `relative_path`/`sha256`, `not_before`
+is timezone-aware, and both scientific flags are false. Preserve each
+descriptor; a newer pointer requires a newly reviewed binding. Pass the descriptor
+using `--descriptor`/`--descriptor-sha256` for the observer and
+`--launch-descriptor`/`--launch-descriptor-sha256` for the completion verifier,
+together with actual immutable observation/accounting paths and hashes. Only
+metadata/source/stat work is allowed on login. No scientific binary is read by
+these tools; full numerical recertification remains allocated.
 
 The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
 frozen in a new clean checkout and separate locked environment. Preserve all scientific

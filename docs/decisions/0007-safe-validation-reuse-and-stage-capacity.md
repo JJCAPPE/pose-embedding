@@ -15,10 +15,22 @@ within-revision repeats but failed the wrapper fixed-identity check
 (229 scheduler seconds; exit_status=1). Its unchanged IDs/manifests and
 differing scalar/jitter hashes require a separate diagnostic; CPU dispatch
 remains unproven. Diagnostic job 8072666 was submitted October 13 at
-22:49:45.058490 UTC after 127 local checks passed and observed queued at
-22:52:26.185888 UTC. It has no eligible scientific output; no diagnostic
-outcome, geometry acceptance or gate pass is claimed. Next manual check:
-October 13 at 8:00 PM EDT (October 14 at 00:00 UTC), under hourly polling.
+22:49:45.058490 UTC after 127 local checks passed and initially observed queued
+at 22:52:26.185888 UTC. The scheduled 8:00 PM EDT check was not executed after
+SSH disconnected. After access was restored, the October 14 inspection at
+19:40:13.233256–19:40:25.519918 UTC found wrapper failure before the parent:
+neuro-pub@scc-h32, four OMP slots, two scheduler seconds, failed=0/exit_status=1.
+Independent metadata-only review verified zero operation/resource/worker outputs;
+receipt SHA-256 `c9e2d25740334923a537c36c82b0d2574f6b90a74b7d45ebf26ddc0c3aac371d`.
+No CPU capability comparison ran and the geometry cause remains unproven.
+A separate reviewed operational remedy passed 64 focused checks and was staged
+at 20:08:33.599282 UTC in new immutable tools, preserving the parent/worker,
+source, scientific settings and tolerances. Tools manifest SHA-256
+`c6404952ea81aa28b04c2603b6b4b7190cc85c1c759ff08410ee2dd7f63c1d77`; packet SHA-256
+`32289c531a0330f93dad42b7974022181eb494d775d6b70825a80a7a1877d716`.
+Its launcher has not been executed; no new job, scientific admission or gate
+pass is claimed. Next permitted launch/status check: October 14 at 4:41 PM EDT
+(20:41 UTC), under hourly polling.
 
 The researcher explicitly approved a result-blind amendment for safe validation
 reuse and separate CPU/GPU time accounting, preserving all scientific checks and

@@ -212,14 +212,36 @@ CPU dispatch remains an unproven hypothesis. Separate native/default diagnostic
 job 8072666 was submitted October 13 at 22:49:45.058490 UTC after 127 local
 checks passed (60 parent, 27 worker, 40 launcher). Initial inspection at
 22:52:26.185888–22:52:38.052404 UTC observed queued (qw), four slots, with
-no operation, log or resource records. No diagnostic outcome is claimed.
+no operation, log or resource records. No numerical diagnostic result was produced.
 Launch `week5-r2-launches/20261013T224936Z/launch.json` has SHA-256
 `91358af8b0e0f3c04765c7fd9f5d4d5264c32cbb7dbaec2c5a2f7dfa917332a3`.
 Its diagnostic-only 1-GiB bound comes from 67,480,406 bytes of metadata/log/source
 bindings; the existing 17,675,344-byte archive is read only and never copied.
 Fresh quota/filesystem reserve passed; this does not establish campaign capacity.
-Next manual check: **October 13, 2026 at 8:00 PM EDT (October 14 at 00:00 UTC)**.
-Hourly polling remains in force; no automatic inspection occurs before 23:52:39 UTC. Its output can only be diagnostic metadata;
+The October 13 at 8:00 PM EDT check was not executed after SSH disconnected;
+no result was inferred during the gap. After access was restored, inspection
+on October 14 at 19:40:13.233256–19:40:25.519918 UTC found diagnostic 8072666
+failed before its parent started: neuro-pub@scc-h32, four OMP slots,
+October 13 at 22:54:00–22:54:02 UTC, two scheduler seconds,
+accounting failed=0/exit_status=1. SGE copied the wrapper to its spool directory;
+the helper lookup used that directory and failed before either worker ran.
+Independent metadata-only review at 19:56:38.194670 UTC verified zero operations,
+resource records or worker outputs and 139 artifact/617 external/616 source bindings.
+No CPU capability comparison ran; the geometry cause remains unproven.
+Failure receipt `week5-r2-geometry-runtime-failure-verification/20261014T195626Z/verification.json`
+has SHA-256 `c9e2d25740334923a537c36c82b0d2574f6b90a74b7d45ebf26ddc0c3aac371d`.
+A separate reviewed operational remedy derives the unchanged parent helper from
+the canonical bound input packet directory. Its 64 focused checks and review
+passed; the original parent/worker and scientific settings/tolerances are unchanged.
+New immutable tools `study-v3/operations/week5-r2-geometry-runtime-diagnostic-remedy-tools/20261014T200830Z` were staged and verified
+October 14 at 20:08:33.599282 UTC. Tools manifest SHA-256
+`c6404952ea81aa28b04c2603b6b4b7190cc85c1c759ff08410ee2dd7f63c1d77`; input packet SHA-256
+`32289c531a0330f93dad42b7974022181eb494d775d6b70825a80a7a1877d716`; staging verification SHA-256
+`ae31768ad55b7107b113c581aa6aff0e8690f7e1b86ecdd575a40bd72dd87316`.
+The launcher has not been executed; no new job is claimed.
+Next permitted launch/status check: **October 14, 2026 at 4:41 PM EDT (20:41 UTC)**.
+Fresh source, locks, quota/free space, compatible runtime and duplicate guards
+must pass before submission; hourly scheduler polling remains in force. Its output can only be diagnostic metadata;
 it cannot produce eligible scientific artifacts or pass a gate. Source,
 scientific settings and tolerances remain frozen; there is no blind geometry retry.
 Preparation and fixture rehearsal grant no scientific admission.

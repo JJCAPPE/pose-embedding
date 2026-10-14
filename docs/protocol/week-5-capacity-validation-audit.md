@@ -219,3 +219,22 @@ under the same eventual full-A profile. Full A runs these validators in one
 process. New r2 heads have their own locked initialization evidence; historical
 r1 heads cannot be adopted. A successful four-case diagnostic alone cannot
 establish compatibility, scientific admission or deadline feasibility.
+
+## October 14: diagnostic wrapper failure
+
+The restored controller observed 8072666 terminal at 19:40 UTC. It consumed
+**two whole-job CPU wall-clock seconds** (four slots, CPU=0.098 seconds) and
+failed before the parent, workers or resource sampler started. Dependency setup
+passed; the wrapper incorrectly searched the scheduler spool directory for its
+helper. Independent metadata-only failure receipt SHA
+`c9e2d25740334923a537c36c82b0d2574f6b90a74b7d45ebf26ddc0c3aac371d`
+confirms zero numerical results. Retain this cost and failed attempt alongside
+geometry's 229 seconds. The CPU-dispatch hypothesis, compatible-profile proof
+and measured successor capacity remain pending. Any reviewed new diagnostic
+remedy retains the original four-slot, 32-GiB, 30-minute and 1-GiB reserve scope.
+The reviewed staged remedy input contains 80,064 bytes; its unchanged
+source-binding copy contains 73,320 bytes. The metadata/log bound is
+67,481,168 bytes before rounding to 1 GiB, with no archive copy. Fresh
+quota/filesystem evidence is still required at launch. This is a diagnostic
+reserve, not measured campaign capacity. It cannot replace full candidate/panel
+or paired-pilot compatibility checks.

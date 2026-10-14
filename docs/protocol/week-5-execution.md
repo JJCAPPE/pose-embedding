@@ -1957,6 +1957,104 @@ every prior record and use the prepared metadata-only observer/verifier; never
 rerun an executed launcher or infer progress during disconnection. Source remains
 frozen at f101; geometry, dependent stages, full A and measured capacity stay held.
 
+### October 14: restored access and verified wrapper failure
+
+The researcher restored the existing SSH connection. Root verified an
+authenticated idle SCC prompt at **19:37:51 UTC**, read the retained status
+pointer, then inspected diagnostic 8072666 once at
+**19:40:13.233256–19:40:25.519918 UTC**. The earlier visibility gap is historical;
+no scheduler progress was inferred from it.
+
+The diagnostic failed before its parent or workers started: failed=0/exit=1,
+four `omp` slots, **two whole-job CPU wall-clock seconds**, CPU=0.098 seconds,
+`neuro-pub@scc-h32`. It ran October 13 at 22:54:00–22:54:02 UTC. Dependency setup
+passed, then the wrapper looked for its helper beside the scheduler's copied
+script under `/var/spool/sge/`, where that helper did not exist. There are zero
+parent operations, resource samples or numerical outputs. The CPU-dispatch
+hypothesis remains untested. Preserve the original job, launch, intent and tools;
+its executed launcher must never run again.
+
+Observation `week5-status/20261014T194013Z/observation.json` has SHA
+`c40240ac655192b2ab2ed525dd09a54bb1b4c7a76ecc90d68b9ee2999bd52208`;
+accounting SHA `170e02451bfccfe53ce4f8e30752aec7242338df5aa335c16ea19c3b76dc142d`;
+log SHA `01358f1b1d4f22753ec447a1b5b08cf121605c5fc19b4f26735d92c80cbb8cf2`.
+Independent metadata-only failure verification completed at **19:56:38.194670 UTC**:
+`week5-r2-geometry-runtime-failure-verification/20261014T195626Z/verification.json`,
+SHA `c9e2d25740334923a537c36c82b0d2574f6b90a74b7d45ebf26ddc0c3aac371d`.
+It binds 139 metadata records, 617 external metadata/source records and all
+616 scientific source files. Its verifier passed 19 local checks and independent
+review; it reads no scientific binary. A passed failure-verification receipt
+confirms the failure and grants no diagnostic completion or scientific acceptance.
+
+The reviewed administrative remedy was staged at **20:08:33.599282 UTC** under
+`week5-r2-geometry-runtime-diagnostic-remedy-tools/20261014T200830Z`.
+Tools SHA `c6404952ea81aa28b04c2603b6b4b7190cc85c1c759ff08410ee2dd7f63c1d77`;
+input SHA `32289c531a0330f93dad42b7974022181eb494d775d6b70825a80a7a1877d716`;
+staging receipt SHA `ae31768ad55b7107b113c581aa6aff0e8690f7e1b86ecdd575a40bd72dd87316`.
+Staging rechecked 757 metadata/source bindings. The new launcher remains
+**unexecuted**; there is no new job or scheduler result. The old failed job is
+not resubmitted. The new wrapper resolves its canonical tools beside the
+hash-bound input file and checks the failure receipt before and after the
+unchanged parent. All original input fields remain equal except the explicit
+administrative remedy. Parent, worker, scientific source and resource budgets
+are unchanged. The new launcher/wrapper passed 64 tests, including actual
+scheduler-spool-copy regression and receipt/path/hash failure tests, plus
+independent review, Ruff/format and Bash syntax.
+
+At **October 14, 2026 at 4:41 PM EDT (20:41 UTC)**, root may read the latest
+status pointer and execute this new launcher once after its fresh duplicate,
+source, seal, lock, runtime and quota/reserve guards pass. No routine scheduler
+query is permitted before 20:40:26 UTC. No scheduler polling loop is used.
+
+The new metadata observer and independent completion verifier were separately
+reviewed and staged at **20:27:34.800332 UTC** under
+`week5-r2-geometry-runtime-remedy-control-tools/20261014T202734Z`, tools SHA
+`650418b03e6600d65decc6e1acfb0dd59fe0ad1dd152650b6537e9f4c1c9aaaa`.
+Observer SHA `18c30ef7722fd84482d786980dd1df0cdcd70d0410e2bc1dd76d853e68f6eeab`;
+verifier SHA `6001322b261f3229e1bbb2e75054b79180c9408b93dbb897338e5d6781390798`.
+All **106 checks** passed (29 observer, 77 verifier), including the actual
+staged metadata schema, with Ruff/format and independent review. These tools
+remain unexecuted on SCC. No job descriptor exists yet: root must create it
+only after actual submission, binding the real job/launch, current status,
+input/tools/failure receipts and exact permitted observation time. The observer
+rechecks the current pointer before querying. Completion still requires the
+unchanged full comparison/accounting/resource/seal/runtime evidence and the
+new wrapper's final marker; a valid negative diagnostic grants no scientific
+acceptance. The original c02/f23 tools and every original attempt remain intact.
+
+### Verified failure/staging publication
+
+Guarded migration `20261014195000_record_week_five_runtime_wrapper_failure_and_remedy.sql`,
+SHA `a4e0f3b2360a81189918f1e51afc361924bc9ac730a8d297e4899604a899d8da`,
+advanced only evidence/version fields: Week 5 **31 → 32**, task 02 **28 → 29**,
+task 04 **11 → 12**, gate 03 **12 → 13**. Root's separate database check at
+**20:21:30.919483 UTC** verified every complete public row, all prior history
+and the new migration statement/source hash. Independent DB receipt SHA
+`06e1d4e01907ecef10f033c4948c589df87f6d67f3be876c1dec87587ebb48aa`.
+States, completed-task history,
+researcher time, 13 other weeks, sources and links remain unchanged.
+
+Deployment **dpl_AHXW34C6wTpPiQ4WLdVMvvQcVRDw** passed staged checks and was
+promoted to <https://pose-embed-tracker.vercel.app>. Publication receipt at
+**20:27:44.360419 UTC** has SHA
+`fa17dc34075f2c7148a58af19d91eadbd88be5b5f48afe8e60af5f21c3a9bcfe`.
+Root's independent complete canonical check at **20:28:27.858713 UTC** passed,
+receipt SHA `d739e3d462080701b8f682cd5d145a899d92e05e3f2e32340954a3a72eb46907`;
+export SHA `7a9f619dbb8edc0e62f9de82dd588d8472513297896ccdb092730f5fb146f6ac`.
+Page/export/fallback/protocol/health match. Staged and canonical browser checks
+rendered the verified failure, unexecuted staged remedy, next check and retained
+task 01/03 history without page errors. The private export redirected with an
+empty body; Journey returned 200. Deployed functions use Node 24; the existing
+79 staging app-source files were preserved except the requested protocol bundle.
+
+All **31 database guards**, **22 maintained tracker tests**, **three Journey
+tests**, lint/typecheck, default Node 24 builds, local security/workspace checks
+and independent review passed. The same five inherited staging assertions fail
+before/after, with 20 other checks passing; two pre-existing hosted Auth warnings
+remain unchanged. Scientific source/configuration/dependency locks and the
+primary checkout are unchanged. Publication records staging, without claiming
+a new job, a numerical result, scientific admission or measured capacity.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -2005,9 +2103,9 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** At the dated next check inspect diagnostic 8072666 without resubmitting;
-independently verify its accounting, commands, resources, seals and exact
-native/default comparisons. Geometry 8070391 remains a preserved failed attempt.
+**Next:** At the dated next check execute the reviewed, staged administrative
+wrapper remedy once, then independently verify its eventual diagnostic result.
+Geometry 8070391 remains a preserved failed attempt.
 Confirm the complete compatible profile before a reviewed fresh geometry attempt.
 Then regenerate
 the remaining declared evidence. Finish full A and corrupted-artifact replay, refresh
@@ -2018,7 +2116,7 @@ engineering amendment does not authorize selection, final training or opening.
 capacity condition. Task 04 is blocked, task 02 remains in progress, and all
 scientific gates remain unresolved. The prior failed validator and its successful
 compatible-runtime retry remain preserved. Successor geometry failed its fixed
-identity guard; a bounded CPU diagnostic is queued, with no cause or remedy yet
-verified. Actual researcher minutes remain
+identity guard; the bounded CPU diagnostic failed its wrapper before numerical
+work. The wrapper cause is verified; CPU dispatch remains untested. Actual researcher minutes remain
 unreported by explicit request. Week 5 cannot close while required scientific
 gates are unresolved; all selection/final/novel authorization remains shut.
