@@ -269,6 +269,25 @@ together with actual immutable observation/accounting paths and hashes. Only
 metadata/source/stat work is allowed on login. No scientific binary is read by
 these tools; full numerical recertification remains allocated.
 
+Latest checkpoint: the **new remedy launcher has executed once**. Diagnostic
+**8102231** was submitted October 14 at **20:43:11.969137 UTC**. Launch
+`week5-r2-launches/20261014T204308Z/launch.json`, SHA
+`82427510eb77a8bc0875753d343783a1e9a383f05bef736aa2c01654ee4037f2`;
+submission verification
+`week5-r2-geometry-runtime-remedy-submission-verification/20261014T205034Z/verification.json`,
+SHA `63aa23c6e514f9cd1757021354fa1262b8f48f89af10e8a8015259e885dbb471`.
+The verification binds 763 metadata/616 sources, intent/packet/command/seals and
+fresh quota/free-space reserve. All staged labels above are historical; never
+execute the new launcher or its prepared guarded command again.
+
+The pre-submit scheduler check completed by 20:43:10.988132 UTC. First actual
+job observation is **October 14, 2026 at 5:45 PM EDT (21:45 UTC)**, respecting
+the hourly limit. No post-submit scheduler state or numerical result is claimed.
+Read the current status pointer and bind a real descriptor to its exact hash
+before invoking the reviewed observer after that boundary. The completion
+verifier stays unexecuted until actual terminal evidence exists. Keep geometry,
+every successor, full A and capacity held; inspect no scientific binary on login.
+
 The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
 frozen in a new clean checkout and separate locked environment. Preserve all scientific
 settings and validate the exact original → execution-r1 → execution-r2 design

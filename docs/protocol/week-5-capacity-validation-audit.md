@@ -238,3 +238,12 @@ source-binding copy contains 73,320 bytes. The metadata/log bound is
 quota/filesystem evidence is still required at launch. This is a diagnostic
 reserve, not measured campaign capacity. It cannot replace full candidate/panel
 or paired-pilot compatibility checks.
+
+Diagnostic remedy 8102231 was submitted October 14 at 20:43:11.969137 UTC after
+fresh quota 826,630,000,000 bytes and filesystem free 994,956,017,664 bytes passed
+that diagnostic-only reserve. Independent submission receipt SHA
+`63aa23c6e514f9cd1757021354fa1262b8f48f89af10e8a8015259e885dbb471`
+binds all source/input/command/seal evidence. Whole-job accounting is still
+unobserved: submission establishes no runtime measurement, numerical result,
+compatible-profile proof or campaign capacity. First job observation is
+October 14 at 5:45 PM EDT (21:45 UTC), after the hourly preflight boundary.

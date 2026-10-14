@@ -2055,6 +2055,75 @@ remain unchanged. Scientific source/configuration/dependency locks and the
 primary checkout are unchanged. Publication records staging, without claiming
 a new job, a numerical result, scientific admission or measured capacity.
 
+### New remedy submitted; first observation deferred
+
+The permitted boundary arrived during final handoff. Root read the verified
+20:37 status, executed the guarded **new** launcher once and submitted diagnostic
+**8102231 at 20:43:11.969137 UTC**. Launch
+`week5-r2-launches/20261014T204308Z/launch.json` has SHA
+`82427510eb77a8bc0875753d343783a1e9a383f05bef736aa2c01654ee4037f2`;
+intent SHA `7c690ce8410753e592a06c555dfb87c4b638ca28e344552a1d246c8c2fdeee6d`.
+Every staged/unexecuted claim above is a dated checkpoint. The actual launch
+supersedes those operational labels; neither this launcher nor its guarded
+command may execute again. The old failed diagnostic is preserved separately.
+
+Independent submission-metadata verification at **20:50:34.444145 UTC** rehashed
+763 metadata and 616 source bindings and checked the exact intent, packet,
+six wrapper arguments and both launch seals. Receipt
+`week5-r2-geometry-runtime-remedy-submission-verification/20261014T205034Z/verification.json`
+has SHA `63aa23c6e514f9cd1757021354fa1262b8f48f89af10e8a8015259e885dbb471`.
+Fresh quota **826,630,000,000 bytes** and filesystem free **994,956,017,664 bytes**
+passed the unchanged diagnostic reserve: 1 GiB from 67,481,168 additional
+metadata/log/source/receipt bytes, no archive copy. Resources remain four `omp`
+slots, 32 GiB, 30 minutes, no GPU, Gold-6426Y/AVX2. No actual allocated runtime
+or numerical outcome is accepted from submission alone.
+
+The empty pre-submit duplicate-job check completed by **20:43:10.988132 UTC**.
+To preserve the hourly inspection limit, the **first actual job observation is
+deferred to October 14, 2026 at 5:45 PM EDT (21:45 UTC)**. No post-submit query,
+operation, log, resource sample or outcome has been inspected; no queued,
+running or completion state is inferred. No waiting/polling loop is used.
+Source, inputs, comparisons and every held scientific gate remain unchanged.
+
+The large bulk metadata export exceeded terminal scrollback and its partial
+capture was retained. A compact metadata-verification attempt also stopped
+before producing a receipt because its local 1-MiB limit excluded large panel
+JSON. The corrected version uses the already reviewed 64-MiB metadata limit
+and preserves the scientific-binary denylist; that version produced the receipt
+above. Neither issue altered or resubmitted the job. Original commands/captures
+are preserved privately; no scientific comparison or tolerance was changed.
+
+### Verified submitted-only milestone publication
+
+The submitted-only milestone advanced the guarded evidence versions to Week 5
+33, task 02 30, task 04 13 and gate 03 14. Full public rows and prior migration
+history were independently checked at 21:00:27.615952 UTC on October 14;
+root receipt SHA is
+`01bf019aef7095f54e13428d61f59de03b47414394ab67c998a1565ed5e0233b`.
+Migration `20261014204512` has exact source/statement SHA
+`a6b1b980daeaddda87f35840b2be0994542c4f506515a8dae84f8d189ea021d4`.
+Task/gate states, task 01/03 history, actual time, the other 13 weeks, source
+links, ownership and RLS remain unchanged.
+
+Deployment `dpl_4NaBAGp9XYxFaqiC948oEhsud5SU` passed staged checks and was
+promoted to <https://pose-embed-tracker.vercel.app> with Node 24. Publication
+receipt SHA `d9b26e6002c7365678684b7024052a7b2dca94d9d14fb26886f72db24865db6a`
+was recorded at 21:12:09.523251 UTC. Root independently checked the canonical
+export, envelope, protocol, health, private login redirect and Journey at
+21:12:58.610318 UTC; receipt SHA
+`b43d74bd2ffc5a8bba1517a09d6952c3953d55fbb15cfbc8f41d334dfb05bbd9`
+and exact export SHA
+`af6d1dc303f35102308dee293c5a693c42f41b88e9d9b9800ddf7d72eb733ce3`
+bind the published submission facts. No job query or scientific acceptance is
+inferred from this publication.
+
+The 32 pgTAP guards, 22 maintained tracker tests, three Journey tests, lint,
+typecheck, Node 24 builds, workspace verification and independent review passed.
+The same five inherited staging assertions and two hosted Auth warnings remain
+unchanged. Scientific source, configurations and dependency locks remain frozen
+at `f101f0e9d9bd64275d2088deab1b0bdcfcc53620`. First diagnostic observation
+remains October 14 at 5:45 PM EDT (21:45 UTC).
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -2103,8 +2172,8 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** At the dated next check execute the reviewed, staged administrative
-wrapper remedy once, then independently verify its eventual diagnostic result.
+**Next:** At the dated first check observe diagnostic 8102231 without resubmitting,
+then independently verify its eventual diagnostic result.
 Geometry 8070391 remains a preserved failed attempt.
 Confirm the complete compatible profile before a reviewed fresh geometry attempt.
 Then regenerate

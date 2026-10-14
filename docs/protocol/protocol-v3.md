@@ -238,10 +238,28 @@ October 14 at 20:08:33.599282 UTC. Tools manifest SHA-256
 `c6404952ea81aa28b04c2603b6b4b7190cc85c1c759ff08410ee2dd7f63c1d77`; input packet SHA-256
 `32289c531a0330f93dad42b7974022181eb494d775d6b70825a80a7a1877d716`; staging verification SHA-256
 `ae31768ad55b7107b113c581aa6aff0e8690f7e1b86ecdd575a40bd72dd87316`.
-The launcher has not been executed; no new job is claimed.
-Next permitted launch/status check: **October 14, 2026 at 4:41 PM EDT (20:41 UTC)**.
-Fresh source, locks, quota/free space, compatible runtime and duplicate guards
-must pass before submission; hourly scheduler polling remains in force. Its output can only be diagnostic metadata;
+At the staged checkpoint on October 14 at 20:08:33.599282 UTC, the launcher
+had not been executed. That checkpoint and the earlier 4:41 PM EDT launch/check
+boundary remain historical. The new guarded launcher executed once:
+diagnostic remedy job **8102231 was submitted October 14 at 20:43:11.969137 UTC**.
+The fresh pre-submit scheduler check completed by 20:43:10.988132 UTC with no
+active jobs; it precedes submission and does not establish the new job state.
+Launch `week5-r2-launches/20261014T204308Z/launch.json` has SHA-256
+`82427510eb77a8bc0875753d343783a1e9a383f05bef736aa2c01654ee4037f2`; submission intent SHA-256
+`7c690ce8410753e592a06c555dfb87c4b638ca28e344552a1d246c8c2fdeee6d`.
+Independent submission-metadata review at 20:50:34.444145 UTC rehashed 763 metadata
+and 616 frozen-source bindings, checked the packet/intent/command and both launch seals.
+Receipt `week5-r2-geometry-runtime-remedy-submission-verification/20261014T205034Z/verification.json`
+has SHA-256 `63aa23c6e514f9cd1757021354fa1262b8f48f89af10e8a8015259e885dbb471`.
+Fresh quota 826,630,000,000 bytes and filesystem free 994,956,017,664 bytes passed
+the diagnostic-only reserve. Its 1-GiB bound derives from 67,481,168 bytes of
+metadata/log/source/receipt allowances; the existing 17,675,344-byte archive is
+read only in allocation, with no copy. This does not establish campaign capacity.
+The request remains four OMP CPU slots, 32 GiB, 30 minutes, no GPU and the
+reviewed Gold-6426Y/AVX2 selector. No post-submission scheduler observation or
+numerical result is claimed; no queued or running state is inferred.
+First permitted job observation: **October 14, 2026 at 5:45 PM EDT (21:45 UTC)**,
+preserving the hourly limit after launch preflight. Do not execute the launcher again. Its output can only be diagnostic metadata;
 it cannot produce eligible scientific artifacts or pass a gate. Source,
 scientific settings and tolerances remain frozen; there is no blind geometry retry.
 Preparation and fixture rehearsal grant no scientific admission.

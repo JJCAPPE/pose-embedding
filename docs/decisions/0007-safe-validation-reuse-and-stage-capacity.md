@@ -28,9 +28,18 @@ at 20:08:33.599282 UTC in new immutable tools, preserving the parent/worker,
 source, scientific settings and tolerances. Tools manifest SHA-256
 `c6404952ea81aa28b04c2603b6b4b7190cc85c1c759ff08410ee2dd7f63c1d77`; packet SHA-256
 `32289c531a0330f93dad42b7974022181eb494d775d6b70825a80a7a1877d716`.
-Its launcher has not been executed; no new job, scientific admission or gate
-pass is claimed. Next permitted launch/status check: October 14 at 4:41 PM EDT
-(20:41 UTC), under hourly polling.
+At the staged checkpoint the launcher had not been executed; the earlier
+4:41 PM EDT launch/check boundary remains historical. The new guarded launcher
+executed once and diagnostic remedy job 8102231 was submitted October 14 at
+20:43:11.969137 UTC. Launch SHA-256
+`82427510eb77a8bc0875753d343783a1e9a383f05bef736aa2c01654ee4037f2`. Independent submission review
+at 20:50:34.444145 UTC verified 763 metadata/616 source bindings, the intent,
+packet/command and both launch seals; receipt SHA-256
+`63aa23c6e514f9cd1757021354fa1262b8f48f89af10e8a8015259e885dbb471`.
+The fresh diagnostic-only quota/free-space reserve passed; this is not campaign
+capacity. No post-submission scheduler observation or numerical result is claimed.
+First permitted job observation: October 14 at 5:45 PM EDT (21:45 UTC), under
+hourly polling. No scientific admission or gate pass is claimed.
 
 The researcher explicitly approved a result-blind amendment for safe validation
 reuse and separate CPU/GPU time accounting, preserving all scientific checks and
