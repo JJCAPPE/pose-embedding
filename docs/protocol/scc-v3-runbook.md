@@ -206,6 +206,18 @@ cannot accept geometry, pin the full pipeline runtime or establish capacity.
 Full A uses one process/profile for geometry, pilots and projections. Preserve
 all intents and held dependent stages; do not resubmit the diagnostic.
 
+October 14 visibility checkpoint: SSH closed with `Broken pipe` and the pane
+returned to a local shell before another scheduler observation. The researcher
+must restore the existing connection; root must not type SCC commands into the
+local shell, enter credentials or create another connection. The October 13
+22:52 UTC queued snapshot above remains the latest actual observation, not a
+current-state claim. A metadata-only completion verifier and guarded observer
+passed 85 and nine local checks respectively plus independent review; neither
+has verified the real operation. Read the newest private handoff before resuming.
+No result, remote pointer update, retry or scientific acceptance is inferred from
+the gap. The prepared verifier SHA is
+`c02d66d5b069f9987f51f1cccd0277f7ca366057cff92600743c3d9195e8e871`.
+
 The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
 frozen in a new clean checkout and separate locked environment. Preserve all scientific
 settings and validate the exact original → execution-r1 → execution-r2 design

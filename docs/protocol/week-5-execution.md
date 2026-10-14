@@ -1921,6 +1921,42 @@ was made. Publication and heartbeat resumption grant no scientific acceptance
 or measured campaign capacity. Latest diagnostic observation remains the dated
 22:52 UTC queued snapshot; publication made no later scheduler query.
 
+### October 14: SSH visibility lost; completion review prepared
+
+The transferred SCC connection closed with `Broken pipe`; the pane returned
+to a local shell before the next diagnostic observation could execute. Root
+requested that the researcher restore authentication in the existing pane.
+No scheduler query, new submission, diagnostic result or remote status update
+was made during this visibility gap. The latest actual diagnostic observation
+remains **October 13 at 22:52:26–22:52:38 UTC**, queued `qw`. Diagnostic 8072666
+and failed geometry 8070391 must not be resubmitted.
+
+Local independent completion tools are prepared, reviewed and preserved.
+The metadata-only diagnostic verifier has SHA
+`c02d66d5b069f9987f51f1cccd0277f7ca366057cff92600743c3d9195e8e871`;
+**85 checks** passed (57 author tests and 28 independent edge cases), with
+Ruff/format and independent review. The guarded observation tool passed
+**nine checks** and independent review. It rejects execution before the saved
+time, optimized Python, unsafe paths and unbounded metadata; partial records
+from a healthy job are preserved without a completion claim.
+
+Completion verification requires exact immutable observation/accounting hashes,
+whole-job accounting, both commands, all resource/seal/source/input/runtime
+bindings and independent reconstruction of the scalar/hash/damage-row comparisons.
+A positive summary cannot override a later parent/postcheck or scheduler failure.
+The verifier checks every build/runtime field exactly, normalizing only Torch's
+single CPU-capability report line after checking it against that worker's declared
+mode. Numerical comparisons and tolerances are unchanged. Scientific archives
+receive stat/binding checks only on login; their complete hashes remain allocated
+worker claims. A valid unsupported hypothesis is diagnostic completion, not
+scientific acceptance. No real diagnostic completion was verified locally.
+
+Resume only after observing an authenticated idle SCC prompt and reviewing the
+latest private controller handoff and retained remote status pointer. Preserve
+every prior record and use the prepared metadata-only observer/verifier; never
+rerun an executed launcher or infer progress during disconnection. Source remains
+frozen at f101; geometry, dependent stages, full A and measured capacity stay held.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
