@@ -208,7 +208,7 @@ Diagnosis `week5-r2-geometry-diagnosis/20261013T220749Z/diagnosis.json` has
 SHA-256 `d9d8b549c159206754d8f8b21eaaac1e6b5f656dee54959c23611717aa70534b`;
 discriminator `week5-r2-geometry-diagnosis/20261013T221341Z/clean-tensor-discriminator.json`
 has SHA-256 `f0dc0f44ba52c114e76b95ac044dd1ed63fd14fc62c8e1b9efd57c80f886ddcb`.
-CPU dispatch remains an unproven hypothesis. Separate native/default diagnostic
+At that earlier geometry checkpoint, CPU dispatch was an untested recovery hypothesis. Separate native/default diagnostic
 job 8072666 was submitted October 13 at 22:49:45.058490 UTC after 127 local
 checks passed (60 parent, 27 worker, 40 launcher). Initial inspection at
 22:52:26.185888–22:52:38.052404 UTC observed queued (qw), four slots, with
@@ -227,7 +227,7 @@ accounting failed=0/exit_status=1. SGE copied the wrapper to its spool directory
 the helper lookup used that directory and failed before either worker ran.
 Independent metadata-only review at 19:56:38.194670 UTC verified zero operations,
 resource records or worker outputs and 139 artifact/617 external/616 source bindings.
-No CPU capability comparison ran; the geometry cause remains unproven.
+No CPU capability comparison ran in job 8072666; the geometry cause remains unproven.
 Failure receipt `week5-r2-geometry-runtime-failure-verification/20261014T195626Z/verification.json`
 has SHA-256 `c9e2d25740334923a537c36c82b0d2574f6b90a74b7d45ebf26ddc0c3aac371d`.
 A separate reviewed operational remedy derives the unchanged parent helper from
@@ -256,10 +256,34 @@ the diagnostic-only reserve. Its 1-GiB bound derives from 67,481,168 bytes of
 metadata/log/source/receipt allowances; the existing 17,675,344-byte archive is
 read only in allocation, with no copy. This does not establish campaign capacity.
 The request remains four OMP CPU slots, 32 GiB, 30 minutes, no GPU and the
-reviewed Gold-6426Y/AVX2 selector. No post-submission scheduler observation or
-numerical result is claimed; no queued or running state is inferred.
-First permitted job observation: **October 14, 2026 at 5:45 PM EDT (21:45 UTC)**,
-preserving the hourly limit after launch preflight. Do not execute the launcher again. Its output can only be diagnostic metadata;
+reviewed Gold-6426Y/AVX2 selector. At the submitted-only checkpoint, no post-submission state or result had been
+observed; the earlier 5:45 PM EDT (21:45 UTC) first-check boundary is historical.
+Actual inspection on October 14 at 22:25:31–22:25:43 UTC found completed diagnostic
+remedy job **8102231**, completed at **20:49:21.682189 UTC**. Accounting records
+neuro-pub@scc-ke1.scc.bu.edu, four OMP slots, failed=0/exit_status=0,
+**17 whole-job CPU wall seconds and 9.340 actual CPU seconds**.
+Independent completion review at 22:34:10.047781–22:34:14.167272 UTC verified
+both seals, two unchanged worker commands, dispatch evidence, the final wrapper
+marker, six resource records and 184 artifact/617 external/616 frozen-source bindings.
+Receipt `week5-r2-geometry-runtime-remedy-queue-record-verification/20261014T223409Z/verification.json`
+has SHA-256 `f077737e6781d002d92458d1a743d83c772f7ef028676ec987ad54455ce34d36`.
+The four-case recovery hypothesis is **unsupported**: native AVX512 exactly
+matched the failed-fresh four scales, 40 tensor hashes and 36 damage rows.
+DEFAULT recovered the original four scales but only **36/40 tensor hashes and
+32/36 damage rows**. Clean and all masking records matched the original; four
+residual jitter hash/damage-row differences across two cases remain. This does
+not establish the complete geometry cause or a permanent CPU profile.
+The first completion verifier rejected only the allocation QUEUE representation
+and produced no accepted receipt; its source and failure remain preserved.
+The reviewed replacement accepts the scheduler's bare queue name with a
+separately verified host, or its exact qualified forms. Host, job, PE, slot,
+thread, scientific and numerical checks remain unchanged; 93 focused tests,
+Ruff/format and independent review passed.
+Geometry and every dependent stage, full allocated A/corruption replay,
+scientific admission and measured CPU/GPU capacity remain held. No new profile,
+helper or job is claimed. Do not execute the launcher again.
+Next permitted scheduler/preflight check: **October 14, 2026 at 7:27 PM EDT (23:27 UTC)**,
+under the hourly limit. Its output can only be diagnostic metadata;
 it cannot produce eligible scientific artifacts or pass a gate. Source,
 scientific settings and tolerances remain frozen; there is no blind geometry retry.
 Preparation and fixture rehearsal grant no scientific admission.

@@ -14,7 +14,7 @@ admission. Geometry job 8070391 passed its tracked checker and exact
 within-revision repeats but failed the wrapper fixed-identity check
 (229 scheduler seconds; exit_status=1). Its unchanged IDs/manifests and
 differing scalar/jitter hashes require a separate diagnostic; CPU dispatch
-remains unproven. Diagnostic job 8072666 was submitted October 13 at
+was an untested recovery hypothesis at that checkpoint. Diagnostic job 8072666 was submitted October 13 at
 22:49:45.058490 UTC after 127 local checks passed and initially observed queued
 at 22:52:26.185888 UTC. The scheduled 8:00 PM EDT check was not executed after
 SSH disconnected. After access was restored, the October 14 inspection at
@@ -22,7 +22,7 @@ SSH disconnected. After access was restored, the October 14 inspection at
 neuro-pub@scc-h32, four OMP slots, two scheduler seconds, failed=0/exit_status=1.
 Independent metadata-only review verified zero operation/resource/worker outputs;
 receipt SHA-256 `c9e2d25740334923a537c36c82b0d2574f6b90a74b7d45ebf26ddc0c3aac371d`.
-No CPU capability comparison ran and the geometry cause remains unproven.
+No CPU capability comparison ran in job 8072666 and the geometry cause remains unproven.
 A separate reviewed operational remedy passed 64 focused checks and was staged
 at 20:08:33.599282 UTC in new immutable tools, preserving the parent/worker,
 source, scientific settings and tolerances. Tools manifest SHA-256
@@ -37,9 +37,28 @@ at 20:50:34.444145 UTC verified 763 metadata/616 source bindings, the intent,
 packet/command and both launch seals; receipt SHA-256
 `63aa23c6e514f9cd1757021354fa1262b8f48f89af10e8a8015259e885dbb471`.
 The fresh diagnostic-only quota/free-space reserve passed; this is not campaign
-capacity. No post-submission scheduler observation or numerical result is claimed.
-First permitted job observation: October 14 at 5:45 PM EDT (21:45 UTC), under
-hourly polling. No scientific admission or gate pass is claimed.
+capacity. At the submitted-only checkpoint no post-submission state or result had been
+observed; the earlier 5:45 PM EDT first-check boundary is historical.
+The October 14 inspection at 22:25:31–22:25:43 UTC found completed job 8102231,
+completed at 20:49:21.682189 UTC: neuro-pub@scc-ke1.scc.bu.edu, four OMP slots,
+failed=0/exit_status=0, 17 whole-job CPU wall seconds and 9.340 actual CPU seconds.
+Independent review at 22:34:10.047781–22:34:14.167272 UTC verified both seals,
+worker commands, dispatch, final wrapper marker, six resource records and
+184 artifact/617 external/616 source bindings; accepted receipt SHA-256
+`f077737e6781d002d92458d1a743d83c772f7ef028676ec987ad54455ce34d36`.
+The four-case recovery hypothesis is unsupported: native AVX512 matched all
+failed-fresh scales/hashes/rows; DEFAULT restored the four original scales but
+only 36/40 hashes and 32/36 rows. Four jitter hash/damage-row differences across
+two cases remain. This establishes neither the complete cause nor a permanent profile.
+The original completion verifier rejected only the scheduler's QUEUE form and
+produced no accepted receipt; that failure and source remain preserved.
+The independently reviewed replacement accepts bare or exact qualified queue
+forms while independently checking the host and retaining every other check;
+93 tests, Ruff/format and review passed. Geometry, all dependent stages, full
+allocated A/corruption replay, scientific admission and measured CPU/GPU capacity
+remain held. No new profile, helper, job or gate pass is claimed.
+Next permitted scheduler/preflight check: October 14 at 7:27 PM EDT (23:27 UTC),
+under hourly polling. The executed launcher must not run again.
 
 The researcher explicitly approved a result-blind amendment for safe validation
 reuse and separate CPU/GPU time accounting, preserving all scientific checks and

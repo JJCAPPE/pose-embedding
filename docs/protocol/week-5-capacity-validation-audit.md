@@ -247,3 +247,17 @@ binds all source/input/command/seal evidence. Whole-job accounting is still
 unobserved: submission establishes no runtime measurement, numerical result,
 compatible-profile proof or campaign capacity. First job observation is
 October 14 at 5:45 PM EDT (21:45 UTC), after the hourly preflight boundary.
+
+### October 14 diagnostic completion accounting
+
+Diagnostic 8102231 completed with four omp slots, no GPU, failed=0/exit_status=0,
+17 whole-job CPU wall seconds and actual CPU=9.340 seconds. The entire scheduler
+wall time counts, including environment setup, hashing and parent overhead.
+Independent receipt `f077737e6781d002d92458d1a743d83c772f7ef028676ec987ad54455ce34d36`
+binds exact accounting, both commands/seals, six resources and 184 metadata/617
+external/616 source records. Its valid negative diagnostic result does not admit
+geometry or establish a compatible profile, GPU timing or campaign capacity.
+Every failed attempt and the earlier verifier queue-record rejection is retained.
+The new verifier changes only exact queue representations; all parity/resource
+checks remain fixed. No declared workload or capacity budget is reduced. Next
+permitted scheduler inspection/preflight is October 14 at 7:27 PM EDT (23:27 UTC).

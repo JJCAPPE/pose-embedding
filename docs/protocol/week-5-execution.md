@@ -2124,6 +2124,92 @@ unchanged. Scientific source, configurations and dependency locks remain frozen
 at `f101f0e9d9bd64275d2088deab1b0bdcfcc53620`. First diagnostic observation
 remains October 14 at 5:45 PM EDT (21:45 UTC).
 
+### Corrected diagnostic completed; tested recovery remains incomplete
+
+Root's first post-submission observation ran October 14 from
+22:25:31.228546 to 22:25:43.899681 UTC. Diagnostic **8102231** completed on
+`neuro-pub@scc-ke1.scc.bu.edu`: four `omp` slots, failed=0, exit_status=0,
+**17 whole-job CPU wall seconds**, actual CPU=9.340 seconds. Submission/start/end
+accounting is retained, including setup and parent overhead. Observation SHA
+`1173326cdf23c740b8c041bf22b18c677efd9ae7b1227b8dfc426c2659dc111b`
+and accounting SHA
+`29a6e9af415ec18fcd553d6ae818826218ba328b283c284f7884f499f1b317e5`
+bind the actual operation
+`study-v3/operations/20261014T204914Z-8102231-geometry-runtime-diagnostic`.
+No launcher or job was resubmitted.
+
+The first metadata completion verifier stopped because it expected a combined
+queue/host string, while the actual allocation records `QUEUE=neuro-pub` and
+`HOSTNAME=scc-ke1.scc.bu.edu` separately. Preserve that failed verifier attempt
+and original source. A new reviewed verifier accepts the exact bare queue,
+full qualified queue or SCC short-host qualified queue, with all separate
+job/host/PE/slot/thread, source, numerical, seal, resource and accounting checks
+unchanged. Actual allocation SHA is
+`b68f110b3662b8e1e7e9f90ea721d54370f4e7d7211b1988dacb2b81dfcd7957`.
+The new verifier SHA is
+`9b2908891555f7636f138a72fa183961a2b545866f336480c7f67bf6d956fcce`;
+93 checks, Ruff/format and independent review passed. Its new immutable tools
+manifest has SHA
+`522a10317ead8150e8f4506538c4e959e75c5a596529973104563e443bffbb55`.
+No scientific artifact or sidecar was changed.
+
+Actual completion verification passed from 22:34:10.047781 to
+22:34:14.167272 UTC. Receipt
+`study-v3/operations/week5-r2-geometry-runtime-remedy-queue-record-verification/20261014T223409Z/verification.json`,
+SHA `f077737e6781d002d92458d1a743d83c772f7ef028676ec987ad54455ce34d36`,
+binds 184 metadata, 617 external metadata and 616 source records, both seals,
+both fresh-process commands, six resource samples, dispatch identity, final
+parent/wrapper markers and complete scheduler accounting. The completion
+verifier reads metadata only; the scientific archive hashing occurred in the
+allocated parent/workers.
+
+The result is **hypothesis-unsupported**, a valid completed diagnostic. Native
+AVX512 reproduced the failed-fresh reference exactly: four scales, 40 tensor
+hashes and 36 damage rows. Explicit `DEFAULT` reproduced the original four
+scales, **36 of 40 tensor hashes and 32 of 36 rows**. All four clean tensors
+and 24 mask tensors/rows match; four jitter tensors and their damage values
+remain different, confined to two cases. This establishes that the tested
+`DEFAULT` setting is insufficient; it does not establish a complete cause,
+compatible permanent profile or scientific acceptance. Geometry 8070391 and
+both earlier failure attempts remain preserved; every dependent stage, full A
+and capacity remain held. Scientific source stays frozen at
+`f101f0e9d9bd64275d2088deab1b0bdcfcc53620` with unchanged comparisons,
+original fallback and fixed panel IDs.
+
+Next permitted scheduler inspection or launch preflight is **October 14, 2026
+at 7:27 PM EDT (23:27 UTC)**. Diagnose the remaining runtime difference before
+preparing a new allocated confirmation; never rerun either executed launcher.
+Any later profile still requires full ordered 18,929-candidate and fixed
+43-clean/430-tensor/387-row confirmation, then fresh paired r2 initialization,
+full pilot/projection replay and full A under the same eventual profile before
+permanent runtime or admission. No new profile, job or admission is claimed.
+
+### Verified completion milestone publication
+
+The guarded completion milestone advanced only evidence versions to Week 5
+34, task 02 31, task 04 14 and gate 03 15. Independent root full-row/history
+verification at 22:49:54.406199 UTC has receipt SHA
+`b0378a3afe949f408f7a6a716a054455871ebee2c0f6716abe04d1e6c1493e54`;
+exact migration `20261014223712` source/statement SHA is
+`fee92654b61de4fe592c68e0c280cdaf941bdb24c1d9564d09f41cee56dfc640`.
+Task/gate states, task 01/03 history, all prior migrations, actual time, the
+other 13 weeks, source links and privacy remain unchanged.
+
+Node 24 deployment `dpl_7KL74p4iwKbPQig5yAPECUg3NU9A` passed staged checks
+and was promoted. Publication receipt, recorded at 22:51:56.908206 UTC, has SHA
+`2af4a3e17952c17bf97e151440c9a271f5a25f8ad96d780fc18770bb61c448e3`.
+Root independently checked the complete canonical export/envelope, health,
+private login redirect and Journey at 22:53:01.500432 UTC: receipt SHA
+`99f43f021ecda863ea8c11fc6d68e49c884efcbe5e5172a02710eb6104d7bf9d`,
+export SHA
+`db21f8abecaf556670981b341fc029933e9a99aa71c9f7347b830ef6a1b83b04`.
+Plan source, rendered completion/history and protocol checks also passed.
+The 34 pgTAP guards, 22 maintained tracker tests, three Journey tests, lint,
+typecheck, Node 24 builds, workspace and independent review passed. The same
+five inherited staging assertions and two hosted Auth warnings remain unchanged.
+Publication establishes no new job, compatible profile, geometry acceptance or
+scientific/capacity gate. The previous submitted-only milestone remains retained.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -2172,8 +2258,8 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** At the dated first check observe diagnostic 8102231 without resubmitting,
-then independently verify its eventual diagnostic result.
+**Next:** Diagnose the residual jitter differences in independently verified
+diagnostic 8102231, then prepare a separately reviewed allocated confirmation.
 Geometry 8070391 remains a preserved failed attempt.
 Confirm the complete compatible profile before a reviewed fresh geometry attempt.
 Then regenerate
@@ -2185,7 +2271,9 @@ engineering amendment does not authorize selection, final training or opening.
 capacity condition. Task 04 is blocked, task 02 remains in progress, and all
 scientific gates remain unresolved. The prior failed validator and its successful
 compatible-runtime retry remain preserved. Successor geometry failed its fixed
-identity guard; the bounded CPU diagnostic failed its wrapper before numerical
-work. The wrapper cause is verified; CPU dispatch remains untested. Actual researcher minutes remain
+identity guard; diagnostic 8072666 failed its wrapper before numerical work.
+Corrected diagnostic 8102231 completed and passed independent verification,
+but its tested DEFAULT recovery was incomplete. The full runtime cause and
+compatible profile remain unproven. Actual researcher minutes remain
 unreported by explicit request. Week 5 cannot close while required scientific
 gates are unresolved; all selection/final/novel authorization remains shut.

@@ -288,6 +288,30 @@ before invoking the reviewed observer after that boundary. The completion
 verifier stays unexecuted until actual terminal evidence exists. Keep geometry,
 every successor, full A and capacity held; inspect no scientific binary on login.
 
+Newer checkpoint: first post-submit observation of 8102231 ran October 14 at
+22:25:31.228546–22:25:43.899681 UTC. It completed with failed=0/exit_status=0,
+four omp slots, 17 whole-job CPU wall seconds, on neuro-pub@scc-ke1. Independent
+metadata-only completion receipt
+`week5-r2-geometry-runtime-remedy-queue-record-verification/20261014T223409Z/verification.json`,
+SHA `f077737e6781d002d92458d1a743d83c772f7ef028676ec987ad54455ce34d36`,
+passed at 22:34:14.167272 UTC: 184 metadata/617 external/616 source bindings,
+both commands/seals, six resources and final wrapper marker. The first verifier
+rejected SCC's bare queue-name representation; its attempt remains preserved.
+New verifier SHA `9b2908891555f7636f138a72fa183961a2b545866f336480c7f67bf6d956fcce`
+accepts the exact queue representations with all independent host/job/resource
+and numerical checks unchanged; 93 checks and independent review passed.
+
+The diagnostic is valid but its hypothesis is unsupported: native AVX512
+matches failed-fresh 4/40/36; DEFAULT matches original 4 scales, 36/40 tensor
+hashes and 32/36 damage rows. Four jitter outputs remain different. No full
+cause, compatible permanent profile or scientific gate is established. Both
+observer and new verifier have executed; historical staged labels are preserved.
+Never rerun the observation command or an executed launcher. Keep geometry and
+all successors held while diagnosing the residual. Next permitted scheduler
+inspection/preflight: **October 14 at 7:27 PM EDT (23:27 UTC)**. Full ordered
+candidate/fixed-panel confirmation and same-profile fresh pilot/projection/full-A
+recertification remain required; no scientific binary may be read on login.
+
 The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
 frozen in a new clean checkout and separate locked environment. Preserve all scientific
 settings and validate the exact original → execution-r1 → execution-r2 design
