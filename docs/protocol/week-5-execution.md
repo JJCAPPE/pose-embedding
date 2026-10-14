@@ -2176,13 +2176,15 @@ and capacity remain held. Scientific source stays frozen at
 `f101f0e9d9bd64275d2088deab1b0bdcfcc53620` with unchanged comparisons,
 original fallback and fixed panel IDs.
 
-Next permitted scheduler inspection or launch preflight is **October 14, 2026
-at 7:27 PM EDT (23:27 UTC)**. Diagnose the remaining runtime difference before
+At the completed-diagnostic checkpoint, the saved scheduler inspection or launch
+preflight boundary was **October 14, 2026 at 7:27 PM EDT (23:27 UTC)**. The
+separate later submission is recorded below. Diagnose the runtime difference before
 preparing a new allocated confirmation; never rerun either executed launcher.
 Any later profile still requires full ordered 18,929-candidate and fixed
 43-clean/430-tensor/387-row confirmation, then fresh paired r2 initialization,
 full pilot/projection replay and full A under the same eventual profile before
-permanent runtime or admission. No new profile, job or admission is claimed.
+permanent runtime or admission. That checkpoint claimed no new profile, job or
+admission.
 
 ### Verified completion milestone publication
 
@@ -2209,6 +2211,80 @@ typecheck, Node 24 builds, workspace and independent review passed. The same
 five inherited staging assertions and two hosted Auth warnings remain unchanged.
 Publication establishes no new job, compatible profile, geometry acceptance or
 scientific/capacity gate. The previous submitted-only milestone remains retained.
+
+### Separately reviewed libm diagnostic submitted; outcome unobserved
+
+At the October 14 completion checkpoint, no further profile, helper or job had
+been claimed; the earlier 7:27 PM EDT scheduler/preflight boundary is historical.
+Separate libm diagnostic tools were staged and verified at 23:26:33.802337 UTC
+after **173 local checks and independent review**. Tools manifest SHA-256
+`90c9336085f01d6b423a04a6087aff381b1527952cc86bea57e67c3cefd43093`; input SHA-256
+`1d6ea033970b2b1b49ca6548180e5e6e5f8c097cb722a2466db49b4809d4a4ff`.
+The new guarded launcher executed once: **libm diagnostic job 8104416 was
+submitted October 14 at 23:29:21.658353 UTC**.
+Launch `week5-r2-geometry-libm-launches/20261014T232917Z/launch.json` has SHA-256
+`03fa95ee91fb6c6686b792e111d3033bef8af8e5a12cca740be813023c87caf5`; intent SHA-256
+`574b8f072e3364b6650f01cead24e0bf60fae09eae8cda94bf574e938d3760b9`.
+Independent submission review at 23:34:29.161902 UTC rehashed 815 metadata and
+616 frozen-source bindings, checked exact intent/source/tools/input/command and
+complete before/after launch seals. Receipt
+`week5-r2-geometry-libm-submission-verification/20261014T233429Z/verification.json`
+has SHA-256 `0b6a6e05b49bd698cc4d0d317d5142d319d3ec6a5677448e0b90803e19938b33`.
+Fresh quota 824,700,000,000 bytes and filesystem free 992,888,225,792 bytes passed
+the diagnostic-only reserve: 67,667,170 bytes rounded to 1 GiB. The existing
+17,675,344-byte archive is read only in allocation, with no archive copy or
+runtime ELF output copies. This does not establish campaign capacity.
+The request is four OMP CPU slots, 32 GiB, 30 minutes, no GPU and the reviewed
+Gold-6426Y/AVX2 selector. The four-case diagnostic pairs fresh DEFAULT control
+and DEFAULT plus a version-appropriate libc/libm FMA-disable request; actual
+runtime, ELF and selected function implementation must be proven in allocation
+before interpreting numerical metadata. No permanent runtime profile or complete
+geometry cause is established. The accepted 8102231 negative result and all
+earlier failures remain preserved; geometry and every dependent scientific,
+replay and capacity gate remain held.
+The pre-submit scheduler check ran at 23:29:20.578046–23:29:20.793929 UTC; it
+precedes submission and does not establish the new job state. No post-submission
+scheduler observation or numerical result is claimed; no queued, running or
+completed state is inferred. First permitted observation:
+**October 14, 2026 at 8:31 PM EDT (October 15, 00:31 UTC)**, under the hourly limit.
+Never rerun any executed launcher.
+
+The same root controller retains the common operation and dataset-access locks,
+opening ledger, scheduler-side 60-second resource sampling, every attempt and
+all seals/manifests. The launch request does not establish actual allocated
+runtime, memory, dispatch or whole-job accounting. Those require the first
+observation and independent terminal review. Source/input/tool/status guards
+and a fresh sealed descriptor must pass before that observation; a newer status
+pointer requires review. This diagnostic cannot admit geometry or replace full
+ordered candidate/panel reproduction and same-profile fresh initialization,
+full paired pilot/projection replay and full A.
+
+### Verified libm submitted-only milestone publication
+
+Only evidence versions advanced to Week 5 35, task 02 32, task 04 15 and gate 03
+16. Migration `20261014233121` source/statement SHA is
+`5f9d69c3955e37d9079509c5b878677bd80b1f832ddb073e3dfccff34a230822`;
+actual database trigger timestamp is 23:44:04.942481 UTC. Root independently
+verified every before/after public row and all prior migration statements,
+project/source links, other 13 weeks, task 01/03 history, actual time and pending
+scientific gates: receipt SHA
+`b5dc7732f5f945cd70a9f3ce7a03cbca12a7d866e89fbca6a6fd87f7d3396380`.
+
+Node 24 deployment `dpl_CNQgfiTqYuGN6oMJZr3cQ1jJ3iSa` was inspected, promoted
+and verified. Actual publication receipt at 23:47:12.831163 UTC has SHA
+`195b1df4f41789691337e22be0aa66b0f5c197d0e69de56a6fbcc938becfb223`.
+Root independently verified the complete canonical export/envelope, history,
+health, private redirect with empty response and Journey at
+23:48:23.697795 UTC: receipt SHA
+`08f07c32a513a14e5e6d3563658bf7fa4ea012e76be32d1fb943ae3e120a1a9a`,
+export SHA `4617e9166d38dcc40e7197ae59f658272e7eb476262f800ff14575986b85c167`.
+Canonical plan/protocol sources and rendered submission/negative history passed.
+The 36 pgTAP guards, 22 maintained tracker tests, Node 24 lint/typecheck/builds,
+workspace and independent reviews passed. The same five inherited staging
+assertions and two hosted Auth warnings remain unchanged. The narrow verifier
+passed all eight changed public fields/four evidence rows and the complete live
+export. No post-submission job state/result, geometry acceptance, profile choice
+or scientific/capacity gate follows from this publication.
 
 ## Reflection
 
@@ -2258,8 +2334,10 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** Diagnose the residual jitter differences in independently verified
-diagnostic 8102231, then prepare a separately reviewed allocated confirmation.
+**Next:** Observe submitted libm diagnostic 8104416 no earlier than October 14
+at 8:31 PM EDT (October 15, 00:31 UTC), then independently verify its actual
+accounting/runtime/dispatch/metadata result before interpreting the hypothesis.
+Do not rerun the executed launcher or infer progress during the gap.
 Geometry 8070391 remains a preserved failed attempt.
 Confirm the complete compatible profile before a reviewed fresh geometry attempt.
 Then regenerate

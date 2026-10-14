@@ -307,10 +307,43 @@ hashes and 32/36 damage rows. Four jitter outputs remain different. No full
 cause, compatible permanent profile or scientific gate is established. Both
 observer and new verifier have executed; historical staged labels are preserved.
 Never rerun the observation command or an executed launcher. Keep geometry and
-all successors held while diagnosing the residual. Next permitted scheduler
-inspection/preflight: **October 14 at 7:27 PM EDT (23:27 UTC)**. Full ordered
+all successors held while diagnosing the residual. That checkpoint saved the
+**October 14 at 7:27 PM EDT (23:27 UTC)** preflight boundary, now historical. Full ordered
 candidate/fixed-panel confirmation and same-profile fresh pilot/projection/full-A
 recertification remain required; no scientific binary may be read on login.
+
+Newest actual submission checkpoint: separate libm diagnostic **8104416** was
+submitted October 14 at **23:29:21.658353 UTC**, after 173 local checks and
+independent review. The new launcher and guarded command have executed once;
+never rerun either or any historical launcher. Tools
+`week5-r2-geometry-libm-diagnostic-tools/20261014T232633Z/tools.json` has SHA
+`90c9336085f01d6b423a04a6087aff381b1527952cc86bea57e67c3cefd43093`;
+new input SHA `1d6ea033970b2b1b49ca6548180e5e6e5f8c097cb722a2466db49b4809d4a4ff`.
+Actual launch `week5-r2-geometry-libm-launches/20261014T232917Z/launch.json`
+has SHA `03fa95ee91fb6c6686b792e111d3033bef8af8e5a12cca740be813023c87caf5`.
+Independent submission receipt
+`week5-r2-geometry-libm-submission-verification/20261014T233429Z/verification.json`,
+SHA `0b6a6e05b49bd698cc4d0d317d5142d319d3ec6a5677448e0b90803e19938b33`,
+passed at 23:34:29.161902 UTC: 815 metadata/616 source bindings, exact intent,
+source/tools/input/command, both launch seals and fresh diagnostic storage reserve.
+The actual pre-submit qstat ran **23:29:20.578046–23:29:20.793929 UTC**.
+No post-submission scheduler, operation, log, resources or result has been
+observed. Do not claim queued/running/completed or infer an operation directory.
+
+**First observation: October 14, 2026 at 8:31 PM EDT (October 15, 00:31 UTC).**
+No scheduler query before this boundary. Read the newest `WEEK5-STATUS.txt`;
+root alone controls the authenticated idle SCC pane. Use the newly reviewed
+libm observer/verifier and sealed actual-job descriptor from the latest private
+handoff. A newer pointer requires reviewing and resealing the descriptor;
+never bypass it or invoke an old observer/launcher main. Future tools are
+preparation until their actual immutable stage/receipt is verified. The two
+serial DEFAULT control/candidate workers require allocated runtime/ELF/versioned
+function-dispatch proof before interpreting their raw four-case comparisons.
+All prior failures and the valid negative f077 completion remain preserved;
+no permanent profile, geometry acceptance or capacity is established. Full
+ordered candidate/panel confirmation and fresh same-profile paired initialization,
+full pilot/projection replay and full A remain required. Hold every dependent
+stage, selection/final/novel access. No scientific binary hashing on login.
 
 The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
 frozen in a new clean checkout and separate locked environment. Preserve all scientific

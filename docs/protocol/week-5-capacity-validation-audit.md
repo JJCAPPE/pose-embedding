@@ -260,4 +260,28 @@ geometry or establish a compatible profile, GPU timing or campaign capacity.
 Every failed attempt and the earlier verifier queue-record rejection is retained.
 The new verifier changes only exact queue representations; all parity/resource
 checks remain fixed. No declared workload or capacity budget is reduced. Next
-permitted scheduler inspection/preflight is October 14 at 7:27 PM EDT (23:27 UTC).
+permitted scheduler inspection/preflight at that checkpoint was October 14 at
+7:27 PM EDT (23:27 UTC), now historical.
+
+### October 14 separate libm diagnostic submission
+
+Diagnostic 8104416 was submitted at 23:29:21.658353 UTC. Independent submission
+receipt `0b6a6e05b49bd698cc4d0d317d5142d319d3ec6a5677448e0b90803e19938b33`
+verified 815 metadata/616 source bindings, exact intent/source/tools/input/command
+and both launch seals. Fresh quota 824,700,000,000 bytes and filesystem free
+992,888,225,792 bytes passed the 200-GiB plus 1.25-times-remaining-peak reserve.
+The diagnostic-only derived additional peak is 67,667,170 bytes, rounded to
+1 GiB; the existing 17,675,344-byte archive remains read only, with zero archive
+or runtime ELF output copies. This reserve does not certify campaign capacity.
+
+The request is four omp CPU slots, 32 GiB, 30 minutes, no GPU. No actual allocated
+runtime/dispatch, resource record, outcome or whole-job accounting has been
+observed. Environment setup, archive/runtime-library reads, hashing, both fresh
+workers and parent overhead must count in the complete CPU job wall time;
+parent/worker timers cannot substitute for qacct. The actual pre-submit qstat
+completed at 23:29:20.793929 UTC. First permitted job observation is October 14
+at 8:31 PM EDT (October 15, 00:31 UTC), with independent terminal review required.
+No capacity_passed, permanent profile, geometry acceptance, residual workload
+reduction or CPU/GPU budget relaxation follows from submission or four cases.
+Full fresh same-profile scientific regeneration/replay and the measured schema-2
+typed CPU/GPU campaign capacity conditions remain pending.

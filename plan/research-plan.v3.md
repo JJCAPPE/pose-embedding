@@ -131,10 +131,40 @@ separately verified host, or its exact qualified forms. Host, job, PE, slot,
 thread, scientific and numerical checks remain unchanged; 93 focused tests,
 Ruff/format and independent review passed.
 Geometry and every dependent stage, full allocated A/corruption replay,
-scientific admission and measured CPU/GPU capacity remain held. No new profile,
-helper or job is claimed. Do not execute the launcher again.
-Next permitted scheduler/preflight check: **October 14, 2026 at 7:27 PM EDT (23:27 UTC)**,
-under the hourly limit. Its output can only be diagnostic metadata;
+scientific admission and measured CPU/GPU capacity remain held. At the October 14 completion checkpoint, no further profile, helper or job had
+been claimed; the earlier 7:27 PM EDT scheduler/preflight boundary is historical.
+Separate libm diagnostic tools were staged and verified at 23:26:33.802337 UTC
+after **173 local checks and independent review**. Tools manifest SHA-256
+`90c9336085f01d6b423a04a6087aff381b1527952cc86bea57e67c3cefd43093`; input SHA-256
+`1d6ea033970b2b1b49ca6548180e5e6e5f8c097cb722a2466db49b4809d4a4ff`.
+The new guarded launcher executed once: **libm diagnostic job 8104416 was
+submitted October 14 at 23:29:21.658353 UTC**.
+Launch `week5-r2-geometry-libm-launches/20261014T232917Z/launch.json` has SHA-256
+`03fa95ee91fb6c6686b792e111d3033bef8af8e5a12cca740be813023c87caf5`; intent SHA-256
+`574b8f072e3364b6650f01cead24e0bf60fae09eae8cda94bf574e938d3760b9`.
+Independent submission review at 23:34:29.161902 UTC rehashed 815 metadata and
+616 frozen-source bindings, checked exact intent/source/tools/input/command and
+complete before/after launch seals. Receipt
+`week5-r2-geometry-libm-submission-verification/20261014T233429Z/verification.json`
+has SHA-256 `0b6a6e05b49bd698cc4d0d317d5142d319d3ec6a5677448e0b90803e19938b33`.
+Fresh quota 824,700,000,000 bytes and filesystem free 992,888,225,792 bytes passed
+the diagnostic-only reserve: 67,667,170 bytes rounded to 1 GiB. The existing
+17,675,344-byte archive is read only in allocation, with no archive copy or
+runtime ELF output copies. This does not establish campaign capacity.
+The request is four OMP CPU slots, 32 GiB, 30 minutes, no GPU and the reviewed
+Gold-6426Y/AVX2 selector. The four-case diagnostic pairs fresh DEFAULT control
+and DEFAULT plus a version-appropriate libc/libm FMA-disable request; actual
+runtime, ELF and selected function implementation must be proven in allocation
+before interpreting numerical metadata. No permanent runtime profile or complete
+geometry cause is established. The accepted 8102231 negative result and all
+earlier failures remain preserved; geometry and every dependent scientific,
+replay and capacity gate remain held.
+The pre-submit scheduler check ran at 23:29:20.578046–23:29:20.793929 UTC; it
+precedes submission and does not establish the new job state. No post-submission
+scheduler observation or numerical result is claimed; no queued, running or
+completed state is inferred. First permitted observation:
+**October 14, 2026 at 8:31 PM EDT (October 15, 00:31 UTC)**, under the hourly limit.
+Never rerun any executed launcher. Its output can only be diagnostic metadata;
 it cannot produce eligible scientific artifacts or pass a gate. Source,
 scientific settings and tolerances remain frozen; there is no blind geometry retry.
 Fresh successor scientific evidence, full admission and measured CPU/GPU

@@ -56,9 +56,29 @@ The independently reviewed replacement accepts bare or exact qualified queue
 forms while independently checking the host and retaining every other check;
 93 tests, Ruff/format and review passed. Geometry, all dependent stages, full
 allocated A/corruption replay, scientific admission and measured CPU/GPU capacity
-remain held. No new profile, helper, job or gate pass is claimed.
-Next permitted scheduler/preflight check: October 14 at 7:27 PM EDT (23:27 UTC),
-under hourly polling. The executed launcher must not run again.
+remain held. At the October 14 completion checkpoint no further profile, helper or job had
+been claimed; the earlier 7:27 PM EDT scheduler/preflight boundary is historical.
+Separate libm tools were staged at 23:26:33.802337 UTC after 173 checks and
+independent review. Tools SHA-256
+`90c9336085f01d6b423a04a6087aff381b1527952cc86bea57e67c3cefd43093`; input SHA-256
+`1d6ea033970b2b1b49ca6548180e5e6e5f8c097cb722a2466db49b4809d4a4ff`.
+The new guarded launcher executed once: job 8104416 was submitted October 14
+at 23:29:21.658353 UTC; launch SHA-256
+`03fa95ee91fb6c6686b792e111d3033bef8af8e5a12cca740be813023c87caf5`.
+Independent submission review at 23:34:29.161902 UTC verified 815 metadata and
+616 source bindings, intent/source/tools/input/command and both launch seals;
+receipt SHA-256 `0b6a6e05b49bd698cc4d0d317d5142d319d3ec6a5677448e0b90803e19938b33`.
+Fresh quota/free reserve passed: 67,667,170 bytes rounded to 1 GiB, with no
+archive or runtime ELF output copies; this is not campaign capacity.
+The four-case DEFAULT control versus DEFAULT plus version-appropriate libc/libm
+FMA-disable request requires allocated runtime/ELF/function-dispatch proof before
+interpreting numerical metadata. No permanent profile or full cause is established;
+the accepted 8102231 negative result and all failures remain preserved.
+Geometry, all dependent scientific/replay/capacity gates and all Week 6 selection,
+final training and novel opening remain held. Pre-submit qstat completed at
+23:29:20.793929 UTC; no post-submit state or result has been observed.
+First permitted observation: October 14 at 8:31 PM EDT (October 15, 00:31 UTC),
+under hourly polling. Never rerun any executed launcher.
 
 The researcher explicitly approved a result-blind amendment for safe validation
 reuse and separate CPU/GPU time accounting, preserving all scientific checks and
