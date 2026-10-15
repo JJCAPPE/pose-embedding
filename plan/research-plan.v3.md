@@ -181,11 +181,43 @@ supports neither acceptance nor rejection of the libm cause hypothesis and
 selects no permanent profile. The earlier 8102231 unsupported recovery result
 and all failed attempts remain preserved.
 The next hourly boundary after observation was October 15 at 01:32:16.614103 UTC;
-no repeat scheduler query is needed for terminal review. SCC access was found disconnected after an attempted full-receipt export
-returned no receipt. Accepted compact/capture
-evidence remains retained; no full local verification-JSON export or refreshed
-SCC status is claimed. Access restoration is pending; no new diagnostic or
-scientific job is claimed. Geometry, all dependent stages/full allocated replay,
+no repeat scheduler query is needed for terminal review. At the later access-blocked checkpoint, SCC access was found disconnected
+after an attempted full-receipt export returned no receipt. Only accepted
+compact/capture evidence was then retained, with no full local JSON export or
+refreshed SCC status claimed; restoration was pending and no new job was claimed.
+That checkpoint remains historical. **The researcher restored the existing SCC
+connection on October 15.** The full **238,862-byte** verification JSON was
+recovered at **15:03:07.054586 UTC** from seven checked metadata chunks, retaining
+its exact `9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`
+identity. Four bound JSONs (child inputs, control runtime, FMA-off runtime and
+summary) were recovered and hash-checked against that receipt by
+**15:05:07.897329 UTC**. Independent read-only review confirmed exact transport,
+the original comparisons and **240 metadata/617 external/616 source** counts.
+SCC status was refreshed at **15:13:30.934012 UTC**, SHA-256
+`bbf4d01268ac8db236ceba3424aa2167a741caba72c8b930166d57ca0fbd1230`.
+Recovery read only metadata: no scheduler query, scientific archive or runtime
+binary was read. Last actual scheduler batch remains October 15 at
+00:32:05.186540–00:32:16.493406 UTC. The earlier `5644` recovery command stopped
+at its export-size guard and remains preserved without rerun; the earlier
+`ac786` export remains ambiguous and preserved.
+
+Recovered runtime metadata records glibc **2.28 stable**, baseline
+`GLIBC_TUNABLES` unset and candidate `glibc.tune.hwcaps=-FMA_Usable`, with identical
+required/default versioned math offsets before/after both conditions.
+Classification remains **inconclusive-dispatch**; recovery establishes neither
+a libm cause nor a permanent profile. One **data-free resolver sensitivity
+design** is selected for local implementation and independent review only:
+two serial fresh children, `GLIBC_TUNABLES` unset versus exact
+`glibc.cpu.hwcaps=-FMA_Usable`, changing only the namespace from the prior request.
+It reads no NPZ, runs no historical worker or numerical experiment, and imports
+no Torch in the children; the supervisor imports Torch to retain inherited
+safeguards. Actual package/loader provenance and required-version offset
+sensitivity must be established in allocation. Producer tools passed **140 local
+checks**, Ruff/format/Bash syntax and independent review. Separate metadata-only
+submission, observation and terminal controls passed **75 synthetic checks**,
+Ruff/format and independent review. Both exact source sets are reviewed and
+frozen locally; **nothing is staged or submitted**. No new job, resolver result,
+permanent runtime or scientific acceptance is claimed. Geometry, all dependent stages/full allocated replay,
 scientific admission, measured CPU/GPU capacity, Week 6 selection, final training
 and novel opening remain held. Source, recipes, tolerances, IDs and fallback
 remain frozen. Never rerun an executed launcher or observer. Its output can only be diagnostic metadata;

@@ -303,6 +303,28 @@ hash and four damage-row differences from the original four-case reference.
 This is no compatible-profile proof, scientific admission, GPU measurement or
 campaign capacity result. Keep the prior failed attempts and their entire costs;
 do not reduce remaining regeneration/replay or any budget. SSH subsequently
-disconnected; exact recorded metadata recovery and SCC status refresh await
-researcher-restored authentication. Full same-profile scientific reproduction,
-fresh pilot/replay evidence and measured schema-2 capacity remain pending.
+disconnected; recovery was pending at the initial completion checkpoint.
+
+### October 15 metadata recovery and next diagnostic preparation
+
+The researcher restored the existing connection. The full 238,862-byte terminal
+receipt and four bound runtime JSONs were recovered with exact hashes and
+independent review. SCC status `week5-status/20261015T151330Z/status.txt`, SHA
+`bbf4d01268ac8db236ceba3424aa2167a741caba72c8b930166d57ca0fbd1230`, was
+refreshed at 15:13:30.934012 UTC. No scheduler query or runtime/scientific binary
+read occurred during login metadata recovery. Its transport work is not a new
+allocated experiment or a capacity measurement.
+
+The next resolver-only diagnostic is locally prepared and reviewed, with no
+staging or submission yet: two serial fresh processes, unset tunables versus
+`glibc.cpu.hwcaps=-FMA_Usable`, retaining the prior feature token and changing
+only its namespace. Required package/loader/build/import/offset provenance and
+any sensitivity contrast must come from an allocation. Resolver children perform
+no tensor, worker or licensed-input work; inherited supervisor imports/setup and
+all hashing/I/O still belong to the complete CPU allocation wall time. Preserve
+all prior costs and remaining full same-profile scientific reproduction, fresh
+pilot/replay evidence and measured schema-2 capacity requirements. No resolver
+result can itself pass those gates. All 140 producer and 75 controller checks,
+Ruff/format, Bash syntax and independent reviews passed locally; none measures
+allocated capacity. The next permitted prelaunch check is October 15 at
+12:14 PM EDT (16:14 UTC), with fresh storage/runtime/lock/duplicate guards.

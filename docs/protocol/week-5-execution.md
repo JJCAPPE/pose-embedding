@@ -2325,8 +2325,8 @@ evidence both match 0/4 scales, 28/40 hashes and 24/36 rows. An intervention
 without a measured dispatch change cannot reject the libm hypothesis or prove
 the cause. No compatible permanent profile or geometry admission follows.
 
-SSH subsequently closed with connection reset/Broken pipe. The pane is a local
-shell; the researcher has been asked to restore the existing connection. Root
+SSH subsequently closed with connection reset/Broken pipe. At that checkpoint
+the pane was a local shell and restoration had been requested. Root
 stopped remote commands. An attempted full-receipt metadata export returned no
 receipt; preserve the ambiguous attempt without claiming an export or its
 execution timing. The exact compact completion receipt and completed capture are retained
@@ -2359,8 +2359,70 @@ The 38 pgTAP guards, 22 maintained tracker tests, lint/typecheck/Node 24 builds,
 workspace, narrow scope and independent reviews passed. The same five inherited
 staging assertions and two hosted Auth warnings remain unchanged. This records
 the valid inconclusive diagnostic; it adds no scientific/profile/capacity gate
-or SSH restoration. Remote metadata recovery and SCC status refresh remain
-blocked by the disconnected session.
+or SSH restoration. At that published checkpoint, remote metadata recovery and
+SCC status refresh remained blocked by the disconnected session.
+
+### October 15: access restored and exact runtime metadata recovered
+
+The researcher restored the existing connection. Root verified the authenticated
+idle SCC pane before each metadata command, without entering credentials or
+creating a connection. No scheduler query was needed or performed: the last
+actual batch remains October 15 at 00:32:05.186540–00:32:16.493406 UTC.
+
+The complete **238,862-byte** terminal receipt was recovered at 15:03:07 UTC,
+with exact SHA `9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`.
+Its compressed representation required seven bounded pieces, independently
+reassembled and checked against the recorded hash. The preceding recovery
+command stopped at its 60,000-character export guard; the 101,196-character
+encoding, failed attempt and all distinct subsequent commands are preserved.
+Never rerun those commands or infer execution of the earlier ambiguous export.
+
+Four JSON files from the actual `20261014T233420Z-8104416-geometry-libm-diagnostic`
+operation were then exported separately at 15:05:07 UTC. Independent review
+confirmed their exact raw bytes against the terminal receipt:
+
+| Recorded metadata | SHA-256 |
+| --- | --- |
+| `child-inputs.json` | `f282baa5b5cbdc257932cf34ca538af01a8c34123e4da864b7e6223e8dd9fd3a` |
+| `control-runtime.json` | `fa6c5c72536fa89cbe34730104455dbcebbf644de5660529df3fd575a4a8856d` |
+| `fma-off-runtime.json` | `b976f865f42599aa4b94846028b889f27a6836f3c30083c5b4ed0ac0199fa898` |
+| `summary.json` | `74c5ba083235766f0532b7bc5eb8c3e0c2edac8b62b9558539cd3bdd4fd46f0c` |
+
+These are recovered records, not a new numerical validation. The actual records
+show glibc 2.28, an unset baseline `GLIBC_TUNABLES`, candidate
+`glibc.tune.hwcaps=-FMA_Usable`, and ATEN `default`. Binary identities, imported
+symbol versions/providers and required/default code offsets agree before and
+after both conditions. In particular, the recorded `logf` import is
+`GLIBC_2.27`; an unversioned or legacy-wrapper explanation is not established by
+these records. The result remains inconclusive, with no cause or permanent
+profile selected. No runtime ELF or scientific binary was read on login.
+
+The SCC status was refreshed once at 15:13:30.934012 UTC:
+`week5-status/20261015T151330Z/status.txt`, SHA
+`bbf4d01268ac8db236ceba3424aa2167a741caba72c8b930166d57ca0fbd1230`;
+manifest SHA `effbe46b62b85e908e082d2f93468c94ac5ba4ee47d32cb9f1599e0d17614c52`.
+The previous pointer/hash was checked before publication and the new pointer/hash
+was verified afterward. Three local boundary checks and independent source review
+passed. The earlier status and executed descriptor remain immutable history.
+
+The next diagnostic is prepared and independently reviewed locally: one data-free CPU
+allocation with two serial fresh resolver processes, `GLIBC_TUNABLES` unset
+versus `glibc.cpu.hwcaps=-FMA_Usable`. It changes only the namespace from the
+previous request. Actual package/loader provenance, unchanged binary/import
+identity, exact control offsets and a measured required-version dispatch contrast
+must be checked in allocation. Resolver children must not import Torch, run the
+scientific worker, read licensed inputs or evaluate tensors/math functions. The
+supervisor may import Torch for inherited locks/resource checks; its entire cost
+stays in CPU allocation time. No tools are staged or job submitted at this
+checkpoint. A changed resolver would establish sensitivity only; no change would
+remain inconclusive. Neither result admits geometry, a permanent profile or any
+dependent scientific/capacity stage. All 140 producer checks and 75 independent
+controller checks passed, including separate hashes for the `readelf` executable
+and its recorded output. Ruff/format, wrapper syntax and independent source
+reviews passed. These are software checks, not an allocated runtime result.
+The next permitted SCC prelaunch check is October 15 at 12:14 PM EDT
+(16:14 UTC); the exact future command and current-pointer guards remain in the
+private handoff.
 
 ## Reflection
 
@@ -2410,11 +2472,11 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** Restore authenticated access in the existing pane, recover the exact
-already-recorded libm runtime metadata and refresh the dated SCC status.
-The first observation and terminal verifier have executed; do not rerun either.
-Use the inconclusive dispatch result to prepare a source-grounded diagnostic
-that demonstrates an actual intervention before interpreting numerical effects.
+**Next:** At the permitted check time, stage the exact reviewed data-free
+resolver-sensitivity tools immutably, then run the new launcher once after fresh
+launch guards pass. Access and recorded metadata recovery are complete. The first observation,
+terminal verifier and recovery commands have executed; do not rerun them.
+Establish an actual intervention before interpreting numerical effects.
 Geometry 8070391 remains a preserved failed attempt.
 Confirm the complete compatible profile before a reviewed fresh geometry attempt.
 Then regenerate
@@ -2430,7 +2492,9 @@ identity guard; diagnostic 8072666 failed its wrapper before numerical work.
 Corrected diagnostic 8102231 completed and passed independent verification,
 but its tested DEFAULT recovery was incomplete. Libm diagnostic 8104416 passed
 independent completion review; its dispatch intervention was inconclusive and
-the same residual differences remain. SSH access is blocked. The full runtime cause and
+the same residual differences remain. SSH access and exact metadata recovery are
+restored; the resolver-only successor is locally reviewed, unstaged and unsubmitted.
+The full runtime cause and
 compatible profile remain unproven. Actual researcher minutes remain
 unreported by explicit request. Week 5 cannot close while required scientific
 gates are unresolved; all selection/final/novel authorization remains shut.

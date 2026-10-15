@@ -360,18 +360,38 @@ or default math-symbol implementation offsets changed. Both conditions retain
 original4/36/32 matches; this does not reject the libm hypothesis or admit a
 permanent profile, geometry or any dependent stage.
 
-SSH subsequently disconnected with Broken pipe and the pane is now local.
-The researcher has been asked once to restore the existing connection; never
-enter credentials, reconnect, create another connection or type SCC commands at
-a local/password prompt. Inspect the authenticated idle pane immediately before
-typing. Do not repeat the authentication request while this blocker persists.
-Read the latest private handoff for the exact next access-check time. The dated
-SCC status still predates the actual4197/9f45 receipts; review newer receipts and
-refresh it after access returns. Full9f45 and child runtime JSON export remains
-unconfirmed; preserve the attempted export and use a new reviewed metadata-only
-recovery command after authentication. No scheduler requery is needed to recover
-already-completed metadata. Never rerun the executed observer, verifier or any
-launcher. Keep every scientific/capacity/selection/final/novel gate held.
+The researcher subsequently restored the existing connection. Root recovered
+the full238862-byte9f45 receipt and its four bound runtime JSONs with exact
+hashes and independent review, without a scheduler query or binary work on login.
+The size-guard failure, seven distinct chunk exports, four JSON exports and
+earlier ambiguous export are preserved; never rerun executed recovery commands,
+observer/verifier mains or launchers. Inspect the authenticated idle existing
+pane immediately before typing; never enter credentials, reconnect, create
+another connection or type SCC commands at a local/password prompt.
+
+Current SCC status `week5-status/20261015T151330Z/status.txt`, SHA
+`bbf4d01268ac8db236ceba3424aa2167a741caba72c8b930166d57ca0fbd1230`, was
+created15:13:30.934012UTC with prior/new pointer/hash checks. The olda8d status
+and executed descriptor remain history. Read the latest pointer and private
+handoff before any permitted command; a newer pointer requires review, never a
+bypass. Last actual scheduler query remains00:32:16.493406UTC. Follow the exact
+next check time in the private handoff; no completed-job scheduler requery is needed.
+
+Next diagnostic is locally prepared/reviewed, not staged or submitted: one
+data-free allocated resolver test with two serial fresh children, tunables unset
+versus `glibc.cpu.hwcaps=-FMA_Usable`. Reuse only the hash-bound runtime snapshot
+helper with `loaded_torch=False`, never its historical main/worker/control code.
+Require actual package/loader identity, unchanged9f45 builds/imports, exact
+baseline offsets and stable executable-provider mappings before classifying
+resolver sensitivity. Resolver children import no Torch and evaluate no math,
+tensors or licensed inputs; inherited supervisor imports for safeguards must be
+recorded and included in whole CPU job time. All 140 producer checks and 75
+independent controller checks, Ruff/format, Bash syntax and independent reviews
+passed. At or after October 15, 12:14 PM EDT (16:14 UTC), stage the exact reviewed
+files and launch only after all fresh guards. These local checks establish no
+runtime result. Neither sensitivity nor no effect
+accepts geometry or a permanent runtime. Keep every scientific/capacity/selection/
+final/novel gate held.
 
 The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
 frozen in a new clean checkout and separate locked environment. Preserve all scientific

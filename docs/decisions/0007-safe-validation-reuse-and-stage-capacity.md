@@ -90,10 +90,38 @@ four original scales, 36/40 hashes and 32/36 rows. Required-symbol dispatch and
 default math code offsets did not change; no intended implementation contrast
 was established. No libm cause conclusion or permanent profile follows.
 The earlier unsupported 8102231 result and every failure remain preserved.
-SCC access was found disconnected after an attempted full-receipt export
-returned no receipt; accepted compact/capture
-evidence is retained, with no full local JSON export or refreshed SCC status claimed.
-Access restoration is pending. No new diagnostic/scientific job is claimed;
+At the later access-blocked checkpoint SCC access was found disconnected
+after an attempted full-receipt export returned no receipt. Only compact/capture
+evidence was then retained; full JSON export/status refresh were not claimed,
+restoration was pending and no new job was claimed. That checkpoint is historical.
+The researcher restored the existing SCC connection on October 15. The complete
+238,862-byte verification JSON was recovered at 15:03:07.054586 UTC from seven
+checked metadata chunks with its exact `9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`
+identity; its four bound input/runtime/summary JSONs were recovered and hash-checked
+by 15:05:07.897329 UTC. Independent read-only review confirmed exact transport,
+unchanged comparisons and 240 metadata/617 external/616 source counts. SCC status
+was refreshed at 15:13:30.934012 UTC, SHA-256
+`bbf4d01268ac8db236ceba3424aa2167a741caba72c8b930166d57ca0fbd1230`.
+Recovery was metadata-only, without scheduler queries or scientific/runtime-binary
+reads; last actual scheduler batch remains 00:32:05.186540–00:32:16.493406 UTC.
+Preserve the `5644` export-size guard stop without rerun and ambiguous earlier
+`ac786` attempt. Recorded glibc 2.28 stable used baseline GLIBC_TUNABLES unset
+versus `glibc.tune.hwcaps=-FMA_Usable`; required/default versioned math offsets
+were identical before/after both conditions. Inconclusive-dispatch remains the
+classification; no cause or permanent profile follows.
+
+One data-free resolver sensitivity design is selected only for local implementation
+and independent review: two serial fresh children with GLIBC_TUNABLES unset versus
+exact `glibc.cpu.hwcaps=-FMA_Usable`, changing only the prior namespace. No NPZ,
+historical worker, numerical experiment or child Torch import is involved; the
+supervisor imports Torch to retain inherited safeguards. Actual package/loader
+provenance and required-version offset sensitivity must be established in
+allocation. Producer tools passed 140 local checks, Ruff/format/Bash syntax
+and independent review. Separate metadata-only submission, observation and
+terminal controls passed 75 synthetic checks, Ruff/format and independent review.
+Both exact source sets are reviewed and frozen locally; nothing is staged or
+submitted. No new job, resolver result, permanent runtime or scientific acceptance
+is claimed;
 geometry, all dependent/replay/admission/capacity gates and Week 6 selection,
 final training and novel opening remain held. Never rerun executed commands.
 
