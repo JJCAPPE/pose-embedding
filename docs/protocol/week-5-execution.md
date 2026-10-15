@@ -2327,9 +2327,9 @@ the cause. No compatible permanent profile or geometry admission follows.
 
 SSH subsequently closed with connection reset/Broken pipe. The pane is a local
 shell; the researcher has been asked to restore the existing connection. Root
-stopped remote commands. A full-receipt metadata export returned no receipt
-before the disconnect; preserve the ambiguous attempt without claiming an
-export. The exact compact completion receipt and completed capture are retained
+stopped remote commands. An attempted full-receipt metadata export returned no
+receipt; preserve the ambiguous attempt without claiming an export or its
+execution timing. The exact compact completion receipt and completed capture are retained
 and independently reviewed. The SCC status pointer was last verified at the
 dated pre-observation status; refresh it only after authentication, following the
 newer observation and completion receipts. Never rerun an executed launcher,
@@ -2337,6 +2337,30 @@ observer or terminal-verifier main. Recover already-recorded metadata without
 scientific binary reads or a redundant scheduler query. All dependent stages,
 full A, capacity, selection, final training and novel opening remain held.
 Actual researcher time remains unreported.
+
+### Verified inconclusive-diagnostic milestone publication
+
+Only four evidence records advanced to Week 5 36, task 02 33, task 04 16 and
+gate 03 17. Migration `20261015052051` has source/statement SHA
+`7101a72ffa9612520894f4af6656495093d236f6146692a4e5c99861241f4f72`;
+the actual database timestamp is October 15 at 10:06:28.172255 UTC.
+Independent full-row/history review receipt SHA
+`524c4b20e56dac501b87ca4dba8257a8d42a64868042c55029b6df7ba68da052`
+confirms that only the four evidence payloads and their trigger-maintained
+versions/timestamps changed. Other weeks, states, sources, links and actual
+researcher time are preserved.
+
+Node 24 deployment `dpl_68t2AbGm6SLREsp8WTVQpkUPxanw` was promoted.
+Independent canonical verification at 10:27:19.307379 UTC passed the complete
+export/fallback, history, health, private redirect with empty body and Journey:
+receipt SHA `5430680454a2ec84fe9b102091bb54461eafe0deb0360ad73a83bd09e16cbfe3`,
+export SHA `278e35692ce77da56566ebafabeb7e2799516dfbe3ff4ede5d31c4bd1df3d989`.
+The 38 pgTAP guards, 22 maintained tracker tests, lint/typecheck/Node 24 builds,
+workspace, narrow scope and independent reviews passed. The same five inherited
+staging assertions and two hosted Auth warnings remain unchanged. This records
+the valid inconclusive diagnostic; it adds no scientific/profile/capacity gate
+or SSH restoration. Remote metadata recovery and SCC status refresh remain
+blocked by the disconnected session.
 
 ## Reflection
 
