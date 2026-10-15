@@ -160,11 +160,35 @@ geometry cause is established. The accepted 8102231 negative result and all
 earlier failures remain preserved; geometry and every dependent scientific,
 replay and capacity gate remain held.
 The pre-submit scheduler check ran at 23:29:20.578046–23:29:20.793929 UTC; it
-precedes submission and does not establish the new job state. No post-submission
-scheduler observation or numerical result is claimed; no queued, running or
-completed state is inferred. First permitted observation:
-**October 14, 2026 at 8:31 PM EDT (October 15, 00:31 UTC)**, under the hourly limit.
-Never rerun any executed launcher. Its output can only be diagnostic metadata;
+precedes submission and does not establish the new job state. At the submitted-only checkpoint no post-submission state or result had been
+observed; the October 15 at 00:31 UTC first-check boundary is historical.
+The first observation ran once on **October 15 at 00:32:02.955881–00:32:16.614103 UTC**.
+Diagnostic **8104416 completed October 14 at 23:34:33 UTC** on
+apolkovnikov-pub@scc-h30.scc.bu.edu: four OMP slots, failed=0/exit_status=0,
+**21 whole-job CPU wall seconds and 14.493 actual CPU seconds**, peak RSS 695,096 KiB.
+Independent terminal review at **October 15, 02:34:06.243155 UTC** passed
+its diagnostic-only accounting/command/seal/final-marker checks, six resources
+and 240 artifact metadata/617 external metadata/616 frozen-source bindings.
+Receipt `week5-r2-geometry-libm-terminal-verification/20261015T023357Z/verification.json`
+has SHA-256 `9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`;
+retained compact receipt SHA-256
+`dc5d3db0011bea0c1f3cae4d814e5d0ec2919588a441afda45d61ccdc2684fd6`.
+Classification is **inconclusive-dispatch**: both DEFAULT control and FMA-off
+matched the original four scales, **36/40 tensor hashes and 32/36 damage rows**.
+Neither required-symbol dispatch nor default math code offsets changed; the
+intervention did not establish the intended implementation difference. This
+supports neither acceptance nor rejection of the libm cause hypothesis and
+selects no permanent profile. The earlier 8102231 unsupported recovery result
+and all failed attempts remain preserved.
+The next hourly boundary after observation was October 15 at 01:32:16.614103 UTC;
+no repeat scheduler query is needed for terminal review. SCC access was found disconnected after an attempted full-receipt export
+returned no receipt. Accepted compact/capture
+evidence remains retained; no full local verification-JSON export or refreshed
+SCC status is claimed. Access restoration is pending; no new diagnostic or
+scientific job is claimed. Geometry, all dependent stages/full allocated replay,
+scientific admission, measured CPU/GPU capacity, Week 6 selection, final training
+and novel opening remain held. Source, recipes, tolerances, IDs and fallback
+remain frozen. Never rerun an executed launcher or observer. Its output can only be diagnostic metadata;
 it cannot produce eligible scientific artifacts or pass a gate. Source,
 scientific settings and tolerances remain frozen; there is no blind geometry retry.
 Fresh successor scientific evidence, full admission and measured CPU/GPU

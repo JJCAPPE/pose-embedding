@@ -345,6 +345,34 @@ ordered candidate/panel confirmation and fresh same-profile paired initializatio
 full pilot/projection replay and full A remain required. Hold every dependent
 stage, selection/final/novel access. No scientific binary hashing on login.
 
+Latest completion checkpoint supersedes that submitted-only observation plan.
+The first observer executed once October 15 at 00:32:02.955881 UTC, inspection
+completed at 00:32:16.614103 UTC; actual observation SHA4197d2bf4784b91b6947447477767303b442775e8e04d6824e549eecfa81ca61
+and sibling accounting SHAe095946f5d0b0fe07985d6666bc6328baf1b6732c239590845e607faa035f04e.
+Actual job 8104416 is terminal: failed0/exit0/four omp slots/21 whole-job CPU
+wall seconds/actual CPU14.493. New terminal verifier15c5 executed once and wrote
+`week5-r2-geometry-libm-terminal-verification/20261015T023357Z/verification.json`,
+SHA `9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`,
+recorded02:34:06.243155 UTC, after240metadata/617external/616source bindings,
+six resources, commands, seals, final marker and runtime/comparison review.
+Its valid diagnostic-only classification is inconclusive-dispatch: no required
+or default math-symbol implementation offsets changed. Both conditions retain
+original4/36/32 matches; this does not reject the libm hypothesis or admit a
+permanent profile, geometry or any dependent stage.
+
+SSH subsequently disconnected with Broken pipe and the pane is now local.
+The researcher has been asked once to restore the existing connection; never
+enter credentials, reconnect, create another connection or type SCC commands at
+a local/password prompt. Inspect the authenticated idle pane immediately before
+typing. Do not repeat the authentication request while this blocker persists.
+Read the latest private handoff for the exact next access-check time. The dated
+SCC status still predates the actual4197/9f45 receipts; review newer receipts and
+refresh it after access returns. Full9f45 and child runtime JSON export remains
+unconfirmed; preserve the attempted export and use a new reviewed metadata-only
+recovery command after authentication. No scheduler requery is needed to recover
+already-completed metadata. Never rerun the executed observer, verifier or any
+launcher. Keep every scientific/capacity/selection/final/novel gate held.
+
 The reviewed numerical-proof reuse and schema-2 CPU/GPU capacity changes are
 frozen in a new clean checkout and separate locked environment. Preserve all scientific
 settings and validate the exact original → execution-r1 → execution-r2 design

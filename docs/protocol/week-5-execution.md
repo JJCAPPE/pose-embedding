@@ -2286,6 +2286,58 @@ passed all eight changed public fields/four evidence rows and the complete live
 export. No post-submission job state/result, geometry acceptance, profile choice
 or scientific/capacity gate follows from this publication.
 
+### October 15: libm diagnostic verified, intervention inconclusive
+
+The first observer executed once at 00:32:02.955881 UTC; its scheduler batch
+ran at 00:32:05.186540–00:32:16.493406 UTC and inspection completed at
+00:32:16.614103 UTC. Observation SHA
+`4197d2bf4784b91b6947447477767303b442775e8e04d6824e549eecfa81ca61`
+and accounting SHA
+`e095946f5d0b0fe07985d6666bc6328baf1b6732c239590845e607faa035f04e`
+bind the actual operation `20261014T233420Z-8104416-geometry-libm-diagnostic`.
+Job 8104416 completed October 14 at 23:34:33 UTC on
+`apolkovnikov-pub@scc-h30.scc.bu.edu`: failed=0/exit_status=0, four omp slots,
+**21 whole-job CPU wall seconds**, actual CPU=14.493 seconds,
+RSS=695,096 KiB and maxvmem=9.140G. Keep setup, hashing and parent overhead in
+the whole-job ledger; command timers do not replace scheduler accounting.
+
+The new metadata-only observer/verifier passed 110 local checks, Ruff, format,
+root review and independent peer review before immutable staging. Corrected
+observer source SHA is
+`07ae5a3b8611fb3f943810eca6a883236f9fcc54cd89e5bb1a6391f26d253c3d`;
+terminal verifier SHA is
+`15c5b78c9ecf27ecca0477fcad32f9054796504543b728b33c60011601309c1d`.
+Both mains have now executed once. The preserved earlier staging guard failure
+occurred before directory creation or scheduler queries; the reviewed correction
+adds bounded reads for sealed JSONL/XML metadata. It changes no scientific code.
+
+Independent terminal receipt
+`week5-r2-geometry-libm-terminal-verification/20261015T023357Z/verification.json`,
+SHA `9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`,
+was recorded at 02:34:06.243155 UTC. It passed 240 metadata, 617 external and
+616 frozen-source bindings, six resources, commands, both seals, final marker,
+accounting and recorded runtime/comparison checks. No scientific archive or
+runtime library was rehashed on login. Its four-case-only result is
+**inconclusive-dispatch**: the FMA-off request changed neither required-version
+nor default math-symbol implementation offsets. Both conditions match all four
+original scales, 36/40 tensor hashes and 32/36 damage rows; against failed-fresh
+evidence both match 0/4 scales, 28/40 hashes and 24/36 rows. An intervention
+without a measured dispatch change cannot reject the libm hypothesis or prove
+the cause. No compatible permanent profile or geometry admission follows.
+
+SSH subsequently closed with connection reset/Broken pipe. The pane is a local
+shell; the researcher has been asked to restore the existing connection. Root
+stopped remote commands. A full-receipt metadata export returned no receipt
+before the disconnect; preserve the ambiguous attempt without claiming an
+export. The exact compact completion receipt and completed capture are retained
+and independently reviewed. The SCC status pointer was last verified at the
+dated pre-observation status; refresh it only after authentication, following the
+newer observation and completion receipts. Never rerun an executed launcher,
+observer or terminal-verifier main. Recover already-recorded metadata without
+scientific binary reads or a redundant scheduler query. All dependent stages,
+full A, capacity, selection, final training and novel opening remain held.
+Actual researcher time remains unreported.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -2334,10 +2386,11 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** Observe submitted libm diagnostic 8104416 no earlier than October 14
-at 8:31 PM EDT (October 15, 00:31 UTC), then independently verify its actual
-accounting/runtime/dispatch/metadata result before interpreting the hypothesis.
-Do not rerun the executed launcher or infer progress during the gap.
+**Next:** Restore authenticated access in the existing pane, recover the exact
+already-recorded libm runtime metadata and refresh the dated SCC status.
+The first observation and terminal verifier have executed; do not rerun either.
+Use the inconclusive dispatch result to prepare a source-grounded diagnostic
+that demonstrates an actual intervention before interpreting numerical effects.
 Geometry 8070391 remains a preserved failed attempt.
 Confirm the complete compatible profile before a reviewed fresh geometry attempt.
 Then regenerate
@@ -2351,7 +2404,9 @@ scientific gates remain unresolved. The prior failed validator and its successfu
 compatible-runtime retry remain preserved. Successor geometry failed its fixed
 identity guard; diagnostic 8072666 failed its wrapper before numerical work.
 Corrected diagnostic 8102231 completed and passed independent verification,
-but its tested DEFAULT recovery was incomplete. The full runtime cause and
+but its tested DEFAULT recovery was incomplete. Libm diagnostic 8104416 passed
+independent completion review; its dispatch intervention was inconclusive and
+the same residual differences remain. SSH access is blocked. The full runtime cause and
 compatible profile remain unproven. Actual researcher minutes remain
 unreported by explicit request. Week 5 cannot close while required scientific
 gates are unresolved; all selection/final/novel authorization remains shut.

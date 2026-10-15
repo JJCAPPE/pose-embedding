@@ -75,10 +75,27 @@ FMA-disable request requires allocated runtime/ELF/function-dispatch proof befor
 interpreting numerical metadata. No permanent profile or full cause is established;
 the accepted 8102231 negative result and all failures remain preserved.
 Geometry, all dependent scientific/replay/capacity gates and all Week 6 selection,
-final training and novel opening remain held. Pre-submit qstat completed at
-23:29:20.793929 UTC; no post-submit state or result has been observed.
-First permitted observation: October 14 at 8:31 PM EDT (October 15, 00:31 UTC),
-under hourly polling. Never rerun any executed launcher.
+final training and novel opening remain held. Pre-submit qstat completed at 23:29:20.793929 UTC; the submitted-only
+no-observation checkpoint and October 15 at 00:31 UTC first-check boundary are historical.
+First observation ran once October 15 at 00:32:02.955881–00:32:16.614103 UTC.
+Job 8104416 completed October 14 at 23:34:33 UTC: four OMP slots,
+apolkovnikov-pub@scc-h30.scc.bu.edu, failed=0/exit_status=0,
+21 whole-job CPU wall seconds, actual CPU 14.493 seconds and peak RSS 695,096 KiB.
+Independent diagnostic-only terminal review at October 15, 02:34:06.243155 UTC
+passed accounting/commands/seals/final-marker, six resources and 240 metadata/
+617 external/616 frozen-source bindings; accepted receipt SHA-256
+`9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`.
+Classification is inconclusive-dispatch: both control and FMA-off reproduce
+four original scales, 36/40 hashes and 32/36 rows. Required-symbol dispatch and
+default math code offsets did not change; no intended implementation contrast
+was established. No libm cause conclusion or permanent profile follows.
+The earlier unsupported 8102231 result and every failure remain preserved.
+SCC access was found disconnected after an attempted full-receipt export
+returned no receipt; accepted compact/capture
+evidence is retained, with no full local JSON export or refreshed SCC status claimed.
+Access restoration is pending. No new diagnostic/scientific job is claimed;
+geometry, all dependent/replay/admission/capacity gates and Week 6 selection,
+final training and novel opening remain held. Never rerun executed commands.
 
 The researcher explicitly approved a result-blind amendment for safe validation
 reuse and separate CPU/GPU time accounting, preserving all scientific checks and

@@ -285,3 +285,24 @@ No capacity_passed, permanent profile, geometry acceptance, residual workload
 reduction or CPU/GPU budget relaxation follows from submission or four cases.
 Full fresh same-profile scientific regeneration/replay and the measured schema-2
 typed CPU/GPU campaign capacity conditions remain pending.
+
+### October 15 libm completion accounting
+
+Job 8104416 completed with failed=0/exit_status=0, four omp slots and no GPU:
+**21 whole-job CPU wall seconds**, actual CPU=14.493 seconds, RSS=695,096 KiB,
+maxvmem=9.140G. The complete allocation, including setup, archive/runtime reads,
+hashing, fresh workers and parent overhead, belongs in the CPU ledger.
+Independent receipt
+`9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`
+binds actual accounting, commands, both seals, six resources and
+240 metadata/617 external/616 frozen-source records.
+
+The diagnostic is valid but its intervention is inconclusive: no recorded math
+implementation offset changed, and both conditions retain the same four tensor
+hash and four damage-row differences from the original four-case reference.
+This is no compatible-profile proof, scientific admission, GPU measurement or
+campaign capacity result. Keep the prior failed attempts and their entire costs;
+do not reduce remaining regeneration/replay or any budget. SSH subsequently
+disconnected; exact recorded metadata recovery and SCC status refresh await
+researcher-restored authentication. Full same-profile scientific reproduction,
+fresh pilot/replay evidence and measured schema-2 capacity remain pending.
