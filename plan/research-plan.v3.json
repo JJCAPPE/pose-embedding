@@ -837,12 +837,12 @@
         "Current quota and remaining peak bytes must pass; dated capacity readings and prior GPU access are not reservations."
       ],
       "advisorPrompt": "Do all October 18 validity, seal, storage, runtime and researcher-availability criteria pass without changing the declared study?",
-      "reflection": "October 19 checkpoint: Week 5 remains incomplete. Execution-r2 release f101f0e9d9bd64275d2088deab1b0bdcfcc53620 retains accepted installation, rehearsal 8044010, preparation 8045152 and supplementary checks 8048540. Tasks 01 and 03 retain accepted execution-r1 history, which does not admit execution-r2. Job 8135335 failed October 15 at 1:54:30 PM EDT after five scheduler seconds; the October 19 observation verified Missing/ambiguous ELF build ID before either resolver child ran. After inconclusive 8104416 and failed 8135335, two consecutive allocated attempts have neither narrowed nor unblocked geometry. Stop further diagnostic jobs/tool-building for this blocker. The researcher authorized the focused runtime review and explicitly held new allocations. The completed review distinguishes an interpreter provenance representation failure from the unresolved numerical mismatch; no compatible common runtime is proven. Next: BU Research Computing Services consultation is recommended to resolve missing interpreter-note and vendor-runtime evidence before choosing another comparison. No contact was made. The two-attempt count remains two; diagnostic jobs and tool-building remain held. Preserve exact equality/identity checks and the original panel/fallback. Fresh scientific regeneration, full admission replay and measured CPU/GPU capacity remain incomplete. Tasks 02 and 04 are blocked; all scientific gates remain pending. October 18 passed without admission; re-estimate the remaining schedule before selection. No active job was observed October 19 and no new job was submitted. Selection, final training and novel opening remain closed. Actual researcher time remains unreported.",
+      "reflection": "October 19: the researcher adopted ADR0008 and authorized resuming Week 5 allocations after recording the runtime-baseline amendment and passing fresh preflights. Freeze one actual runtime; require exact within-profile geometry and initialization repeatability and cross-method pairing. Historical runtime-derived numerical equality is superseded prospectively; original panel IDs, fallback, all scientific settings, prior artifacts and seals remain required. Existing f101f0e execution-r2 scientific source and protocol/design locks remain unchanged. Accepted setup receipts remain evidence for their bound inputs; no new scientific gate has passed. Next: review the narrow external baseline checks, verify identity/authorization/seal/resources/no duplicate job, and run the allocated baseline/geometry prerequisite. Fresh parity/five caches, three complete pilots, nine corruption paths and independent replay/full admission/capacity remain incomplete. The two prior non-progress diagnostics are retained; the approach changes without erasing their count. October 18 remains missed; later deadlines are unchanged. Selection, final training and novel opening remain closed. Actual researcher time is unreported.",
       "plannedMinutes": 300,
       "actualMinutes": 0,
       "state": "active",
       "closedAt": null,
-      "version": 39,
+      "version": 40,
       "tasks": [
         {
           "id": "w05-task-01",
@@ -868,11 +868,11 @@
           "expectedOutput": "Fresh successor admission receipts, nine complete corruption paths, 27 head projections and measured stage-level runtime/memory/bytes.",
           "required": true,
           "estimateMinutes": 90,
-          "state": "blocked",
-          "completionNote": "BLOCKED, October 19: execution-r2 setup receipts remain accepted, but geometry and a compatible runtime remain unproven. Job 8135335 failed October 15 at 17:54:30 UTC after five scheduler seconds with Missing/ambiguous ELF build ID, before resolver children. Together with inconclusive 8104416, this reaches two consecutive allocated attempts without narrowing or unblocking the blocker. The authorized focused runtime review is complete: the interpreter-note failure is operational, and no single runtime is proven for both original geometry and locked initialization. New allocations and diagnostic tool-building remain held; the stopping count stays two. Recommend BU RCS compatibility consultation using retained evidence before choosing another comparison; no contact was made. Fresh parity/five caches, three paired full pilots, nine corruption paths, projections/results and independent replay remain required; predecessor artifacts cannot substitute. Terminal observation: study-v3/operations/week5-status/20261019T153819Z/observation.json; SHA-256 04f51f12fed2eea628c45e6cccb4f837f45bf039b0be02a28655cbaedcc7342b.",
+          "state": "in_progress",
+          "completionNote": "IN PROGRESS, October 19: researcher-authorized ADR0008 permits a prospective runtime baseline with exact current-run repeatability and pairing, preserving scientific settings, original identities/fallback and every historical attempt. No new runtime or scientific artifact is accepted yet. Review external checks and pass all fresh preflights before baseline/geometry allocation; then complete fresh parity/five caches, three full paired pilots, all nine development corruption paths/projections/results and independent replay. Existing r2 scientific source and locks remain unchanged. The historical two-attempt diagnostic stop is retained; the libm investigation is not resumed.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 36
+          "version": 37
         },
         {
           "id": "w05-task-03",
@@ -899,10 +899,10 @@
           "required": true,
           "estimateMinutes": 60,
           "state": "blocked",
-          "completionNote": "BLOCKED, October 19: the October 18 go/no-go did not pass. The predecessor measured-profile no-go remains preserved; execution-r2 capacity is unproven while geometry, scientific regeneration and full admission replay remain incomplete. Include every diagnostic allocation, hashing/replay, independent recertification, memory/storage, CPU/GPU windows, queue/setup and at least 25% slack in a renewed schedule. Retain the 200 GiB reserve plus 1.25 times remaining peak bytes, November 29 final-lock deadline, December 6 compute deadline and protected December 7–18 delivery time. The researcher-authorized runtime review is complete without new allocations or a capacity result. BU RCS compatibility consultation is recommended before another comparison; allocations remain held and the diagnostic stopping count stays two. No selection authorization or closure is granted; actual time remains unreported.",
+          "completionNote": "BLOCKED, October 19: ADR0008 authorizes runtime-baseline regeneration after preflights but grants no capacity pass. October 18 admission was missed. Re-estimate all fresh scientific work, full admission, independent recertification, retained/remaining storage, CPU/GPU windows and researcher work with queue/setup and at least 25% slack. Preserve the 200 GiB reserve plus 1.25 times remaining peak bytes, November 29 final locks, December 6 compute and protected December 7–18 delivery. Prior measured no-go remains historical evidence; selection and closure require accepted successor evidence. Actual time remains unreported.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 19
+          "version": 20
         }
       ],
       "gates": [
@@ -937,10 +937,10 @@
           "criterion": "The measured dependency/schedule/storage/availability ledger passes, including revalidation and all remaining work with slack, before immutable successor selection authorization; otherwise no sweep starts.",
           "required": true,
           "state": "pending",
-          "evidence": "UNRESOLVED, October 19: no measured successor capacity pass or selection authorization exists. Accepted execution-r2 setup does not replace scientific regeneration and full admission validation. Resolver job 8135335 failed before comparison; following inconclusive 8104416, the stopping count remains two. The researcher authorized a focused runtime review and kept new allocations on hold. That review is complete but proves no common runtime or scientific gate. Recommend BU RCS compatibility consultation to resolve missing interpreter-note and vendor-runtime evidence before choosing another comparison. No contact was made; diagnostic jobs/tool-building remain held and exact equality/identity checks remain required. October 18 passed without admission. The renewed schema-2 CPU/GPU schedule must include all remaining scientific work, validation/recertification, retained/remaining storage, researcher availability, queue/setup and at least 25% slack. Predecessor no-go and every failed attempt remain retained. Terminal observation: study-v3/operations/week5-status/20261019T153819Z/observation.json; SHA-256 04f51f12fed2eea628c45e6cccb4f837f45bf039b0be02a28655cbaedcc7342b. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
+          "evidence": "UNRESOLVED, October 19: adopted ADR0008 authorizes a prospective runtime baseline and fresh regeneration after identity, authorization, seal, resource and duplicate-job preflights. This grants no scientific/capacity pass or selection authorization. The original panel/fallback and scientific scope remain fixed; exact within-profile repeats, pairing, independent validation and all retained evidence are required. The two historical non-progress diagnostics remain recorded. Complete the fresh scientific inventory and measured schema-2 CPU/GPU/storage/availability assessment, including all validation, recertification, queue/setup and at least 25% slack. The October 18 gate was missed; later deadlines remain unchanged. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/decisions/0008-runtime-baseline.md",
           "waiverReason": "",
           "decidedAt": null,
-          "version": 20
+          "version": 21
         }
       ]
     },

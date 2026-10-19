@@ -1,11 +1,28 @@
 # Final v3 plan: frozen one-shot pose robustness
 
-Original decision: **2026-09-29**. Execution amendments: **2026-10-09** and
-**2026-10-12**. Delivery: **2026-12-18**. Status: **final planning
+Original decision: **2026-09-29**. Execution amendments: **2026-10-09**,
+**2026-10-12** and **2026-10-19**. Delivery: **2026-12-18**. Status: **final planning
 decision; implementation and measured campaign gates remain to be completed**.
 This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-frozen-one-shot-v3.md)
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
+
+The October 19 researcher-authorized [ADR0008](../docs/decisions/0008-runtime-baseline.md)
+governs the next Week 5 execution. Freeze one prospective runtime baseline;
+require exact repeats and initialization/batch pairing within that profile,
+without requiring runtime-derived scales, tensors or initialization to equal
+historical CPU outputs. Original panel IDs, fallback, manifests, algorithms,
+scientific settings and all other checks remain fixed. Bind the immutable
+amendment/runtime record and fresh scientific inventory to the unchanged r2
+protocol/design/source hashes, preserving all locks and artifacts. Accepted
+setup/rehearsal remains valid where its bound inputs are unchanged; refresh
+runtime-dependent and dynamic checks. Only a bound core change requires a new
+revision through the existing correction path. Allocations may resume after
+recording the amendment and passing required preflights; selection, final
+training and novel opening remain
+gated. The two non-progress diagnostic attempts remain historical and are not
+reset. Earlier runtime recovery instructions below describe their dated
+checkpoints; ADR0008 controls this specific prospective change.
 
 The October 9 researcher-authorized amendment adopts the specifications below
 before selection or novel opening. Scientific settings remain fixed; completing

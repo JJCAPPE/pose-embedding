@@ -6,6 +6,23 @@ study. The original prospectus and v1/v2 protocols, code and evidence remain
 historical records. They are not permission to execute the new study. Independent
 research governance applies; no advisor sign-off is required.
 
+The October 19 researcher-authorized [ADR0008](../decisions/0008-runtime-baseline.md)
+replaces historical cross-runtime numerical equality with one prospective,
+immutable runtime baseline. Original panel IDs, fallback evidence, ordered
+manifests and all scientific algorithms/settings remain fixed. Exact fresh-process
+repeatability, within-campaign initialization/batch pairing, numerical tolerances
+and independent validation remain required. Bind the immutable amendment/runtime
+record and fresh scientific inventory to existing r2 protocol/design/source
+hashes; preserve those locks while bound core inputs are unchanged. Accepted
+setup/rehearsal remains valid for unchanged bound inputs; refresh runtime-dependent
+and dynamic checks. A bound core change still requires the existing immutable
+revision/correction path. Do not rewrite or adopt predecessor scientific
+artifacts. Allocations may resume only after the recorded amendment and required
+preflights; no selection, final-training or novel-opening gate is passed. The
+prior two non-progress diagnostics remain retained, not reset. ADR0008 supersedes
+only the historical numerical-equality requirement in the dated recovery
+instructions below.
+
 ## Complete design and measured preparation
 
 [`configs/protocol.v3.yaml`](../../configs/protocol.v3.yaml) specifies the complete

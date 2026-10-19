@@ -13,36 +13,39 @@ govern this work.
 
 ## Current checkpoint: October 19, 2026
 
-**Week 5 is blocked.** Execution-r2 release
-`f101f0e9d9bd64275d2088deab1b0bdcfcc53620` retains accepted
-[installation and rehearsal 8044010](#execution-r2-rehearsal-accepted-preparation-submitted),
+**Week 5 remains incomplete; runtime-baseline regeneration is authorized.** The
+researcher adopted [ADR0008](../decisions/0008-runtime-baseline.md) and authorized
+resuming allocations after recording it and passing the required preflights.
+The frozen scientific release remains
+`f101f0e9d9bd64275d2088deab1b0bdcfcc53620`, with existing execution-r2 protocol/design
+locks unchanged. Accepted [rehearsal 8044010](#execution-r2-rehearsal-accepted-preparation-submitted),
 [preparation 8045152](#successor-preparation-accepted-october-13) and
-[supplementary checks 8048540](#transferred-controller-supplementary-checks-accepted-october-13).
-Tasks 01 and 03 retain their accepted execution-r1 history; those completions
-do not admit execution-r2. Fresh geometry, parity/caches, three pilots,
-corruption/replay evidence and measured CPU/GPU capacity remain incomplete.
+[supplementary checks 8048540](#transferred-controller-supplementary-checks-accepted-october-13)
+remain evidence for their bound inputs; tasks 01/03 retain their r1 history.
+No new scientific task or gate has passed.
 
-Resolver job **8135335 failed on October 15 at 1:54:30 PM EDT**, after five
-scheduler seconds; the October 19 observation verified the failure. It stopped
-at the interpreter ELF build-ID check before either resolver child ran. The
-geometry cause and a compatible runtime remain unproven. After inconclusive
-job 8104416 and failed job 8135335, the diagnostic stopping count is **two
-consecutive allocated attempts without narrowing or unblocking this blocker**.
-No further diagnostic jobs or tool-building for this blocker are authorized
-under the current stopping rule.
+**Acceptance checklist:** freeze one actual runtime and exact within-profile
+geometry/initialization evidence; generate and independently validate fresh
+parity/five caches, three complete pilots and all nine corruption paths with
+projections/replay; measure resident/full admission work and schema-2 capacity.
+Retain original panel IDs, fallback, every scientific setting and all historical
+artifacts. Selection, final training and novel opening remain closed.
 
-The researcher authorized the [focused runtime review](#october-19-focused-runtime-review-allocations-remain-held)
-and explicitly kept new allocations on hold. That review is complete; it
-establishes no compatible runtime and does not reset the stopping count.
-**Next prerequisite:** resolve the missing interpreter-note and vendor-runtime
-identity evidence and obtain a researcher decision before another allocated
-comparison. BU Research Computing Services consultation is the recommended
-route. The review below specifies the questions and acceptance criteria; no contact or allocation has
-been made. Preserve exact equality/identity checks and the original panel/fallback. The October 18
-go/no-go did not pass; re-estimate the complete remaining schedule and capacity
-before selection. Task 02 and task 04 are blocked, all scientific gates remain
-pending, and selection, final training and novel opening remain closed. No job
-was active in the October 19 scheduler observation; no new job was submitted.
+**Next unmet prerequisite:** record and independently review the narrow external
+baseline checks, then pass fresh identity, authorization, seal, resource and
+duplicate-job checks before the first allocated baseline/geometry run. Existing
+core validators already enforce current-run exact repeats and pairing; preserve
+them. No new launcher framework or historical libm resolver investigation is
+needed. No profile or output is accepted merely by this amendment.
+
+The two unsuccessful historical diagnostics, 8104416 and 8135335, remain recorded
+with stopping count **two**. The researcher changed the approach prospectively;
+those attempts are not erased or relabeled. Apply the stopping rule to any new
+blocker. The October 18 gate remains missed; November 29 final locks, December 6
+compute and December 7–18 protected delivery remain unchanged. The October 19
+19:11 UTC survey found an empty user queue and configured L40S queues with the
+candidate Gold-6426Y CPU model; this is availability metadata, not a reservation
+or runtime/capacity pass. No new allocation has been submitted at this checkpoint.
 
 ## Starting evidence and scope
 
@@ -2693,11 +2696,10 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** Follow the [October 19 checkpoint](#current-checkpoint-october-19-2026):
-the authorized runtime review is complete, with BU RCS compatibility consultation
-recommended before choosing another comparison. New allocations remain explicitly
-held. Do not rerun executed launchers/observers or continue diagnostic tool-building
-after the two-attempt stopping threshold.
+**Next:** Follow the [October 19 checkpoint](#current-checkpoint-october-19-2026)
+and adopted ADR0008: establish the prospective runtime baseline, then complete
+the unchanged fresh scientific inventory and measured capacity. Resume allocations
+only after the required preflights; do not replay historical launch commands.
 
 **Open issues:** Tasks 02 and 04 are blocked; all scientific gates remain
 pending. Accepted predecessor evidence and the measured-profile capacity no-go

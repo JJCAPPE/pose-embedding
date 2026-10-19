@@ -5,13 +5,15 @@ govern these commands. Use a clean committed release, Python 3.11 and the locked
 environment. Perform tensor processing only inside Grid Engine allocations.
 Historical releases, artifacts and run manifests remain immutable.
 
-**October 19 control checkpoint:** the researcher authorized a focused runtime
-review and explicitly held new allocations. The [completed review and current
-state](week-5-execution.md#current-checkpoint-october-19-2026) supersede all
-historical submission/observation instructions below. Jobs 8104416 and 8135335
-reached the two-attempt diagnostic stop; the review does not reset that count.
-No launch, diagnostic tool-building or scheduled poll is authorized. Consult the
-current private handoff before any later researcher-authorized SCC action.
+**October 19 control checkpoint:** the researcher adopted
+[ADR0008](../decisions/0008-runtime-baseline.md) and authorized resuming Week 5
+allocations after the amendment and required fresh preflights are recorded.
+The [current execution checkpoint](week-5-execution.md#current-checkpoint-october-19-2026)
+supersedes historical hold/submission/observation instructions below. Preserve
+frozen f101f0e scientific source and existing r2 locks; bind the new amendment and
+runtime record through reviewed external operational inputs. The two historical
+non-progress diagnostics remain recorded; do not resume the libm investigation.
+Use one controller and the current private handoff, never an old executed launcher.
 
 ## Active SCC installation
 
