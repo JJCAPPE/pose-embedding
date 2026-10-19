@@ -31,10 +31,14 @@ consecutive allocated attempts without narrowing or unblocking this blocker**.
 No further diagnostic jobs or tool-building for this blocker are authorized
 under the current stopping rule.
 
-**Next prerequisite:** a researcher decision on a runtime compatibility review
-using the retained minimal reproducer and existing evidence, with BU Research
-Computing Services consultation if needed, before further allocations. Preserve
-exact equality/identity checks and the original panel/fallback. The October 18
+The researcher authorized the [focused runtime review](#october-19-focused-runtime-review-allocations-remain-held)
+and explicitly kept new allocations on hold. That review is complete; it
+establishes no compatible runtime and does not reset the stopping count.
+**Next prerequisite:** resolve the missing interpreter-note and vendor-runtime
+identity evidence and obtain a researcher decision before another allocated
+comparison. BU Research Computing Services consultation is the recommended
+route. The review below specifies the questions and acceptance criteria; no contact or allocation has
+been made. Preserve exact equality/identity checks and the original panel/fallback. The October 18
 go/no-go did not pass; re-estimate the complete remaining schedule and capacity
 before selection. Task 02 and task 04 are blocked, all scientific gates remain
 pending, and selection, final training and novel opening remain closed. No job
@@ -2515,6 +2519,132 @@ Workspace verification, whitespace checks and the 22 tracker tests, typecheck
 and lint under Node 24 passed. Scientific code and frozen tools were unchanged;
 no GPU, pilot or full scientific validation was run.
 
+### October 19: focused runtime review; allocations remain held
+
+The researcher instructed: **“Proceed with the focused runtime review; keep new
+allocations on hold.”** Root reviewed retained metadata and upstream sources;
+two bounded, independent local reviews examined provenance enforcement and the
+runtime evidence separately. Neither reviewer controlled SCC. This review
+changes no frozen source, helper, scientific setting or acceptance threshold.
+
+The review acceptance checklist is complete: identify the failed guard and its
+protected requirement; distinguish demonstrated numerical results from untested
+runtime explanations; specify the smallest justified next approach. No new
+scientific evidence has been accepted. The stopping count remains **two**.
+
+**Interpreter identity failure.** The resolver parent newly passes the Python
+executable to the frozen `binary()` helper, previously used for libc, libm and
+libtorch. Its `readelf --notes` parser requires exactly one build-ID match and
+fails before storing the executable SHA-256. The retained evidence
+contains neither those raw notes nor the interpreter identity record. Therefore
+8135335 proves only that the parsed count was not one: absence, duplicate output
+and parsing mismatch remain unresolved. Mock fixtures with a fabricated build
+ID did not establish compatibility with the real executable.
+
+The canonical plan requires pinned runtime identity. The resolver runbook also
+requires package/loader identity and unchanged recorded libraries/imports;
+neither requires exactly one GNU build-ID for every executable. GNU ld permits
+disabling the build-ID note and states that it is not a file-content checksum.
+Thus the failed cardinality assertion is a tool representation constraint, not
+itself failed scientific evidence. This does **not** establish that Python has
+no build ID or authorize removing the guard. See the
+[GNU ld build-ID documentation](https://sourceware.org/binutils/docs/ld/Options.html#index-_002d_002dbuild_002did).
+
+If a correction is later authorized, preserve the frozen helper and attempt;
+retain the resolved executable path, full SHA-256, size and bounded raw ELF-note
+evidence before deciding how to represent the observed case. An interpreter-only
+representation correction must reach parent capture, child validation,
+independent verification and fixtures together. Preserve the strict existing
+library identities, before/after and cross-process bindings, and every numerical
+comparison. This is a correction design, not implemented or accepted code.
+
+**Runtime compatibility evidence.** Each row describes its own retained result;
+hardware-family labels do not establish exact library or dispatch identity.
+
+| Evidence | Established runtime distinction | Accepted result or remaining limitation |
+| --- | --- | --- |
+| Original geometry 8028081 | `scc-ne7`, r1; documented Ivy Bridge without AVX2, but original math-library identities/dispatch are absent from the inspected receipt | Original 43-row panel, 430 tensors and fresh-process repeats accepted for r1 |
+| Initialization 8035737 | Ivy Bridge; native and explicit DEFAULT | Same RNG state, wrong locked initialization hash; DEFAULT cannot simply be adopted for the whole pipeline |
+| Initialization/pilot replay 8035829 | Broadwell with actual AVX2/FMA flags; native AVX2 | Three exact initialization repeats and unchanged full three-pilot validator passed; geometry was not checked on this profile |
+| Geometry comparison 8102231 | r2, Python 3.11.15, Torch 2.9.1+cu128, NumPy 2.4.6; native AVX512 versus DEFAULT, Torch threads 4/inter-op 32 | Native reproduces failed r2 on the four tested cases (4 scales, 40 hashes, 36 rows); DEFAULT restores 4/4 original scales, but only 36/40 output hashes and 32/36 damage rows |
+| Libm comparison 8104416 | DEFAULT in both; unset tunables versus `glibc.tune.hwcaps=-FMA_Usable`; exact library identities retained | No measured dispatch change; both conditions retain the same four residual jitter mismatches |
+| Resolver 8135335 | Parent interpreter-note guard failed before children | No package/loader or resolver comparison; no numerical result |
+
+The four DEFAULT mismatches are jitter 0.025/0.05 in case 2 and 0.01/0.05 in
+case 4; clean and mask outputs agree. The evidence does not distinguish Gaussian
+generation from later float32 arithmetic or libm dispatch. Pinned PyTorch source
+uses separate scalar and AVX2 normal-generation paths; this supplies a plausible
+mechanism, not proof of the residual cause in the loaded binary. See
+[PyTorch 2.9.1 DistributionTemplates.h](https://raw.githubusercontent.com/pytorch/pytorch/v2.9.1/aten/src/ATen/native/cpu/DistributionTemplates.h).
+
+For 8104416 the imported `logf@GLIBC_2.27`, `sinf@GLIBC_2.2.5`,
+`cosf@GLIBC_2.2.5` and `sincosf@GLIBC_2.2.5` resolved to offsets 551968,
+553168, 554624 and 556160 respectively. Required-version and default-symbol
+offsets stayed identical before/after and across both conditions. A requested
+environment setting is therefore not evidence that an intervention occurred.
+
+The retained glibc version string **2.28** does not identify vendor backports.
+Upstream 2.28 uses `glibc.tune`, whereas 2.29 uses `glibc.cpu`; the namespace
+rename also exists in the CentOS downstream patch archive. Both inspected
+upstream parsers recognize `FMA_Usable`, while the 2.28 FMA selector checks both
+FMA and AVX2 usability. These sources cannot identify SCC's installed package or
+prove that changing the namespace alone will change the imported implementations.
+Sources: [2.28 parser](https://raw.githubusercontent.com/bminor/glibc/glibc-2.28/sysdeps/x86/cpu-tunables.c),
+[2.29 parser](https://raw.githubusercontent.com/bminor/glibc/glibc-2.29/sysdeps/x86/cpu-tunables.c),
+[2.28 selector](https://raw.githubusercontent.com/bminor/glibc/glibc-2.28/sysdeps/x86_64/fpu/multiarch/ifunc-fma.h),
+[downstream rename patch](https://gitlab.com/CentOS/archives/git.centos.org/rpms/glibc/-/raw/b61eb49f301ad1e476c2ab99445fa0e6c7287f2e/SOURCES/glibc-rh1817513-2.patch).
+GNU also documents that tunables vary by release/distribution; modern
+`--list-tunables` support must not be assumed for this unverified loader.
+See [GNU tunables documentation](https://sourceware.org/glibc/manual/latest/html_node/Tunables.html).
+
+**Recommended next approach: BU RCS compatibility consultation, before another
+allocation.** Use the existing four-case reproducer, retained library hashes and
+this review to resolve two questions: which exact installed package/loader build
+and tunable semantics correspond to the recorded libc/libm identities; and how
+the locked Python executable's actual ELF notes should be represented without
+losing identity evidence. No consultation message has been sent. Runtime binary
+inspection stays allocation-only and requires renewed researcher authorization;
+missing metadata must not be collected on the login node to evade the hold.
+
+After those questions and any necessary correction review are resolved, the
+smallest useful common-profile comparison would run the existing four-case
+geometry probe and full-size initialization preflight serially under the **same
+recorded native AVX2 profile** already known to reproduce initialization. This
+is a proposed future comparison, not a selected or authorized runtime. Require
+4/4 original scales, 40/40 output hashes, 36/36 damage rows and three exact
+initialization repeats matching
+`035a3e5e57569c0ae765b797f705b3a9f70353a6832fcb757c7622ebfa9b3284`.
+Passing would nominate a candidate for full original-panel reproduction and
+same-profile pilot/projection replay; failure would rule out that profile before
+expensive regeneration. Switching dispatch between checks would not establish
+a common profile. Any proposed libm intervention must first demonstrate a change
+in the actually imported symbol implementations with other bindings unchanged.
+
+This review consumed **no allocated CPU/GPU time** and started no monitor or job.
+It provides no capacity estimate. The October 18 gate remains missed; full fresh
+scientific evidence, independent validation and schema-2 capacity are still
+required before selection. All attempts, seals, the original panel/fallback and
+November 29/December 6 deadlines remain preserved. Next check is on a researcher
+decision or new supplied runtime evidence; there is no scheduled SCC poll.
+
+Two independent local reviews checked the evidence and acceptance limits; their
+wording findings were corrected: the native comparison covers only four cases, the failure packet
+includes logs/accounting outside the operation directory, and RCS consultation
+is a recommendation rather than a new protocol requirement. Workspace and
+whitespace checks and 22 tracker tests under Node 24 passed. The existing guarded
+migration body passed rollback/idempotence and stale-version checks; the applied
+`20261019161401` update changed exactly four status texts and their versions,
+with every task/gate state and all other rows unchanged. Live versions are
+**39/36/19/20** for Week 5/task 02/task 04/gate 03. Public export verification at
+16:16:18.858474 UTC matched the plan after normalizing equivalent timestamps,
+ID-keyed row order and response-only metadata; export SHA-256
+`fe5149ebd3aa1528ad5d70fe31800e04681ed0a0792c7cb2fee690fd60c74c31`.
+Other weeks and sources were unchanged. Cache refresh required no deployment.
+The guarded SCC status pointer now targets
+`week5-status/20261019T161457Z/status.txt`, SHA-256
+`8ab60816bc48f4545d21b94b942ebb7041563fa289e5881cc31d76ceaa38db19`;
+this metadata update performed no scheduler query or allocation.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -2564,9 +2694,10 @@ actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
 **Next:** Follow the [October 19 checkpoint](#current-checkpoint-october-19-2026):
-obtain the researcher decision on runtime compatibility review before further
-allocations. Do not rerun executed launchers/observers or continue diagnostic
-tool-building after the two-attempt stopping threshold.
+the authorized runtime review is complete, with BU RCS compatibility consultation
+recommended before choosing another comparison. New allocations remain explicitly
+held. Do not rerun executed launchers/observers or continue diagnostic tool-building
+after the two-attempt stopping threshold.
 
 **Open issues:** Tasks 02 and 04 are blocked; all scientific gates remain
 pending. Accepted predecessor evidence and the measured-profile capacity no-go
