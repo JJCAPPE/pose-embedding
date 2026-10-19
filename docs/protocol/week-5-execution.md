@@ -31,12 +31,15 @@ projections/replay; measure resident/full admission work and schema-2 capacity.
 Retain original panel IDs, fallback, every scientific setting and all historical
 artifacts. Selection, final training and novel opening remain closed.
 
-**Next unmet prerequisite:** record and independently review the narrow external
-baseline checks, then pass fresh identity, authorization, seal, resource and
-duplicate-job checks before the first allocated baseline/geometry run. Existing
-core validators already enforce current-run exact repeats and pairing; preserve
-them. No new launcher framework or historical libm resolver investigation is
-needed. No profile or output is accepted merely by this amendment.
+**Next unmet prerequisite:** accept the actual runtime, initialization repeats
+and complete geometry evidence from job **8189505**. The reviewed external
+correction passed fresh identity, authorization, seal, source, resource and
+duplicate-job preflights before submission at **19:28:39 UTC**. The initial
+observation at **19:31:15–19:31:16 UTC** found it queued (`qw`, four slots), with
+no operation or runtime output yet. Check again no earlier than **October 19,
+4:32 PM EDT (20:32 UTC)**. Existing core validators retain exact current-run
+repeats, pairing and independent replay. No profile or scientific output is
+accepted by submission or the amendment.
 
 The two unsuccessful historical diagnostics, 8104416 and 8135335, remain recorded
 with stopping count **two**. The researcher changed the approach prospectively;
@@ -45,7 +48,70 @@ blocker. The October 18 gate remains missed; November 29 final locks, December 6
 compute and December 7–18 protected delivery remain unchanged. The October 19
 19:11 UTC survey found an empty user queue and configured L40S queues with the
 candidate Gold-6426Y CPU model; this is availability metadata, not a reservation
-or runtime/capacity pass. No new allocation has been submitted at this checkpoint.
+or runtime/capacity pass. Job 8189505 requests four Gold-6426Y CPU slots, 32 GiB,
+two hours and no GPU. Root remains the sole SCC controller; automated polling
+remains off.
+
+## October 19 amendment recorded and baseline geometry submitted
+
+ADR0008 was committed as `e9454b3`; its retained SHA-256 is
+`ae9f0db3c90a40070c220e3ae9aa3e4ce34de76e06e52f8ae5eaac0e6801548e`.
+The external geometry correction preserves the original tools, scientific
+source, failed 8070391 attempt and every historical binding. It permits only the
+authorized change in positive finite own-scale values; panel identities,
+validity/missingness, original fallback and all invariants remain exact. The
+allocated startup check captures actual hardware, dispatch, interpreter and
+loaded libraries, freezes the prospective profile before geometry, checks three
+fresh initializations per seed 7/17/29 and rechecks the profile afterward. Review
+removed an unnecessary distinct-PID requirement and corrected parent/child
+import ordering before use. Seventy-five focused checks, Ruff/format and Bash
+syntax passed; independent review found no remaining blocker for this submission.
+
+Immutable tools are under
+`study-v3/operations/week5-runtime-baseline-tools/20261019T192725Z`; manifest SHA
+`5769ce7fa83af58d7f6fcee7c6686da8733495720d4b7a53e95da6b10245256d`.
+The launcher retains the tracked supplementary checker and its independent
+geometry validation required by admission. No core scientific file changed.
+
+Launch receipt:
+`study-v3/operations/week5-r2-launches/20261019T192831Z/launch.json`, SHA
+`cd30a061f8e6144cd96f1d9fdfa1bf7737042f5b17ff580844f6f5108192b143`.
+It binds 741 metadata and 616 frozen-source entries; input SHA
+`ee588f70f36b00b10321ad31a11db891094d1b6f997aaf5057bfb19a6b8bb846`.
+Quota remaining 716,620,000,000 bytes and filesystem free 876,836,028,416 bytes
+passed the geometry-only 1 GiB remaining-peak reserve plus the required 200 GiB
+and 25% margin. This is not campaign capacity. Initial observation:
+`study-v3/operations/week5-status/20261019T193115Z/observation.json`, SHA
+`4cf4dfb85e10bf74e3fd74526365888c16d5062d6d752c53ed7e6fe2274b07f3`.
+The complete observation was recovered in checked metadata chunks without
+another scheduler query. It establishes only the queued state stated above.
+Independent submission review at 19:36:33 UTC verified all 20 captured hashes,
+launch/intent/input agreement, the declared bindings and 616 source hashes
+against frozen Git objects. Its receipt SHA is
+`d97260c2884c90f71727a5000c8e67768b1bc74daafcfdb6d977c8e8d3e8568a`.
+This accepts submission evidence only; no allocated scientific result exists in
+that observation.
+
+The amendment's four guarded, audited tracker updates passed rollback,
+idempotence and conflict checks; live versions are Week 5/task 02/task 04/gate 03
+**40/37/20/21**, with all scientific gates still pending. An initial direct
+publication from the research checkout omitted the separately maintained
+Journey page. It was rolled back to the prior deployment. The corrected
+publication snapshot retained all prior live Journey source bytes, including
+two later fixes recovered from hash-matching retained source maps. Only the
+current canonical plan bundle and related tests changed among published app
+files. Node 24.14.0/pnpm 10.28.1 checks passed: 25 tracker tests, lint, typecheck
+and build. Browser smoke was unavailable because the cached Chromium executable
+was missing; HTTP and exact source checks passed.
+
+Corrected deployment `dpl_GBs4DdYMNZT66BApqqtxkGTa7Nv1` was verified before
+promotion and on the live site at **19:38:52 UTC**. The full export matched the
+checked-in plan, all other weeks/source links were unchanged, canonical plan
+source matched byte-for-byte, Journey returned 200 with all 14 chapters, health
+used Supabase and private export redirected to sign-in. Live export SHA:
+`9345c5fa8e35b98f76a2529534d038bbe4c985c9029331e4c435ba3021addeda`.
+This publication records the amendment, not a scientific milestone. Subsequent
+submission metadata stays in this execution record without another deployment.
 
 ## Starting evidence and scope
 
