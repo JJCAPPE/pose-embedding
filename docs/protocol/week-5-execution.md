@@ -11,6 +11,35 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
+## Current checkpoint: October 19, 2026
+
+**Week 5 is blocked.** Execution-r2 release
+`f101f0e9d9bd64275d2088deab1b0bdcfcc53620` retains accepted
+[installation and rehearsal 8044010](#execution-r2-rehearsal-accepted-preparation-submitted),
+[preparation 8045152](#successor-preparation-accepted-october-13) and
+[supplementary checks 8048540](#transferred-controller-supplementary-checks-accepted-october-13).
+Tasks 01 and 03 retain their accepted execution-r1 history; those completions
+do not admit execution-r2. Fresh geometry, parity/caches, three pilots,
+corruption/replay evidence and measured CPU/GPU capacity remain incomplete.
+
+Resolver job **8135335 failed on October 15 at 1:54:30 PM EDT**, after five
+scheduler seconds; the October 19 observation verified the failure. It stopped
+at the interpreter ELF build-ID check before either resolver child ran. The
+geometry cause and a compatible runtime remain unproven. After inconclusive
+job 8104416 and failed job 8135335, the diagnostic stopping count is **two
+consecutive allocated attempts without narrowing or unblocking this blocker**.
+No further diagnostic jobs or tool-building for this blocker are authorized
+under the current stopping rule.
+
+**Next prerequisite:** a researcher decision on a runtime compatibility review
+using the retained minimal reproducer and existing evidence, with BU Research
+Computing Services consultation if needed, before further allocations. Preserve
+exact equality/identity checks and the original panel/fallback. The October 18
+go/no-go did not pass; re-estimate the complete remaining schedule and capacity
+before selection. Task 02 and task 04 are blocked, all scientific gates remain
+pending, and selection, final training and novel opening remain closed. No job
+was active in the October 19 scheduler observation; no new job was submitted.
+
 ## Starting evidence and scope
 
 The live tracker had closed Weeks 1–4. Week 4's five caches and three complete
@@ -2424,6 +2453,68 @@ The next permitted SCC prelaunch check is October 15 at 12:14 PM EDT
 (16:14 UTC); the exact future command and current-pointer guards remain in the
 private handoff.
 
+### October 19: resolver failure verified; diagnostic stopping rule reached
+
+The existing observer ran once on October 19. Its scheduler queries ran from
+15:38:32.013261 to 15:38:43.208815 UTC: the user queue was empty, job 8135335
+was absent from `qstat`, and `qacct` recorded its October 15 terminal failure.
+Observation `week5-status/20261019T153819Z/observation.json` has SHA-256
+`04f51f12fed2eea628c45e6cccb4f837f45bf039b0be02a28655cbaedcc7342b`;
+the adjacent `qacct.txt` has SHA-256
+`017c4798794d41006009dd861ff79d46f5e6ad5bee95b1a5ec43a64d803e51c1`.
+Paths here are relative to `study-v3/operations/` under the canonical artifact
+root. No resubmission or scientific job followed this observation.
+
+Job 8135335 ran on `apolkovnikov-pub@scc-h30.scc.bu.edu`, four OMP slots,
+from October 15 at 17:54:25 to 17:54:30 UTC. Accounting reports `failed=0`,
+`exit_status=1`, **five whole-job CPU wall seconds**, 3.260 actual CPU seconds
+and peak RSS 676,296 KiB. The parent recorded 0.40552129491697997 seconds;
+that internal timer does not replace whole-job accounting. Operation
+`20261015T175429Z-8135335-resolver-sensitivity/outcome.json`, SHA-256
+`85f4c15f995d6c3a0362213f00a0e2bd3ba851ed9ad14a1cf6673380e070b234`,
+records `AssertionError: Missing/ambiguous ELF build ID`. The traceback stops
+at `shim.binary(Path(sys.executable).resolve())`, before resolver children;
+the operation contains no child runtime or comparison-summary output. The
+retained scheduler log has SHA-256
+`367747b49e8584fd38429510bd45b76714cf985515d5f2ba19de2de747c26d84`.
+Recorded before/after seals remain `sealed`, and the outcome records no novel
+pose/outcome access or eligible scientific output. This is an operational
+provenance-check failure, not evidence against the scientific hypothesis.
+
+The prior 8102231 diagnostic narrowed the issue to residual jitter differences;
+8104416 then established no dispatch intervention, and 8135335 produced no
+resolver comparison. Carrying that history forward gives **two consecutive
+allocated attempts without narrowing or unblocking the geometry blocker**.
+Stop further diagnostic allocations and tool-building for it. Retain every
+attempt and request the researcher decision in the current checkpoint; do not
+weaken the ELF, geometry or identity checks. October 18 passed without admission.
+Fresh scientific regeneration, complete validation/recertification, remaining
+storage and both resource calendars still require evidence, including all
+diagnostic costs, queue/setup and 25% slack. Final locks remain due November 29,
+all compute December 6, with December 7–18 protected. No capacity pass, selection
+authorization or Week 5 closure is claimed.
+
+Independent read-only review verified the retained failure bundle, all seven
+embedded file hashes, accounting, source ordering and the two seal snapshots.
+Review receipt SHA-256:
+`76330be5e043db9ea33879bd2544e4ffa275424680feba36d97bd0e55895c459`.
+This accepts the terminal failure record, not a completed runtime diagnostic.
+
+The guarded status update changed only Week 5 and task 02/task 04/gate 03 to
+versions **38/35/18/19**. Task 02 is now blocked; no gate passed. Rollback,
+idempotence and stale-version rejection checks passed, and a complete before/after
+row comparison confirmed all other tracker rows unchanged. The CLI's bulk
+migration push found three pre-existing timestamp aliases; those were left
+unchanged. Only migration `20261019154211` was applied through the linked SQL
+command and registered after verification. The public export at
+15:48:46.331265 UTC matched the checked-in status after equivalent timestamp
+normalization, preserving all other weeks and source links; export SHA-256
+`da36400d04cf63178c02e7369afcef1ad769fe2a55326cc79fb502af338047b1`.
+The existing data tag and CDN cache were refreshed without a deployment.
+Workspace verification, whitespace checks and the 22 tracker tests, typecheck
+and lint under Node 24 passed. Scientific code and frozen tools were unchanged;
+no GPU, pilot or full scientific validation was run.
+
 ## Reflection
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
@@ -2472,29 +2563,16 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** At the permitted check time, stage the exact reviewed data-free
-resolver-sensitivity tools immutably, then run the new launcher once after fresh
-launch guards pass. Access and recorded metadata recovery are complete. The first observation,
-terminal verifier and recovery commands have executed; do not rerun them.
-Establish an actual intervention before interpreting numerical effects.
-Geometry 8070391 remains a preserved failed attempt.
-Confirm the complete compatible profile before a reviewed fresh geometry attempt.
-Then regenerate
-the remaining declared evidence. Finish full A and corrupted-artifact replay, refresh
-seals and measure the complete CPU/GPU dependency/capacity ledger. Passing this
-engineering amendment does not authorize selection, final training or opening.
+**Next:** Follow the [October 19 checkpoint](#current-checkpoint-october-19-2026):
+obtain the researcher decision on runtime compatibility review before further
+allocations. Do not rerun executed launchers/observers or continue diagnostic
+tool-building after the two-attempt stopping threshold.
 
-**Open issues:** P passed independent verification but fails the measured-profile
-capacity condition. Task 04 is blocked, task 02 remains in progress, and all
-scientific gates remain unresolved. The prior failed validator and its successful
-compatible-runtime retry remain preserved. Successor geometry failed its fixed
-identity guard; diagnostic 8072666 failed its wrapper before numerical work.
-Corrected diagnostic 8102231 completed and passed independent verification,
-but its tested DEFAULT recovery was incomplete. Libm diagnostic 8104416 passed
-independent completion review; its dispatch intervention was inconclusive and
-the same residual differences remain. SSH access and exact metadata recovery are
-restored; the resolver-only successor is locally reviewed, unstaged and unsubmitted.
-The full runtime cause and
-compatible profile remain unproven. Actual researcher minutes remain
-unreported by explicit request. Week 5 cannot close while required scientific
-gates are unresolved; all selection/final/novel authorization remains shut.
+**Open issues:** Tasks 02 and 04 are blocked; all scientific gates remain
+pending. Accepted predecessor evidence and the measured-profile capacity no-go
+are preserved. Execution-r2 geometry and a compatible runtime remain unproven
+after resolver job 8135335 failed before its comparison. Fresh scientific
+regeneration, full admission validation and renewed CPU/GPU capacity remain
+required. Actual researcher minutes remain unreported by explicit request.
+Week 5 cannot close while these gates remain unresolved; selection, final
+training and novel opening remain closed.
