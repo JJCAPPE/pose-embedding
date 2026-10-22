@@ -8,7 +8,7 @@ Historical releases, artifacts and run manifests remain immutable.
 **October 19 control checkpoint:** the researcher adopted
 [ADR0008](../decisions/0008-runtime-baseline.md) and authorized resuming Week 5
 allocations after the amendment and required fresh preflights are recorded.
-The [current execution checkpoint](week-5-execution.md#current-checkpoint-october-19-2026)
+The [current execution checkpoint](week-5-execution.md#current-checkpoint-october-22-2026)
 supersedes historical hold/submission/observation instructions below. Preserve
 frozen f101f0e scientific source and existing r2 locks; bind the new amendment and
 runtime record through reviewed external operational inputs. The two historical

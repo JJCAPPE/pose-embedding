@@ -24,6 +24,21 @@ gated. The two non-progress diagnostic attempts remain historical and are not
 reset. Earlier runtime recovery instructions below describe their dated
 checkpoints; ADR0008 controls this specific prospective change.
 
+**October 22 accepted milestone:** independent review accepted job 8189505's
+prospective CPU runtime, three fresh initializations per seed 7/17/29, and exact
+two-process geometry for the original 43 panel IDs and 430 tensors per repeat.
+Original identities, fallback, scientific settings and r2 source/locks remain
+fixed; allocated replay, accounting, resources and seals passed. Receipt
+`study-v3/operations/week5-runtime-baseline-acceptance/20261022T154102Z/verification.json`
+has SHA-256 `16106ecafe347dc8d31795e14a88b267e716f82e494311b4753462cfcd88f8aa`.
+Week 5 remains incomplete. Next is the fresh source-bound GPU diagnostic under
+this baseline, then fresh parity/five caches and independent validation. Three
+complete paired pilots, nine corruption paths/projections/results, full
+admission, independent recertification and measured schema-2 capacity remain
+required. The two historical non-progress diagnostics stay recorded; selection,
+final training and novel opening remain closed. See the
+[current execution checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-october-22-2026).
+
 The October 9 researcher-authorized amendment adopts the specifications below
 before selection or novel opening. Scientific settings remain fixed; completing
 currently disabled stages requires a successor execution release and new
@@ -67,7 +82,8 @@ The due inspection at 22:05:07.547370–22:05:19.824007 UTC found terminal
 failure: bpnlab-pub@scc-kc1, four OMP slots, 20:51:02–20:54:51 UTC,
 229 scheduler seconds, accounting failed=0/exit_status=1. The tracked checker
 and exact within-revision repeats passed, but the external wrapper rejected
-fixed cross-revision identity. No successor geometry completion is accepted.
+fixed cross-revision identity. That attempt produced no accepted successor
+geometry completion.
 Metadata diagnosis found 2,051 candidate own_scale scalars differed; the fixed
 43 panel IDs, selection and manifests remained unchanged. All 43 clean tensor
 hashes matched. Four selected scales and 129 coordinate-jitter hashes differed

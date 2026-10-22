@@ -837,12 +837,12 @@
         "Current quota and remaining peak bytes must pass; dated capacity readings and prior GPU access are not reservations."
       ],
       "advisorPrompt": "Do all October 18 validity, seal, storage, runtime and researcher-availability criteria pass without changing the declared study?",
-      "reflection": "October 19: the researcher adopted ADR0008 and authorized resuming Week 5 allocations after recording the runtime-baseline amendment and passing fresh preflights. Freeze one actual runtime; require exact within-profile geometry and initialization repeatability and cross-method pairing. Historical runtime-derived numerical equality is superseded prospectively; original panel IDs, fallback, all scientific settings, prior artifacts and seals remain required. Existing f101f0e execution-r2 scientific source and protocol/design locks remain unchanged. Accepted setup receipts remain evidence for their bound inputs; no new scientific gate has passed. Next: review the narrow external baseline checks, verify identity/authorization/seal/resources/no duplicate job, and run the allocated baseline/geometry prerequisite. Fresh parity/five caches, three complete pilots, nine corruption paths and independent replay/full admission/capacity remain incomplete. The two prior non-progress diagnostics are retained; the approach changes without erasing their count. October 18 remains missed; later deadlines are unchanged. Selection, final training and novel opening remain closed. Actual researcher time is unreported.",
+      "reflection": "October 22: independent review accepted job 8189505's prospective CPU runtime, three fresh initializations per seed 7/17/29, and two-process geometry with all 43 panel IDs and 430 tensor hashes per repeat. Original identities, training-only fallback, source/locks and scientific settings remain fixed; allocated replay, accounting, resources and seals passed. Week 5 remains incomplete. Next: pass fresh identity/authorization/seal/resource/duplicate-job checks, verify the source-bound GPU diagnostic under the accepted baseline, then generate and independently validate fresh parity/five caches. Three complete paired pilots, nine corruption paths/projections/results, full admission replay and measured schema-2 capacity remain required. Tasks 01/03 retain their historical evidence; the two prior non-progress diagnostics remain recorded and the libm investigation stays stopped. October 18 admission was missed; later deadlines are unchanged. Selection, final training and novel opening remain closed. Actual researcher time is unreported.",
       "plannedMinutes": 300,
       "actualMinutes": 0,
       "state": "active",
       "closedAt": null,
-      "version": 40,
+      "version": 41,
       "tasks": [
         {
           "id": "w05-task-01",
@@ -869,10 +869,10 @@
           "required": true,
           "estimateMinutes": 90,
           "state": "in_progress",
-          "completionNote": "IN PROGRESS, October 19: researcher-authorized ADR0008 permits a prospective runtime baseline with exact current-run repeatability and pairing, preserving scientific settings, original identities/fallback and every historical attempt. No new runtime or scientific artifact is accepted yet. Review external checks and pass all fresh preflights before baseline/geometry allocation; then complete fresh parity/five caches, three full paired pilots, all nine development corruption paths/projections/results and independent replay. Existing r2 scientific source and locks remain unchanged. The historical two-attempt diagnostic stop is retained; the libm investigation is not resumed.",
+          "completionNote": "IN PROGRESS, October 22: independent acceptance of job 8189505 establishes the prospective CPU runtime, three exact initialization repeats per seed and the two-process 43-ID/430-tensor geometry prerequisite under ADR0008. Accounting, resources, seals, original identities/fallback and unchanged f101f0e r2 bindings passed review. Next: fresh preflights and the source-bound GPU diagnostic under this baseline, then fresh parity/five caches and independent validation. Three complete paired pilots, all nine development corruption paths/projections/results and independent replay remain incomplete. Historical diagnostic stop count stays two; no libm investigation is resumed.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 37
+          "version": 38
         },
         {
           "id": "w05-task-03",
@@ -899,10 +899,10 @@
           "required": true,
           "estimateMinutes": 60,
           "state": "blocked",
-          "completionNote": "BLOCKED, October 19: ADR0008 authorizes runtime-baseline regeneration after preflights but grants no capacity pass. October 18 admission was missed. Re-estimate all fresh scientific work, full admission, independent recertification, retained/remaining storage, CPU/GPU windows and researcher work with queue/setup and at least 25% slack. Preserve the 200 GiB reserve plus 1.25 times remaining peak bytes, November 29 final locks, December 6 compute and protected December 7–18 delivery. Prior measured no-go remains historical evidence; selection and closure require accepted successor evidence. Actual time remains unreported.",
+          "completionNote": "BLOCKED, October 22: accepted baseline/geometry job 8189505 took 219 scheduler seconds and passed its geometry-only 1 GiB storage increment; this does not establish campaign capacity. October 18 admission was missed. Measure remaining scientific work, full admission and independent recertification, retained/remaining storage, CPU/GPU windows and researcher work with queue/setup and at least 25% slack. Preserve the 200 GiB reserve plus 1.25 times remaining peak bytes, November 29 final locks, December 6 compute and protected December 7–18 delivery. Selection and closure remain gated; actual time remains unreported.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 20
+          "version": 21
         }
       ],
       "gates": [
@@ -937,10 +937,10 @@
           "criterion": "The measured dependency/schedule/storage/availability ledger passes, including revalidation and all remaining work with slack, before immutable successor selection authorization; otherwise no sweep starts.",
           "required": true,
           "state": "pending",
-          "evidence": "UNRESOLVED, October 19: adopted ADR0008 authorizes a prospective runtime baseline and fresh regeneration after identity, authorization, seal, resource and duplicate-job preflights. This grants no scientific/capacity pass or selection authorization. The original panel/fallback and scientific scope remain fixed; exact within-profile repeats, pairing, independent validation and all retained evidence are required. The two historical non-progress diagnostics remain recorded. Complete the fresh scientific inventory and measured schema-2 CPU/GPU/storage/availability assessment, including all validation, recertification, queue/setup and at least 25% slack. The October 18 gate was missed; later deadlines remain unchanged. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/decisions/0008-runtime-baseline.md",
+          "evidence": "UNRESOLVED, October 22: job 8189505's CPU runtime, initialization and geometry prerequisite passed independent acceptance; fresh GPU/scientific inventory, full admission and measured schema-2 capacity remain incomplete. No capacity pass or selection authorization is granted. Retain original panel/fallback, all scientific settings and the two historical non-progress diagnostic attempts. Renew CPU/GPU/storage/researcher availability forecasts including validation, recertification, queue/setup and at least 25% slack. October 18 was missed; later deadlines remain fixed. Acceptance SHA-256: 16106ecafe347dc8d31795e14a88b267e716f82e494311b4753462cfcd88f8aa. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md#october-22-runtime-initialization-and-geometry-accepted",
           "waiverReason": "",
           "decidedAt": null,
-          "version": 21
+          "version": 22
         }
       ]
     },

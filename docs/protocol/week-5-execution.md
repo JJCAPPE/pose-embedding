@@ -1,7 +1,7 @@
 # Week 5 execution record
 
 Started October 11, 2026 (America/New_York), before the October 12–18 calendar
-week, at the researcher's direction. **Week 5 remains open. The measured runtime
+week, at the researcher's direction. **Week 5 remains open. A predecessor runtime
 profile failed a necessary capacity condition. The reviewed validation/capacity
 successor passed installation, rehearsal and preparation; fresh scientific
 regeneration and measured admission remain pending. No scientific admission is
@@ -11,46 +11,119 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
-## Current checkpoint: October 19, 2026
+## Current checkpoint: October 22, 2026
 
-**Week 5 remains incomplete; runtime-baseline regeneration is authorized.** The
-researcher adopted [ADR0008](../decisions/0008-runtime-baseline.md) and authorized
-resuming allocations after recording it and passing the required preflights.
-The frozen scientific release remains
-`f101f0e9d9bd64275d2088deab1b0bdcfcc53620`, with existing execution-r2 protocol/design
-locks unchanged. Accepted [rehearsal 8044010](#execution-r2-rehearsal-accepted-preparation-submitted),
-[preparation 8045152](#successor-preparation-accepted-october-13) and
-[supplementary checks 8048540](#transferred-controller-supplementary-checks-accepted-october-13)
-remain evidence for their bound inputs; tasks 01/03 retain their r1 history.
-No new scientific task or gate has passed.
+**Week 5 remains incomplete. The prospective CPU runtime, initialization and
+geometry prerequisite is independently accepted.** Job **8189505** completed
+October 19 at **3:35:43 PM EDT**, with exit status zero after 219 scheduler
+seconds. The [October 22 acceptance](#october-22-runtime-initialization-and-geometry-accepted)
+binds its retained allocated evidence under
+[ADR0008](../decisions/0008-runtime-baseline.md). Scientific release
+`f101f0e9d9bd64275d2088deab1b0bdcfcc53620` and the existing execution-r2
+protocol/design locks remain unchanged. Accepted setup receipts remain valid
+for their bound inputs; tasks 01/03 retain their r1 history. No task or
+scientific gate is newly complete.
 
-**Acceptance checklist:** freeze one actual runtime and exact within-profile
-geometry/initialization evidence; generate and independently validate fresh
-parity/five caches, three complete pilots and all nine corruption paths with
-projections/replay; measure resident/full admission work and schema-2 capacity.
-Retain original panel IDs, fallback, every scientific setting and all historical
-artifacts. Selection, final training and novel opening remain closed.
+**Acceptance checklist:** accepted CPU baseline, exact initialization repeats
+and fixed-panel geometry; still required are fresh parity/five caches, three
+complete paired pilots, all nine development corruption paths with projections
+and replay, resident/full-admission measurements, independent recertification
+and schema-2 capacity. Original panel IDs, fallback, scientific settings and all
+historical artifacts remain fixed. Selection, final training and novel opening
+remain closed.
 
-**Next unmet prerequisite:** accept the actual runtime, initialization repeats
-and complete geometry evidence from job **8189505**. The reviewed external
-correction passed fresh identity, authorization, seal, source, resource and
-duplicate-job preflights before submission at **19:28:39 UTC**. The initial
-observation at **19:31:15–19:31:16 UTC** found it queued (`qw`, four slots), with
-no operation or runtime output yet. Check again no earlier than **October 19,
-4:32 PM EDT (20:32 UTC)**. Existing core validators retain exact current-run
-repeats, pairing and independent replay. No profile or scientific output is
-accepted by submission or the amendment.
+**Next unmet prerequisite:** the fresh source-bound GPU diagnostic must pass
+under the accepted baseline before caches. Refresh identity, authorization,
+seal, source, resource and duplicate-job checks; independently accept the
+diagnostic, then generate and validate the five-cache inventory. Synthetic GPU
+job **8249315** was submitted October 22 at **15:52 UTC** after fresh preflights.
+Its launch receipt is
+`study-v3/operations/week5-runtime-baseline-gpu/20261022T155221Z/launch.json`, SHA
+`27f48d6c2c4c890ca15d491690f155a9e65aef9ab5cbfc8a2352d7a170bf5d72`.
+The initial observation at **16:01:28 UTC** found it terminal: exit status one
+after **31 seconds** on `scc-j07`, before the scientific child started. Its
+startup report differs only by PyTorch's conditional CUDA build-information
+block; all CPU/runtime/library fields and build settings match. Next: use the
+independently approved external report-comparison correction below to repeat the diagnostic
+after fresh preflights. No further poll of either terminal job is needed.
+Root remains the sole SCC controller;
+automated polling remains off.
 
-The two unsuccessful historical diagnostics, 8104416 and 8135335, remain recorded
-with stopping count **two**. The researcher changed the approach prospectively;
-those attempts are not erased or relabeled. Apply the stopping rule to any new
-blocker. The October 18 gate remains missed; November 29 final locks, December 6
-compute and December 7–18 protected delivery remain unchanged. The October 19
-19:11 UTC survey found an empty user queue and configured L40S queues with the
-candidate Gold-6426Y CPU model; this is availability metadata, not a reservation
-or runtime/capacity pass. Job 8189505 requests four Gold-6426Y CPU slots, 32 GiB,
-two hours and no GPU. Root remains the sole SCC controller; automated polling
-remains off.
+The historical non-progress diagnostic count remains **two** (8104416 and
+8135335); the libm investigation stays stopped. Apply the stopping rule to any
+new blocker. The October 18 gate remains missed. November 29 final locks,
+December 6 compute and protected December 7–18 delivery remain fixed. Full
+capacity remains unproven; actual researcher time remains unreported.
+
+## October 22: runtime, initialization and geometry accepted
+
+Independent review completed at **15:41:02 UTC**. Receipt
+`study-v3/operations/week5-runtime-baseline-acceptance/20261022T154102Z/verification.json`
+has SHA-256
+`16106ecafe347dc8d31795e14a88b267e716f82e494311b4753462cfcd88f8aa`.
+It binds 59 retained metadata files and the reviewed launch/source chain. The
+accepted allocation used native AVX512 on Gold 6426Y, four numerical threads
+and the locked interpreter/library identities. Each seed 7/17/29 reproduced its
+initial-state hash in three fresh processes.
+
+Both fresh geometry processes retained the original 43 panel IDs and
+training-only fallback **0.6601371765136719**. All **430 tensor hashes** and
+**387 damage rows** matched exactly between repeats; the tracked allocated
+validator passed complete-array and invariant replay. Original identity,
+support and scale-validity fields remained exact. The measured 2,051 own-scale
+differences from the predecessor are retained under ADR0008, not removed or
+used to select a profile. Accounting, three commands, nine resource records and
+both seals passed. Independent review checked retained allocated evidence; it
+did not perform a new local tensor rerun.
+
+This accepts the baseline/geometry prerequisite only. The **1 GiB** remaining
+storage bound applied to that geometry increment; neither 219-second accounting
+nor the accepted metadata establishes GPU compatibility or campaign capacity.
+Fresh scientific regeneration, admission and capacity evidence remain required.
+
+### GPU startup report blocker narrowed
+
+Job **8249315** ran **11:53:39–11:54:10 AM EDT** on October 22. Scheduler failure
+was zero; the gate exited one before its diagnostic child or any CUDA context.
+The retained initial observation has SHA-256
+`cbc61dddf2fc1f82e75529a060c5ce16e678b0b21d4128f0ae12158f5d5f000c`.
+Recursive comparison found exactly one differing field:
+`profile.runtime.torch_build`. On the GPU node, PyTorch inserts CUDA Runtime,
+NVCC architectures, cuDNN/build-cuDNN and Magma details between the unchanged
+CPU-capability and build-settings lines. The pinned PyTorch 2.9.1
+[configuration source](https://github.com/pytorch/pytorch/blob/v2.9.1/aten/src/ATen/Version.cpp)
+and [CUDA hook](https://github.com/pytorch/pytorch/blob/v2.9.1/aten/src/ATen/cuda/detail/CUDAHooks.cpp)
+explain that conditional report expansion. The frozen dependency lock already
+binds the reported cuDNN package. Every other profile field, including actual
+CPU/dispatch, threads, interpreter and loaded numerical-library hashes, matches.
+
+The required check protects the declared runtime. The reviewed external
+correction recognizes only this exact evidence-bound report expansion while
+retaining raw observations and rejecting changed CPU, build settings or CUDA
+versions. ADR0008 permits review of this operational correction; the accepted
+baseline, frozen source and dependencies remain immutable. No numerical check
+or scientific evidence is waived. The attempt narrowed the cause, so it is not
+a non-progress diagnostic. The historical stopped count remains two.
+
+Independent review approved the correction with **56 focused tests**, lint and
+format checks passed. Gate SHA-256
+`e746bddbcb13f597d82bcaa51b8ec2509c87dc4fdca3db973ed4e47aa0569c34`;
+independent review SHA-256
+`5268864b0a5170833c0bd5c24e95c8c563ed4485cec2eb0050f51213afdb4070`.
+The original helper remains unchanged. Startup accepts only the exact retained
+CPU report or exact retained GPU-expanded report; every other profile field
+remains exact, and the complete post-child profile must equal the pre-child
+profile. Failed-job evidence is hash-bound before and after the child. This
+review does not establish GPU diagnostic success or scientific admission.
+
+### October 22 integration deployment rollback
+
+Merging PR 31 as `8726a55` triggered deployment
+`dpl_H7g1hTRMhfKgzUGFpQ5nfGzgM8KD`. Production was restored to the previously
+verified `dpl_GBs4DdYMNZT66BApqqtxkGTa7Nv1`; the canonical alias, Supabase health
+and Journey HTTP 200 were verified at **15:42:46 UTC**. Automatic production
+alias assignment was disabled during integration. This rollback is operational
+history, not publication of the acceptance milestone or scientific progress.
 
 ## October 19 amendment recorded and baseline geometry submitted
 
@@ -2762,15 +2835,15 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** Follow the [October 19 checkpoint](#current-checkpoint-october-19-2026)
-and adopted ADR0008: establish the prospective runtime baseline, then complete
-the unchanged fresh scientific inventory and measured capacity. Resume allocations
+**Next:** Follow the [October 22 checkpoint](#current-checkpoint-october-22-2026)
+and adopted ADR0008: bind the accepted baseline, then complete the unchanged
+fresh scientific inventory and measured capacity. Resume allocations
 only after the required preflights; do not replay historical launch commands.
 
-**Open issues:** Tasks 02 and 04 are blocked; all scientific gates remain
+**Open issues:** Task 02 remains in progress and task 04 is blocked; all scientific gates remain
 pending. Accepted predecessor evidence and the measured-profile capacity no-go
-are preserved. Execution-r2 geometry and a compatible runtime remain unproven
-after resolver job 8135335 failed before its comparison. Fresh scientific
+are preserved. Job 8189505's CPU runtime, initialization and fixed-panel geometry
+are now accepted; GPU compatibility remains unverified. Fresh scientific
 regeneration, full admission validation and renewed CPU/GPU capacity remain
 required. Actual researcher minutes remain unreported by explicit request.
 Week 5 cannot close while these gates remain unresolved; selection, final
