@@ -1,10 +1,43 @@
 # Final v3 plan: frozen one-shot pose robustness
 
-Original decision: **2026-09-29**. Execution amendment: **2026-10-09**. Delivery: **2026-12-18**. Status: **final planning
+Original decision: **2026-09-29**. Execution amendments: **2026-10-09**,
+**2026-10-12** and **2026-10-19**. Delivery: **2026-12-18**. Status: **final planning
 decision; implementation and measured campaign gates remain to be completed**.
 This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-frozen-one-shot-v3.md)
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
+
+The October 19 researcher-authorized [ADR0008](../docs/decisions/0008-runtime-baseline.md)
+governs the next Week 5 execution. Freeze one prospective runtime baseline;
+require exact repeats and initialization/batch pairing within that profile,
+without requiring runtime-derived scales, tensors or initialization to equal
+historical CPU outputs. Original panel IDs, fallback, manifests, algorithms,
+scientific settings and all other checks remain fixed. Bind the immutable
+amendment/runtime record and fresh scientific inventory to the unchanged r2
+protocol/design/source hashes, preserving all locks and artifacts. Accepted
+setup/rehearsal remains valid where its bound inputs are unchanged; refresh
+runtime-dependent and dynamic checks. Only a bound core change requires a new
+revision through the existing correction path. Allocations may resume after
+recording the amendment and passing required preflights; selection, final
+training and novel opening remain
+gated. The two non-progress diagnostic attempts remain historical and are not
+reset. Earlier runtime recovery instructions below describe their dated
+checkpoints; ADR0008 controls this specific prospective change.
+
+**October 22 accepted milestone:** independent review accepted job 8189505's
+prospective CPU runtime, three fresh initializations per seed 7/17/29, and exact
+two-process geometry for the original 43 panel IDs and 430 tensors per repeat.
+Original identities, fallback, scientific settings and r2 source/locks remain
+fixed; allocated replay, accounting, resources and seals passed. Receipt
+`study-v3/operations/week5-runtime-baseline-acceptance/20261022T154102Z/verification.json`
+has SHA-256 `16106ecafe347dc8d31795e14a88b267e716f82e494311b4753462cfcd88f8aa`.
+Week 5 remains incomplete. Next is the fresh source-bound GPU diagnostic under
+this baseline, then fresh parity/five caches and independent validation. Three
+complete paired pilots, nine corruption paths/projections/results, full
+admission, independent recertification and measured schema-2 capacity remain
+required. The two historical non-progress diagnostics stay recorded; selection,
+final training and novel opening remain closed. See the
+[current execution checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-october-22-2026).
 
 The October 9 researcher-authorized amendment adopts the specifications below
 before selection or novel opening. Scientific settings remain fixed; completing
@@ -12,6 +45,219 @@ currently disabled stages requires a successor execution release and new
 provenance bindings. Preserve the September release, Week 4 closure and all
 original evidence. Sections 5–10 govern the remaining work; they do not assert
 that the new implementation, capacity checks or deployment have happened.
+
+The October 12 researcher-authorized [ADR0007](../docs/decisions/0007-safe-validation-reuse-and-stage-capacity.md)
+permits command-local reuse of successful numerical validation with complete
+content rehashing, and separate CPU/GPU capacity accounting. It requires a fresh
+`execution-r2` release and regeneration. The independently reviewed implementation
+passed the stable full local suite: 1,373 tests with two historical AVSL skips.
+Source release `f101f0e9d9bd64275d2088deab1b0bdcfcc53620` is frozen and pushed.
+The separate SCC installation and allocated CPU rehearsal 8044010 passed
+independent completion review: 128 checks, no failures or skips, successful
+194-second accounting, nine resource samples and intact seals. Verification
+receipt `week5-r2-rehearsal-verification/20261013T002413Z/verification.json` has
+SHA-256 `963babe02eba70d34f3f9c9aa47af21145de387ca4d5a1ad6ccf9c226fb43381`.
+This fixture-only evidence does not admit scientific execution. Preparation
+8045152 also passed independent completion review: successful 44-second
+accounting, three commands, seven resource samples, both seals, all eight
+byte-identical manifest identities and original → r1 → r2 scientific equality.
+Receipt `week5-r2-preparation-verification/20261013T063819Z/verification.json`
+has SHA-256 `0a3823e66a97192c5665185edbb908bf5b44c6dd9b451328d95d96476a84d785`.
+The new protocol SHA-256 is
+`18f7d17fa81e7ae3a6b1e5deddf42d9eda589d96e5a13968188a8ce275bfb95f`.
+Supplementary CPU checks 8048540 completed October 13 at 08:31:43.006302 UTC
+on apolkovnikov-pub@scc-h30: 86 checks passed without skips, successful
+87-second accounting, three commands, seven resource records and both seals.
+Independent review completed at 20:43:00.762966 UTC, verifying 108 metadata
+bindings, 616 source bindings and actual locked-ID dependence tables for
+18,929 development queries and 18,884 primary novel IDs, each over 20 actions.
+Novel poses and outcomes remained unopened. Receipt
+`week5-r2-additional-verification/20261013T204221Z/verification.json` has
+SHA-256 `7703859e50361123de9054fba446c8384d423b8c549b69eab92720314c46c3d2`.
+Geometry job 8070391 was submitted at 20:46:55.956765 UTC and initially
+observed queued with four CPU slots at 20:49:22.424937 UTC. Its launch receipt
+`week5-r2-launches/20261013T204651Z/launch.json` retains SHA-256
+`a8c55f5a6054996d49cb2abab304a8b8925914a4cf0495a2f0368f84e4177452`.
+The due inspection at 22:05:07.547370–22:05:19.824007 UTC found terminal
+failure: bpnlab-pub@scc-kc1, four OMP slots, 20:51:02–20:54:51 UTC,
+229 scheduler seconds, accounting failed=0/exit_status=1. The tracked checker
+and exact within-revision repeats passed, but the external wrapper rejected
+fixed cross-revision identity. That attempt produced no accepted successor
+geometry completion.
+Metadata diagnosis found 2,051 candidate own_scale scalars differed; the fixed
+43 panel IDs, selection and manifests remained unchanged. All 43 clean tensor
+hashes matched. Four selected scales and 129 coordinate-jitter hashes differed
+across revisions; all 430 hashes were exact within each revision.
+Diagnosis `week5-r2-geometry-diagnosis/20261013T220749Z/diagnosis.json` has
+SHA-256 `d9d8b549c159206754d8f8b21eaaac1e6b5f656dee54959c23611717aa70534b`;
+discriminator `week5-r2-geometry-diagnosis/20261013T221341Z/clean-tensor-discriminator.json`
+has SHA-256 `f0dc0f44ba52c114e76b95ac044dd1ed63fd14fc62c8e1b9efd57c80f886ddcb`.
+At that earlier geometry checkpoint, CPU dispatch was an untested recovery hypothesis. Separate native/default diagnostic
+job 8072666 was submitted October 13 at 22:49:45.058490 UTC after 127 local
+checks passed (60 parent, 27 worker, 40 launcher). Initial inspection at
+22:52:26.185888–22:52:38.052404 UTC observed queued (qw), four slots, with
+no operation, log or resource records. No numerical diagnostic result was produced.
+Launch `week5-r2-launches/20261013T224936Z/launch.json` has SHA-256
+`91358af8b0e0f3c04765c7fd9f5d4d5264c32cbb7dbaec2c5a2f7dfa917332a3`.
+Its diagnostic-only 1-GiB bound comes from 67,480,406 bytes of metadata/log/source
+bindings; the existing 17,675,344-byte archive is read only and never copied.
+Fresh quota/filesystem reserve passed; this does not establish campaign capacity.
+The October 13 at 8:00 PM EDT check was not executed after SSH disconnected;
+no result was inferred during the gap. After access was restored, inspection
+on October 14 at 19:40:13.233256–19:40:25.519918 UTC found diagnostic 8072666
+failed before its parent started: neuro-pub@scc-h32, four OMP slots,
+October 13 at 22:54:00–22:54:02 UTC, two scheduler seconds,
+accounting failed=0/exit_status=1. SGE copied the wrapper to its spool directory;
+the helper lookup used that directory and failed before either worker ran.
+Independent metadata-only review at 19:56:38.194670 UTC verified zero operations,
+resource records or worker outputs and 139 artifact/617 external/616 source bindings.
+No CPU capability comparison ran in job 8072666; the geometry cause remains unproven.
+Failure receipt `week5-r2-geometry-runtime-failure-verification/20261014T195626Z/verification.json`
+has SHA-256 `c9e2d25740334923a537c36c82b0d2574f6b90a74b7d45ebf26ddc0c3aac371d`.
+A separate reviewed operational remedy derives the unchanged parent helper from
+the canonical bound input packet directory. Its 64 focused checks and review
+passed; the original parent/worker and scientific settings/tolerances are unchanged.
+New immutable tools `study-v3/operations/week5-r2-geometry-runtime-diagnostic-remedy-tools/20261014T200830Z` were staged and verified
+October 14 at 20:08:33.599282 UTC. Tools manifest SHA-256
+`c6404952ea81aa28b04c2603b6b4b7190cc85c1c759ff08410ee2dd7f63c1d77`; input packet SHA-256
+`32289c531a0330f93dad42b7974022181eb494d775d6b70825a80a7a1877d716`; staging verification SHA-256
+`ae31768ad55b7107b113c581aa6aff0e8690f7e1b86ecdd575a40bd72dd87316`.
+At the staged checkpoint on October 14 at 20:08:33.599282 UTC, the launcher
+had not been executed. That checkpoint and the earlier 4:41 PM EDT launch/check
+boundary remain historical. The new guarded launcher executed once:
+diagnostic remedy job **8102231 was submitted October 14 at 20:43:11.969137 UTC**.
+The fresh pre-submit scheduler check completed by 20:43:10.988132 UTC with no
+active jobs; it precedes submission and does not establish the new job state.
+Launch `week5-r2-launches/20261014T204308Z/launch.json` has SHA-256
+`82427510eb77a8bc0875753d343783a1e9a383f05bef736aa2c01654ee4037f2`; submission intent SHA-256
+`7c690ce8410753e592a06c555dfb87c4b638ca28e344552a1d246c8c2fdeee6d`.
+Independent submission-metadata review at 20:50:34.444145 UTC rehashed 763 metadata
+and 616 frozen-source bindings, checked the packet/intent/command and both launch seals.
+Receipt `week5-r2-geometry-runtime-remedy-submission-verification/20261014T205034Z/verification.json`
+has SHA-256 `63aa23c6e514f9cd1757021354fa1262b8f48f89af10e8a8015259e885dbb471`.
+Fresh quota 826,630,000,000 bytes and filesystem free 994,956,017,664 bytes passed
+the diagnostic-only reserve. Its 1-GiB bound derives from 67,481,168 bytes of
+metadata/log/source/receipt allowances; the existing 17,675,344-byte archive is
+read only in allocation, with no copy. This does not establish campaign capacity.
+The request remains four OMP CPU slots, 32 GiB, 30 minutes, no GPU and the
+reviewed Gold-6426Y/AVX2 selector. At the submitted-only checkpoint, no post-submission state or result had been
+observed; the earlier 5:45 PM EDT (21:45 UTC) first-check boundary is historical.
+Actual inspection on October 14 at 22:25:31–22:25:43 UTC found completed diagnostic
+remedy job **8102231**, completed at **20:49:21.682189 UTC**. Accounting records
+neuro-pub@scc-ke1.scc.bu.edu, four OMP slots, failed=0/exit_status=0,
+**17 whole-job CPU wall seconds and 9.340 actual CPU seconds**.
+Independent completion review at 22:34:10.047781–22:34:14.167272 UTC verified
+both seals, two unchanged worker commands, dispatch evidence, the final wrapper
+marker, six resource records and 184 artifact/617 external/616 frozen-source bindings.
+Receipt `week5-r2-geometry-runtime-remedy-queue-record-verification/20261014T223409Z/verification.json`
+has SHA-256 `f077737e6781d002d92458d1a743d83c772f7ef028676ec987ad54455ce34d36`.
+The four-case recovery hypothesis is **unsupported**: native AVX512 exactly
+matched the failed-fresh four scales, 40 tensor hashes and 36 damage rows.
+DEFAULT recovered the original four scales but only **36/40 tensor hashes and
+32/36 damage rows**. Clean and all masking records matched the original; four
+residual jitter hash/damage-row differences across two cases remain. This does
+not establish the complete geometry cause or a permanent CPU profile.
+The first completion verifier rejected only the allocation QUEUE representation
+and produced no accepted receipt; its source and failure remain preserved.
+The reviewed replacement accepts the scheduler's bare queue name with a
+separately verified host, or its exact qualified forms. Host, job, PE, slot,
+thread, scientific and numerical checks remain unchanged; 93 focused tests,
+Ruff/format and independent review passed.
+Geometry and every dependent stage, full allocated A/corruption replay,
+scientific admission and measured CPU/GPU capacity remain held. At the October 14 completion checkpoint, no further profile, helper or job had
+been claimed; the earlier 7:27 PM EDT scheduler/preflight boundary is historical.
+Separate libm diagnostic tools were staged and verified at 23:26:33.802337 UTC
+after **173 local checks and independent review**. Tools manifest SHA-256
+`90c9336085f01d6b423a04a6087aff381b1527952cc86bea57e67c3cefd43093`; input SHA-256
+`1d6ea033970b2b1b49ca6548180e5e6e5f8c097cb722a2466db49b4809d4a4ff`.
+The new guarded launcher executed once: **libm diagnostic job 8104416 was
+submitted October 14 at 23:29:21.658353 UTC**.
+Launch `week5-r2-geometry-libm-launches/20261014T232917Z/launch.json` has SHA-256
+`03fa95ee91fb6c6686b792e111d3033bef8af8e5a12cca740be813023c87caf5`; intent SHA-256
+`574b8f072e3364b6650f01cead24e0bf60fae09eae8cda94bf574e938d3760b9`.
+Independent submission review at 23:34:29.161902 UTC rehashed 815 metadata and
+616 frozen-source bindings, checked exact intent/source/tools/input/command and
+complete before/after launch seals. Receipt
+`week5-r2-geometry-libm-submission-verification/20261014T233429Z/verification.json`
+has SHA-256 `0b6a6e05b49bd698cc4d0d317d5142d319d3ec6a5677448e0b90803e19938b33`.
+Fresh quota 824,700,000,000 bytes and filesystem free 992,888,225,792 bytes passed
+the diagnostic-only reserve: 67,667,170 bytes rounded to 1 GiB. The existing
+17,675,344-byte archive is read only in allocation, with no archive copy or
+runtime ELF output copies. This does not establish campaign capacity.
+The request is four OMP CPU slots, 32 GiB, 30 minutes, no GPU and the reviewed
+Gold-6426Y/AVX2 selector. The four-case diagnostic pairs fresh DEFAULT control
+and DEFAULT plus a version-appropriate libc/libm FMA-disable request; actual
+runtime, ELF and selected function implementation must be proven in allocation
+before interpreting numerical metadata. No permanent runtime profile or complete
+geometry cause is established. The accepted 8102231 negative result and all
+earlier failures remain preserved; geometry and every dependent scientific,
+replay and capacity gate remain held.
+The pre-submit scheduler check ran at 23:29:20.578046–23:29:20.793929 UTC; it
+precedes submission and does not establish the new job state. At the submitted-only checkpoint no post-submission state or result had been
+observed; the October 15 at 00:31 UTC first-check boundary is historical.
+The first observation ran once on **October 15 at 00:32:02.955881–00:32:16.614103 UTC**.
+Diagnostic **8104416 completed October 14 at 23:34:33 UTC** on
+apolkovnikov-pub@scc-h30.scc.bu.edu: four OMP slots, failed=0/exit_status=0,
+**21 whole-job CPU wall seconds and 14.493 actual CPU seconds**, peak RSS 695,096 KiB.
+Independent terminal review at **October 15, 02:34:06.243155 UTC** passed
+its diagnostic-only accounting/command/seal/final-marker checks, six resources
+and 240 artifact metadata/617 external metadata/616 frozen-source bindings.
+Receipt `week5-r2-geometry-libm-terminal-verification/20261015T023357Z/verification.json`
+has SHA-256 `9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`;
+retained compact receipt SHA-256
+`dc5d3db0011bea0c1f3cae4d814e5d0ec2919588a441afda45d61ccdc2684fd6`.
+Classification is **inconclusive-dispatch**: both DEFAULT control and FMA-off
+matched the original four scales, **36/40 tensor hashes and 32/36 damage rows**.
+Neither required-symbol dispatch nor default math code offsets changed; the
+intervention did not establish the intended implementation difference. This
+supports neither acceptance nor rejection of the libm cause hypothesis and
+selects no permanent profile. The earlier 8102231 unsupported recovery result
+and all failed attempts remain preserved.
+The next hourly boundary after observation was October 15 at 01:32:16.614103 UTC;
+no repeat scheduler query is needed for terminal review. At the later access-blocked checkpoint, SCC access was found disconnected
+after an attempted full-receipt export returned no receipt. Only accepted
+compact/capture evidence was then retained, with no full local JSON export or
+refreshed SCC status claimed; restoration was pending and no new job was claimed.
+That checkpoint remains historical. **The researcher restored the existing SCC
+connection on October 15.** The full **238,862-byte** verification JSON was
+recovered at **15:03:07.054586 UTC** from seven checked metadata chunks, retaining
+its exact `9f45a91a0ba63431f22bad35b6402fde9faabcde0d8b53682b4c448f9b6b3277`
+identity. Four bound JSONs (child inputs, control runtime, FMA-off runtime and
+summary) were recovered and hash-checked against that receipt by
+**15:05:07.897329 UTC**. Independent read-only review confirmed exact transport,
+the original comparisons and **240 metadata/617 external/616 source** counts.
+SCC status was refreshed at **15:13:30.934012 UTC**, SHA-256
+`bbf4d01268ac8db236ceba3424aa2167a741caba72c8b930166d57ca0fbd1230`.
+Recovery read only metadata: no scheduler query, scientific archive or runtime
+binary was read. Last actual scheduler batch remains October 15 at
+00:32:05.186540–00:32:16.493406 UTC. The earlier `5644` recovery command stopped
+at its export-size guard and remains preserved without rerun; the earlier
+`ac786` export remains ambiguous and preserved.
+
+Recovered runtime metadata records glibc **2.28 stable**, baseline
+`GLIBC_TUNABLES` unset and candidate `glibc.tune.hwcaps=-FMA_Usable`, with identical
+required/default versioned math offsets before/after both conditions.
+Classification remains **inconclusive-dispatch**; recovery establishes neither
+a libm cause nor a permanent profile. One **data-free resolver sensitivity
+design** is selected for local implementation and independent review only:
+two serial fresh children, `GLIBC_TUNABLES` unset versus exact
+`glibc.cpu.hwcaps=-FMA_Usable`, changing only the namespace from the prior request.
+It reads no NPZ, runs no historical worker or numerical experiment, and imports
+no Torch in the children; the supervisor imports Torch to retain inherited
+safeguards. Actual package/loader provenance and required-version offset
+sensitivity must be established in allocation. Producer tools passed **140 local
+checks**, Ruff/format/Bash syntax and independent review. Separate metadata-only
+submission, observation and terminal controls passed **75 synthetic checks**,
+Ruff/format and independent review. Both exact source sets are reviewed and
+frozen locally; **nothing is staged or submitted**. No new job, resolver result,
+permanent runtime or scientific acceptance is claimed. Geometry, all dependent stages/full allocated replay,
+scientific admission, measured CPU/GPU capacity, Week 6 selection, final training
+and novel opening remain held. Source, recipes, tolerances, IDs and fallback
+remain frozen. Never rerun an executed launcher or observer. Its output can only be diagnostic metadata;
+it cannot produce eligible scientific artifacts or pass a gate. Source,
+scientific settings and tolerances remain frozen; there is no blind geometry retry.
+Fresh successor scientific evidence, full admission and measured CPU/GPU
+capacity remain pending. Preserve the measured no-go and all `execution-r1` evidence.
 
 Following the [final prospectus](../docs/proposal/2026/kulis_pose_sequence_retrieval_prospectus.pdf),
 the December study asks whether a **full contextual training recipe reduces
@@ -495,6 +741,10 @@ do not rewrite verified v3 operators or analysis merely to repeat this table.
 
 ### Completion release before selection
 
+The following completion-release requirements record the October 9 amendment
+for `execution-r1`. The October 12 subsection below defines its authorized
+successor; neither changes or relabels the original release.
+
 Adopt one coordinated completion release. The current final-training guard in
 `training/runner.py`, novel-role guard in `motionbert_features.py`, final-lock
 guard in `protocol.py`, selection authorizer, corrupted-development evaluator
@@ -586,21 +836,52 @@ Enforce reuse counts in the campaign manifest: nine development corruption
 encodings shared by three pilot heads; one novel gallery plus ten query-condition
 encodings; 21 final pre-head files (ten official, ten primary, one gallery);
 nine reusable gallery projections and 180 role-specific query projections.
-Keep immutable role-specific files and existing validation. Do not replace CPU
-projection with GPU arithmetic, change precision, memoize validation or omit
-hash checks as part of this amendment. Optimize measured orchestration/I/O
-reuse first. Start with one scientific subprocess at a time on the validated
+Keep immutable role-specific files and existing validation. The October 9
+amendment prohibited memoized validation; that prohibition remains part of the
+immutable `731938a`/`execution-r1` evidence. The October 12 exception below
+authorizes only bounded numerical proof reuse in a new successor. CPU projection
+arithmetic, precision and all content hash checks remain unchanged. Optimize
+measured orchestration/I/O reuse first. Start with one scientific subprocess at a time on the validated
 L40S. Group fresh subprocess runs only when measured queue/setup savings justify
 it and the complete group fits the allocation; preserve independent seeds,
 attempts, manifests and failure handling. No unmeasured concurrent GPU jobs.
 
+### October 12 validation and capacity successor
+
+The researcher authorized [ADR0007](../docs/decisions/0007-safe-validation-reuse-and-stage-capacity.md)
+after measured P=778.274100575014 seconds made the prior profile's repeated
+report component with slack 122.145796 hours against the shared 48-hour opening
+limit. Preserve that no-go; it does not prove all hardware infeasible.
+
+Within one guarded command, a new `execution-r2` release may reuse only complete
+successful deterministic numerical proofs. Each hit must rehash every transitive
+bound file and match validator/options, role, protocol/design/source/runtime
+identities. Reuse never substitutes for fresh seal, authorization, timestamp,
+attempt inventory, resource or calendar decisions. No stat-only trust, persisted
+proof cache, failed/partial result reuse or cross-command reuse is permitted.
+Store successful numerical proof markers only, not mutable result objects.
+Independent recertification
+starts fresh, and changed content/options fail closed or force full validation.
+
+Use the same canonical artifact root and shared seal, new predecessor-bound
+locks and explicit scientific-field equality. Follow ADR0007's regeneration
+inventory: retain original source/identity/fallback evidence through validated
+bindings and byte-identical manifest rebinding; regenerate parity, five caches,
+three complete pilots, panel/repeat evidence, nine development paths/projections,
+report rehearsal and successor timing/admission receipts. Preserve original and
+`execution-r1` artifacts without a cross-release adoption wrapper. Freeze and
+verify the complete successor before scientific execution; passing software
+checks alone cannot authorize selection or opening.
+
 ## 8. Capacity gates
 
 The fixed campaign has the following head-update count under the existing
-sampler. Counts are not GPU-hour estimates. The main table counts the accepted campaign;
-the three retained predecessor pilots add 142,560 historical updates. With the
-three successor pilots, 42 complete training runs would be retained before other
-retries/fixtures, totaling 2,102,580 updates across releases.
+sampler. Counts are not GPU-hour estimates. The main table counts the accepted
+campaign. The original and execution-r1 pilot sets add six retained historical
+runs and 285,120 updates. With execution-r2 engineering regeneration, 45 complete
+training runs would be retained before other retries/fixtures, totaling
+2,245,140 updates across releases. The earlier two-generation estimate was
+42 runs and 2,102,580 updates; preserve it as historical planning evidence.
 
 | Stage | Runs | Updates per run | Total updates |
 | --- | ---: | ---: | ---: |
@@ -629,9 +910,12 @@ Before selection, create an immutable capacity report that includes:
   timing-only engineering outside the 39 scientific runs; record its extra
   steps/bytes, and make its weights ineligible for selection or final results.
   No novel inputs or scores are needed.
-- A dated GPU allocation calendar specifying access windows, job limits,
-  queue allowance, and planned concurrency. An empty queue or prior access
-  is not an allocation commitment.
+- A dated CPU/GPU allocation calendar specifying resource-class windows,
+  complete-job limits and queue/setup allowance. Under ADR0007, schema-2 capacity
+  evidence separates CPU/GPU maximum-job, remaining pre-opening and remaining
+  evaluation time; every window declares its class. CPU/I/O within a GPU job
+  stays in that complete GPU wall time. Preserve global non-overlap and one
+  scientific subprocess; an empty queue or prior access is not a reservation.
 - Researcher-confirmed available hours against the work packages and final
   analysis. The inherited 77 planned hours in Weeks 4–14 and zero recorded
   actual minutes are not evidence of remaining availability or no past work.
@@ -646,6 +930,12 @@ then add the allocation calendar's queue/setup delays. Apply the same minimum
 final heads and locks by November 29, full novel evaluation by December 6,
 and preserve December 7–18 for analysis/delivery. Do not launch overlapping
 jobs beyond the demonstrated GPU, host-memory, or storage budget.
+
+At opening, compare actual GPU allocation time remaining with the complete
+GPU-job bound, while still requiring sufficient CPU and GPU evaluation windows
+and researcher delivery time. Reject scalar/unclassified predecessor receipts
+as successor evidence. Independent report/recertification compute remains due
+by December 6; separate accounting does not create later compute capacity.
 
 October 8 pilot scheduler seconds were 502/525/415 and training-stage seconds
 286.739518/323.617977/254.941551 (Contrastive/Contextual/SupCon). A provisional
@@ -676,7 +966,7 @@ pass iff available >= required.
 ```
 
 The September 29 planning envelope was **100 GB** incremental including slack.
-The amended campaign-wide envelope is **120 decimal GB including slack**,
+The October 9 campaign-wide planning envelope was **120 decimal GB including slack**,
 while retaining the 200 GiB reserve. It includes retained predecessor evidence
 and the planned completion-release regeneration; it is not 120 GB of new work
 on top of files already present. It deliberately keeps
@@ -699,6 +989,12 @@ uncompressed payload estimates include float32 features, int64 labels, and
 | Metadata, per-query results, retained failures, and temporary-file allowance | **10.0000** |
 | Subtotal and allowance multiplied by 1.25 | **118.6426** |
 | **Rounded campaign-wide envelope** | **120.0000** |
+
+This table is the pre-`execution-r2` estimate. ADR0007 adds a retained fresh
+engineering generation; inventory all actual retained bytes, successor outputs
+and remaining temporary peaks before admission. No new numeric envelope or
+capacity pass is inferred here. The current-space/reserve equation above remains
+mandatory, and no historical evidence may be deleted to fit the plan.
 
 The original roughly 4.14 million development/final per-query result rows,
 511,083 development-corruption rows and successor pilot records are covered by

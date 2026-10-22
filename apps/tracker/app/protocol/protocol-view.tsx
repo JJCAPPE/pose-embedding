@@ -47,8 +47,10 @@ export function ProtocolView({
           <h1>The rules before the result.</h1>
           <p className="page-summary">
             Three training recipes, a frozen MotionBERT encoder, and one clean reference per
-            unseen action. Week 3 software is implemented and checked; real SCC preparation,
-            design freeze, measured capacity, and final-test authorization remain pending.
+            unseen action. Verified successor evidence and measured capacity are required
+            before selection; all nine final heads and full opening authorization are
+            required before novel-test access. The current planning status below records
+            verified progress.
             A null or negative result still counts as success.
           </p>
           <Space size={[12, 12]} wrap>
@@ -61,7 +63,7 @@ export function ProtocolView({
       <Alert
         className="protocol-success"
         title="Capacity is a gate, not a completed result"
-        description="September 29, 2026: the plan budgets 100 GB of incremental storage with slack while preserving a 200 GiB reserve. The inspected quota leaves 58.05 GB above that reserve, a gap of about 42 GB. GPU runtime and researcher availability still require measurement and confirmation."
+        description="The amended plan budgets 120 decimal GB including slack and preserves a 200 GiB reserve. Selection requires current free space, a measured full-pipeline forecast, and a dated allocation calendar that fits confirmed researcher hours. Earlier quota readings remain dated evidence; ordinary queued GPU access does not establish a reservation."
         showIcon
         type="warning"
       />

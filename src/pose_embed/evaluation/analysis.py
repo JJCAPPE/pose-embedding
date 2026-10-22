@@ -422,6 +422,42 @@ def leave_one_action_out_v3(
     ]
 
 
+def metadata_dependence_table_v3(sample_ids: Sequence[str]) -> list[dict[str, Any]]:
+    """Describe query dependence using identifiers only, without accessing poses."""
+    if not sample_ids or len(set(sample_ids)) != len(sample_ids):
+        raise ValueError("dependence table requires nonempty unique sample IDs")
+    groups: dict[int, dict[tuple[int, int, int, int], int]] = defaultdict(
+        lambda: defaultdict(int)
+    )
+    for sample_id in sample_ids:
+        parsed = parse_ntu_sample_id(sample_id)
+        if parsed.sample_id != sample_id:
+            raise ValueError("dependence table requires canonical sample IDs")
+        groups[parsed.action][parsed.performance_id] += 1
+    rows = []
+    for action, performances in sorted(groups.items()):
+        performer_counts: dict[int, int] = defaultdict(int)
+        view_counts: dict[int, int] = defaultdict(int)
+        for (_, performer, _, _), count in performances.items():
+            performer_counts[performer] += 1
+            view_counts[count] += 1
+        rows.append(
+            {
+                "action": action,
+                "query_count": sum(performances.values()),
+                "performance_group_count": len(performances),
+                "views_per_group": [
+                    {"views": views, "groups": count}
+                    for views, count in sorted(view_counts.items())
+                ],
+                "distinct_performers": len(performer_counts),
+                "largest_performer_share_of_groups": max(performer_counts.values())
+                / len(performances),
+            }
+        )
+    return rows
+
+
 def primary_robustness_analysis_v3(
     results: Sequence[EvaluationResult],
     *,
@@ -526,6 +562,44 @@ def primary_robustness_analysis_v3(
             )
     per_query = effects.mean(axis=(0, 1))
     interval = within_action_cluster_bootstrap_v3(per_query, sample_ids)
+    absolute_top1 = {
+        method: {
+            "clean": math.fsum(getattr(cell, f"{method}_clean_top1") for cell in cells)
+            / len(cells),
+            "mean_corrupted": math.fsum(
+                getattr(cell, f"{method}_corrupted_top1") for cell in cells
+            )
+            / len(cells),
+            "drop": math.fsum(getattr(cell, f"{method}_drop") for cell in cells)
+            / len(cells),
+        }
+        for method in ("contextual", "contrastive")
+    }
+    gaps = {
+        metric: absolute_top1["contextual"][metric]
+        - absolute_top1["contrastive"][metric]
+        for metric in ("clean", "mean_corrupted", "drop")
+    }
+    delta_from_gaps = gaps["clean"] - gaps["mean_corrupted"]
+    if not math.isclose(interval.estimate, delta_from_gaps, rel_tol=0, abs_tol=1e-12):
+        raise ValueError("v3 Delta differs from clean gap minus corrupted gap")
+    absolute_top1["contextual_minus_contrastive"] = gaps
+    if interval.upper < 0:
+        interpretation = (
+            "Evidence of smaller degradation; higher corrupted accuracy is descriptive."
+            if gaps["mean_corrupted"] > 0
+            else "Evidence of smaller degradation without higher absolute "
+            "corrupted accuracy."
+        )
+    elif interval.lower > 0:
+        interpretation = (
+            "Results favor greater contextual degradation under this mixture."
+        )
+    else:
+        interpretation = (
+            "Inconclusive for the declared claim; not evidence of equivalence "
+            "or no effect."
+        )
     clusters = defaultdict(set)
     for sample_id in sample_ids:
         clusters[parse_ntu_sample_id(sample_id).performance_id].add(sample_id)
@@ -547,6 +621,24 @@ def primary_robustness_analysis_v3(
             "conditioning": (
                 "fixed_trained_heads_seeds_actions_anchors_queries_corruptions"
             ),
+            "conditioning_caveat": (
+                "The interval is conditional on the trained heads, three seeds, fixed "
+                "actions and anchors, query definitions and realized synthetic "
+                "corruptions. "
+                "It assumes exchangeable performance groups within each fixed action; "
+                "repeated performances from a person may remain dependent. It does not "
+                "quantify uncertainty over arbitrary seeds, actions, participants, "
+                "anchors or natural camera errors."
+            ),
+            "recipe_caveat": (
+                "This compares complete recipes and cannot isolate contextual "
+                "neighborhoods from their different margins and regularizer. "
+                "Synthetic stress does not establish natural-camera robustness."
+            ),
+            "interpretation": interpretation,
+            "absolute_top1": absolute_top1,
+            "delta_from_accuracy_gaps": delta_from_gaps,
+            "dependence_by_action": metadata_dependence_table_v3(sample_ids),
             "seed_effects": [
                 {"seed": seed, "effect": float(effects[i].mean())}
                 for i, seed in enumerate(paired_seeds)

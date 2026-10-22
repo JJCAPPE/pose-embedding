@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import UTC, datetime
+from functools import wraps
 from pathlib import Path
 from typing import Any, Literal
 
@@ -12,6 +13,7 @@ import torch
 
 from pose_embed.artifacts import (
     FeatureSidecar,
+    load_feature_sidecar,
     sidecar_path_for,
     validate_feature_artifact,
 )
@@ -39,8 +41,9 @@ from pose_embed.provenance import (
     write_immutable_json,
 )
 from pose_embed.test_access import open_final_test_once
+from pose_embed.validation_proofs import validation_command, verify_validation_proofs
 
-EvaluationMode = Literal["development", "final", "exploratory"]
+EvaluationMode = Literal["development", "engineering", "final", "exploratory"]
 Method = Literal["contrastive", "supcon", "contextual", "multi_similarity_with_miner"]
 QueryDefinition = Literal["development", "primary", "official"]
 
@@ -75,12 +78,12 @@ def _authorize_roles(
         )
     if query_sidecar.condition != condition:
         raise ValueError("declared condition does not match the query feature sidecar")
-    if mode == "development":
+    if mode in {"development", "engineering"}:
         if query_definition != "development":
             raise ValueError(
                 "development evaluation requires query_definition=development"
             )
-        if condition != "clean":
+        if mode == "development" and condition != "clean":
             raise ValueError(
                 "development retrieval is clean-only; corruptions are geometric "
                 "checks until final-test opening"
@@ -145,7 +148,7 @@ def _validate_identities(
     query_ids = {record.sample_id for record in query_records}
     if gallery_ids & query_ids:
         raise ValueError("gallery and query sample identities must be disjoint")
-    if mode == "development":
+    if mode in {"development", "engineering"}:
         gallery_performances = {record.ntu.performance_id for record in gallery_records}
         if any(
             record.ntu.performance_id in gallery_performances
@@ -164,7 +167,7 @@ def _validate_identities(
         raise ValueError("final query set must cover every novel action")
 
 
-def evaluate_files(
+def _evaluate_files(
     gallery_path: str | Path,
     query_path: str | Path,
     output_path: str | Path,
@@ -184,6 +187,23 @@ def evaluate_files(
     """Evaluate one development, locked core, or labeled exploratory cell."""
     started_at = datetime.now(UTC)
     protocol, digest = verify_protocol(protocol_path)
+    if mode == "engineering":
+        if protocol.protocol_id != "protocol-v3":
+            raise ValueError("engineering evaluation requires protocol-v3")
+        if any(
+            load_feature_sidecar(path).scientific_use_allowed
+            for path in (gallery_path, query_path)
+        ):
+            from pose_embed.dataset_seal import require_dataset_unopened
+            from pose_embed.protocol_v3 import require_v3_design
+
+            require_dataset_unopened(require_registry=True)
+            require_v3_design(protocol)
+            paths = resolve_scientific_paths(protocol)
+            revision_root = (
+                paths.root / protocol.test_access.resolved_protocol_relative_path
+            ).parent.parent
+            require_path_within(output_path, revision_root, label="engineering result")
     evaluation_plan_sha256: str | None = None
     final_run_set_sha256: str | None = None
     protocol_lock_sha256: str | None = None
@@ -265,6 +285,7 @@ def evaluate_files(
             )
 
         ledger = open_final_test_once(protocol, protocol_sha256=digest)
+        started_at = datetime.now(UTC)
         manifest_validation = validate_evaluation_manifests(
             protocol,
             evaluation_plan,
@@ -452,5 +473,21 @@ def evaluate_files(
         ),
     }
     validated = EvaluationResult.model_validate(payload).model_dump(mode="json")
+    verify_validation_proofs()
     write_immutable_json(output_path, validated)
     return validated
+
+
+@wraps(_evaluate_files)
+@validation_command()
+def evaluate_files(gallery_path, query_path, output_path, **kwargs):
+    if kwargs.get("mode") in {"development", "engineering"} and any(
+        load_feature_sidecar(path).scientific_use_allowed
+        for path in (gallery_path, query_path)
+    ):
+        from pose_embed.dataset_seal import guarded_auxiliary
+
+        return guarded_auxiliary(_evaluate_files)(
+            gallery_path, query_path, output_path, **kwargs
+        )
+    return _evaluate_files(gallery_path, query_path, output_path, **kwargs)

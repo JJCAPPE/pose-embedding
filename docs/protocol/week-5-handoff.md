@@ -1,7 +1,9 @@
 # Week 5 handoff — October 12–18, 2026
 
-Prepared October 8; amended October 9 under [decision 0006](../decisions/0006-v3-execution-completion-amendment.md). **Week 4 technical validation passed; Week 5 has not
-been executed.** All four Week 5 tasks remain todo and all three gates pending in the
+Incoming handoff prepared October 8; amended October 9 under [decision 0006](../decisions/0006-v3-execution-completion-amendment.md). **At handoff, Week 4 technical validation had passed and Week 5 had not
+been executed.** Current work and live status are recorded in the
+[Week 5 execution record](week-5-execution.md). The original handoff began with
+all four Week 5 tasks todo and all three gates pending in the
 [canonical plan](../../plan/research-plan.v3.json). Selection and novel access
 remain closed. This handoff does not authorize either.
 

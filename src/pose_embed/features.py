@@ -33,6 +33,7 @@ from pose_embed.provenance import (
     sha256_file,
     write_immutable_json,
 )
+from pose_embed.validation_proofs import validation_command, verify_validation_proofs
 
 
 def extract_fixture_features(
@@ -234,6 +235,7 @@ def extract_fixture_features(
     return sidecar.model_dump(mode="json")
 
 
+@validation_command()
 def apply_trained_head(
     input_path: str | Path,
     output_path: str | Path,
@@ -360,6 +362,7 @@ def apply_trained_head(
         "training_seed": config.seed,
     }
     destination.parent.mkdir(parents=True, exist_ok=True)
+    verify_validation_proofs()
     np.savez_compressed(
         destination,
         embeddings=embeddings,
@@ -410,6 +413,7 @@ def apply_trained_head(
             ],
         ),
     )
+    verify_validation_proofs()
     write_immutable_json(
         destination_sidecar,
         sidecar.model_dump(mode="json"),

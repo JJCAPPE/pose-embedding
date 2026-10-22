@@ -52,6 +52,13 @@ from pose_embed.provenance import (
     write_immutable_json,
 )
 from pose_embed.training.sampler import BalancedBatchSampler
+from pose_embed.validation_proofs import (
+    check_numerical_proof,
+    proof_reuse_allowed,
+    proof_source_bindings,
+    validation_command,
+    verify_validation_proofs,
+)
 
 TrainingStage = Literal["engineering_pilot", "development_selection", "final_training"]
 _PILOT_SNAPSHOTS = (5, 10, 15, 20)
@@ -126,6 +133,7 @@ def build_loss(config: ExperimentConfig) -> nn.Module:
     )
 
 
+@validation_command()
 def train_head(
     config_path: str | Path,
     input_path: str | Path,
@@ -190,6 +198,7 @@ def _train_head(
     started_at = datetime.now(UTC)
     config = load_experiment(config_path)
     protocol = load_protocol(protocol_path)
+    campaign_inputs = []
     source = Path(input_path)
     preliminary = load_feature_sidecar(source)
     if (
@@ -225,11 +234,18 @@ def _train_head(
                 from pose_embed.protocol_v3 import require_v3_selection_authorization
 
                 require_v3_selection_authorization(protocol)
-            if stage == "final_training":
-                raise ValueError(
-                    "v3 final training requires a selected-rate lock; "
-                    "not yet authorized"
+                campaign_inputs.append(
+                    resolve_scientific_paths(protocol).root
+                    / protocol.test_access.selection_authorization_relative_path
                 )
+            if stage == "final_training":
+                from pose_embed.protocol_v3_campaign import (
+                    require_selected_configuration,
+                    selected_configs_path,
+                )
+
+                require_selected_configuration(protocol, config)
+                campaign_inputs.append(selected_configs_path(protocol))
     elif stage is not None and not allow_fixture:
         raise ValueError("engineering stages require protocol-v3 or explicit fixtures")
     sidecar = validate_feature_artifact(
@@ -284,7 +300,10 @@ def _train_head(
         assert scientific_paths is not None
         destination = require_path_within(
             destination,
-            scientific_paths.root / "study-v3" if is_v3 else scientific_paths.root,
+            scientific_paths.root
+            / Path(protocol.test_access.resolved_protocol_relative_path).parent.parent
+            if is_v3
+            else scientific_paths.root,
             label="scientific run output",
         )
     if scientific_paths is not None and (
@@ -363,7 +382,8 @@ def _train_head(
                 manifest_path,
                 source,
                 source.with_suffix(f"{source.suffix}.manifest.json"),
-            ],
+            ]
+            + campaign_inputs,
             started_at=started_at,
         ),
     }
@@ -385,7 +405,9 @@ def _train_head(
             attempt_sha256=sha256_file(attempt_path),
             stage=stage,
             development=development,
+            campaign_inputs=campaign_inputs,
         )
+        verify_validation_proofs()
     except BaseException as exc:
         known_files = {}
         for candidate in sorted(destination.rglob("*")):
@@ -437,6 +459,7 @@ def _execute_training(
     attempt_sha256: str,
     stage: TrainingStage | None = None,
     development: dict[str, Any] | None = None,
+    campaign_inputs: list[Path] | None = None,
 ) -> dict[str, Any]:
     """Execute one preflighted attempt inside its immutable run directory."""
     with np.load(source, allow_pickle=False) as archive:
@@ -680,6 +703,7 @@ def _execute_training(
                 ),
             }
         )
+    verify_validation_proofs()
     write_immutable_json(destination / "metrics.json", summary)
     provenance = capture_provenance(
         command="train",
@@ -696,7 +720,8 @@ def _execute_training(
             source.with_suffix(f"{source.suffix}.manifest.json"),
         ]
         + ([stretch_gate_evidence_path] if stretch_gate_evidence_path else [])
-        + (development["input_paths"] if development is not None else []),
+        + (development["input_paths"] if development is not None else [])
+        + (campaign_inputs or []),
         started_at=started_at,
         ended_at=ended_at,
     )
@@ -732,6 +757,16 @@ def _execute_training(
                 resolve_scientific_paths(locked_protocol).root
                 / locked_protocol.test_access.design_lock_relative_path
             )
+            provenance["resolved_protocol_relative_path"] = (
+                locked_protocol.test_access.resolved_protocol_relative_path
+            )
+            if stage == "final_training":
+                from pose_embed.protocol_v3_campaign import selected_configs_path
+
+                provenance["selected_configs_sha256"] = sha256_file(
+                    selected_configs_path(locked_protocol)
+                )
+    verify_validation_proofs()
     write_immutable_json(destination / "run-manifest.json", provenance)
     return summary
 
@@ -998,6 +1033,15 @@ def validate_engineering_pilot(run_dir: str | Path) -> dict[str, Any]:
     This validates engineering evidence only; a pilot is never selection or final
     evidence, even when its learning rate matches a selection candidate.
     """
+    return validate_v3_training_run(run_dir, stage="engineering_pilot")
+
+
+def validate_v3_training_run(
+    run_dir: str | Path, *, stage: TrainingStage
+) -> dict[str, Any]:
+    """Revalidate immutable stage evidence; eligibility never crosses stages."""
+    if stage not in {"engineering_pilot", "development_selection", "final_training"}:
+        raise ValueError("unknown training stage")
     root = Path(run_dir).resolve()
     manifest = json.loads((root / "run-manifest.json").read_text())
     metrics = json.loads((root / "metrics.json").read_text())
@@ -1006,7 +1050,7 @@ def validate_engineering_pilot(run_dir: str | Path) -> dict[str, Any]:
     for value in (manifest, metrics, attempt):
         if any(
             value.get(key) != expected
-            for key, expected in _stage_identity("engineering_pilot").items()
+            for key, expected in _stage_identity(stage).items()
         ):
             raise ValueError("engineering pilot stage/eligibility binding is invalid")
     if (
@@ -1037,7 +1081,12 @@ def validate_engineering_pilot(run_dir: str | Path) -> dict[str, Any]:
         resolved = require_path_within(root / path, root, label="pilot artifact")
         if sha256_file(resolved) != digest:
             raise ValueError("engineering pilot artifact changed")
-    expected_records = {f"epoch-{epoch:03d}.json" for epoch in (0, *_PILOT_SNAPSHOTS)}
+    expected_epochs = (
+        (0, *_PILOT_SNAPSHOTS)
+        if stage == "engineering_pilot"
+        else ((20,) if stage == "development_selection" else ())
+    )
+    expected_records = {f"epoch-{epoch:03d}.json" for epoch in expected_epochs}
     if (
         set(manifest["epoch_records"]) != expected_records
         or manifest["epoch_records"] != metrics["epoch_records"]
@@ -1046,6 +1095,44 @@ def validate_engineering_pilot(run_dir: str | Path) -> dict[str, Any]:
             "engineering pilot requires all epoch diagnostics and snapshots"
         )
     config = ExperimentConfig.model_validate(manifest["configuration"]["experiment"])
+    from pose_embed.protocol import _validate_batch_plan, _validate_head_checkpoint
+
+    sidecar = FeatureSidecar.model_validate(manifest["feature_sidecar"])
+    epoch_hashes = _validate_batch_plan(
+        root / "batch-plan.json",
+        config,
+        labels=[int(sample_id[-3:]) for sample_id in sidecar.sample_ids],
+        sample_order_sha256=sidecar.sample_order_sha256,
+    )
+    _validate_head_checkpoint(
+        root / "head.pt",
+        config,
+        initialization_sha256=manifest["initialization_sha256"],
+        allow_unchanged=True,
+    )
+    checkpoint = torch.load(root / "head.pt", map_location="cpu", weights_only=True)
+    if (
+        any(
+            checkpoint.get(key) != value
+            for key, value in _stage_identity(stage).items()
+        )
+        or checkpoint.get("epoch") != 20
+        or manifest["epoch_batch_plan_sha256"] != epoch_hashes
+        or metrics["epoch_batch_plan_sha256"] != epoch_hashes
+    ):
+        raise ValueError("training checkpoint stage or paired batch plan changed")
+    if (
+        metrics["objective"] != config.objective
+        or metrics["seed"] != config.seed
+        or metrics["epochs"] != config.epochs
+        or metrics["initialization_sha256"] != manifest["initialization_sha256"]
+        or metrics["batch_plan_sha256"] != manifest["batch_plan_sha256"]
+        or len(metrics["epoch_losses"]) != config.epochs
+        or not all(math.isfinite(value) for value in metrics["epoch_losses"])
+        or metrics["initial_loss"] != metrics["epoch_losses"][0]
+        or metrics["final_loss"] != metrics["epoch_losses"][-1]
+    ):
+        raise ValueError("training summary differs from its immutable configuration")
     config_paths = [
         Path(path)
         for path, digest in manifest["inputs"].items()
@@ -1053,13 +1140,17 @@ def validate_engineering_pilot(run_dir: str | Path) -> dict[str, Any]:
     ]
     if len(config_paths) != 1 or load_experiment(config_paths[0]) != config:
         raise ValueError("engineering pilot configuration differs from its input file")
-    _validate_pilot_scientific_provenance(manifest, metrics, attempt, config)
+    _validate_pilot_scientific_provenance(manifest, metrics, attempt, config, stage)
     rows = manifest["feature_sidecar"]["shape"][0]
     expected_updates = 20 * math.ceil(
         rows / (config.classes_per_batch * config.samples_per_class)
     )
     if (
-        (config.epochs, config.seed, config.learning_rate) != (20, 7, 3e-4)
+        config.epochs != 20
+        or (
+            stage == "engineering_pilot"
+            and (config.seed, config.learning_rate) != (7, 3e-4)
+        )
         or metrics["updates"] != expected_updates
         or metrics["expected_updates"] != expected_updates
     ):
@@ -1072,8 +1163,7 @@ def validate_engineering_pilot(run_dir: str | Path) -> dict[str, Any]:
         record = json.loads((root / name).read_text())
         epoch = int(name.removeprefix("epoch-").removesuffix(".json"))
         if record["epoch"] != epoch or any(
-            record.get(key) != value
-            for key, value in _stage_identity("engineering_pilot").items()
+            record.get(key) != value for key, value in _stage_identity(stage).items()
         ):
             raise ValueError("engineering pilot epoch identity changed")
         health = record["health"]
@@ -1111,7 +1201,9 @@ def validate_engineering_pilot(run_dir: str | Path) -> dict[str, Any]:
     return metrics
 
 
-def _validate_pilot_scientific_provenance(manifest, metrics, attempt, config) -> None:
+def _validate_pilot_scientific_provenance(
+    manifest, metrics, attempt, config, stage="engineering_pilot"
+) -> None:
     scientific = manifest["feature_sidecar"]["scientific_use_allowed"]
     if (
         manifest.get("scientific_use_allowed") != scientific
@@ -1124,12 +1216,22 @@ def _validate_pilot_scientific_provenance(manifest, metrics, attempt, config) ->
     from pose_embed.protocol_v3 import require_v3_design
 
     root = canonical_artifact_root()
-    protocol = load_protocol(root / "study-v3/locks/protocol.v3.json")
+    protocol = load_protocol(
+        require_path_within(
+            root
+            / manifest.get(
+                "resolved_protocol_relative_path", "study-v3/locks/protocol.v3.json"
+            ),
+            root,
+            label="training protocol",
+        )
+    )
     design = require_v3_design(protocol)
     validate_experiment_against_protocol(config, protocol)
     if (
         manifest["protocol_sha256"] != protocol_digest(protocol)
-        or manifest["feature_sidecar"]["shape"] != [76013, 8704]
+        or manifest["feature_sidecar"]["shape"]
+        != [95001 if stage == "final_training" else 76013, 8704]
         or manifest["design_code_sha256"] != design.code_sha256
         or manifest["design_lock_sha256"]
         != sha256_file(root / protocol.test_access.design_lock_relative_path)
@@ -1151,34 +1253,174 @@ def _validate_pilot_scientific_provenance(manifest, metrics, attempt, config) ->
             raise ValueError("scientific pilot runtime differs from its frozen design")
     if metrics["training_environment"] != manifest["training_environment"]:
         raise ValueError("engineering pilot runtime evidence changed")
+    sidecar = FeatureSidecar.model_validate(manifest["feature_sidecar"])
+    role = "final_train" if stage == "final_training" else "development_train"
+    if sidecar.manifest_sha256 != design.manifests[role].sha256:
+        raise ValueError("scientific training manifest differs from its fixed split")
+    sources = [
+        Path(path)
+        for path, digest in manifest["inputs"].items()
+        if digest == sidecar.artifact_sha256
+    ]
+    if len(sources) != 1:
+        raise ValueError("scientific training requires one bound input cache")
+    validate_feature_artifact(
+        sources[0],
+        protocol=protocol,
+        manifest_path=root / design.manifests[role].relative_path,
+    )
 
 
 def _validate_pilot_scores(root, epoch, record, manifest) -> None:
-    """Reproduce complete ranks from the exact saved, ordered query projections."""
-    from pose_embed.evaluation.metrics import evaluate_one_shot
+    """Replay the bound head/cache, then reproduce exact retained-array ranks."""
+    from pose_embed.protocol import _validate_head_checkpoint
 
-    development = {}
-    for path in manifest["development_inputs"]:
+    bindings = manifest["development_inputs"]
+    if record["development_inputs"] != bindings or any(
+        manifest["inputs"].get(path) != digest or sha256_file(path) != digest
+        for path, digest in bindings.items()
+    ):
+        raise ValueError("development scoring inputs differ from the bound run")
+    protocols = []
+    for path in manifest["inputs"]:
+        if Path(path).suffix in {".yaml", ".yml", ".json"}:
+            try:
+                candidate = load_protocol(path)
+            except ValueError:
+                continue
+            if protocol_digest(candidate) == manifest["protocol_sha256"]:
+                protocols.append(candidate)
+    if len(protocols) != 1:
+        raise ValueError("development scoring requires one bound protocol")
+    inputs = {}
+    for path in bindings:
         if path.endswith(".npz.manifest.json"):
             sidecar = FeatureSidecar.model_validate_json(Path(path).read_text())
-            development[sidecar.role] = sidecar
+            if sidecar.role in inputs:
+                raise ValueError("development scoring has duplicate source roles")
+            source = Path(path.removesuffix(".manifest.json"))
+            manifests = [
+                Path(value)
+                for value, digest in bindings.items()
+                if digest == sidecar.manifest_sha256
+            ]
+            if (
+                bindings.get(str(source)) != sidecar.artifact_sha256
+                or len(manifests) != 1
+            ):
+                raise ValueError("development cache/sidecar/manifest do not pair")
+            inputs[sidecar.role] = (source, manifests[0])
+    if set(inputs) != {"gallery_clean", "query_clean"}:
+        raise ValueError("development scoring requires both clean source caches")
+    training = FeatureSidecar.model_validate(manifest["feature_sidecar"])
+    development = _load_development(
+        (
+            inputs["gallery_clean"][0],
+            inputs["query_clean"][0],
+            inputs["gallery_clean"][1],
+            inputs["query_clean"][1],
+        ),
+        protocol=protocols[0],
+        training=training,
+        allow_fixture=not training.scientific_use_allowed,
+        required=True,
+    )
+    checkpoint_path = require_path_within(
+        root / record["checkpoint"], root, label="development checkpoint"
+    )
+    if sha256_file(checkpoint_path) != record["checkpoint_sha256"]:
+        raise ValueError("development scoring checkpoint binding changed")
+    config = ExperimentConfig.model_validate(manifest["configuration"]["experiment"])
+    _validate_head_checkpoint(
+        checkpoint_path,
+        config,
+        initialization_sha256=manifest["initialization_sha256"],
+        allow_unchanged=True,
+    )
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    if checkpoint.get("epoch") != epoch or any(
+        checkpoint.get(key) != value
+        for key, value in _stage_identity(manifest["stage"]).items()
+    ):
+        raise ValueError("development scoring checkpoint has wrong stage or epoch")
+    head = NormalizedLinearHead(config.input_dimension, config.embedding_dimension)
+    head.load_state_dict(checkpoint["state_dict"], strict=True)
+    files = {
+        **manifest["inputs"],
+        **record["projections"],
+        str(checkpoint_path): record["checkpoint_sha256"],
+        str(root / "run-manifest.json"): sha256_file(root / "run-manifest.json"),
+        str(root / f"epoch-{epoch:03d}.json"): sha256_file(
+            root / f"epoch-{epoch:03d}.json"
+        ),
+    }
+    for path in (Path(__file__), Path(__file__).parents[1] / "evaluation/metrics.py"):
+        files[str(path)] = sha256_file(path)
+    # Frozen source expectations must win over observed/provenance file hashes.
+    files.update(
+        proof_source_bindings(
+            protocols[0], scientific_use_allowed=training.scientific_use_allowed
+        )
+    )
+    check_numerical_proof(
+        "pilot-snapshot-replay-v1",
+        enabled=proof_reuse_allowed(
+            protocols[0], scientific_use_allowed=training.scientific_use_allowed
+        ),
+        files=files,
+        metadata={
+            "epoch": epoch,
+            "record": record,
+            "manifest": manifest,
+            "protocol": protocols[0].model_dump(mode="json"),
+        },
+        check=lambda: _replay_pilot_scores(
+            root, epoch, record, development, config, head
+        ),
+    )
+
+
+def _replay_pilot_scores(root, epoch, record, development, config, head) -> None:
+    from pose_embed.evaluation.metrics import evaluate_one_shot
+
     projected = {}
-    for name, role in (("gallery", "gallery_clean"), ("queries", "query_clean")):
+    for name in ("gallery", "queries"):
         path = root / f"epochs/{epoch:03d}/{name}.npz"
         if record["projections"].get(str(path)) != sha256_file(path):
             raise ValueError("engineering pilot projection binding changed")
         with np.load(path, allow_pickle=False) as archive:
             ids = tuple(str(value) for value in archive["sample_ids"])
             labels = np.asarray(archive["labels"])
-            if ids != development[role].sample_ids or not np.array_equal(
+            embeddings = np.asarray(archive["embeddings"])
+            if ids != development[name][2] or not np.array_equal(
                 labels, [int(value[-3:]) for value in ids]
             ):
                 raise ValueError("engineering pilot projected identities changed")
-            projected[name] = (
-                torch.from_numpy(np.asarray(archive["embeddings"])),
-                torch.from_numpy(labels),
-                ids,
-            )
+        if embeddings.dtype != np.float32 or embeddings.shape != (
+            len(ids),
+            config.embedding_dimension,
+        ):
+            raise ValueError("development projection dtype or shape changed")
+        with torch.no_grad():
+            for start in range(0, len(ids), 256):
+                raw = head.projection(development[name][0][start : start + 256])
+                _require_projection_health(raw)
+                expected = functional.normalize(raw, dim=-1).numpy()
+                # Existing model-layer parity bounds, fixed before successor runs.
+                # CPU/GPU GEMM can differ; ranks below use the retained arrays exactly.
+                if not np.allclose(
+                    embeddings[start : start + 256],
+                    expected,
+                    atol=1e-6,
+                    rtol=1e-5,
+                    equal_nan=False,
+                ):
+                    raise ValueError(
+                        "development projections differ from bound checkpoint/cache"
+                    )
+        projected[name] = (torch.from_numpy(embeddings), torch.from_numpy(labels), ids)
+    if record["health"] != _embedding_health(projected["queries"][0]):
+        raise ValueError("development health differs from retained projections")
     scores = evaluate_one_shot(
         projected["gallery"][0],
         projected["gallery"][1],

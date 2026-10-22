@@ -37,7 +37,12 @@ class V3DesignLock(StrictModel):
     schema_version: Literal[3]
     kind: Literal["v3_auxiliary_design_and_pilot_authorization"]
     protocol_sha256: SHA256
-    protocol_relative_path: Literal["study-v3/locks/protocol.v3.json"]
+    protocol_relative_path: Literal[
+        "study-v3/locks/protocol.v3.json",
+        "study-v3/revisions/execution-r1/locks/protocol.v3.json",
+        "study-v3/revisions/execution-r2/locks/protocol.v3.json",
+    ]
+    predecessor_design: ArtifactBinding | None = None
     recorded_at: datetime
     recorded_by: str = Field(min_length=1, pattern=r"\S")
     manifests: dict[str, ArtifactBinding]
@@ -50,6 +55,9 @@ class V3DesignLock(StrictModel):
     @model_validator(mode="after")
     def complete_design(self) -> V3DesignLock:
         _timestamp(self.recorded_at)
+        successor = self.protocol_relative_path.startswith("study-v3/revisions/")
+        if successor != (self.predecessor_design is not None):
+            raise ValueError("execution revision requires its predecessor design")
         if set(self.manifests) != set(COUNTS):
             raise ValueError("design lock requires all eight identity-bound manifests")
         return self
@@ -141,15 +149,18 @@ def _bound_file(root: Path, binding: ArtifactBinding) -> Path:
 
 
 def v3_design_code_hashes() -> dict[str, str]:
-    """Freeze cache and pilot math separately from later campaign authorizers."""
+    """Freeze the complete v3 command, authorization and scientific path."""
     from pose_embed.motionbert_inputs import MOTIONBERT_CODE_PATHS
 
     root = Path(__file__).resolve().parents[2]
     files = {
         "src/pose_embed/config.py",
         "src/pose_embed/config_v3.py",
+        "src/pose_embed/cli.py",
+        "src/pose_embed/v3_commands.py",
         "src/pose_embed/protocol_v3.py",
         "src/pose_embed/artifacts.py",
+        "src/pose_embed/validation_proofs.py",
         "src/pose_embed/features.py",
         "src/pose_embed/motionbert_inputs.py",
         "src/pose_embed/motionbert_features.py",
@@ -161,6 +172,23 @@ def v3_design_code_hashes() -> dict[str, str]:
         "src/pose_embed/training/runner.py",
         "src/pose_embed/training/sampler.py",
         "src/pose_embed/evaluation/metrics.py",
+        "src/pose_embed/revision_v3.py",
+        "src/pose_embed/novel_subset_v3.py",
+        "src/pose_embed/geometry_v3.py",
+        "src/pose_embed/protocol_v3_campaign.py",
+        "src/pose_embed/protocol.py",
+        "src/pose_embed/test_access.py",
+        "src/pose_embed/opening_capacity_v3.py",
+        "src/pose_embed/evaluation/runner.py",
+        "src/pose_embed/evaluation/result.py",
+        "src/pose_embed/evaluation/analysis.py",
+        "src/pose_embed/report.py",
+        "docs/protocol/v3-report-template.md",
+        "scripts/run_v3_execution.py",
+        "scripts/time_v3_resident.py",
+        "scripts/validate_v3_execution.py",
+        "scripts/study_v3_execution.qsub",
+        "scripts/study_v3.qsub",
     }
     files.update(MOTIONBERT_CODE_PATHS)
     for folder in ("data", "corruptions", "models", "losses"):
@@ -227,8 +255,15 @@ def _validate_design_inputs(
     if (
         lock.protocol_sha256 != protocol_digest(protocol)
         or lock.pilot != protocol.training.pilot
+        or lock.protocol_relative_path
+        != protocol.test_access.resolved_protocol_relative_path
     ):
         raise ValueError("v3 design lock differs from the protocol/pilot specification")
+    if (
+        lock.protocol_relative_path.startswith("study-v3/revisions/")
+        or lock.predecessor_design is not None
+    ):
+        validate_execution_revision(protocol, lock, root)
     prep = protocol.preparation
     assets = verify_motionbert_assets(_registry_path().parents[1])
     if prep.encoder_checkpoint_sha256 != assets[
@@ -314,6 +349,7 @@ def freeze_v3_design(
     manifests: dict[str, ArtifactBinding | dict],
     recorded_by: str,
     code_sha256: dict[str, str] | None = None,
+    predecessor_design: ArtifactBinding | None = None,
 ) -> V3DesignLock:
     """Publish the complete design only after measured preparation is verified."""
     from pose_embed.dataset_seal import require_dataset_unopened
@@ -328,6 +364,7 @@ def freeze_v3_design(
         kind="v3_auxiliary_design_and_pilot_authorization",
         protocol_sha256=protocol_digest(protocol),
         protocol_relative_path=protocol.test_access.resolved_protocol_relative_path,
+        predecessor_design=predecessor_design,
         recorded_at=datetime.now(UTC),
         recorded_by=recorded_by,
         manifests=manifests,
@@ -345,6 +382,57 @@ def freeze_v3_design(
     return require_v3_design(protocol)
 
 
+def validate_execution_revision(
+    protocol: ProtocolV3Config, lock: V3DesignLock, root: Path
+) -> None:
+    """Permit only the declared predecessor chain and identical scientific inputs."""
+    predecessors = {
+        "study-v3/revisions/execution-r1/locks/protocol.v3.json": "study-v3/locks",
+        "study-v3/revisions/execution-r2/locks/protocol.v3.json": (
+            "study-v3/revisions/execution-r1/locks"
+        ),
+    }
+    parent = predecessors.get(lock.protocol_relative_path)
+    binding = lock.predecessor_design
+    if (
+        parent is None
+        or binding is None
+        or binding.relative_path != f"{parent}/design-lock.v3.json"
+    ):
+        raise ValueError(
+            "execution revision requires its immediate immutable predecessor"
+        )
+    previous = V3DesignLock.model_validate_json(_bound_file(root, binding).read_text())
+    prior = load_protocol(root / previous.protocol_relative_path)
+    if (
+        previous.protocol_relative_path != f"{parent}/protocol.v3.json"
+        or protocol_digest(prior) != previous.protocol_sha256
+        or previous.recorded_at >= lock.recorded_at
+        or previous.artifact_root_registry_sha256 != lock.artifact_root_registry_sha256
+    ):
+        raise ValueError("execution revision predecessor or chronology differs")
+    if (
+        previous.protocol_relative_path != "study-v3/locks/protocol.v3.json"
+        or previous.predecessor_design is not None
+    ):
+        validate_execution_revision(prior, previous, root)
+    old = prior.model_dump(mode="json")
+    new = protocol.model_dump(mode="json")
+    for payload in (old, new):
+        for field in tuple(payload["test_access"]):
+            if field.endswith("_relative_path"):
+                del payload["test_access"][field]
+    if old != new:
+        raise ValueError("execution revision changes scientific design or preparation")
+    for role, original in previous.manifests.items():
+        current = lock.manifests[role]
+        if (
+            _bound_file(root, original).read_bytes()
+            != _bound_file(root, current).read_bytes()
+        ):
+            raise ValueError("execution revision changes original manifest bytes")
+
+
 def require_v3_selection_authorization(
     protocol: ProtocolV3Config,
 ) -> V3SelectionAuthorization:
@@ -353,3 +441,68 @@ def require_v3_selection_authorization(
 
     require_v3_design(protocol)
     return require_selection_authorization(protocol)
+
+
+def require_v3_final_authorization(
+    protocol: ProtocolV3Config, *, now: datetime | None = None
+) -> V3FinalLock:
+    """Require every final head and the complete canonical cross-binding."""
+    from pose_embed.protocol import (
+        load_evaluation_plan,
+        load_final_run_set,
+        load_protocol_lock,
+        validate_evaluation_manifests,
+        validate_final_run_artifacts,
+        verify_protocol_lock,
+    )
+    from pose_embed.protocol_v3_campaign import (
+        require_selected_configurations,
+        selected_configs_path,
+    )
+
+    if (
+        protocol.preparation is None
+        or protocol.test_access.design_lock_relative_path
+        not in {
+            "study-v3/revisions/execution-r1/locks/design-lock.v3.json",
+            "study-v3/revisions/execution-r2/locks/design-lock.v3.json",
+        }
+    ):
+        raise ValueError(
+            "v3 final authorization is unavailable before the measured campaign audit; "
+            "the completion release is required"
+        )
+    paths = resolve_scientific_paths(protocol)
+    selected = require_selected_configurations(protocol)
+    authorization = V3SelectionAuthorization.model_validate_json(
+        (
+            paths.root / protocol.test_access.selection_authorization_relative_path
+        ).read_text()
+    )
+    lock = load_protocol_lock(paths.protocol_lock)
+    plan = load_evaluation_plan(paths.evaluation_plan)
+    runs = load_final_run_set(paths.final_run_set)
+    if not isinstance(lock, V3FinalLock) or not isinstance(runs, V3FinalRunSet):
+        raise ValueError("v3 requires its complete final lock and run-set schemas")
+    selection_hash = sha256_file(
+        paths.root / protocol.test_access.selection_authorization_relative_path
+    )
+    if (
+        lock.design_lock_sha256 != authorization.design_lock_sha256
+        or lock.selection_authorization_sha256 != selection_hash
+        or runs.selection_authorization_sha256 != selection_hash
+        or lock.artifact_root_registry_sha256 != sha256_file(_registry_path())
+        or runs.selection_locked_at <= authorization.recorded_at
+        or runs.selection_locked_at != selected.recorded_at
+        or (paths.root / runs.selection_evidence.relative_path).resolve()
+        != selected_configs_path(protocol).resolve()
+        or runs.selection_evidence.sha256
+        != sha256_file(selected_configs_path(protocol))
+    ):
+        raise ValueError("v3 final lock authorization bindings or chronology differ")
+    _bound_file(paths.root, runs.selection_evidence)
+    verify_protocol_lock(protocol, lock, plan, runs, now=now)
+    validate_evaluation_manifests(protocol, plan, paths.root, check_source_files=False)
+    for run in runs.runs:
+        validate_final_run_artifacts(runs, run, paths.root, protocol=protocol)
+    return lock

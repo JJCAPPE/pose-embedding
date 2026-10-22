@@ -200,7 +200,9 @@ def test_v3_motionbert_cache_rejects_role_and_condition_misuse_before_provenance
     sidecar = SimpleNamespace(
         provenance={}, role=role, split=split, condition=condition
     )
-    with pytest.raises(ValueError, match="(condition|novel extraction)"):
+    with pytest.raises(
+        ValueError, match="(condition|novel extraction|v3 final authorization)"
+    ):
         validate_motionbert_cache(
             sidecar, load_protocol("configs/protocol.v3.yaml"), "unused-manifest"
         )

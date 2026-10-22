@@ -21,7 +21,12 @@ def _heredoc(script: Path, marker: str) -> str:
 
 
 @pytest.mark.parametrize(
-    "script,args", [("prepare_v3.qsub", []), ("study_v3.qsub", ["caches"])]
+    "script,args",
+    [
+        ("prepare_v3.qsub", []),
+        ("study_v3.qsub", ["caches"]),
+        ("study_v3_execution.qsub", ["caches"]),
+    ],
 )
 def test_v3_launchers_refuse_login_node_execution(
     repository_root, tmp_path, script, args
@@ -169,7 +174,7 @@ def test_launcher_quota_preflight_uses_real_parser_and_reserve(
 
     quota = tmp_path / "quota.txt"
     code = _heredoc(repository_root / "scripts" / filename, marker)
-    monkeypatch.setattr(sys, "argv", ["-", str(quota)])
+    monkeypatch.setattr(sys, "argv", ["-", str(quota), str(tmp_path / "protocol.json")])
     monkeypatch.setattr(
         pose_embed.dataset_seal, "canonical_artifact_root", lambda: tmp_path
     )

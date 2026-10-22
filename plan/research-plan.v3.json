@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-10-09T17:54:14+00:00",
+  "generatedAt": "2026-10-13T20:49:34.991908Z",
   "project": {
     "id": "pose-embed",
     "slug": "pose-embed",
@@ -17,22 +17,22 @@
     {
       "id": "manual-gpu",
       "dueDate": "2026-10-18",
-      "title": "Confirm GPU access and researcher availability",
-      "details": "Record an allocation calendar for the measured L40S workload, approved job limits, queue and setup allowance, and researcher-confirmed available hours. Apply at least 25% slack to remaining compute and researcher work; prior GPU access is not an allocation commitment.",
-      "whyManual": "Resource access and available researcher hours require confirmation; planned estimates cannot establish either.",
+      "title": "Complete the dated CPU/GPU and researcher schedule",
+      "details": "The researcher confirmed up to 5 hours weekly normally and 10 if necessary, with limited Thanksgiving time; budget no guaranteed hours for November 23 to 29. Under decision 0007, build a dated ordinary-queue CPU/GPU calendar with separate resource classes, complete-job limits, queue/setup allowance and explicit contingency weeks. Count all CPU and I/O overhead inside a GPU allocation in its GPU job time. Apply at least 25% slack to remaining compute and researcher work; prior access is not a reservation.",
+      "whyManual": "Availability is confirmed, but the dated allocation calendar and measured workload must still establish feasibility; actual researcher time remains unreported.",
       "weekTaskId": "w05-task-04"
     },
     {
       "id": "manual-capacity-v3",
       "dueDate": "2026-10-18",
       "title": "Verify current remaining capacity",
-      "details": "Remeasure quota and filesystem space for the October 18 decision. Use 200 GiB reserve plus 1.25 times remaining peak bytes, including completion-release regeneration, projections, failures and staging; existing files count once. The campaign-wide envelope is 120 decimal GB including slack. October 8 observed 1,008.48 GB quota free; neither that nor September shortfalls establish current capacity. Request additional authorized allocation only if the current calculation fails.",
+      "details": "Remeasure quota and filesystem space for the October 18 decision. Use 200 GiB reserve plus 1.25 times remaining peak bytes, including fresh execution-r2 regeneration, projections, failures and staging; existing files count once. The October 9 estimate was 120 decimal GB including slack, before the authorized execution-r2 regeneration. A fresh inventory of all retained evidence and execution-r2 additional peak storage is pending; the historical estimate does not establish successor capacity. October 8 observed 1,008.48 GB quota free; neither that nor September shortfalls establish current capacity. Request additional authorized allocation only if the current calculation fails.",
       "whyManual": "Any additional quota or artifact allocation requires institutional authorization; current measurements determine whether it is needed.",
       "weekTaskId": "w05-task-04"
     }
   ],
   "protocol": {
-    "bindingSource": "plan/research-plan.v3.md and decision 0004 define the scientific v3 scope; decision 0006 (October 9) amends upcoming execution, verification and reporting. Scientific settings remain fixed. Complete one successor release with new provenance bindings and fresh admission evidence before selection. Original locks, Week 4 evidence and closed history remain unchanged. Planning documents are not executable authorization or final-test locks.",
+    "bindingSource": "plan/research-plan.v3.md and decision 0004 define the scientific v3 scope; decision 0006 (October 9) amended execution, verification and reporting. Decision 0007 (October 12) records researcher authorization for command-local validation reuse and separate CPU/GPU time accounting in execution-r2, with full fresh successor regeneration and no cross-release artifact adoption. Scientific settings remain fixed. The independently reviewed execution-r2 software passed the stable full local suite and source release f101f0e9d9bd64275d2088deab1b0bdcfcc53620 is frozen. Separate SCC installation and the allocated 128-test CPU rehearsal passed independent verification. Successor preparation 8045152 passed independent completion review of its accounting, commands, resources, seals, all eight original manifest identities and original → r1 → r2 scientific equality. Successor supplementary checks 8048540 passed independent completion review of 86 executed fixture checks, commands, resources, seals and reproduced metadata-only dependence tables. Fresh scientific regeneration, full admission and measured CPU/GPU capacity remain pending before selection. Original locks, prior releases, evidence and closed history remain unchanged. Planning documents are not executable authorization or final-test locks.",
     "successDefinition": "Complete the three-recipe study faithfully: nine verified final heads, all 180 declared result cells, reproducible conditional analysis and descriptive results, and a report with costs, failures and limitations. A positive, null or negative contextual result is successful. A failed capacity or validity gate requires an honest blocked-study record and result-blind amendment; it is not a completed empirical comparison.",
     "lockedDecisions": [
       {
@@ -49,23 +49,23 @@
       },
       {
         "label": "Required campaign",
-        "value": "Three valid completion-release engineering pilots + 27 clean-development selection runs + nine fresh final heads = 39 admitted campaign runs and 1,960,020 updates. Retain the three original Week 4 pilots separately: 42 complete runs and 2,102,580 updates across releases before other retries/fixtures. Final evaluation remains 180 cells."
+        "value": "Three valid execution-r2 engineering pilots + 27 clean-development selection runs + nine fresh final heads = 39 admitted campaign runs and 1,960,020 updates. Retain the original Week 4 and execution-r1 pilot sets separately: 45 complete runs and 2,245,140 updates across generations before other retries/fixtures. The prior 42-run estimate remains historical. Final evaluation remains 180 cells."
       },
       {
         "label": "Current planning status",
-        "value": "Week 3 preparation remains complete as dated September 29 evidence. On October 8, dated cleanup records and researcher confirmation resolved retirement of two historical roots without recovering or recreating artifacts; the original registry, audit and scientific locks remain unchanged. All 46 focused numerical/source checks and three full-size synthetic L40S learnable fixtures passed; reduced-dimension software fixtures verified paired initialization and batch plans. Week 4 is closed: all five fresh v3 caches passed independent validation job 7969962, and independent validator 7971490 passed the three complete 20-epoch engineering pilots with paired provenance, complete checkpoint/score records and health/resource checks. Week 5 remains planned; full-campaign capacity/availability is required before selection, and final-test authorization remains closed. Pilot accuracy is ineligible for learning-rate selection. Actual researcher time remains unreported."
+        "value": "Week 5 remains active. The separate SCC installation of frozen source release f101f0e9d9bd64275d2088deab1b0bdcfcc53620 passed verification. CPU rehearsal job 8044010 completed October 12 at 21:54:03.440725 UTC on scc-ke1: 128 tests passed with no skips, failures or errors; accounting failed=0/exit_status=0 and 194 scheduler seconds. Independent completion review accepted all three monitored commands, nine resource samples and both real dataset seals. Its nine heads and 180 cells are synthetic fixtures only, not eligible scientific heads or results. Receipt: study-v3/operations/week5-r2-rehearsal-verification/20261013T002413Z/verification.json; SHA-256 963babe02eba70d34f3f9c9aa47af21145de387ca4d5a1ad6ccf9c226fb43381. Successor preparation job 8045152 completed October 13 at 00:31:55 UTC on scc-ke1 with four CPU slots, accounting failed=0/exit_status=0 and 44 scheduler seconds. Independent completion review wrote its passed receipt at 06:39:11.971297 UTC after verifying 73 metadata bindings, 616 source bindings, three commands, seven resource samples, both seals, all eight byte-identical original manifests and original → r1 → r2 scientific equality. Receipt: study-v3/operations/week5-r2-preparation-verification/20261013T063819Z/verification.json; SHA-256 0a3823e66a97192c5665185edbb908bf5b44c6dd9b451328d95d96476a84d785. Successor protocol SHA-256: 18f7d17fa81e7ae3a6b1e5deddf42d9eda589d96e5a13968188a8ce275bfb95f. Supplementary CPU checks job 8048540 completed October 13 at 08:31:43.006302 UTC on apolkovnikov-pub@scc-h30 with four CPU slots, accounting failed=0/exit_status=0 and 87 scheduler seconds. All 86 fixture checks executed and passed without skips. Independent review ran from 20:42:57.604956 to 20:43:00.762966 UTC, verifying 108 metadata bindings, 616 source bindings, three commands, seven resource records and both seals. The actual dependence tables reproduced from locked IDs: 18,929 development queries and 18,884 primary novel query IDs, each across 20 actions. No novel poses or outcomes were accessed. Receipt: study-v3/operations/week5-r2-additional-verification/20261013T204221Z/verification.json; SHA-256 7703859e50361123de9054fba446c8384d423b8c549b69eab92720314c46c3d2. The submitted launch at 07:58:52.315989 UTC and initial queued observation at 08:17:32.236172 UTC remain retained. Launch: study-v3/operations/week5-r2-launches/20261013T075848Z/launch.json; SHA-256 0e77ecb106c977dd9922f473b80f29fd7475d8b4f5b243d9db9b34cc92368fd8. Successor geometry job 8070391 was submitted October 13 at 20:46:55.956765 UTC and observed queued (qw), four CPU slots, at 20:49:22.424937 UTC. No geometry operation, log or resource records existed at that observation; no outcome is claimed. Launch: study-v3/operations/week5-r2-launches/20261013T204651Z/launch.json; SHA-256 a8c55f5a6054996d49cb2abab304a8b8925914a4cf0495a2f0368f84e4177452. The geometry-only 1-GiB bound passed the fresh quota/filesystem storage reserve; measured campaign capacity remains pending. Next manual status check: October 13, 2026 at 5:55 PM EDT (21:55 UTC); hourly polling remains in force. Task 02 remains in progress; task 04 is blocked by incomplete measured capacity. Tasks 01 and 03 retain their verified execution-r1 history; all scientific gates remain pending. Full fresh execution-r2 regeneration, full A and measured CPU/GPU capacity are required before selection. Preserve the prior measured-profile no-go, original evidence and every failed attempt. Actual researcher time remains unreported by request. The scientific matrix, fixed seeds/epochs/physical batches, all checks and the shared dataset seal are unchanged."
       },
       {
         "label": "Measured capacity prerequisite",
-        "value": "The October 9 campaign-wide planning envelope is 120 decimal GB including slack, replacing the historical 100 GB envelope. It itemizes 27 development-corruption projections and retained successor caches/pilots. October 8 observed 1,008.48 GB quota free; this is dated evidence, not a reservation. Admission requires current min(filesystem free, quota remaining) >= 200 GiB + 1.25 times remaining peak bytes; existing files count once."
+        "value": "The October 9 120-decimal-GB planning envelope covered the original and execution-r1 generations; the historical 100 GB envelope is also retained. Execution-r2 requires a new actual retained/remaining inventory including all regeneration, corruption, timing and temporary artifacts; no larger numeric envelope or capacity pass is invented. Current min(filesystem free, quota remaining) must be at least 200 GiB + 1.25 times remaining peak bytes; existing files count once. Schema-2 CPU/GPU maps and dated classified windows must fit complete commands with slack and queue/setup; CPU/I/O within a GPU job remains part of its GPU wall time."
       },
       {
         "label": "October 18 go/no-go",
-        "value": "Before selection require the coordinated completion release and full fixture-to-v3-report rehearsal, fresh successor parity/five caches/three pilots, fixed geometry panel and nine complete development corruption paths, fixed analysis/report template, resolved seals and a measured dependency/schedule/storage/availability ledger. Apply at least 25% remaining-work slack plus queue/setup delays; otherwise stop before selection."
+        "value": "Before selection require the authorized execution-r2 completion release and full fixture-to-v3-report rehearsal, fresh successor parity/five caches/three pilots, fixed geometry panel and nine complete development corruption paths, fixed analysis/report template, resolved seals and a measured dependency/schedule/storage/availability ledger. Use classified CPU/GPU job/remaining-time maps and nonoverlapping dated windows; preserve all CPU/I/O overhead within its whole allocated command. Apply at least 25% remaining-work slack plus queue/setup delays; otherwise stop before selection."
       },
       {
         "label": "Test seal",
-        "value": "Preserve the original design/locks and Week 4 closure. Admit the completion release at study-v3/revisions/execution-r1/ with explicit predecessor/successor bindings and fresh caches/pilots. The successor digest may change for provenance paths; scientific settings must compare equal and its digest stays fixed thereafter. One shared dataset seal spans all releases. Lock all nine final heads and atomically authorize before novel loading; forbid subsequent training/selection across versions."
+        "value": "Preserve the original design/locks, Week 4 closure and immutable execution-r1 evidence. Prepare execution-r2 beneath the same canonical root with explicit predecessor/successor bindings, unchanged scientific fields and fresh caches/pilots; no cross-release adoption or sidecar relabeling. The successor digest may change for provenance paths and stays fixed within its admitted campaign. One shared dataset seal spans all releases. Lock all nine final heads and atomically authorize before novel loading; forbid subsequent training/selection across versions."
       },
       {
         "label": "Historical access audit",
@@ -81,7 +81,11 @@
       },
       {
         "label": "October 9 execution amendment",
-        "value": "Complete the currently disabled final-training, novel-extraction, selection/final authorization, corrupted-development evaluation and actual v3 report interfaces before selection. A new immutable completion release and fresh admission evidence are chosen over bypass wrappers or relabeled artifacts. No scientific settings, accuracy-based acceptance rules or new evaluation arms are added. Implementation remains pending."
+        "value": "Complete the currently disabled final-training, novel-extraction, selection/final authorization, corrupted-development evaluation and actual v3 report interfaces before selection. A new immutable completion release and fresh admission evidence are chosen over bypass wrappers or relabeled artifacts. No scientific settings, accuracy-based acceptance rules or new evaluation arms are added. Release 731938a implements these interfaces and passed the isolated SCC command rehearsal; fresh scientific admission evidence remains pending."
+      },
+      {
+        "label": "October 12 validation/capacity amendment",
+        "value": "The researcher explicitly authorized ADR0007 after the measured-profile no-go. A new execution-r2 release may reuse only successful deterministic numerical proof markers within one guarded command, rehashing complete transitive contents on every hit. Dynamic seal/authorization/time/attempt/resource checks stay fresh; no persistent or cross-command proof reuse. Independent recertification starts empty. Separate schema-2 CPU/GPU accounting preserves whole-job overhead, all checks, budgets, deadlines and the storage reserve. Full fresh parity/caches/pilots/corruption/report/timing/admission regeneration is required. The independently reviewed implementation passed 1,373 local tests with two historical AVSL skips; source release f101f0e9d9bd64275d2088deab1b0bdcfcc53620 is frozen. Separate SCC installation and the allocated 128-test CPU rehearsal passed independent verification. Successor preparation 8045152 passed independent completion review of its accounting, commands, resources, seals, all eight original manifest identities and original → r1 → r2 scientific equality. Successor supplementary checks 8048540 passed independent completion review of 86 executed fixture checks, commands, resources, seals and reproduced metadata-only dependence tables. Fresh scientific regeneration, full A, measured capacity and all scientific gates remain pending."
       }
     ],
     "experimentalDesign": [
@@ -225,9 +229,9 @@
       "reflection": "Week 1 established a documented, hash-bound protocol, verified the licensed HRNet aggregate, official one-shot split, and MotionBERT checkpoint, and confirmed physical batch 32 on an SCC A40. The GPU-host inventory accounts for 113,945 usable annotations plus 535 official missing-skeleton exclusions. The researcher adopted the result-blind aggregate-aware input contract on 2026-09-24 and confirmed that BU has issued the applicable governance determination. No determination attachment is required. Researcher-supplied actual minutes and final weekly closeout remain pending; the novel test remains sealed and the weekly record remains open.",
       "plannedMinutes": 480,
       "actualMinutes": 0,
-      "state": "blocked",
-      "closedAt": null,
-      "version": 6,
+      "state": "closed",
+      "closedAt": "2026-09-28T17:34:56.63523+00:00",
+      "version": 8,
       "tasks": [
         {
           "id": "w01-task-01",
@@ -269,10 +273,10 @@
           "required": true,
           "estimateMinutes": 120,
           "state": "done",
-          "completionNote": "Completed 2026-09-16: a real frozen MotionBERT encoder profile ran on a scheduler-assigned BU SCC A40 using dense protocol-shaped float32 inputs. Physical batch 32 completed with 2.572 GiB peak allocated, 2.855 GiB peak reserved, and an 842.164 ms median forward; batch 64 completed with 4.977 GiB allocated, 5.514 GiB reserved, and a 1,685.400 ms median. Required device, CUDA, scheduler, quota, and job-limit evidence was captured. Physical batch 32 remained selected for the v1 frozen path because protocol v1 permitted 64 only after all core methods fit. This frozen-forward result does not establish v2 fine-tuning capacity; later v2 priority profiling passed on A100 80 GB and failed with CUDA out of memory on L40S. It is compute evidence only, not preprocessing or encoder-parity evidence.",
+          "completionNote": "Completed 2026-09-16: a real frozen MotionBERT encoder profile ran on a scheduler-assigned BU SCC A40 using dense protocol-shaped float32 inputs. Physical batch 32 completed with 2.572 GiB peak allocated, 2.855 GiB peak reserved, and an 842.164 ms median forward; batch 64 completed with 4.977 GiB allocated, 5.514 GiB reserved, and a 1,685.400 ms median. Required device, CUDA, scheduler, quota, and job-limit evidence was captured. Physical batch 32 remains selected because protocol v1 permits 64 only after all core methods fit. This is compute evidence only, not preprocessing or encoder-parity evidence.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-gpu-profile.md",
           "completedAt": "2026-09-16T16:41:15+00:00",
-          "version": 3
+          "version": 2
         },
         {
           "id": "w01-task-04",
@@ -298,11 +302,11 @@
           "expectedOutput": "A complete Week 1 progress record.",
           "required": true,
           "estimateMinutes": 60,
-          "state": "blocked",
+          "state": "done",
           "completionNote": "Verified inputs, remote setup, the adopted result-blind input contract, and the researcher-confirmed BU determination are recorded. Final closeout remains blocked until researcher-supplied actual minutes are recorded. No hours or week closure are inferred.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-remote-setup.md",
-          "completedAt": null,
-          "version": 6
+          "completedAt": "2026-09-28T17:34:49.117828+00:00",
+          "version": 8
         }
       ],
       "gates": [
@@ -334,13 +338,13 @@
           "id": "w01-gate-03",
           "weekId": "week-01",
           "position": 3,
-          "criterion": "A representative frozen-forward GPU profile confirms a feasible physical batch size for the v1 extraction path.",
+          "criterion": "A representative GPU profile confirms a feasible physical batch size.",
           "required": true,
           "state": "met",
-          "evidence": "Verified 2026-09-16: frozen MotionBERT completed the protocol-shaped physical batch 32 profile on a scheduler-assigned BU SCC A40, and all required device, CUDA, memory, runtime, scheduler, quota, and job-limit evidence was captured. This establishes v1 frozen-forward feasibility only. Later v2 fine-tuning priority profiling passed on A100 80 GB and failed with CUDA out of memory on L40S; all-method batch feasibility remains open. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-gpu-profile.md and docs/protocol/v2-implementation-record.md.",
+          "evidence": "Verified 2026-09-16: frozen MotionBERT completed the protocol-shaped physical batch 32 profile on a scheduler-assigned BU SCC A40, and all required device, CUDA, memory, runtime, scheduler, quota, and job-limit evidence was captured. Physical batch 32 is feasible and remains selected pending the Week 4 all-core-method batch-64 profile. See https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-1-gpu-profile.md.",
           "waiverReason": "",
           "decidedAt": "2026-09-16T16:41:15+00:00",
-          "version": 3
+          "version": 2
         },
         {
           "id": "w01-gate-04",
@@ -372,11 +376,11 @@
         "Upstream one-shot files may use a different action index convention."
       ],
       "advisorPrompt": "Does the primary deduplicated query definition answer the intended question while the exact-official query set preserves comparability?",
-      "reflection": "Week 2 technical deliverables are verified: the licensed HRNet aggregate yielded seven hash-bound manifests, independent byte-identical regeneration, zero forbidden overlap, and reproducible synchronized-view exclusions. The result-blind aggregate-aware input contract was adopted. Actual researcher minutes remain unreported, so the formal week is open and later week-state transitions are held by sequential closure.",
+      "reflection": "",
       "plannedMinutes": 480,
       "actualMinutes": 0,
-      "state": "planned",
-      "closedAt": null,
+      "state": "closed",
+      "closedAt": "2026-09-28T17:35:37.559593+00:00",
       "version": 2,
       "tasks": [
         {
@@ -833,12 +837,12 @@
         "Current quota and remaining peak bytes must pass; dated capacity readings and prior GPU access are not reservations."
       ],
       "advisorPrompt": "Do all October 18 validity, seal, storage, runtime and researcher-availability criteria pass without changing the declared study?",
-      "reflection": "",
+      "reflection": "October 22: independent review accepted job 8189505's prospective CPU runtime, three fresh initializations per seed 7/17/29, and two-process geometry with all 43 panel IDs and 430 tensor hashes per repeat. Original identities, training-only fallback, source/locks and scientific settings remain fixed; allocated replay, accounting, resources and seals passed. Week 5 remains incomplete. Next: pass fresh identity/authorization/seal/resource/duplicate-job checks, verify the source-bound GPU diagnostic under the accepted baseline, then generate and independently validate fresh parity/five caches. Three complete paired pilots, nine corruption paths/projections/results, full admission replay and measured schema-2 capacity remain required. Tasks 01/03 retain their historical evidence; the two prior non-progress diagnostics remain recorded and the libm investigation stays stopped. October 18 admission was missed; later deadlines are unchanged. Selection, final training and novel opening remain closed. Actual researcher time is unreported.",
       "plannedMinutes": 300,
       "actualMinutes": 0,
-      "state": "planned",
+      "state": "active",
       "closedAt": null,
-      "version": 3,
+      "version": 41,
       "tasks": [
         {
           "id": "w05-task-01",
@@ -849,11 +853,11 @@
           "expectedOutput": "Immutable panel IDs/hashes, invariant/repeatability receipts and full-query damage denominators for all nine conditions.",
           "required": true,
           "estimateMinutes": 90,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 3
+          "state": "done",
+          "completionNote": "Geometry job 8028081 previously passed the fixed 40-base/43-total panel, exact identity/nesting/missingness checks, two fresh-process repeats, and fixture coverage for absent invalid-own-scale/all-missing cases. The passed corruption completion receipt was written October 12 at 18:31:21.614571 UTC; its review independently recomputed all nine complete 18,929-row geometry summaries from ordered allocated telemetry. Every condition has 18,929 finite rows, zero undefined and zero zero-damage rows, with 38,605,963 originally observed joint-frame/person locations. Each jitter condition used fallback 0 of 18,929 queries; the original training-only value 0.6601371765136719 and evidence binding remain unchanged. All 927 evidence bindings, 135 commands, 67 GPU preflights, 358 resource samples and both seals passed. Task 01 is complete; full scientific tensor/hash/numerical admission replay and all scientific gates remain pending. See the execution record for exact receipt and per-condition damage summaries.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
+          "completedAt": "2026-10-12T18:31:21.614571+00:00",
+          "version": 8
         },
         {
           "id": "w05-task-02",
@@ -864,11 +868,11 @@
           "expectedOutput": "Fresh successor admission receipts, nine complete corruption paths, 27 head projections and measured stage-level runtime/memory/bytes.",
           "required": true,
           "estimateMinutes": 90,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
+          "state": "in_progress",
+          "completionNote": "IN PROGRESS, October 22: independent acceptance of job 8189505 establishes the prospective CPU runtime, three exact initialization repeats per seed and the two-process 43-ID/430-tensor geometry prerequisite under ADR0008. Accounting, resources, seals, original identities/fallback and unchanged f101f0e r2 bindings passed review. Next: fresh preflights and the source-bound GPU diagnostic under this baseline, then fresh parity/five caches and independent validation. Three complete paired pilots, all nine development corruption paths/projections/results and independent replay remain incomplete. Historical diagnostic stop count stays two; no libm investigation is resumed.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 3
+          "version": 38
         },
         {
           "id": "w05-task-03",
@@ -879,11 +883,11 @@
           "expectedOutput": "Reviewed successor release and regeneration matrix; complete fixture-to-v3-report receipts and fixed analysis/interpretation template before real revalidation.",
           "required": true,
           "estimateMinutes": 60,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
-          "completedAt": null,
-          "version": 4
+          "state": "done",
+          "completionNote": "Release 731938a and its completion/regeneration workflow are verified. SCC job 8028010 passed 41 full command/rehearsal checks; job 8028071 passed 84 supplementary checks with no failures, errors or skips. Successor preparation preserved all eight manifest byte identities and scientific settings. Actual dependence tables were independently rehashed and matched to the locked manifests: 18,929 development queries and 18,884 primary novel query IDs, each across 20 actions. Only metadata was inspected; real seals remained intact. The fixed analysis/interpretation path is complete. Fresh cache/pilot/corruption and capacity admission remain separate pending gates; see the Week 5 execution record.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
+          "completedAt": "2026-10-11T22:44:38.000Z",
+          "version": 8
         },
         {
           "id": "w05-task-04",
@@ -894,11 +898,11 @@
           "expectedOutput": "Measured dependency, capacity and availability ledger plus immutable selection authorization or explicit blocker; no date-based waiver.",
           "required": true,
           "estimateMinutes": 60,
-          "state": "todo",
-          "completionNote": "",
-          "evidenceUrl": null,
+          "state": "blocked",
+          "completionNote": "BLOCKED, October 22: accepted baseline/geometry job 8189505 took 219 scheduler seconds and passed its geometry-only 1 GiB storage increment; this does not establish campaign capacity. October 18 admission was missed. Measure remaining scientific work, full admission and independent recertification, retained/remaining storage, CPU/GPU windows and researcher work with queue/setup and at least 25% slack. Preserve the 200 GiB reserve plus 1.25 times remaining peak bytes, November 29 final locks, December 6 compute and protected December 7–18 delivery. Selection and closure remain gated; actual time remains unreported.",
+          "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 3
+          "version": 21
         }
       ],
       "gates": [
@@ -912,7 +916,7 @@
           "evidence": "",
           "waiverReason": "",
           "decidedAt": null,
-          "version": 3
+          "version": 4
         },
         {
           "id": "w05-gate-02",
@@ -924,7 +928,7 @@
           "evidence": "",
           "waiverReason": "",
           "decidedAt": null,
-          "version": 3
+          "version": 4
         },
         {
           "id": "w05-gate-03",
@@ -933,10 +937,10 @@
           "criterion": "The measured dependency/schedule/storage/availability ledger passes, including revalidation and all remaining work with slack, before immutable successor selection authorization; otherwise no sweep starts.",
           "required": true,
           "state": "pending",
-          "evidence": "",
+          "evidence": "UNRESOLVED, October 22: job 8189505's CPU runtime, initialization and geometry prerequisite passed independent acceptance; fresh GPU/scientific inventory, full admission and measured schema-2 capacity remain incomplete. No capacity pass or selection authorization is granted. Retain original panel/fallback, all scientific settings and the two historical non-progress diagnostic attempts. Renew CPU/GPU/storage/researcher availability forecasts including validation, recertification, queue/setup and at least 25% slack. October 18 was missed; later deadlines remain fixed. Acceptance SHA-256: 16106ecafe347dc8d31795e14a88b267e716f82e494311b4753462cfcd88f8aa. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md#october-22-runtime-initialization-and-geometry-accepted",
           "waiverReason": "",
           "decidedAt": null,
-          "version": 4
+          "version": 22
         }
       ]
     },
@@ -975,7 +979,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 3
+          "version": 4
         },
         {
           "id": "w06-task-02",
@@ -1020,7 +1024,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 3
+          "version": 4
         }
       ],
       "gates": [
@@ -1112,7 +1116,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 3
+          "version": 4
         },
         {
           "id": "w07-task-03",
@@ -1127,7 +1131,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 3
+          "version": 4
         },
         {
           "id": "w07-task-04",
@@ -1463,7 +1467,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 3
+          "version": 4
         },
         {
           "id": "w10-task-02",
@@ -1508,7 +1512,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 3
+          "version": 4
         }
       ],
       "gates": [
@@ -1722,7 +1726,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 3
+          "version": 4
         },
         {
           "id": "w12-task-03",
@@ -1737,7 +1741,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 3
+          "version": 4
         },
         {
           "id": "w12-task-04",
@@ -1829,7 +1833,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 4
+          "version": 5
         },
         {
           "id": "w13-task-02",
@@ -1844,7 +1848,7 @@
           "completionNote": "",
           "evidenceUrl": null,
           "completedAt": null,
-          "version": 4
+          "version": 5
         },
         {
           "id": "w13-task-03",
@@ -1900,7 +1904,7 @@
           "evidence": "",
           "waiverReason": "",
           "decidedAt": null,
-          "version": 4
+          "version": 5
         },
         {
           "id": "w13-gate-03",
@@ -2181,6 +2185,16 @@
       "purpose": "Image evidence motivates limiting synthetic-stress claims; it does not establish pose robustness.",
       "verifiedAt": "2026-10-09",
       "version": 1
+    },
+    {
+      "id": "source-week5-execution",
+      "title": "Week 5 execution record",
+      "authors": "Pose Embed research project",
+      "year": 2026,
+      "canonicalUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
+      "purpose": "Public-safe progress, verified corrections, SCC status and remaining Week 5 admission requirements.",
+      "verifiedAt": "2026-10-11",
+      "version": 1
     }
   ],
   "weekSources": [
@@ -2294,77 +2308,77 @@
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-05",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-06",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-07",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-08",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-09",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-10",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-11",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-12",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-13",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-14",
       "sourceId": "source-plan-v3",
       "purpose": "Use the final v3 design, fixed schedule and stage-specific validity, capacity and novel-test gates for this week.",
       "priority": "required",
-      "version": 2
+      "version": 1
     },
     {
       "weekId": "week-04",
@@ -2420,6 +2434,13 @@
       "sourceId": "source-natural-shift",
       "purpose": "Image evidence motivates limiting synthetic-stress claims; it does not establish pose robustness.",
       "priority": "recommended",
+      "version": 1
+    },
+    {
+      "weekId": "week-05",
+      "sourceId": "source-week5-execution",
+      "purpose": "Public-safe progress, verified corrections, SCC status and remaining Week 5 admission requirements.",
+      "priority": "required",
       "version": 1
     }
   ]

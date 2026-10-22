@@ -9,6 +9,44 @@ from pose_embed.provenance import sha256_file
 
 
 def run_preparation_command(args) -> dict:
+    if args.operation in {"authorize-selection", "select"}:
+        from pose_embed.config_v3 import ArtifactBinding
+        from pose_embed.protocol_v3 import V3SelectionAuthorization
+        from pose_embed.protocol_v3_campaign import (
+            create_selected_configs,
+            record_selection_authorization,
+        )
+
+        protocol = load_protocol(args.protocol_config)
+        if args.operation == "authorize-selection":
+            record = V3SelectionAuthorization.model_validate_json(
+                Path(args.authorization).read_text()
+            )
+            return record_selection_authorization(protocol, record).model_dump(
+                mode="json"
+            )
+        root = canonical_artifact_root()
+        path = Path(args.ledger).resolve()
+        binding = ArtifactBinding(
+            relative_path=str(path.relative_to(root)), sha256=sha256_file(path)
+        )
+        return create_selected_configs(
+            protocol, binding, recorded_by=args.recorded_by
+        ).model_dump(mode="json")
+    if args.operation == "geometry-panel":
+        from pose_embed.geometry_v3 import run_geometry_panel
+
+        return run_geometry_panel(
+            args.protocol_config, args.manifest_set, args.output_dir
+        )
+    if args.operation == "prepare-execution":
+        from pose_embed.revision_v3 import prepare_execution_revision
+
+        return prepare_execution_revision(
+            historical_manifest_set=args.historical_manifest_set,
+            recorded_by=args.recorded_by,
+            revision=args.revision,
+        )
     if args.operation == "register-roots":
         return register_artifact_roots(args.root, external_audits=args.external_audit)
     if args.operation == "prepare":

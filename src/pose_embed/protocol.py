@@ -791,9 +791,12 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/dataset_seal.py",
         "src/pose_embed/preparation_v3.py",
         "src/pose_embed/v3_commands.py",
+        "src/pose_embed/revision_v3.py",
+        "src/pose_embed/novel_subset_v3.py",
         "src/pose_embed/features.py",
         "src/pose_embed/gpu_profile.py",
         "src/pose_embed/provenance.py",
+        "src/pose_embed/validation_proofs.py",
         "src/pose_embed/training/__init__.py",
         "src/pose_embed/training/runner.py",
         "src/pose_embed/losses/__init__.py",
@@ -842,6 +845,7 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
         "src/pose_embed/protocol_v3.py",
         "src/pose_embed/protocol_v3_campaign.py",
         "src/pose_embed/test_access.py",
+        "src/pose_embed/opening_capacity_v3.py",
         "src/pose_embed/data/__init__.py",
         "src/pose_embed/data/inventory.py",
         "src/pose_embed/data/manifest.py",
@@ -854,11 +858,13 @@ SCIENTIFIC_CODE_PATHS: dict[str, tuple[str, ...]] = {
     ),
     "sampler": ("src/pose_embed/training/sampler.py",),
     "corruptions": (
+        "src/pose_embed/geometry_v3.py",
         "src/pose_embed/corruptions/__init__.py",
         "src/pose_embed/corruptions/pose.py",
         "src/pose_embed/corruptions/fallback.py",
     ),
     "analysis": (
+        "docs/protocol/v3-report-template.md",
         "src/pose_embed/evaluation/analysis.py",
         "src/pose_embed/report.py",
         "src/pose_embed/benchmark/analysis.py",
@@ -896,6 +902,7 @@ def _validate_head_checkpoint(
     config: ExperimentConfig,
     *,
     initialization_sha256: str,
+    allow_unchanged: bool = False,
 ) -> None:
     try:
         import torch
@@ -937,7 +944,7 @@ def _validate_head_checkpoint(
         config.input_dimension, config.embedding_dimension
     )
     final_head.load_state_dict(state_dict, strict=True)
-    if _state_dict_digest(final_head) == initialization_sha256:
+    if not allow_unchanged and _state_dict_digest(final_head) == initialization_sha256:
         raise ValueError("final checkpoint is still the untrained initialization")
 
 
@@ -1011,6 +1018,7 @@ def _validate_training_run_artifacts(
     from pose_embed.provenance import sha256_file
 
     root = Path(artifact_root).resolve()
+    is_v3 = protocol.protocol_id == "protocol-v3"
     if run_set.protocol_sha256 != protocol_digest(protocol):
         raise ValueError("final run set belongs to a different protocol")
     if run_set.code_sha256 != current_code_hashes():
@@ -1086,6 +1094,20 @@ def _validate_training_run_artifacts(
         "telemetry",
         "outputs",
     }
+    if is_v3:
+        expected_manifest_keys.update(
+            {
+                "stage",
+                "selection_eligible",
+                "final_eligible",
+                "epoch_records",
+                "training_environment",
+                "design_code_sha256",
+                "design_lock_sha256",
+                "resolved_protocol_relative_path",
+                "selected_configs_sha256",
+            }
+        )
     if set(manifest) != expected_manifest_keys:
         raise ValueError("locked final run manifest has incomplete provenance")
     from pose_embed.artifacts import FeatureSidecar
@@ -1125,6 +1147,10 @@ def _validate_training_run_artifacts(
         raise ValueError("locked final run provenance is not release-grade")
     expected_experiment = config.model_dump(mode="json")
     expected_configuration_keys = {"experiment", "device", "attempt_sha256"}
+    if is_v3:
+        expected_configuration_keys.update(
+            {"stage", "selection_eligible", "final_eligible"}
+        )
     configuration = manifest.get("configuration")
     if not isinstance(configuration, dict) or set(configuration) != (
         expected_configuration_keys
@@ -1157,11 +1183,14 @@ def _validate_training_run_artifacts(
         and required_input_sha256 not in inputs.values()
     ):
         raise ValueError("training run does not bind its required authorization input")
-    if not isinstance(outputs, dict) or outputs != {
+    expected_outputs = {
         "checkpoint": run.checkpoint_sha256,
         "metrics": run.metrics_sha256,
         "batch_plan": run.batch_plan_sha256,
-    }:
+    }
+    if is_v3 and isinstance(outputs, dict):
+        expected_outputs["pilot_artifacts"] = outputs.get("pilot_artifacts")
+    if not isinstance(outputs, dict) or outputs != expected_outputs:
         raise ValueError("locked final run output hashes are incomplete")
     if manifest.get("initialization_sha256") != run.initialization_sha256:
         raise ValueError("locked final run manifest initialization hash mismatch")
@@ -1292,6 +1321,25 @@ def _validate_training_run_artifacts(
         "checkpoint_sha256",
         "telemetry",
     }
+    if is_v3:
+        expected_metrics_keys.update(
+            {
+                "stage",
+                "selection_eligible",
+                "final_eligible",
+                "training_environment",
+                "updates",
+                "expected_updates",
+                "epoch_records",
+                "diagnostics",
+                "optimizer",
+                "stage_seconds",
+                "peak_host_memory_bytes",
+                "peak_gpu_allocated_bytes",
+                "peak_gpu_reserved_bytes",
+                "checkpoint_bytes",
+            }
+        )
     losses = metrics.get("epoch_losses")
     if (
         set(metrics) != expected_metrics_keys
@@ -1305,7 +1353,7 @@ def _validate_training_run_artifacts(
         )
         or metrics.get("initial_loss") != losses[0]
         or metrics.get("final_loss") != losses[-1]
-        or losses[-1] >= losses[0]
+        or (not is_v3 and losses[-1] >= losses[0])
         or metrics.get("input_metadata") != sidecar.model_dump(mode="json")
         or metrics.get("initialization_sha256") != run.initialization_sha256
         or metrics.get("batch_plan_sha256") != run.batch_plan_sha256
@@ -1348,6 +1396,8 @@ def _validate_training_run_artifacts(
         "canonical_test_opening_ledger",
         "provenance",
     }
+    if is_v3:
+        expected_attempt_keys.update({"stage", "selection_eligible", "final_eligible"})
     try:
         attempt_started_at = datetime.fromisoformat(str(attempt.get("started_at")))
     except ValueError as exc:
@@ -1429,8 +1479,35 @@ def _validate_training_run_artifacts(
         raise ValueError("locked final training outcome is incomplete")
 
     _validate_head_checkpoint(
-        files["checkpoint"], config, initialization_sha256=run.initialization_sha256
+        files["checkpoint"],
+        config,
+        initialization_sha256=run.initialization_sha256,
+        allow_unchanged=is_v3,
     )
+    if is_v3:
+        from pose_embed.protocol_v3 import _bound_file, _timestamp
+        from pose_embed.protocol_v3_campaign import (
+            SelectedConfigurations,
+            selected_configs_path,
+        )
+        from pose_embed.training.runner import validate_v3_training_run
+
+        selection_path = _bound_file(root, run_set.selection_evidence)
+        selection = SelectedConfigurations.model_validate_json(
+            selection_path.read_text()
+        )
+        _timestamp(selection.recorded_at)
+        if (
+            selection_path != selected_configs_path(protocol)
+            or selection.protocol_sha256 != run_set.protocol_sha256
+            or selection.selection_authorization_sha256
+            != run_set.selection_authorization_sha256
+            or selection.recorded_at != run_set.selection_locked_at
+            or selection.selected_rates.get(config.objective) != config.learning_rate
+            or manifest.get("selected_configs_sha256") != sha256_file(selection_path)
+        ):
+            raise ValueError("final training did not bind the selected configurations")
+        validate_v3_training_run(files["run_manifest"].parent, stage="final_training")
     return files
 
 
@@ -1524,6 +1601,8 @@ def derive_core_failure_status(protocol: ProtocolConfig) -> dict[str, object]:
         "canonical_test_opening_ledger",
         "provenance",
     }
+    if protocol.protocol_id == "protocol-v3":
+        attempt_fields.update({"stage", "selection_eligible", "final_eligible"})
     records: list[dict[str, object]] = []
     unresolved: list[str] = []
     core_methods = {"contrastive", "supcon", "contextual"}
@@ -1554,6 +1633,14 @@ def derive_core_failure_status(protocol: ProtocolConfig) -> dict[str, object]:
             != str(paths.test_opening_ledger)
         ):
             raise ValueError(f"core training attempt is incomplete: {attempt_path}")
+        if protocol.protocol_id == "protocol-v3" and (
+            attempt.get("stage") != "final_training"
+            or attempt.get("selection_eligible") is not False
+            or attempt.get("final_eligible") is not True
+        ):
+            raise ValueError(
+                f"core attempt is not fresh final training: {attempt_path}"
+            )
         for raw_path, expected_sha256 in provenance.inputs.items():
             if sha256_file(raw_path) != expected_sha256:
                 raise ValueError(f"core attempt input hash mismatch: {raw_path}")
@@ -1931,6 +2018,10 @@ def load_evaluation_plan(path: str | Path) -> EvaluationPlan:
         raise ValueError(f"evaluation plan does not exist: {path}") from exc
     except yaml.YAMLError as exc:
         raise ValueError(f"invalid evaluation plan YAML: {exc}") from exc
+    if payload.get("schema_version") == 3:
+        from pose_embed.protocol_v3 import V3EvaluationPlan
+
+        return V3EvaluationPlan.model_validate(payload)
     return EvaluationPlan.model_validate(payload)
 
 
@@ -1945,6 +2036,10 @@ def load_final_run_set(path: str | Path) -> FinalRunSet:
         raise ValueError(f"final run set does not exist: {path}") from exc
     except json.JSONDecodeError as exc:
         raise ValueError(f"invalid final run-set JSON: {exc}") from exc
+    if payload.get("schema_version") == 3:
+        from pose_embed.protocol_v3 import V3FinalRunSet
+
+        return V3FinalRunSet.model_validate(payload)
     return FinalRunSet.model_validate(payload)
 
 
@@ -1959,6 +2054,10 @@ def load_protocol_lock(path: str | Path) -> ProtocolLock:
         raise ValueError(f"protocol lock does not exist: {path}") from exc
     except json.JSONDecodeError as exc:
         raise ValueError(f"invalid protocol lock JSON: {exc}") from exc
+    if payload.get("protocol_id") == "protocol-v3":
+        from pose_embed.protocol_v3 import V3FinalLock
+
+        return V3FinalLock.model_validate(payload)
     return ProtocolLock.model_validate(payload)
 
 
@@ -2055,10 +2154,18 @@ def verify_protocol(
     if protocol.protocol_id == "protocol-v3" and (
         require_locked or lock_path is not None
     ):
-        raise ValueError(
-            "v3 final authorization is unavailable before the measured campaign audit; "
-            "a design lock does not authorize novel evaluation"
-        )
+        from pose_embed.protocol_v3 import require_v3_final_authorization
+
+        require_v3_final_authorization(protocol, now=now)
+        paths = resolve_scientific_paths(protocol)
+        for supplied, canonical in (
+            (lock_path, paths.protocol_lock),
+            (evaluation_plan_path, paths.evaluation_plan),
+            (final_run_set_path, paths.final_run_set),
+        ):
+            if supplied is not None and Path(supplied).resolve() != canonical:
+                raise ValueError("v3 final authorization requires canonical lock paths")
+        return protocol, digest
     if require_locked and lock_path is None:
         paths = resolve_scientific_paths(protocol)
         lock_path = paths.protocol_lock

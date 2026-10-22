@@ -98,7 +98,7 @@ class EvaluationResult(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     schema_version: Literal[4]
-    mode: Literal["development", "final", "exploratory"]
+    mode: Literal["development", "engineering", "final", "exploratory"]
     protocol_sha256: Hash = Field(pattern=r"^[0-9a-f]{64}$")
     evaluation_plan_sha256: Hash | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     final_run_set_sha256: Hash | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
@@ -182,7 +182,7 @@ class EvaluationResult(BaseModel):
         }
         if not required_input_hashes <= set(self.provenance.inputs.values()):
             raise ValueError("evaluation provenance does not bind feature artifacts")
-        if self.mode == "development":
+        if self.mode in {"development", "engineering"}:
             if self.query_definition != "development":
                 raise ValueError("development result requires development queries")
             if any(value is not None for value in final_fields):

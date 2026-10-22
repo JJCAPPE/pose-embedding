@@ -31,6 +31,9 @@ def jitter_cache(tmp_path, monkeypatch):
     )
     protocol = SimpleNamespace(
         protocol_id="protocol-v3",
+        test_access=SimpleNamespace(
+            resolved_protocol_relative_path="study-v3/locks/protocol.v3.json"
+        ),
         preparation=SimpleNamespace(fallback_evidence=binding, fallback_value=2.0),
         corruptions=SimpleNamespace(
             coordinate_jitter_fractions=(0.01, 0.025, 0.05),
@@ -83,7 +86,8 @@ def jitter_cache(tmp_path, monkeypatch):
     )
     monkeypatch.setattr("pose_embed.protocol_v3.require_v3_design", lambda _: None)
     monkeypatch.setattr(
-        "pose_embed.motionbert_features.load_motionbert_inputs", lambda *args: inputs
+        "pose_embed.motionbert_features.load_motionbert_inputs",
+        lambda *args, **kwargs: inputs,
     )
     monkeypatch.setattr(
         "pose_embed.motionbert_features._source_paths", lambda _: [paths["aggregate"]]

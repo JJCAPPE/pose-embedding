@@ -16,6 +16,7 @@ from pose_embed.gpu_profile import profile_motionbert_gpu
 from pose_embed.protocol import current_code_hashes, verify_protocol
 from pose_embed.report import build_report
 from pose_embed.training import train_head
+from pose_embed.validation_proofs import validation_command
 
 DEFAULT_PROTOCOL = "configs/protocol.v1.yaml"
 
@@ -57,6 +58,31 @@ def _parser() -> argparse.ArgumentParser:
     freeze.add_argument("--protocol-config", required=True)
     freeze.add_argument("--manifest-set", required=True)
     freeze.add_argument("--recorded-by", required=True)
+    revision = operations.add_parser(
+        "prepare-execution", help="freeze a declared execution successor"
+    )
+    revision.add_argument("--historical-manifest-set", required=True)
+    revision.add_argument("--recorded-by", required=True)
+    revision.add_argument(
+        "--revision", choices=("execution-r1", "execution-r2"), default="execution-r1"
+    )
+    geometry = operations.add_parser(
+        "geometry-panel", help="verify fixed development geometry"
+    )
+    geometry.add_argument("--protocol-config", required=True)
+    geometry.add_argument("--manifest-set", required=True)
+    geometry.add_argument("--output-dir", required=True)
+    authorize = operations.add_parser(
+        "authorize-selection", help="verify the measured October admission evidence"
+    )
+    authorize.add_argument("--protocol-config", required=True)
+    authorize.add_argument("--authorization", required=True)
+    select = operations.add_parser(
+        "select", help="lock rates from the complete clean selection ledger"
+    )
+    select.add_argument("--protocol-config", required=True)
+    select.add_argument("--ledger", required=True)
+    select.add_argument("--recorded-by", required=True)
 
     profile = commands.add_parser("profile", help="profile compute prerequisites")
     profile_commands = profile.add_subparsers(dest="operation", required=True)
@@ -114,6 +140,12 @@ def _parser() -> argparse.ArgumentParser:
 
     features = commands.add_parser("features", help="extract cached representations")
     feature_commands = features.add_subparsers(dest="operation", required=True)
+    subset = feature_commands.add_parser(
+        "export-primary", help="export exact primary query rows"
+    )
+    subset.add_argument("--protocol-config", required=True)
+    subset.add_argument("--input", required=True)
+    subset.add_argument("--output", required=True)
     feature_extract = feature_commands.add_parser(
         "extract", help="extract feature cache"
     )
@@ -202,7 +234,9 @@ def _parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--queries", required=True)
     evaluate.add_argument("--output", required=True)
     evaluate.add_argument(
-        "--mode", choices=["development", "final", "exploratory"], required=True
+        "--mode",
+        choices=["development", "engineering", "final", "exploratory"],
+        required=True,
     )
     evaluate.add_argument("--protocol-config", default=DEFAULT_PROTOCOL)
     evaluate.add_argument("--gallery-manifest", required=True)
@@ -250,6 +284,7 @@ def _print(payload: object) -> None:
     print(json.dumps(payload, indent=2, sort_keys=True, default=str))
 
 
+@validation_command(fresh=True)
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
@@ -323,7 +358,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             return 0
         if args.area == "features":
-            if args.operation == "verify-repeatability":
+            if args.operation == "export-primary":
+                from pose_embed.novel_subset_v3 import export_primary_queries
+
+                _print(
+                    export_primary_queries(
+                        args.input, args.output, protocol_path=args.protocol_config
+                    )
+                )
+            elif args.operation == "verify-repeatability":
                 from pose_embed.motionbert_reproducibility import verify_repeatability
 
                 _print(

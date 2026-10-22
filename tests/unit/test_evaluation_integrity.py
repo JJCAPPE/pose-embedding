@@ -24,14 +24,21 @@ def _make_features(
     sample_ids: list[str],
     split: str,
     role: str,
+    corruption_family: str | None = None,
+    corruption_severity: float = 0,
 ) -> tuple[Path, Path]:
     poses_path = tmp_path / f"{name}-poses.npz"
     feature_path = tmp_path / f"{name}-features.npz"
     manifest_path = tmp_path / f"{name}.jsonl"
     labels = np.asarray([int(sample_id[-3:]) for sample_id in sample_ids])
-    poses = np.arange(len(sample_ids) * 1 * 6 * 17 * 3, dtype=np.float32).reshape(
-        len(sample_ids), 1, 6, 17, 3
+    people, frames = (
+        (2, 100)
+        if load_protocol(protocol_path).protocol_id == "protocol-v3"
+        else (1, 6)
     )
+    poses = np.arange(
+        len(sample_ids) * people * frames * 17 * 3, dtype=np.float32
+    ).reshape(len(sample_ids), people, frames, 17, 3)
     np.savez(poses_path, poses=poses, labels=labels, sample_ids=sample_ids)
     manifest_path.write_text(
         "\n".join(
@@ -53,6 +60,8 @@ def _make_features(
         role=role,
         split=split,
         embedding_dimension=6,
+        corruption_family=corruption_family,
+        corruption_severity=corruption_severity,
     )
     return feature_path, manifest_path
 

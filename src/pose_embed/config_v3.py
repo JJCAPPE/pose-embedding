@@ -324,18 +324,39 @@ class V3TestAccess(StrictModel):
     final_evaluation_requires_lock: Literal[True]
     artifact_root_environment: Literal["POSE_EMBED_ARTIFACT_ROOT"]
     evaluation_plan_template: Literal["configs/evaluation-plan.v3.yaml"]
-    protocol_lock_relative_path: Literal["study-v3/locks/protocol-lock.v3.json"]
-    evaluation_plan_relative_path: Literal["study-v3/locks/evaluation-plan.v3.yaml"]
-    final_run_set_relative_path: Literal["study-v3/locks/final-run-set.v3.json"]
-    opening_ledger_relative_path: Literal["study-v3/locks/test-opening.v3.json"]
-    design_lock_relative_path: Literal["study-v3/locks/design-lock.v3.json"]
-    selection_authorization_relative_path: Literal[
-        "study-v3/locks/selection-authorization.v3.json"
-    ]
-    resolved_protocol_relative_path: Literal["study-v3/locks/protocol.v3.json"]
+    protocol_lock_relative_path: str
+    evaluation_plan_relative_path: str
+    final_run_set_relative_path: str
+    opening_ledger_relative_path: str
+    design_lock_relative_path: str
+    selection_authorization_relative_path: str
+    resolved_protocol_relative_path: str
     opening_policy: Literal["one_atomic_dataset_opening_across_all_protocol_versions"]
     training_after_opening: Literal["forbidden_across_all_protocol_versions"]
     confirmatory_changes_after_opening: Literal["forbidden"]
+
+    @model_validator(mode="after")
+    def coherent_revision_paths(self) -> V3TestAccess:
+        filenames = {
+            "protocol_lock": "protocol-lock.v3.json",
+            "evaluation_plan": "evaluation-plan.v3.yaml",
+            "final_run_set": "final-run-set.v3.json",
+            "opening_ledger": "test-opening.v3.json",
+            "design_lock": "design-lock.v3.json",
+            "selection_authorization": "selection-authorization.v3.json",
+            "resolved_protocol": "protocol.v3.json",
+        }
+        parent = str(PurePosixPath(self.resolved_protocol_relative_path).parent)
+        if parent not in {
+            "study-v3/locks",
+            "study-v3/revisions/execution-r1/locks",
+            "study-v3/revisions/execution-r2/locks",
+        } or any(
+            getattr(self, f"{field}_relative_path") != f"{parent}/{filename}"
+            for field, filename in filenames.items()
+        ):
+            raise ValueError("v3 lock paths must belong to one declared revision")
+        return self
 
 
 class ProtocolV3Config(StrictModel):
