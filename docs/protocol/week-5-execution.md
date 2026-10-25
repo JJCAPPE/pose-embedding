@@ -13,26 +13,35 @@ govern this work.
 
 ## Current checkpoint: October 25, 2026
 
-**Week 5 remains open. Access is restored, but the targeted Contrastive pilot
-failed its frozen runtime check before training. A researcher decision on an
-updated-kernel amendment is the next prerequisite; no such amendment is yet
-authorized.** The [October 25 failure record](#october-25-targeted-pilot-failure-confirmed-after-access-restoration)
+**Week 5 remains open. The researcher authorized [ADR0009](../decisions/0009-updated-kernel-baseline.md)
+after the targeted Contrastive pilot failed its frozen runtime check. Fresh quota
+is insufficient for regeneration. Next: obtain adequate available quota without
+lowering the reserve, then verify the new complete profile and independently
+accept fresh baseline evidence.** The [October 25 failure record](#october-25-targeted-pilot-failure-confirmed-after-access-restoration)
 binds the terminal evidence. No active job was observed at the restored-session
 check, and no new allocation was submitted.
 
-- Accepted under the frozen baseline: CPU runtime, exact initialization and
+- Accepted under the old frozen baseline: CPU runtime, exact initialization and
   fixed-panel geometry, synthetic GPU prerequisite, and all five caches with
   independent validation. These receipts remain evidence for their bound inputs;
   they do not authorize use under a changed runtime.
-- Still required: three complete paired pilots and independent numerical replay;
+- Required under the new profile: fresh initialization/fixed-panel geometry,
+  synthetic GPU verification, parity/all five caches with exact repeats and
+  independent validation; three complete paired pilots and numerical replay;
   nine development corruption paths with projections and retrieval evidence;
   resident timing; full admission and independent recertification; measured
   schema-2 CPU/GPU/storage/researcher capacity; and selection authorization before
   Week 5 closure. Selection runs, final training and novel opening remain closed.
-- Blocker and next action: job **8272752** reached the requested `scc-j01`, but
-  its kernel differed from the frozen profile. Retain the failed attempt and seek
-  the researcher decision before further runtime attempts. Do not whitelist the
-  kernel, infer numerical equivalence or rerun this terminal job.
+- Next prerequisite: bind the authorized `.177.1` kernel profile to unchanged
+  f101f0e source/r2 locks, review any external correction, refresh the complete
+  remaining-storage forecast and required preflights, then run the allocated
+  baseline checks. Preserve `.172.1` evidence and both failed pilot attempts.
+  Do not whitelist kernels against the old baseline or infer numerical equivalence.
+- Storage blocks allocation: the refreshed **202,000,000,000-byte** remaining
+  bound requires **467,248,364,800 bytes** available. Observed quota remainder is
+  **370,870,000,000 bytes**, a **96,378,364,800-byte** deficit; filesystem free
+  space is **505,598,181,376 bytes**. Additional accessible quota is required.
+  Preserve the 200 GiB reserve and 25% margin; do not delete retained evidence.
 - The historical libm non-progress count remains **two**, with that investigation
   stopped. The separate host-availability retry failed but narrowed availability;
   it does not establish that every SCC host has changed.
@@ -2920,10 +2929,43 @@ binds accounting, runtime, resources, seals and source. Preserve these artifacts
 and all prior evidence; their acceptance does not establish compatibility with
 the updated kernel.
 
-The next decision is whether to authorize a result-blind updated-kernel amendment
-with the required independent runtime-dependent revalidation. It remains pending;
+At this failure checkpoint, a result-blind updated-kernel amendment with the
+required independent runtime-dependent revalidation remained pending;
 the frozen release, r2 locks, runtime gate, panel/fallback and scientific settings
 are unchanged. The separate availability line contains one unsuccessful but
 narrowing targeted retry; the historical libm count remains two and stopped.
 No further allocation, selection run, final training or novel opening was made.
 The 29-second failure adds no successful capacity evidence. Week 5 cannot close.
+
+## October 25: updated-kernel amendment authorized
+
+The researcher subsequently authorized [ADR0009](../decisions/0009-updated-kernel-baseline.md):
+freeze a complete prospective `4.18.0-553.177.1.el8_10.x86_64` profile on actual
+Sapphire Rapids Gold-6426Y, native AVX512, four numerical threads and the existing
+L40S target. No numerical equivalence with `.172.1` is claimed. Preserve frozen
+f101f0e source, r2 locks/configuration and dependencies; bind the immutable
+amendment/runtime record through the existing reviewed external correction path.
+A bound core change would require a separate immutable revision, not this amendment.
+
+The authorization requires fresh affected initialization/geometry, synthetic GPU,
+parity/five-cache repeatability, three paired pilots/replay, nine development
+corruption paths/projections/retrieval, timing, full admission/independent
+recertification and measured schema-2 capacity. Retain unchanged-input setup
+acceptance, all old baseline/cache evidence and both failed pilots. Refresh
+source-derived remaining storage and every dynamic preflight before allocations.
+Original panel IDs/fallback, algorithms, settings, seeds and physical pairing
+remain fixed. This records authorization only: no new baseline result, allocation,
+scientific gate, selection run, final training, novel opening or closure is claimed.
+
+The fresh October 25 storage inventory blocks the next allocation. Restoring the
+five-cache output allowance and fresh geometry to the retained source-derived
+forecast, with existing headroom, gives a rounded **202,000,000,000-byte** remaining
+bound. With the unchanged 200 GiB reserve and 25% margin, required available space
+is **467,248,364,800 bytes**. Quota remainder is **370,870,000,000 bytes**, tighter
+than the **505,598,181,376 bytes** free on the filesystem; the deficit is
+**96,378,364,800 bytes**. At least **97 decimal GB** of additional available quota
+is needed to clear the observed deficit. No additional capacity or new allocation is claimed.
+Inventory `study-v3/operations/week5-storage-forecast/20261025T174943Z/inventory.json`,
+SHA-256 `93a60efd32a7ab932fd06e51837e6f2f35f8f3ec7d318cb82cffe6eff1f68af0`,
+retains the observation. Recheck actual quota and all required preflights after
+the capacity issue is resolved; no safeguard or retained evidence is waived.
