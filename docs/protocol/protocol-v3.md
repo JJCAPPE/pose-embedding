@@ -6,6 +6,19 @@ study. The original prospectus and v1/v2 protocols, code and evidence remain
 historical records. They are not permission to execute the new study. Independent
 research governance applies; no advisor sign-off is required.
 
+The October 25 researcher-authorized [ADR0009](../decisions/0009-updated-kernel-baseline.md)
+authorizes a new complete prospective profile for kernel
+`4.18.0-553.177.1.el8_10.x86_64` on actual Gold-6426Y/Sapphire Rapids, native
+AVX512, four numerical threads and the existing L40S target. It preserves frozen
+f101f0e source, r2 locks/configuration and dependencies; it claims no equivalence
+with the old kernel. Fresh affected baseline, GPU/cache, paired-pilot/replay,
+corruption, timing/admission/recertification and capacity evidence is required.
+Bind the new immutable amendment/runtime records through the existing external
+correction path; retain all old evidence and accept unchanged-input setup only.
+The [current execution checkpoint](week-5-execution.md#current-checkpoint-october-25-2026)
+governs the next prerequisite. No selection, final training, novel opening or
+closure is granted.
+
 The October 19 researcher-authorized [ADR0008](../decisions/0008-runtime-baseline.md)
 replaces historical cross-runtime numerical equality with one prospective,
 immutable runtime baseline. Original panel IDs, fallback evidence, ordered

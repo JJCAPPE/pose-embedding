@@ -1,14 +1,36 @@
 # Final v3 plan: frozen one-shot pose robustness
 
 Original decision: **2026-09-29**. Execution amendments: **2026-10-09**,
-**2026-10-12** and **2026-10-19**. Delivery: **2026-12-18**. Status: **final planning
+**2026-10-12**, **2026-10-19** and **2026-10-25**. Delivery: **2026-12-18**. Status: **final planning
 decision; implementation and measured campaign gates remain to be completed**.
 This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-frozen-one-shot-v3.md)
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
+**October 25 authorized amendment:** [ADR0009](../docs/decisions/0009-updated-kernel-baseline.md)
+governs the next Week 5 work after the frozen kernel was unavailable in both
+observed pilot allocations. Freeze and verify a complete prospective profile
+with kernel `4.18.0-553.177.1.el8_10.x86_64`, actual Sapphire Rapids Gold-6426Y,
+native AVX512, four numerical threads and the existing L40S target. This is not
+a claim of numerical equivalence with kernel `4.18.0-553.172.1.el8_10.x86_64`.
+Keep source `f101f0e9d9bd64275d2088deab1b0bdcfcc53620`, r2 locks/configuration,
+dependencies, original panel IDs/fallback and all scientific settings unchanged.
+Fresh initialization/geometry, synthetic GPU verification, parity/five caches,
+paired pilots/replay, development corruptions/projections/retrieval, timing,
+full admission, independent recertification and measured schema-2 capacity are
+required under the new profile. Retain old baseline/cache evidence and failed
+jobs 8272259/8272752; no prior cache is admitted as new-profile evidence.
+Accepted setup remains valid only for unchanged bound inputs. Next: record the
+immutable amendment/runtime bindings, review any external operational correction,
+refresh the remaining-storage forecast and all required preflights, then obtain
+allocated baseline evidence and independent acceptance. Fresh October 25 quota
+is insufficient for the revised forecast; additional available quota is required
+before any allocation, without lowering the reserve or deleting evidence. No new baseline or
+capacity pass is claimed. Selection, final training, novel opening and Week 5
+closure remain closed. See the [current execution checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-october-25-2026).
+
 The October 19 researcher-authorized [ADR0008](../docs/decisions/0008-runtime-baseline.md)
-governs the next Week 5 execution. Freeze one prospective runtime baseline;
+established the prospective runtime policy retained by ADR0009. Freeze one prospective runtime baseline;
 require exact repeats and initialization/batch pairing within that profile,
 without requiring runtime-derived scales, tensors or initialization to equal
 historical CPU outputs. Original panel IDs, fallback, manifests, algorithms,
@@ -22,7 +44,7 @@ recording the amendment and passing required preflights; selection, final
 training and novel opening remain
 gated. The two non-progress diagnostic attempts remain historical and are not
 reset. Earlier runtime recovery instructions below describe their dated
-checkpoints; ADR0008 controls this specific prospective change.
+checkpoints; ADR0008 and ADR0009 control their respective prospective changes.
 
 **October 22 accepted milestone:** independent review accepted job 8189505's
 prospective CPU runtime, three fresh initializations per seed 7/17/29, and exact
@@ -31,13 +53,13 @@ Original identities, fallback, scientific settings and r2 source/locks remain
 fixed; allocated replay, accounting, resources and seals passed. Receipt
 `study-v3/operations/week5-runtime-baseline-acceptance/20261022T154102Z/verification.json`
 has SHA-256 `16106ecafe347dc8d31795e14a88b267e716f82e494311b4753462cfcd88f8aa`.
-Week 5 remains incomplete. Next is the fresh source-bound GPU diagnostic under
-this baseline, then fresh parity/five caches and independent validation. Three
+Week 5 remained incomplete. At that checkpoint, next was the source-bound GPU
+diagnostic under this baseline, then parity/five caches and independent validation. Three
 complete paired pilots, nine corruption paths/projections/results, full
 admission, independent recertification and measured schema-2 capacity remain
 required. The two historical non-progress diagnostics stay recorded; selection,
 final training and novel opening remain closed. See the
-[current execution checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-october-22-2026).
+[historical October 22 checkpoint](../docs/protocol/week-5-execution.md#historical-checkpoint-october-22-2026).
 
 The October 9 researcher-authorized amendment adopts the specifications below
 before selection or novel opening. Scientific settings remain fixed; completing
