@@ -11,7 +11,40 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
-## Current checkpoint: October 22, 2026
+## Current checkpoint: October 25, 2026
+
+**Week 5 remains open. Access is restored, but the targeted Contrastive pilot
+failed its frozen runtime check before training. A researcher decision on an
+updated-kernel amendment is the next prerequisite; no such amendment is yet
+authorized.** The [October 25 failure record](#october-25-targeted-pilot-failure-confirmed-after-access-restoration)
+binds the terminal evidence. No active job was observed at the restored-session
+check, and no new allocation was submitted.
+
+- Accepted under the frozen baseline: CPU runtime, exact initialization and
+  fixed-panel geometry, synthetic GPU prerequisite, and all five caches with
+  independent validation. These receipts remain evidence for their bound inputs;
+  they do not authorize use under a changed runtime.
+- Still required: three complete paired pilots and independent numerical replay;
+  nine development corruption paths with projections and retrieval evidence;
+  resident timing; full admission and independent recertification; measured
+  schema-2 CPU/GPU/storage/researcher capacity; and selection authorization before
+  Week 5 closure. Selection runs, final training and novel opening remain closed.
+- Blocker and next action: job **8272752** reached the requested `scc-j01`, but
+  its kernel differed from the frozen profile. Retain the failed attempt and seek
+  the researcher decision before further runtime attempts. Do not whitelist the
+  kernel, infer numerical equivalence or rerun this terminal job.
+- The historical libm non-progress count remains **two**, with that investigation
+  stopped. The separate host-availability retry failed but narrowed availability;
+  it does not establish that every SCC host has changed.
+- Hourly automation was authorized October 24, superseding historical
+  polling-off text below. Keep one SCC controller; no further scheduler poll of
+  this terminal job is needed. November 29 final locks, December 6 compute and
+  December 7–18 delivery safeguards remain fixed; actual researcher time is
+  unreported.
+
+<a id="current-checkpoint-october-22-2026"></a>
+
+## Historical checkpoint: October 22, 2026
 
 **Week 5 remains incomplete. The prospective CPU runtime, initialization and
 geometry prerequisite is independently accepted.** Job **8189505** completed
@@ -2787,7 +2820,7 @@ The guarded SCC status pointer now targets
 `8ab60816bc48f4545d21b94b942ebb7041563fa289e5881cc31d76ceaa38db19`;
 this metadata update performed no scheduler query or allocation.
 
-## Reflection
+## Reflection through October 22 (historical)
 
 **Done:** Reconciled the prior handoff, live closure and authorized amendment;
 published the active Week 5 scope; inspected SCC; recorded future availability;
@@ -2835,7 +2868,7 @@ resource records, both seals, 108 metadata and 616 source bindings, and both
 actual metadata-dependence tables. Scientific regeneration and admission remain
 pending.
 
-**Next:** Follow the [October 22 checkpoint](#current-checkpoint-october-22-2026)
+**Next:** Follow the [October 22 checkpoint](#historical-checkpoint-october-22-2026)
 and adopted ADR0008: bind the accepted baseline, then complete the unchanged
 fresh scientific inventory and measured capacity. Resume allocations
 only after the required preflights; do not replay historical launch commands.
@@ -2848,3 +2881,49 @@ regeneration, full admission validation and renewed CPU/GPU capacity remain
 required. Actual researcher minutes remain unreported by explicit request.
 Week 5 cannot close while these gates remain unresolved; selection, final
 training and novel opening remain closed.
+
+## October 25: targeted pilot failure confirmed after access restoration
+
+The existing SCC session was restored October 25. A single metadata observation
+at **17:35:41 UTC** found no active job and recovered accounting for **8272752**.
+The requested host intervention occurred: both scheduler accounting and the
+runtime observation identify `scc-j01`. The job ran October 24 from
+**8:44:04 to 8:44:33 PM EDT**, using four OMP slots, with scheduler `failed=0`,
+process exit status one and **29 scheduler seconds**. The startup gate rejected
+the profile before CUDA initialization or the scientific child; no fixture,
+pilot operation or operation-resource records were produced.
+
+The entire observed profile equals the prior failed `scc-j08` profile from job
+**8272259**. Against the frozen baseline, the only raw differences are the kernel
+in `runtime.platform`, **4.18.0-553.172.1 → 4.18.0-553.177.1**, and the already
+approved GPU-only `torch_build` report expansion. All other profile fields agree.
+Independent local metadata comparison confirmed these differences. This rules
+out the hypothesis that the previously accepted cache host retained the frozen
+profile at this allocation; it is not a cluster-wide availability finding or a
+failed numerical result.
+
+The terminal review at **17:38:05 UTC** verified **988 metadata bindings and 616
+source bindings**, retained accounting/runtime evidence, and checked a fresh
+sealed dataset state. Receipt:
+`study-v3/operations/week5-runtime-baseline-pilot-contrastive/20261025T004216Z/terminal-review-20261025.json`,
+SHA-256 `7df8b7ab15dce8d318f3006eb9708c465e76c55ab023ca1ae7569bb00b8c3163`.
+Runtime SHA-256:
+`24af2821199ac0b25eb0b287ac3bdb72bc184a10cbcdb7c0ed638f147c188a06`.
+This accepts the failure record only; no scientific binary was read during the
+login-node review and no scientific admission is accepted.
+
+All five caches remain independently accepted under the unchanged frozen
+baseline, including the exact **95,001-row repeat**, through validator **8250629**.
+Receipt `study-v3/operations/week5-cache-acceptance/20261024T222641Z/verification.json`,
+SHA-256 `dd3fff272d2fc52074580a4fe307b04da6932323231ec5f04eac7640bf5d6506`,
+binds accounting, runtime, resources, seals and source. Preserve these artifacts
+and all prior evidence; their acceptance does not establish compatibility with
+the updated kernel.
+
+The next decision is whether to authorize a result-blind updated-kernel amendment
+with the required independent runtime-dependent revalidation. It remains pending;
+the frozen release, r2 locks, runtime gate, panel/fallback and scientific settings
+are unchanged. The separate availability line contains one unsuccessful but
+narrowing targeted retry; the historical libm count remains two and stopped.
+No further allocation, selection run, final training or novel opening was made.
+The 29-second failure adds no successful capacity evidence. Week 5 cannot close.
