@@ -11,7 +11,38 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
-## Current checkpoint: October 25, 2026
+## Current checkpoint: October 28, 2026
+
+**SCC jobs remain on hold at the researcher's direction while additional space
+is pending. Week 5 remains open; no new runtime or scientific gate is accepted.**
+Local preparation completed the reviewed ADR0009 external launcher correction,
+the [conditional remaining-work calendar](week-6-handoff.md#remaining-work-calendar--october-28),
+and result-independent [report](../results/v3-report-draft.md) and
+[poster text](../results/v3-poster-copy.md), with a
+[dated journal entry](../../journal/entries/2026-10-28-storage-wait.tex).
+No SCC command, installation,
+submission, licensed-data read or fresh capacity observation was made for this
+preparation. Historical runtime/cache evidence keeps its original bindings.
+
+The corrected launcher preserves frozen scientific source, r2 locks and the
+existing helper/runtime/qsub bytes. It binds both historical geometry attempts,
+requires the complete authorized kernel profile, and applies the 202 GB
+remaining forecast at submission and before allocated initialization. Local
+synthetic tests passed (108); independent review verified the correction and
+its retained metadata hashes. Reviewed launcher SHA-256:
+`12650b3574afe4468a302017b3ee0fe5c3f749ecf27608a94d13d2869b4b60af`.
+This is software preparation, not SCC execution or measured capacity evidence.
+
+Next: once sufficient quota **and** filesystem space are verified, reconcile the
+current hold and handoff, install the reviewed external copy through the existing
+procedure, and perform all fresh submission checks before the authorized CPU
+baseline/geometry work. Downstream runtime-gate rebinding requires the resulting
+independent acceptance receipt and is intentionally not fabricated now. New
+profile regeneration/admission remains required; selection, final training and
+novel opening remain closed. Calendar targets are conditional on measured
+capacity; November 29 locks, December 6 compute and December 7–18 delivery remain.
+
+## Historical checkpoint: October 25, 2026
 
 **Week 5 remains open. The researcher authorized [ADR0009](../decisions/0009-updated-kernel-baseline.md)
 after the targeted Contrastive pilot failed its frozen runtime check. Fresh quota
