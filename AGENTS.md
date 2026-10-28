@@ -2,6 +2,28 @@
 
 These rules apply to every automated or human change in this repository.
 
+## Local SCC authentication
+
+- On 2026-10-28 the researcher confirmed that the SCC password was saved at
+  `~/.config/pose-embed/scc-password` and authorized its use for requested SCC
+  connections. Check availability and the helper's ownership/permission checks
+  without displaying its contents. Never print, source, export, commit, upload
+  or paste the password into chat, command arguments or tmux buffers.
+- Use `scripts/scc_password.py` only as OpenSSH's password callback, with
+  `SSH_ASKPASS` set to its absolute local path and `SSH_ASKPASS_REQUIRE=force`.
+  Follow [the SSH handoff instructions](docs/protocol/scc-v3-runbook.md#local-ssh-password-handoff),
+  including strict host-key checking and one password attempt. Never invoke
+  callback mode directly or capture its output. Only the researcher runs
+  `--store` in their own Terminal when replacing the saved password.
+- Keep one controller of the existing local `remote` tmux session. Inspect
+  its current pane/process state and reuse the verified SCC username and host.
+  Restart only a confirmed failed or pending login; preserve working sessions
+  and active jobs. The callback cannot be added to an already-running SSH
+  process. Duo requires a separate response and the researcher's approval.
+- Credential access does not authorize research jobs, resume paused work or
+  change protocol gates. This file records the mechanism, not the secret or a
+  guarantee that a previous connection is still live.
+
 ## Canonical intent
 
 - Read `plan/research-plan.v3.md`, `plan/research-plan.v3.json`, and
