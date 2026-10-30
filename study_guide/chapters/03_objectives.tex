@@ -1,0 +1,251 @@
+\clearpage
+\section{The three training recipes, from first principles}\label{sec:losses}
+\subsection{What a training batch tells the model}
+For a batch of $n$ normalized embeddings, form the similarity matrix
+$S=ZZ^\top$, where row $i$ of $Z$ is $z_i^\top$. Let
+\[
+ y_{ij}=\ind[\text{action}_i=\text{action}_j].
+\]
+A \emph{positive pair} has the same action label; a \emph{negative pair} has
+different labels. These names describe supervision, not good or bad examples.
+The losses encourage a geometry consistent with those labels.
+
+Each physical batch has eight action classes and four examples per class:
+$P=8$, $K=4$, $n=PK=32$. Each anchor has three nonself positives and twenty-eight
+negatives. The full matrix contains 96 directed positive pairs and 896 directed
+negative pairs, excluding self-pairs. A directed pair counts $(i,j)$ separately
+from $(j,i)$; the declared reductions handle that consistently.
+
+Why not draw thirty-two arbitrary examples? An unbalanced random batch may have
+too few same-label examples to provide the required positive relations. The
+balanced sampler controls that issue and supplies the local population in which
+contextual neighborhoods are defined.
+
+\subsection{Standard contrastive: enforce similarity margins}
+We want positive similarities to be sufficiently high and negative similarities
+to be sufficiently low. Define a hinge $[a]_+=\max(a,0)$:
+\[
+ h^+_{ij}=[m_+-s_{ij}]_+,
+ \qquad h^-_{ij}=[s_{ij}-m_-]_+.
+\]
+For the standard recipe, $m_+=0.9$ and $m_-=0.6$. A positive pair with
+similarity $0.7$ receives a penalty $0.2$. A negative pair with similarity $0.7$
+receives a penalty $0.1$. Positive similarity above $0.9$ and negative similarity
+below $0.6$ produce no hinge penalty. The interval between the margins is an
+intentional gap, not a probability threshold for an action classifier.
+
+Define the strictly active sets
+\[
+ \mathcal A_+=\{(i,j):i\ne j,\ y_{ij}=1,\ h^+_{ij}>0\},\quad
+ \mathcal A_-=\{(i,j):y_{ij}=0,\ h^-_{ij}>0\}.
+\]
+Then
+\[
+ L_{\mathrm{contrast}}=
+ \frac{\sum_{(i,j)\in\mathcal A_+}h^+_{ij}}{|\mathcal A_+|}
+ +\frac{\sum_{(i,j)\in\mathcal A_-}h^-_{ij}}{|\mathcal A_-|},
+\]
+where an empty active set contributes zero.
+
+This detail is consequential: these are separate means over \emph{violations},
+not one mean over all pairs. An abundance of already-satisfied negatives does
+not dilute the remaining negative violations. The hinges are not squared.
+Away from boundaries and changes in the active set, each active positive gives
+derivative $-1/|\mathcal A_+|$ with respect to its similarity; each active
+negative gives $+1/|\mathcal A_-|$. Through the chain rule these gradients change
+$W,b$ so the relevant similarities move toward their margins.
+
+\subsection{Context: ask how examples relate to the rest of the batch}
+Direct similarity examines a pair. Contextual similarity also examines its
+relations to other examples. Two noisy instances can be more convincingly
+related if their neighborhoods agree. That is a motivation, not a guarantee:
+bad neighborhoods can also reinforce bad relationships.
+
+The current implementation has five steps: find nearby examples, measure shared
+neighbors and non-neighbors, keep that agreement local, expand using reciprocal
+neighbors, then make the score symmetric. The final score is trained to match
+the same-action indicator $y_{ij}$. It is not trained to imitate the current
+cosine matrix; doing that would change the target of the learning problem.
+
+The following equations specify the local implementation. Their source trail
+is the protocol and independently written local code; the contextual paper
+provides the method's intellectual origin.\cite{contextual}
+
+\subsubsection*{Step 1: define a neighborhood}
+Compute squared unit-vector distances and a binary membership matrix:
+\[
+ d_{ij}=\max(2-2s_{ij},0),\qquad
+ N_{ij}=\ind[d_{ij}\le d_{i,(k)}+\epsilon].
+\]
+$d_{i,(k)}$ is the $k$th smallest distance in row $i$. Here $k=4$ and
+$\epsilon=0.05$. \textbf{Self is included} in the ordering. The tolerance
+admits points just beyond the $k$th distance, so the neighborhood may contain
+more than four examples, especially with ties.
+
+The symbol $k$ is a neighbor rank used to set the distance cutoff; $K$ is
+examples per class. Both equal
+four in the fixed recipe, but their conceptual roles differ. Labels do not
+choose the neighbors. Current embedding distances do.
+
+\subsubsection*{Step 2: compare neighborhood membership}
+For row $i$, set
+\[
+ a_i=\max\left(\sum_\ell N_{i\ell},1\right),\qquad
+ b_i=\max\left(\sum_\ell(1-N_{i\ell}),1\right).
+\]
+The first-stage score is
+\[
+ A_{ij}=\frac12\left(
+  \frac{\sum_\ell N_{i\ell}N_{j\ell}}{a_i}
+ +\frac{\sum_\ell(1-N_{i\ell})(1-N_{j\ell})}{b_i}
+ \right)N_{ij}.
+\]
+The numerators count shared neighbors and shared non-neighbors. The row
+denominators turn them into fractions relative to $i$. Multiplication by
+$N_{ij}$ restricts the score to pairs already in $i$'s neighborhood. The clamp
+keeps an empty complement from creating division by zero; it is a declared
+local finite convention.
+
+\begin{concept}{Work one neighborhood calculation by hand}
+In an invented six-example batch, let $i=1$ have neighbors $\{1,2,3,4\}$ and
+$j=2$ have neighbors $\{1,2,3,5\}$. They share three of $i$'s four neighbors.
+Their non-neighbor sets are $\{5,6\}$ and $\{4,6\}$, sharing one of two.
+Because $N_{12}=1$,
+\[
+ A_{12}=\tfrac12(3/4+1/2)=0.625.
+\]
+This is only the first-stage score, not the final contextual similarity or
+the cosine similarity. With unequal row sizes, $A_{ij}$ need not equal $A_{ji}$.
+\end{concept}
+
+\subsubsection*{Step 3: reciprocal expansion and symmetry}
+Construct another neighborhood $N^{1/2}$ using the $k/2$ threshold and the
+same tolerance. A reciprocal relation requires both directions:
+\[
+ R_{i\ell}=N^{1/2}_{i\ell}N^{1/2}_{\ell i}.
+\]
+Use those reciprocal neighbors to average first-stage rows, then symmetrize:
+\[
+ B_{ij}=\frac{\sum_\ell R_{i\ell}A_{\ell j}}
+ {\max(\sum_\ell R_{i\ell},1)},\qquad
+ C_{ij}=\frac{B_{ij}+B_{ji}}2.
+\]
+This incorporates the local relationship profiles of mutually close examples.
+Symmetry gives a common score for the pair regardless of direction.
+
+\subsubsection*{Step 4: fit action-label agreement}
+The contextual penalty is
+\[
+ L_{\mathrm{context}}=\frac1{n^2}\sum_{i\ne j}(C_{ij}-y_{ij})^2.
+\]
+It asks contextual similarity to approach one for same-action pairs and zero
+for different-action pairs. Self terms are omitted, but the denominator remains
+$n^2$, not $n(n-1)$. Even a small reduction change can alter gradient scale and
+therefore the relative weight of the objectives.
+
+\subsection{How can a hard neighborhood comparison have a gradient?}
+An indicator is locally constant almost everywhere and discontinuous at its
+boundary. Its ordinary derivative cannot provide useful smooth updates for
+moving points between neighborhoods. The recipe deliberately uses a
+\textbf{straight-through estimator} (STE): perform the hard comparison in the
+forward pass, but prescribe a surrogate derivative in the backward pass.
+
+For the comparison $H(x,y)=\ind[x\ge y]$, the implemented rule assigns
+\[
+ \frac{\widetilde{\partial}H}{\partial x}=\alpha,\qquad
+ \frac{\widetilde{\partial}H}{\partial y}=-\alpha,\qquad \alpha=10.
+\]
+The tilde emphasizes that this is a chosen backward rule, not the ordinary
+derivative of the hard function. In the neighborhood expression, $x=-d_{ij}
++\epsilon$ and $y=-d_{i,(k)}$.
+
+The $k$th-distance thresholds and first-stage counts are \emph{detached}: they
+retain their forward values but are treated as constants during differentiation.
+The reciprocal denominator in $B$ is \emph{not} detached. It participates in the
+backward calculation. These choices are part of the fixed method, not details
+that an optimizer can infer from a prose description.
+
+\begin{caution}{What a derivative check can and cannot establish}
+For a smooth head calculation, finite differences can check an analytic
+gradient. For this hard comparison, a finite difference will usually see zero
+while the prescribed STE returns a nonzero value. That disagreement is expected.
+Verification must check the declared surrogate backward rule independently;
+it must not claim the rule is the true derivative of the hard forward function.
+\end{caution}
+
+\subsection{The full contextual recipe includes two more terms}
+The recipe also contains the margin contrastive loss and a mean-similarity
+regularizer:
+\[
+ L_{\mathrm{reg}}=
+ \left(\frac1{n^2}\sum_{i,j}s_{ij}-0.25\right)^2,
+ \qquad
+ L_{\mathrm{full}}=0.4L_{\mathrm{context}}
+                  +0.6L_{\mathrm{contrast}}+0.1L_{\mathrm{reg}}.
+\]
+The regularizer includes diagonal entries. Its target controls average batch
+similarity; it is not an action probability or a guarantee against collapse.
+The contrastive term here uses $m_+=0.75$ and $m_-=0.6$, whereas the standalone
+contrastive arm uses $m_+=0.9$.
+
+That means a contextual win could arise from the combined effects of neighborhood
+structure, a different margin, and regularization. Separating their contributions
+would require matched ablations, including the omitted control. This study
+instead compares the two complete declared recipes within its available scope.
+
+The fixed values transfer a published recipe into a pose study. They were not
+established as optimal pose hyperparameters. Do not substitute defaults from
+an older teaching class or historical protocol for the explicit v3 configuration.
+
+\subsection{SupCon: rank all positive examples against the batch}
+Let $P(i)=\{p\ne i:y_{ip}=1\}$. SupCon assigns a softmax distribution over
+every nonself example and penalizes the log probability of each positive:
+\[
+ L_{\mathrm{SupCon}}=-\frac1n\sum_i\frac1{|P(i)|}
+   \sum_{p\in P(i)}\log
+   \frac{\exp(s_{ip}/\tau)}{\sum_{a\ne i}\exp(s_{ia}/\tau)},
+ \qquad \tau=0.07.
+\]
+For one anchor, every positive should rank well relative to all alternatives.
+The denominator includes other positives as well as negatives; self is excluded.
+Using the log converts a product-like probability objective into a sum and
+strongly penalizes a positive assigned very small probability.
+
+Temperature $\tau$ sets sensitivity to score gaps. Two alternatives whose
+similarities differ by $0.14$ have softmax weight ratio
+$\exp(0.14/0.07)=\exp(2)\approx7.39$. A smaller temperature makes the same
+gap matter more. This does not make the value a calibrated probability that
+an arbitrary final query has a particular action.
+
+The study uses a single-view adaptation: no second augmented view and no extra
+temperature multiplier. SupCon is supervised because action labels define
+positives. It is not being used as a label-free pretraining method here.
+In the ideal limit of zero probability on negatives, equal allocation among
+three positives gives per-anchor loss $\log 3$ rather than zero. Raw loss values from different
+recipes are therefore not a common accuracy scale.\cite{supcon}
+
+\subsection{What fairness does and does not require}
+All recipes receive the same architecture, data, batch plans, initialization
+within a seed, training duration, and learning-rate grid. They are allowed to
+use different objective formulas because that is the treatment being compared.
+Equal tuning opportunities do not mean equal floating-point operation counts,
+nor that each method reaches its own global optimum.
+
+\begin{tabularx}{\linewidth}{@{}Y Y Y@{}}
+\toprule Recipe & Main training signal & Interpretation boundary\\\midrule
+Contrastive & Fix positive/negative margin violations & A specified baseline,
+not every possible contrastive method.\\
+Full contextual & Neighborhood agreement, contrastive margins, mean similarity
+& Effects belong to the full recipe.\\
+SupCon & Positive log probabilities against the batch & Descriptive reference;
+no additional superiority test.\\\bottomrule
+\end{tabularx}
+
+\studycheck{Why is gradient accumulation from four batches of eight examples
+not equivalent to one physical batch of thirty-two? Why would a contextual
+win not isolate the neighborhood term? Why should loss magnitudes not be ranked
+across recipes? Answers: Questions 5--7.}
+\source{\src{src/pose_embed/losses/pairwise.py}{Contrastive and SupCon formulas};
+\src{src/pose_embed/losses/contextual.py}{Local contextual implementation};
+\src{docs/protocol/contextual-v3-source-notes.md}{Equation and recipe decisions};
+\src{configs/protocol.v3.yaml}{Locked v3 settings}.}
