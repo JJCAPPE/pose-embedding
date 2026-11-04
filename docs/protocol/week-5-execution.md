@@ -11,7 +11,56 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
-## Current checkpoint: October 28, 2026
+## Current checkpoint: November 3, 2026
+
+**Storage now passes the unchanged reserve requirement. The researcher requested
+continuation, and the authorized ADR0009 CPU baseline/geometry job is queued.
+Week 5 remains open; no new runtime or scientific gate is accepted.**
+
+A fresh metadata-only check at **8:00 PM EST** (November 4, 01:00 UTC) found
+**3,821,470,000,000 bytes** of quota headroom and **4,210,645,008,384 bytes** free
+on the filesystem. Both exceed **467,248,364,800 bytes**, preserving the
+202 GB remaining forecast, 25% margin and 200 GiB reserve. All 19 forecast source
+bindings match the clean frozen release. No new operation/launch/intent metadata
+was found since the October 25 forecast; no outputs were deducted and no retained
+evidence was deleted. Reconciliation receipt:
+`study-v3/operations/week5-storage-forecast/20261104T010010Z/resume-preflight.json`,
+SHA-256 `10ff01e58f7aac9446bc094fbe55c24f370b304011bf1c5f784fc4bf7be64de1`.
+This passes the observed storage condition, not full measured capacity.
+
+The reviewed October 28 launcher was installed immutably with all eight package
+hashes verified. Its unchanged submission guards passed before job **8426211**
+was submitted at **8:03:19 PM EST**. Launch receipt:
+`study-v3/operations/week5-r2-launches/20261104T010311Z/launch.json`, SHA-256
+`36cac3a01ec66d3dbc8bacb1bf4e35ac6fce82d7ee9a52b1a5b1b6432424253f`.
+The initial **8:05:05 PM EST** observation found it queued (`qw`), requesting four
+OMP slots, 32 GiB total memory, two hours, Gold-6426Y/Sapphire Rapids and no GPU.
+No operation output or runtime result existed. Observation SHA-256:
+`49716cd0dcb4efc4d9ccd87667a0069b64cde5f0bb815df1822d544f7a54db5b`.
+An initial observer transport syntax error executed no scheduler query; the
+preserved corrected transport verified its source hash before the observation.
+Next scheduler check is **no earlier than 9:05:06 PM EST** (02:05:06 UTC).
+
+After completion, independently review accounting, exact source/runtime/input
+bindings, initialization repeats, fixed-panel arrays/damage replay, resources and
+seals before accepting the CPU prerequisite or rebinding the downstream runtime
+gate. All remaining ADR0009 regeneration and admission requirements still apply.
+Selection, final training and novel opening remain closed; the historical libm
+non-progress count remains two and stopped.
+
+The October 28–November 1 admission target was missed. The
+[remaining calendar](week-6-handoff.md#remaining-work-calendar--october-28)
+keeps selection blocked, November 29 locks, December 6 compute and protected
+December 7–18 delivery; feasibility remains unmeasured. The preparatory work
+merged in [PR35](https://github.com/JJCAPPE/pose-embedding/pull/35) after its checks
+passed. The tracker database still denies access, so its live status remains
+stale. Automatic production alias assignment remains disabled and the existing
+Journey deployment is preserved. The actual Week 5 automation configuration is
+paused, contrary to the old handoff; resumption awaits the researcher's answer.
+
+<a id="current-checkpoint-october-28-2026"></a>
+
+## Historical checkpoint: October 28, 2026
 
 **SCC jobs remain on hold at the researcher's direction while additional space
 is pending. Week 5 remains open; no new runtime or scientific gate is accepted.**

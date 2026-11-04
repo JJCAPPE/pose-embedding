@@ -1,12 +1,12 @@
 # Week 6 handoff: October 19 to 25, 2026
 
-Updated October 28, 2026 (America/New_York). **Week 5 remains open. Storage
-blocks the authorized ADR0009 regeneration, and the researcher has explicitly
-held SCC jobs while waiting for the increase. No new-profile evidence or
-scientific admission is accepted.** The October 25 retained observation fails
-both quota and filesystem capacity; neither a storage request nor a quota
-increase alone establishes sufficient space. This update makes no live resource
-or scheduler observation.
+Updated November 3, 2026 (America/New_York). **Week 5 remains open. Fresh quota
+and filesystem checks pass the unchanged storage requirement, and the researcher
+requested continuation. ADR0009 CPU baseline/geometry job 8426211 was observed
+queued at 8:05 PM EST. No new-profile evidence or scientific admission is
+accepted.** The [current checkpoint](week-5-execution.md#current-checkpoint-november-3-2026)
+records the exact storage and submission evidence. Full measured capacity remains
+unproven.
 Read the [Week 5 execution record](week-5-execution.md),
 [incoming handoff](week-5-handoff.md), [canonical plan](../../plan/research-plan.v3.md),
 [ADR0006](../decisions/0006-v3-execution-completion-amendment.md),
@@ -16,19 +16,25 @@ Read the [Week 5 execution record](week-5-execution.md),
 
 ## Remaining-work calendar — October 28
 
-While jobs are held, complete the local external-launcher review, this calendar's
-capacity inputs and result-independent report prose. Preserve frozen source
+**November 3 reconciliation:** the October 28–November 1 admission target was
+missed. The November 2–8 selection window remains blocked until Week 5 evidence,
+capacity and authorization pass. The later dates below remain conditional
+targets, not a compressed recovery schedule. New runtime measurements must show
+whether the remaining work fits; no Thanksgiving availability is added.
+
+The local external-launcher review and result-independent report prose are
+complete; measured capacity inputs remain pending. Preserve frozen source
 `f101f0e9d9bd64275d2088deab1b0bdcfcc53620`, r2 locks and historical artifacts.
 Follow [ADR0009's acceptance order](../decisions/0009-updated-kernel-baseline.md#prospective-profile-and-acceptance)
-when the hold is lifted and fresh preflights pass. The original October 18
+with fresh preflights before each allocation. The original October 18
 admission gate was missed; the following windows work backward from the
 November 22 review target. They are provisional planning targets, not measured durations,
 reservations or permission to skip prerequisites.
 
 | Provisional window | Work and required exit evidence |
 | --- | --- |
-| October 28–November 1 | After storage/hold resolution: accept the complete new runtime, initialization and fixed-panel geometry; then synthetic GPU verification, parity and five caches with exact repeats; then three paired pilots and independent replay; then nine development corruption paths, 27 projections/results, resident/whole-job timing, full admission and independent recertification. Finish with measured schema-2 capacity and immutable selection authorization. Until these pass, every later scientific row remains blocked. |
-| November 2–8 | Complete all 27 clean-development selection slots, account for every attempt, independently reproduce three-seed ranking and lock the three selected rates. Requires the preceding admission and current capacity. |
+| October 28–November 1 — missed | Accept the complete new runtime, initialization and fixed-panel geometry; then synthetic GPU verification, parity and five caches with exact repeats; then three paired pilots and independent replay; then nine development corruption paths, 27 projections/results, resident/whole-job timing, full admission and independent recertification. Finish with measured schema-2 capacity and immutable selection authorization. Until these pass, every later scientific row remains blocked. |
+| November 2–8 — blocked | Complete all 27 clean-development selection slots, account for every attempt, independently reproduce three-seed ranking and lock the three selected rates. Requires the preceding admission and current capacity. |
 | November 9–15 | Train and independently validate nine fresh 20-epoch final heads on all 95,001 auxiliary rows; bind paired initialization/batches, checkpoints and complete attempt records. Requires selected-rate locking. |
 | November 16–22 | Complete independent evaluator, report-template, seal and nine-head audits; assemble and review the full final lock and exact 180-cell matrix. November 22 is the target for completing researcher review before Thanksgiving. |
 | November 23–29 | Zero guaranteed researcher hours. This is not a staffed catch-up window. November 29 remains the hard deadline for complete final heads and locks; unresolved prerequisites require a recorded schedule decision before opening. |
