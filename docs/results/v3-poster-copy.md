@@ -76,8 +76,8 @@ isolate neighborhoods, and synthetic tensor stress cannot establish natural
 camera robustness. Positive, null and negative results are valid outcomes.
 This frozen study does not complete the historical 26-method fine-tuned v2 benchmark.
 
-Storage checks passed on November 3; the authorized CPU baseline/geometry job
-is queued. New-kernel validation,
+Storage checks passed on November 4; new-runtime baseline acceptance remains
+pending after a startup failure and reviewed operational correction. New-kernel validation,
 selection, final training and novel opening are incomplete; historical runtime
 evidence is not acceptance of the new profile. The
 [report draft](v3-report-draft.md) retains the methods, provenance and reporting

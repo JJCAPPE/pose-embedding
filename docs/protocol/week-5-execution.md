@@ -13,6 +13,62 @@ govern this work.
 
 ## Current checkpoint: November 4, 2026
 
+**SCC access is restored. Job 8426211 failed before scientific work; its failure
+record passed independent review. The reviewed observation-retention correction
+is installed, and successor job 8435003 was observed queued. Week 5 remains open;
+no new runtime or scientific prerequisite is accepted.**
+
+Accounting places 8426211 on `meanfield-pub@scc-kc4`, four OMP slots, November 3
+at 8:16:38–8:17:17 PM EST: 39 scheduler seconds, 5.957 CPU seconds, scheduler
+`failed=0` and application `exit_status=1`. Its strict startup comparator rejected
+the `runtime` group before storage-preflight output, initialization or geometry.
+The observed profile was only in memory, so the exact nested difference is unknown.
+Independent review verified 21 exported files, 754 metadata bindings, all 616
+frozen Git source files, launch/intent/input/tool bindings and submission seals.
+There are no allocated operation seals/resources or scientific output directories;
+the scientific operation never started. Failure receipt:
+`study-v3/operations/week5-status/20261104T200720Z/failure-verification.json`,
+SHA-256 `adf934852624191d76bc5d241f4e145178da544bc7840c01515fba7b50b4c353`.
+
+The external correction saves the exact captured observation immutably before
+the unchanged comparator. Nine pinned failure records admit only this known
+failed launch; unknown attempts and unexpected startup outputs still block.
+The helper, runtime capture, qsub wrapper and scientific source are unchanged.
+All 121 synthetic checks, a regression check, Ruff, shell syntax and independent
+review passed. Launcher SHA-256:
+`0debced9a8af24ebc4c1de6d39578329a3a5f942aeeb5ac2c0b86cbada554fd0`.
+This is an operational retention correction, not a runtime amendment.
+
+Fresh preflight found 3,820,630,000,000 quota bytes and 4,209,739,038,720 filesystem
+bytes, both above the unchanged 467,248,364,800-byte requirement. All 19 forecast
+source bindings matched. The failed attempt was reconciled without deducting
+completed outputs or deleting evidence. Receipt SHA-256:
+`3d2a5872282262b1b50d59a37810a05ec8cab97e315073790915037f73e555ca`.
+A metadata-only preflight first encountered the restored shell's older default
+Python before issuing any query; its preserved retry used the existing pinned
+environment. This was not an allocated diagnostic.
+
+Job **8435003** was submitted at **3:55:28 PM EST** with the unchanged four-slot,
+32 GiB, two-hour, no-GPU request. Launch SHA-256:
+`3fa182236972f1ac272f9b81d15ac75fb331e380b342cb8fcc290d62ba5e8c62`.
+The initial **3:56:27 PM EST** check found `qw` and no operation output;
+observation SHA-256 `7ed27e8d697df27e191dd77c0246c0f1d7ff88c21f3224e1bee364740bee802e`.
+Next scheduler check is no earlier than **4:56:28 PM EST** (21:56:28 UTC).
+The decisive comparison is the retained actual profile against ADR0009: a mismatch
+stops before initialization; a match permits only the existing authorized baseline
+sequence. Independent acceptance remains necessary before dependent work.
+
+The researcher confirmed that hourly automation continues until **all authorized
+Week 5 work** is complete, with earned website closure and required repository
+merges verified. The existing automation is ACTIVE and must pause itself with
+readback at completion, or when progress requires researcher action. The historical
+libm diagnostic count remains two and stopped. All remaining regeneration,
+admission/recertification and measured capacity requirements remain; selection
+runs, final training and novel opening stay closed. November 29 locks, December 6
+compute and December 7–18 delivery safeguards remain unchanged.
+
+### Earlier November 4 checkpoint: before SCC access restoration
+
 **The tracker connection is restored. SCC access is unavailable, so job 8426211's
 outcome remains unverified. Week 5 is open and no new scientific gate is accepted.**
 At 19:43 UTC, the local SCC session was absent. No scheduler query, new connection
