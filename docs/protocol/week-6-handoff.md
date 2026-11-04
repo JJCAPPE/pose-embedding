@@ -1,12 +1,13 @@
 # Week 6 handoff: October 19 to 25, 2026
 
-Updated November 4, 2026 (America/New_York). **Week 5 remains open. Job 8426211's
-startup failure is independently verified; no initialization or geometry ran.
-A reviewed external correction retains the observed profile before the unchanged
-comparison. Successor 8435003 was observed queued at 3:56 PM EST. Fresh storage
-checks pass, but no new-profile scientific prerequisite or campaign capacity is
-accepted.** The [current checkpoint](week-5-execution.md#current-checkpoint-november-4-2026)
-records the failure, correction, storage and submission evidence.
+Updated November 4, 2026 (America/New_York). **Week 5 remains open. Job 8435003
+failed before scientific work. Independent review found exactly one runtime
+profile difference: SCC kernel 553.182.1 instead of authorized 553.177.1.
+The retention correction worked; no new runtime or scientific prerequisite is
+accepted. Allocations are held and the existing automation is PAUSED pending a
+researcher decision on the proposed exact-profile amendment.** The
+[current checkpoint](week-5-execution.md#current-checkpoint-november-4-2026)
+records the verified failure and unchanged acceptance requirements.
 Read the [Week 5 execution record](week-5-execution.md),
 [incoming handoff](week-5-handoff.md), [canonical plan](../../plan/research-plan.v3.md),
 [ADR0006](../decisions/0006-v3-execution-completion-amendment.md),

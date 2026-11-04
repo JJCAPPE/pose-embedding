@@ -841,12 +841,12 @@
         "Current quota and remaining peak bytes must pass; dated capacity readings and prior GPU access are not reservations."
       ],
       "advisorPrompt": "Do all October 18 validity, seal, storage, runtime and researcher-availability criteria pass without changing the declared study?",
-      "reflection": "November 4: SCC access is restored. Independent review verified that job 8426211 failed its startup runtime-profile comparison on November 3 at 8:17:17 PM EST after 39 scheduler seconds, before initialization or geometry. The exact differing runtime field is unknown because the rejected observation was not retained. A reviewed external correction now saves it before the unchanged comparison. Successor job 8435003 was submitted and observed queued at 3:56 PM EST November 4; no new runtime or scientific result is accepted. Fresh storage checks pass, but full new-profile validation, regeneration, admission/recertification and measured schema-2 capacity remain required. Preserve f101f0e/r2, paired seeds and physical batches, fixed panel/fallback and all scientific settings. Historical libm diagnostics remain two and stopped. Week 5 stays open; selection runs, final training and novel opening remain closed. November 29 locks, December 6 compute and December 7-18 delivery remain fixed. Actual researcher time is unreported.",
+      "reflection": "November 4, 5:41 PM EST review: job 8435003 failed before scientific work after 41 scheduler seconds. The retained complete profile differs from the authorized profile only in runtime.platform: SCC supplied kernel 553.182.1 instead of ADR0009's 553.177.1. All other fields match exactly. Independent failure review verified 22 retained files, 763 metadata bindings and 616 frozen source files; no initialization, geometry or new runtime is accepted. The observation-retention correction worked. Further allocations require a researcher decision; the existing automation is PAUSED with saved-state verification. A narrow result-blind amendment for the exact observed profile is proposed, not adopted. All affected validation/regeneration, admission/recertification, measured schema-2 capacity and selection authorization remain required. Week 5 stays open; selection runs, final training and novel opening remain closed. November 29 locks, December 6 compute and December 7-18 delivery remain fixed. Actual researcher time is unreported.",
       "plannedMinutes": 300,
       "actualMinutes": 0,
       "state": "active",
       "closedAt": null,
-      "version": 43,
+      "version": 44,
       "tasks": [
         {
           "id": "w05-task-01",
@@ -873,10 +873,10 @@
           "required": true,
           "estimateMinutes": 90,
           "state": "in_progress",
-          "completionNote": "IN PROGRESS, November 4: job 8426211's pre-scientific startup failure is independently verified; no initialization, geometry or new runtime was accepted. SCC access is restored. The external observation-retention correction passed 121 synthetic tests and independent review without changing the strict profile comparison, scientific source or numerical requirements. Successor 8435003 was observed queued at 3:56 PM EST. Independently review its retained startup profile and all required accounting, source/input, resource, seal and numerical evidence before dependent work. Fresh synthetic GPU verification, parity/five caches, three paired pilots/replay and all nine corruption paths/projections/retrieval remain required. Preserve prior evidence, paired seeds/batches, fixed panel/fallback and every tolerance.",
+          "completionNote": "IN PROGRESS; allocations held, November 4: independent review verified job 8435003's pre-scientific startup failure. The retained profile has exactly one difference: kernel 553.182.1 instead of the authorized 553.177.1. All other complete profile fields match. The retention correction worked; no initialization, geometry or new runtime is accepted. A researcher decision is required before any retry; the existing automation is paused. The proposed exact-profile amendment is not authorized. Fresh CPU acceptance, synthetic GPU verification, parity/five caches, three paired pilots/replay and all development corruption/projection/retrieval evidence remain required. Preserve frozen source/r2 locks, seeds, physical batches, panel/fallback and every tolerance.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 40
+          "version": 41
         },
         {
           "id": "w05-task-03",
@@ -903,10 +903,10 @@
           "required": true,
           "estimateMinutes": 60,
           "state": "blocked",
-          "completionNote": "BLOCKED, November 4: fresh quota headroom of 3,820,630,000,000 bytes and filesystem free space of 4,209,739,038,720 bytes exceed the unchanged 467,248,364,800-byte storage requirement. The retained failed attempt was reconciled without deducting completed outputs or deleting evidence. This establishes observed storage headroom, not campaign capacity. Job 8426211 failed before scientific work; successor 8435003 acceptance and new-profile timing remain pending. Full admission/recertification and CPU/GPU/researcher capacity must include queue/setup and at least 25% slack. Preserve the 200 GiB reserve, November 29 locks, December 6 compute and December 7-18 delivery. The admission targets were missed; actual researcher time remains unreported.",
+          "completionNote": "BLOCKED, November 4: job 8435003's retained profile isolates a newer kernel (553.182.1 versus authorized 553.177.1); researcher authorization is required before affected validation can resume. The earlier 20:53 UTC storage observation passed the unchanged 467,248,364,800-byte requirement, but no new capacity observation or campaign feasibility is claimed. No scientific outputs were produced or deducted. Full admission/recertification and measured CPU/GPU/storage/researcher capacity remain pending, including queue/setup and at least 25% slack. Preserve the 200 GiB reserve, November 29 locks, December 6 compute and December 7-18 delivery. Admission targets were missed; actual researcher time is unreported.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 23
+          "version": 24
         }
       ],
       "gates": [
@@ -941,10 +941,10 @@
           "criterion": "The measured dependency/schedule/storage/availability ledger passes, including revalidation and all remaining work with slack, before immutable successor selection authorization; otherwise no sweep starts.",
           "required": true,
           "state": "pending",
-          "evidence": "UNRESOLVED, November 4: restored SCC access allowed independent acceptance of job 8426211's startup failure record only. No new-profile scientific prerequisite or measured capacity is accepted. The reviewed external correction retains rejected runtime observations while preserving every comparison and tolerance. Successor 8435003 was observed queued at 3:56 PM EST; submission is not acceptance. Fresh storage headroom passes; complete regeneration, full admission/recertification and schema-2 capacity remain required before selection authorization. Historical libm diagnostics remain two and stopped. Failure-verification SHA-256: adf934852624191d76bc5d241f4e145178da544bc7840c01515fba7b50b4c353. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-5-execution.md#current-checkpoint-november-4-2026",
+          "evidence": "UNRESOLVED, November 4: job 8435003's startup failure is independently verified. Only runtime.platform differs: observed kernel 553.182.1 versus ADR0009's 553.177.1; all other complete profile fields match. No new runtime or scientific prerequisite is accepted. A narrow result-blind amendment is proposed, not adopted; allocations are held and the existing automation is paused pending researcher direction. Complete affected regeneration, full admission/recertification and measured schema-2 capacity remain required before selection authorization. Historical libm diagnostics remain two and stopped; this retention attempt narrowed the current cause. Failure-verification SHA-256: f8d0bc151b4fb042b2f821ea7db0d0b79a268da0e1fcd4aaf35f46b936a17d7f. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-5-execution.md#current-checkpoint-november-4-2026",
           "waiverReason": "",
           "decidedAt": null,
-          "version": 24
+          "version": 25
         }
       ]
     },
