@@ -7,18 +7,19 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 4 operational status:** restored SCC access allowed independent review
-of job 8426211's pre-scientific startup failure. Its strict runtime comparison
-failed before initialization or geometry; the exact differing field is unknown
-because the observation was not saved before rejection. A reviewed external
-correction now retains the profile before the unchanged comparison. Successor
-8435003 was submitted and observed queued at 3:56 PM EST. No new runtime is accepted.
-Fresh quota headroom of 3,820,630,000,000 bytes and 4,209,739,038,720 filesystem bytes
-pass the unchanged 467,248,364,800-byte requirement; no outputs were deducted or
-evidence deleted. Full new-profile regeneration, admission/recertification,
-measured capacity and selection authorization remain required. Week 5 remains open;
-selection runs, final training and novel opening remain closed. November 29 locks,
-December 6 compute and December 7–18 delivery safeguards are unchanged. See the
+**November 4 operational status:** job 8435003 failed before scientific work
+at 3:58:36 PM EST after 41 scheduler seconds. Independent review verified its
+retained complete profile: only `runtime.platform` differs, with kernel
+`553.182.1` instead of ADR0009's authorized `553.177.1`. All other fields match.
+The observation-retention correction worked; no initialization, geometry or new
+runtime is accepted. A narrow result-blind amendment for the exact observed
+profile is proposed, not adopted. Allocations are held and the existing hourly
+automation is PAUSED with saved-state verification, pending researcher direction.
+The earlier storage observation passed; it is not a fresh capacity forecast.
+Full affected regeneration, admission/recertification, measured capacity and
+selection authorization remain required. Week 5 remains open; selection runs,
+final training and novel opening stay closed. November 29 locks, December 6
+compute and December 7–18 delivery safeguards remain unchanged. See the
 [current execution checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-november-4-2026).
 
 **October 25 authorized amendment:** [ADR0009](../docs/decisions/0009-updated-kernel-baseline.md)

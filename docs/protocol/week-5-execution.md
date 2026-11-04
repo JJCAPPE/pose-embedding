@@ -13,6 +13,62 @@ govern this work.
 
 ## Current checkpoint: November 4, 2026
 
+**Job 8435003 failed before scientific work because SCC supplied kernel
+553.182.1, while ADR0009 authorizes 553.177.1. Independent review isolated this
+single profile difference. Allocations are held; the existing automation is
+PAUSED, with saved state verified, pending a researcher decision. Week 5
+remains open.**
+
+The due observation at **22:40:48–22:40:59 UTC** found no active user jobs.
+Accounting records `apolkovnikov-pub@scc-h30`, four OMP slots, **3:57:55–3:58:36
+PM EST**, 41 scheduler seconds, 5.310 CPU seconds, `failed=0`, `exit_status=1`.
+The strict startup comparator rejected the profile before allocated storage
+preflight, initialization or geometry. No scientific operation, allocated
+operation seals/resources or scientific outputs were created. Submission seals
+remain retained and verified; their scope is not an allocated-operation seal.
+
+The retention intervention worked: `runtime-observation-8435003.json`, SHA-256
+`eee4d8b062603b4eb3fa4bd8634ef0ec86843e382d7f4b7764579bfbd2adb8b8`,
+was saved before rejection. Exact recursive comparison against the bound
+prospective profile found only `profile.runtime.platform`: expected
+`Linux-4.18.0-553.177.1.el8_10.x86_64-x86_64-with-glibc2.28`, observed
+`Linux-4.18.0-553.182.1.el8_10.x86_64-x86_64-with-glibc2.28`.
+Every other field, including actual CPU identity/flags, interpreter and loaded
+library hashes, package/build reports and thread settings, matches exactly.
+This establishes the cause of this startup rejection, not numerical equivalence
+or cluster-wide availability. It does not reconstruct job 8426211's missing profile.
+
+Independent review verified all **22 exported files**, exact launch/intent/input/
+tool/amendment bindings, accounting, submission seals and all **616 frozen Git
+source files**. The remote recheck passed **763 metadata and 616 source bindings**.
+Its first metadata reader stopped at the retained predecessor scheduler log's
+`.o8426211` suffix; an exact-path correction retained its pinned hash and passed.
+That bookkeeping correction was not an allocated diagnostic. Failure receipt:
+`study-v3/operations/week5-status/20261104T224048Z/failure-verification.json`,
+SHA-256 `f8d0bc151b4fb042b2f821ea7db0d0b79a268da0e1fcd4aaf35f46b936a17d7f`.
+Observation SHA-256:
+`48756668f564508bbdf446455b90c13347d79da7c118ee7b8f459a0c5b923cc5`.
+
+**Recommended researcher decision, not authorized:** prospectively freeze this
+exact observed 553.182.1 profile, keeping every other field and all ADR0009
+scientific/retention safeguards fixed, then regenerate and independently accept
+the complete affected prerequisite chain. Do not adopt a general kernel allowance,
+retry blindly, change frozen source/r2 locks or reuse old-profile scientific results.
+The retention attempt narrowed the cause; historical libm non-progress count
+remains **two and stopped**. No new allocation was submitted during this review.
+
+The automation `complete-pose-embed-week-5` was set to **PAUSED** and its saved
+state read back. Resume only after researcher direction resolves this prerequisite.
+No replacement monitor was created. The earlier 20:53 UTC storage reading remains
+a dated observation, not fresh capacity. No outputs were deducted or evidence
+deleted. Fresh CPU/GPU/cache, paired-pilot/replay, development, timing, full
+admission/recertification, measured schema-2 capacity and selection authorization
+remain required. Selection runs, final training and novel opening remain closed.
+November 29 locks, December 6 compute and December 7–18 delivery are unchanged;
+actual researcher hours are unreported.
+
+### Earlier November 4 checkpoint: retention correction and submission
+
 **SCC access is restored. Job 8426211 failed before scientific work; its failure
 record passed independent review. The reviewed observation-retention correction
 is installed, and successor job 8435003 was observed queued. Week 5 remains open;

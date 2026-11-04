@@ -1,0 +1,30 @@
+\section{Retained observation isolates a newer SCC kernel}
+\entry{4 November}{Independent failure review and an authorization hold}{No runtime or scientific result is accepted.}
+
+The due check found that job 8435003 had failed at 3:58:36 PM EST after
+41 scheduler seconds, before allocated storage preflight, initialization or
+geometry. The observation-retention correction worked. Independent exact
+comparison found one changed field: the allocated kernel was 553.182.1, while
+ADR0009 authorizes 553.177.1. Every other complete profile field matched,
+including hardware, interpreter and loaded-library hashes, package builds and
+thread settings. This identifies the startup rejection; it does not establish
+numerical equivalence or reconstruct the earlier job's missing profile.
+
+Independent review checked 22 exported files and all 616 frozen Git source
+files. The remote recheck verified 763 metadata and 616 source bindings and the
+retained submission seals. Its first reader stopped at a known predecessor
+scheduler-log suffix; the smallest correction permitted that exact text path
+while preserving its hash check. No allocated diagnostic or scientific check
+was changed. The scientific operation never started, so no operation resources,
+seals, initialization or geometry evidence exists for this attempt.
+
+The recommended next step is a narrow, result-blind amendment for this exact
+observed profile with every other field fixed and the full affected acceptance
+chain repeated. This is a proposal, not an adopted decision. The existing
+Week 5 automation was paused and its saved state verified; further allocations
+await researcher direction. No replacement monitor or retry was created.
+The retention attempt narrowed the cause. The two historical libm diagnostics
+remain stopped, and all scientific, capacity and closure requirements remain.
+November 29 locks, December 6 compute and December 7--18 delivery are unchanged;
+actual researcher time remains unreported. Evidence and receipt hashes are in
+\path{docs/protocol/week-5-execution.md}.
