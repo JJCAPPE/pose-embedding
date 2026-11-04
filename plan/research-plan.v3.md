@@ -7,6 +7,19 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
+**November 4 operational status:** the November 3 storage reconciliation passed
+the unchanged 467,248,364,800-byte requirement, with 3,821,470,000,000 bytes of
+quota headroom and 4,210,645,008,384 filesystem bytes available. The reviewed
+ADR0009 CPU baseline/geometry job 8426211 was last observed queued at 8:05 PM EST
+November 3. SCC access was unavailable at 19:43 UTC November 4, so completion and
+new-profile acceptance remain unverified. Restore access and review the existing
+job before dependent work; do not resubmit blindly. The tracker connection is
+restored. Full new-profile regeneration, admission/recertification, measured
+capacity and selection authorization remain required. Week 5 remains open;
+selection runs, final training and novel opening remain closed. November 29 locks,
+December 6 compute and December 7–18 delivery safeguards are unchanged. See the
+[current execution checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-november-4-2026).
+
 **October 25 authorized amendment:** [ADR0009](../docs/decisions/0009-updated-kernel-baseline.md)
 governs the next Week 5 work after the frozen kernel was unavailable in both
 observed pilot allocations. Freeze and verify a complete prospective profile
@@ -27,7 +40,7 @@ allocated baseline evidence and independent acceptance. Fresh October 25 quota
 is insufficient for the revised forecast; additional available quota is required
 before any allocation, without lowering the reserve or deleting evidence. No new baseline or
 capacity pass is claimed. Selection, final training, novel opening and Week 5
-closure remain closed. See the [current execution checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-october-25-2026).
+closure remain closed. See the [historical October 25 checkpoint](../docs/protocol/week-5-execution.md#historical-checkpoint-october-25-2026).
 
 The October 19 researcher-authorized [ADR0008](../docs/decisions/0008-runtime-baseline.md)
 established the prospective runtime policy retained by ADR0009. Freeze one prospective runtime baseline;
