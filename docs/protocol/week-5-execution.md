@@ -11,7 +11,31 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
-## Current checkpoint: November 3, 2026
+## Current checkpoint: November 4, 2026
+
+**The tracker connection is restored. SCC access is unavailable, so job 8426211's
+outcome remains unverified. Week 5 is open and no new scientific gate is accepted.**
+At 19:43 UTC, the local SCC session was absent. No scheduler query, new connection
+or submission was made. The latest actual job observation remains queued at
+8:05 PM EST November 3; the elapsed wall time does not establish completion.
+Next: restore the authenticated session, reconcile the current remote status
+and existing job, then independently review its accounting, runtime/source/input
+bindings, initialization/geometry, resources and seals before advancing.
+
+The November 3 storage reconciliation below passed the unchanged reserve and
+margin. It does not establish campaign capacity. Supabase read access now passes;
+the four public status texts are reconciled without advancing task/gate states.
+The researcher authorized resuming the existing hourly automation if needed,
+with an explicit completion stop. It remains paused while SCC access and the
+requested stop scope are unresolved. The saved prompt now requires an actual pause
+and readback at completion, and also pauses when researcher action blocks further
+work, preventing repeated blocked sessions. The existing Journey deployment is
+preserved; its bundled protocol text still awaits a separate publication update.
+The frozen protocol, remaining admission requirements and deadlines are unchanged.
+
+<a id="current-checkpoint-november-3-2026"></a>
+
+## Historical checkpoint: November 3, 2026
 
 **Storage now passes the unchanged reserve requirement. The researcher requested
 continuation, and the authorized ADR0009 CPU baseline/geometry job is queued.

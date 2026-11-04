@@ -13,7 +13,7 @@ native AVX512, four numerical threads and the existing L40S target; freeze and
 verify the complete runtime profile, not a kernel allowlist. Record the immutable
 amendment/runtime bindings, review any external correction and refresh the
 source-derived remaining-storage forecast and all required preflights first.
-The [current execution checkpoint](week-5-execution.md#current-checkpoint-november-3-2026)
+The [current execution checkpoint](week-5-execution.md#current-checkpoint-november-4-2026)
 supersedes historical hold/submission/observation instructions below. Preserve
 frozen f101f0e scientific source and existing r2 locks; bind the new amendment and
 runtime record through reviewed external operational inputs. The two historical
