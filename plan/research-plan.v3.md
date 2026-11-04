@@ -7,15 +7,16 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 4 operational status:** the November 3 storage reconciliation passed
-the unchanged 467,248,364,800-byte requirement, with 3,821,470,000,000 bytes of
-quota headroom and 4,210,645,008,384 filesystem bytes available. The reviewed
-ADR0009 CPU baseline/geometry job 8426211 was last observed queued at 8:05 PM EST
-November 3. SCC access was unavailable at 19:43 UTC November 4, so completion and
-new-profile acceptance remain unverified. Restore access and review the existing
-job before dependent work; do not resubmit blindly. The tracker connection is
-restored. Full new-profile regeneration, admission/recertification, measured
-capacity and selection authorization remain required. Week 5 remains open;
+**November 4 operational status:** restored SCC access allowed independent review
+of job 8426211's pre-scientific startup failure. Its strict runtime comparison
+failed before initialization or geometry; the exact differing field is unknown
+because the observation was not saved before rejection. A reviewed external
+correction now retains the profile before the unchanged comparison. Successor
+8435003 was submitted and observed queued at 3:56 PM EST. No new runtime is accepted.
+Fresh quota headroom of 3,820,630,000,000 bytes and 4,209,739,038,720 filesystem bytes
+pass the unchanged 467,248,364,800-byte requirement; no outputs were deducted or
+evidence deleted. Full new-profile regeneration, admission/recertification,
+measured capacity and selection authorization remain required. Week 5 remains open;
 selection runs, final training and novel opening remain closed. November 29 locks,
 December 6 compute and December 7–18 delivery safeguards are unchanged. See the
 [current execution checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-november-4-2026).
