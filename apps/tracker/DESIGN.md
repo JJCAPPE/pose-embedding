@@ -221,6 +221,18 @@ The desktop header is a slim translucent white bar with a subtle bottom rule. Na
 
 This signature composition places Next step and Decision needed side by side, then spans Deliverable below them in an inverted black band. The next action receives the only primary button; decision items are separated by fine rules and numbered circles. On small screens the cards stack without losing the action → decision → deliverable reading logic within the component.
 
+### Journey exhibition (`/journey` only)
+
+The research journey extends the monochrome identity into an explanatory exhibition. An inverted reading field supports original synthetic geometry; the closing answer section returns to a light field. It retains the system font stack and Ant Design controls. Its larger, tightly set headings establish chapter rhythm without introducing a new global type scale or palette.
+
+**The Reading Leads Rule.** Native page scrolling selects the illustration's chapter; the canvas never captures scrolling. Desktop pairs the reading column with a sticky right-hand stage in a 48% / 52% split. At 760px and below, the opening text precedes a compact sticky stage (220px), with controls disclosed in a bounded panel. The remaining chapters form a single reading column. Chapter and week links account for the sticky navigation and stage.
+
+Depth comes from neutral wireframes, joints, points, and spatial relationships inside the illustration. It does not add a shadow vocabulary to the surrounding interface. A restrained scene transition connects the pose, encoder, similarity space, query damage, final heads, and result structure. Manual controls provide recipe selection, corruption severity, frame scrubbing, pause, rotation, and a return to the chapter view.
+
+**The Explanation Survives Rule.** Text, week navigation, public progress, and gate disclosures remain independent of WebGL. A static SVG supports loading and unavailable graphics; reduced motion removes continuous playback and transitions. Every scene carries a plain-language caption and an explicit illustration qualification. Print hides the stage and navigation while retaining the reading sequence.
+
+These are route-specific composition rules, not a redesign of operational pages. See [the journey surface brief](.impeccable/surfaces/app-journey-page-tsx.md) for its content strategy and evidence boundaries. Compact metadata sizes and decorative micro-labels are not additions to the global typography system.
+
 ## Do's and Don'ts
 
 ### Do:

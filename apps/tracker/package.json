@@ -22,12 +22,14 @@
     "@supabase/ssr": "0.12.6",
     "@supabase/supabase-js": "2.115.0",
     "antd": "6.6.3",
+    "motion": "^13.4.6",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-markdown": "10.1.0",
-    "zod": "4.5.4",
-    "remark-gfm": "4.0.1"
+    "remark-gfm": "4.0.1",
+    "three": "^0.186.1",
+    "zod": "4.5.4"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
@@ -35,6 +37,7 @@
     "@types/node": "24.10.12",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "@types/three": "^0.186.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.4",
     "typescript": "6.0.3",

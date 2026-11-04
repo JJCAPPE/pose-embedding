@@ -9,12 +9,14 @@ import type { ReactNode } from "react";
 
 const navigation = [
   { key: "overview", href: "/", label: "Overview" },
+  { key: "journey", href: "/journey", label: "Journey" },
   { key: "protocol", href: "/protocol", label: "Protocol" },
   { key: "sources", href: "/literature", label: "Sources" },
   { key: "manage", href: "/edit", label: "Manage" },
 ];
 
 function selectedKey(pathname: string) {
+  if (pathname.startsWith("/journey")) return "journey";
   if (pathname.startsWith("/protocol")) return "protocol";
   if (pathname.startsWith("/literature")) return "sources";
   if (pathname.startsWith("/edit") || pathname.startsWith("/login")) return "manage";
