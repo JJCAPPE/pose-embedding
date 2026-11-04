@@ -15,7 +15,7 @@ with the old kernel. Fresh affected baseline, GPU/cache, paired-pilot/replay,
 corruption, timing/admission/recertification and capacity evidence is required.
 Bind the new immutable amendment/runtime records through the existing external
 correction path; retain all old evidence and accept unchanged-input setup only.
-The [current execution checkpoint](week-5-execution.md#current-checkpoint-october-25-2026)
+The [current execution checkpoint](week-5-execution.md#current-checkpoint-november-3-2026)
 governs the next prerequisite. No selection, final training, novel opening or
 closure is granted.
 
