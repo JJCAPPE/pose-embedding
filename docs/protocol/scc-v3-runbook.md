@@ -20,6 +20,44 @@ runtime record through reviewed external operational inputs. The two historical
 non-progress diagnostics remain recorded; do not resume the libm investigation.
 Use one controller and the current private handoff, never an old executed launcher.
 
+## Local SSH password handoff
+
+On the local Mac, run this in your own Terminal and enter the password at the
+hidden prompt (never send it in chat):
+
+```bash
+python3 /Users/giacomo/dev/pose-embed/scripts/scc_password.py --store
+```
+
+The helper stores the raw password at `~/.config/pose-embed/scc-password`,
+outside the repository, with directory mode `700` and file mode `600`.
+It is plaintext readable by your local account; it is not encrypted storage.
+Use `--store` again to replace it, or remove that file to revoke local access.
+Do not source, print, export, upload or copy the file into the repository or SCC.
+
+For an authorized connection, start SSH from the local `remote` tmux session,
+reusing the verified SCC username and host. For example, replace
+`YOUR_SCC_USERNAME` before running:
+
+```bash
+SSH_ASKPASS="$PWD/scripts/scc_password.py" SSH_ASKPASS_REQUIRE=force \
+  ssh -o StrictHostKeyChecking=yes -o NumberOfPasswordPrompts=1 \
+  -o PreferredAuthentications=keyboard-interactive \
+  YOUR_SCC_USERNAME@scc1.bu.edu
+```
+
+Run this from the local repository root. OpenSSH consumes the helper's output
+through a private pipe; do not invoke its askpass mode directly or capture/log
+its output. The password does not enter command arguments or tmux paste buffers.
+The helper validates file ownership/permissions and rejects links. Unrecognized
+prompts, including Duo choices, require a separate hidden response in the
+terminal; the saved password is never used for them. The user still completes
+[BU's Duo authentication](https://www.bu.edu/tech/support/research/system-usage/connect-scc/access-and-security/two-factor/).
+Unknown host keys must be independently verified first; do not disable host
+checking. An already-running SSH process cannot adopt these environment
+variables: restart only a confirmed failed or pending login, never a working
+session or active job. Inspect actual session state before acting.
+
 ## Active SCC installation
 
 The September 29 installation uses the verified release and rebound manifest
