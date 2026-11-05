@@ -53,7 +53,7 @@
       },
       {
         "label": "Current planning status",
-        "value": "November 5: ADR0010 authorizes the exact 553.182.1 kernel for Week 5. The existing hourly automation resumed after SCC access was restored. Fresh preflight passed, and CPU job 8454319 was observed queued at 1:11:29 PM EST. Independently accept the new initialization and geometry evidence before GPU work. Complete affected regeneration and measured capacity remain required before selection authorization."
+        "value": "ADR0010 authorizes the exact 553.182.1 kernel. CPU job 8454319 failed the hardware identity check before initialization. The targeted retry must independently pass the full baseline before GPU work. Admission and measured capacity remain required before selection authorization."
       },
       {
         "label": "Measured capacity prerequisite",
@@ -841,12 +841,12 @@
         "Current quota and remaining peak bytes must pass; dated capacity readings and prior GPU access are not reservations."
       ],
       "advisorPrompt": "Do all October 18 validity, seal, storage, runtime and researcher-availability criteria pass without changing the declared study?",
-      "reflection": "November 5: ADR0010 authorizes the exact 553.182.1 SCC kernel for Week 5. Independent review verified the complete prospective profile and both failed startup records. SCC access was restored and the existing hourly automation resumed. CPU baseline job 8454319 was submitted at 1:10:47 PM EST and observed queued at 1:11:29 PM. Initialization and geometry acceptance are pending. Week 5 remains open.",
+      "reflection": "November 5: CPU job 8454319 stopped before initialization because its host failed the CPU identity check. No scientific outputs were produced. Retry 8457156 was queued at 4:07 PM EST for a host that previously matched the exact ADR0010 profile. Week 5 remains open pending independent CPU acceptance.",
       "plannedMinutes": 300,
       "actualMinutes": 0,
       "state": "active",
       "closedAt": null,
-      "version": 45,
+      "version": 46,
       "tasks": [
         {
           "id": "w05-task-01",
@@ -873,10 +873,10 @@
           "required": true,
           "estimateMinutes": 90,
           "state": "in_progress",
-          "completionNote": "IN PROGRESS, November 5: the exact 553.182.1 profile is authorized under ADR0010. The reviewed external launcher passed 143 local fixture checks. Fresh preflight passed, and CPU job 8454319 was observed queued with four slots at 1:11:29 PM EST. Independently verify its runtime, nine initializations, both complete geometry repeats, resource records and seals before starting the synthetic GPU check, parity/five caches, paired pilots/replay and development corruption, projection and retrieval checks.",
+          "completionNote": "IN PROGRESS, November 5: The allocated host for 8454319 failed the CPU check before initialization. Job 8457156 requests the previously verified host with the same settings. Accept its actual profile, three initializations per seed, both full geometry repeats, resources and seals before starting GPU work.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 42
+          "version": 43
         },
         {
           "id": "w05-task-03",
@@ -903,10 +903,10 @@
           "required": true,
           "estimateMinutes": 60,
           "state": "blocked",
-          "completionNote": "BLOCKED, November 5: fresh preflight at 1:09 PM EST found 3,759,490,000,000 quota bytes and 4,144,098,181,120 filesystem bytes available. Both exceed the 467,248,364,800-byte requirement for the source-bound 202 GB forecast plus 25% margin and 200 GiB reserve. Both earlier startup failures were reconciled with zero completed outputs. Measured CPU/GPU/researcher capacity, resident timing, full admission and independent recertification remain pending. The November 29 locks and December 6 compute cutoff still apply.",
+          "completionNote": "BLOCKED, November 5: Three startup failures produced no scientific outputs. The 202 GB remaining forecast still requires 467,248,364,800 bytes including margin and reserve. Fresh quota and filesystem readings at 4:02 PM EST passed. Resident timing, independent admission and measured CPU, GPU, storage and researcher capacity remain pending. November 29 final locks and the December 6 compute cutoff still apply.",
           "evidenceUrl": "https://github.com/JJCAPPE/pose-embedding/blob/codex/pose-week5-execution/docs/protocol/week-5-execution.md",
           "completedAt": null,
-          "version": 25
+          "version": 26
         }
       ],
       "gates": [
@@ -941,10 +941,10 @@
           "criterion": "The measured dependency/schedule/storage/availability ledger passes, including revalidation and all remaining work with slack, before immutable successor selection authorization; otherwise no sweep starts.",
           "required": true,
           "state": "pending",
-          "evidence": "PENDING, November 5: the researcher approved the exact 553.182.1 profile and resumption of Week 5. CPU baseline job 8454319 was observed queued. Full affected regeneration, independent recertification and measured capacity are required before selection authorization. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-5-execution.md#current-checkpoint-november-5-2026",
+          "evidence": "PENDING, November 5: CPU job 8454319 stopped before initialization. A host-targeted retry is queued; CPU acceptance, full affected regeneration, independent recertification and measured capacity are required before selection authorization. Evidence: https://github.com/JJCAPPE/pose-embedding/blob/main/docs/protocol/week-5-execution.md#current-checkpoint-november-5-2026",
           "waiverReason": "",
           "decidedAt": null,
-          "version": 26
+          "version": 27
         }
       ]
     },

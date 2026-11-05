@@ -21,3 +21,11 @@ filesystem readings passed the storage guard. CPU job 8454319 was submitted at
 is the next prerequisite for GPU work. The decision, observation and receipt
 hashes are in \path{docs/decisions/0010-kernel-182-baseline.md} and
 \path{docs/protocol/week-5-execution.md}.
+
+The scheduled review found that job 8454319 stopped after 45 seconds: the host
+failed the CPU identity check before initialization. The log does not identify
+the exact CPU field. No geometry ran. A previous allocation had recorded the
+complete approved profile on another host, so retry 8457156 requested that host
+with unchanged settings. It was observed queued at 4:07 PM EST. The storage
+forecast still includes every scientific output. The execution record links
+the failure and retry receipts; neither establishes CPU acceptance.

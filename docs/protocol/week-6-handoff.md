@@ -2,9 +2,9 @@
 
 Updated November 5, 2026. **Week 5 remains open.** The researcher approved
 [the exact 553.182.1 baseline](../decisions/0010-kernel-182-baseline.md) and
-resumption of the existing automation. SCC access was restored and preflight passed. CPU job 8454319 was
-observed queued at 1:11:29 PM EST. Its runtime and numerical evidence require
-independent acceptance. See the
+resumption of the existing automation. Job 8454319 failed the CPU identity check before initialization.
+Retry 8457156 was queued for the previously verified host. Its actual runtime and
+numerical evidence still require independent acceptance. See the
 [current checkpoint](week-5-execution.md#current-checkpoint-november-5-2026).
 Read the [Week 5 execution record](week-5-execution.md),
 [incoming handoff](week-5-handoff.md), [canonical plan](../../plan/research-plan.v3.md),
