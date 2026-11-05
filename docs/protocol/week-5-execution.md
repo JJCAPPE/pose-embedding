@@ -11,7 +11,48 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
-## Current checkpoint: November 4, 2026
+## Current checkpoint: November 5, 2026
+
+The researcher approved the exact `553.182.1` kernel and instructed the existing
+hourly automation to resume. [ADR0010](../decisions/0010-kernel-182-baseline.md)
+binds that decision to the retained profile from job 8435003. The original fixed
+panel and fallback, physical batches, seeds, tolerances and frozen r2 release
+continue to govern acceptance.
+
+Local preparation reconciled the two failed launches against the source-derived
+storage forecast. Both stopped before scientific work. The forecast covers every
+remaining output, retaining 202,000,000,000 bytes plus the 25% margin and 200 GiB
+reserve. This yields a required 467,248,364,800 bytes. Fresh preflight recorded 3,759,490,000,000 quota bytes and
+4,144,098,181,120 filesystem bytes available. Both passed this threshold. All 143 local fixture checks
+passed. They exercise the exact kernel comparison, retained failure evidence and
+duplicate-attempt guards. Independent review verified the ten added failure-record
+hashes and all 19 frozen forecast source bindings. Reviewed launcher SHA-256:
+`4cf5bbbbba93c065ec019b2b6337373a7d4326809be8fc5667ecd3498566b7ef`. These checks validate
+local preparation. Fresh allocated evidence is required for CPU acceptance.
+
+At 12:32 PM EST the existing SCC session was disconnected. After access was
+restored, the live checkpoint and manifest matched the saved handoff. The existing
+hourly automation resumed and its saved ACTIVE state was verified. All eight
+staged package files and both forecast/amendment files matched their local hashes.
+Preflight rechecked the 19 frozen source bindings, both known failed launches,
+scheduler inventory and resource availability before submission. Its receipt has
+SHA-256 `cf8ee900e5f6dd6b3ff8fe8b1a535efe0b3c0cfc0d90721c16d872b6af3bea3c`.
+
+CPU baseline job **8454319** was submitted at **1:10:47 PM EST**. Its initial
+**1:11:29 PM EST** observation found it queued (`qw`), with four slots requested
+and no operation outputs. Launch SHA-256:
+`9ca98c26dabe186cfeddde532f9f20d2e428eecf45ad4ad90d2b354e4b65f032`.
+Observation SHA-256:
+`72d728ff21c69b5925c29ed28246fc4469e292c2b49dc9fbc6a5abb0efe4bb1f`.
+The earliest next scheduler check is **2:11:30 PM EST**. The existing hourly
+schedule's next eligible check is **2:35 PM EST**. Independent acceptance of
+three initializations per seed and both complete geometry processes precedes GPU
+work. Week 5 remains open. The November 29 locks, December 6 compute cutoff and
+December 7–18 delivery window still govern admission.
+
+<a id="current-checkpoint-november-4-2026"></a>
+
+## Historical checkpoint: November 4, 2026
 
 **Job 8435003 failed before scientific work because SCC supplied kernel
 553.182.1, while ADR0009 authorizes 553.177.1. Independent review isolated this

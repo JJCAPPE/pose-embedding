@@ -5,6 +5,12 @@ govern these commands. Use a clean committed release, Python 3.11 and the locked
 environment. Perform tensor processing only inside Grid Engine allocations.
 Historical releases, artifacts and run manifests remain immutable.
 
+On November 5 the researcher adopted [ADR0010](../decisions/0010-kernel-182-baseline.md).
+Use the complete prospective profile with kernel `4.18.0-553.182.1.el8_10.x86_64`
+and apply the full ADR0009 acceptance sequence. Reconcile the latest handoff and
+remote pointer before acting. The [November 5 checkpoint](week-5-execution.md#current-checkpoint-november-5-2026)
+records the current prerequisite. Earlier kernel and launcher records below are historical.
+
 **October 25 control checkpoint:** the researcher adopted
 [ADR0009](../decisions/0009-updated-kernel-baseline.md), following ADR0008, and
 authorized new-profile baseline verification and complete affected regeneration
@@ -13,7 +19,7 @@ native AVX512, four numerical threads and the existing L40S target; freeze and
 verify the complete runtime profile, not a kernel allowlist. Record the immutable
 amendment/runtime bindings, review any external correction and refresh the
 source-derived remaining-storage forecast and all required preflights first.
-The [current execution checkpoint](week-5-execution.md#current-checkpoint-november-4-2026)
+The [November 4 execution checkpoint](week-5-execution.md#current-checkpoint-november-4-2026)
 supersedes historical hold/submission/observation instructions below. Preserve
 frozen f101f0e scientific source and existing r2 locks; bind the new amendment and
 runtime record through reviewed external operational inputs. The two historical

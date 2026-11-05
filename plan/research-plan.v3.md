@@ -1,29 +1,22 @@
 # Final v3 plan: frozen one-shot pose robustness
 
 Original decision: **2026-09-29**. Execution amendments: **2026-10-09**,
-**2026-10-12**, **2026-10-19** and **2026-10-25**. Delivery: **2026-12-18**. Status: **final planning
+**2026-10-12**, **2026-10-19**, **2026-10-25** and **2026-11-05**. Delivery: **2026-12-18**. Status: **final planning
 decision; implementation and measured campaign gates remain to be completed**.
 This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-frozen-one-shot-v3.md)
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 4 operational status:** job 8435003 failed before scientific work
-at 3:58:36 PM EST after 41 scheduler seconds. Independent review verified its
-retained complete profile: only `runtime.platform` differs, with kernel
-`553.182.1` instead of ADR0009's authorized `553.177.1`. All other fields match.
-The observation-retention correction worked; no initialization, geometry or new
-runtime is accepted. A narrow result-blind amendment for the exact observed
-profile is proposed, not adopted. Allocations are held and the existing hourly
-automation is PAUSED with saved-state verification, pending researcher direction.
-The earlier storage observation passed; it is not a fresh capacity forecast.
-Full affected regeneration, admission/recertification, measured capacity and
-selection authorization remain required. Week 5 remains open; selection runs,
-final training and novel opening stay closed. November 29 locks, December 6
-compute and December 7–18 delivery safeguards remain unchanged. See the
-[current execution checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-november-4-2026).
+**November 5 operational status:** the researcher authorized the exact SCC kernel
+`4.18.0-553.182.1.el8_10.x86_64` for Week 5. Job 8435003's retained profile matched
+the previous prospective profile in every other field. [ADR0010](../docs/decisions/0010-kernel-182-baseline.md)
+requires fresh initialization and geometry acceptance on this profile, followed by
+the full affected GPU, replay, timing, admission and capacity checks. The existing hourly
+automation resumed. CPU job 8454319 was observed queued at 1:11:29 PM EST.
+The receipt and remaining requirements are in the [Week 5 checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-november-5-2026).
 
 **October 25 authorized amendment:** [ADR0009](../docs/decisions/0009-updated-kernel-baseline.md)
-governs the next Week 5 work after the frozen kernel was unavailable in both
+governed the Week 5 work after the frozen kernel was unavailable in both
 observed pilot allocations. Freeze and verify a complete prospective profile
 with kernel `4.18.0-553.177.1.el8_10.x86_64`, actual Sapphire Rapids Gold-6426Y,
 native AVX512, four numerical threads and the existing L40S target. This is not
