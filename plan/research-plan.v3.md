@@ -12,7 +12,8 @@ lock, a completed experiment, or a change to the deployed tracker.
 the previous prospective profile in every other field. [ADR0010](../docs/decisions/0010-kernel-182-baseline.md)
 requires fresh initialization and geometry acceptance on this profile, followed by
 the full affected GPU, replay, timing, admission and capacity checks. The existing hourly
-automation resumed. CPU job 8454319 was observed queued at 1:11:29 PM EST.
+automation resumed. CPU job 8454319 failed the hardware identity check before initialization.
+Retry 8457156 was queued at 4:07 PM EST for the host that previously matched ADR0010.
 The receipt and remaining requirements are in the [Week 5 checkpoint](../docs/protocol/week-5-execution.md#current-checkpoint-november-5-2026).
 
 **October 25 authorized amendment:** [ADR0009](../docs/decisions/0009-updated-kernel-baseline.md)

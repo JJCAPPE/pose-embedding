@@ -13,6 +13,30 @@ govern this work.
 
 ## Current checkpoint: November 5, 2026
 
+CPU job **8454319** ran on scc-h32 for 45 seconds (four OMP slots, exit 1).
+The actual CPU identity check failed before the launcher could record a complete
+profile or start initialization. The log does not identify which CPU field failed.
+Independent review verified accounting, launch and input bindings, frozen source,
+submission seals, and the absence of geometry outputs. Failure receipt:
+`week5-status/20261105T195047Z/failure-verification.json`, SHA-256
+`982fe8cd162f22398f16b79dbff04a8736f99749bd5821dd91bdb4ebeaebea82`.
+
+The prior allocation on scc-h30 had recorded the exact ADR0010 profile. A reviewed
+external launcher restricts placement to that host; all scientific and runtime
+checks are unchanged. The three startup failures produced no scientific outputs.
+At 4:02 PM EST quota and filesystem free space exceeded the unchanged
+467,248,364,800-byte requirement. Preflight SHA-256:
+`6f68a17af42bbafd5d55f2bf3b196ccb76cddacb5d5f9f71c5760fa9f4af504c`.
+
+Retry **8457156** was submitted at **4:03:42 PM EST**. At **4:07:46 PM EST** the
+scheduler showed it queued, four slots, with a hard request for scc-h30. Launch
+SHA-256 `7801d0996c3caf0be9713a3e333a5296c9e848e9353999cec7dbb5ec5b00916a`;
+initial observation SHA-256 `79b820755c5e04e3795db70328991d2fb3b277549f67ff4b1a160b941c97d362`.
+Actual placement, initialization and geometry remain unverified. No GPU work
+or selection is authorized by submission.
+
+### Earlier November 5 checkpoint: kernel authorization and initial submission
+
 The researcher approved the exact `553.182.1` kernel and instructed the existing
 hourly automation to resume. [ADR0010](../decisions/0010-kernel-182-baseline.md)
 binds that decision to the retained profile from job 8435003. The original fixed
