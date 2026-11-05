@@ -6,6 +6,12 @@ study. The original prospectus and v1/v2 protocols, code and evidence remain
 historical records. They are not permission to execute the new study. Independent
 research governance applies; no advisor sign-off is required.
 
+On November 5 the researcher adopted [ADR0010](../decisions/0010-kernel-182-baseline.md).
+Use the complete prospective profile with kernel `4.18.0-553.182.1.el8_10.x86_64`
+and apply the full ADR0009 acceptance sequence. Reconcile the latest handoff and
+remote pointer before acting. The [November 5 checkpoint](week-5-execution.md#current-checkpoint-november-5-2026)
+records the current prerequisite. Earlier kernel and launcher records below are historical.
+
 The October 25 researcher-authorized [ADR0009](../decisions/0009-updated-kernel-baseline.md)
 authorizes a new complete prospective profile for kernel
 `4.18.0-553.177.1.el8_10.x86_64` on actual Gold-6426Y/Sapphire Rapids, native
@@ -15,8 +21,8 @@ with the old kernel. Fresh affected baseline, GPU/cache, paired-pilot/replay,
 corruption, timing/admission/recertification and capacity evidence is required.
 Bind the new immutable amendment/runtime records through the existing external
 correction path; retain all old evidence and accept unchanged-input setup only.
-The [current execution checkpoint](week-5-execution.md#current-checkpoint-november-4-2026)
-governs the next prerequisite. No selection, final training, novel opening or
+The [November 4 execution checkpoint](week-5-execution.md#current-checkpoint-november-4-2026)
+governed the next prerequisite at that checkpoint. No selection, final training, novel opening or
 closure is granted.
 
 The October 19 researcher-authorized [ADR0008](../decisions/0008-runtime-baseline.md)
