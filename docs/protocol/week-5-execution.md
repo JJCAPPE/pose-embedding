@@ -13,6 +13,55 @@ govern this work.
 
 ## Current checkpoint: November 6, 2026
 
+Cache validator **8478212** is independently accepted under ADR0010. It ran on
+scc-h30 from **12:27:53 to 12:32:50 PM EST**, with four OMP slots, failed=0 and
+exit=0 after **297 scheduler seconds**. The allocated frozen validator verified
+all five archives, manifest identities and exact full-array repeatability of both
+95,001-row extractions. Independent review rehashed 65 retained metadata files,
+matched the complete before/after CPU profiles to baseline 8457156, checked eight
+relevant frozen source files, and verified three commands and four seal records.
+The terminal controller recheck passed 1,099 metadata and 616 source bindings.
+
+All eleven operation resource records and the runtime preflight passed the
+467,248,364,800-byte storage guard and 32 GiB RAM limit. Minimum recorded effective
+free space was 3,743,740,000,000 bytes. The validator recorded 267.251448 seconds
+and peak process RSS of 8,684,023,808 bytes. Its zero reusable-proof counters are
+expected for these unprojected base caches: the frozen validator directly loads
+all five archives and performs exact full-array repeatability checks. No numerical
+check or tolerance was waived; scientific arrays were accessed only in allocation.
+
+Acceptance: `week5-cache-acceptance/20261106T194737Z/verification.json`, SHA-256
+`1c753bdaac1a0f366eb2e2560e27f64672e8134e8904664ed62a354b39980a06`.
+Terminal observation: `week5-status/20261106T193624Z/observation.json`, SHA-256
+`5324ec425bee1e24b9f957e186b124c0ac9bb927c77c1bf1b4cbde1c5eef6dae`.
+The source-bound forecast retains all 202 GB with zero completed-output deduction,
+the 200 GiB reserve and 25% margin. Refreshed forecast SHA-256:
+`27f683f3338447972f61beb6041535874866949a6d363a607185b39c0b686cbf`.
+
+The next prerequisite is the contrastive engineering pilot, followed by contextual
+and SupCon pilots with the same initialization, physical P=8/K=4 batches and seed 7,
+then independent numerical replay. Development corruption/projection/retrieval,
+resident timing, full admission and recertification, measured schema-2 capacity and
+selection authorization remain required. Selection runs, final training and novel
+opening stay closed. Week 5 remains open; researcher hours remain unreported.
+
+Fresh authorization, identity, source, data-seal, duplicate-job, storage, RAM,
+GPU and calendar checks passed, including exact reconciliation of 17 retained
+attempt paths. Contrastive pilot **8480921** was submitted once at **19:51:03 UTC**.
+The first observation at **20:52:36 UTC** found it already terminal: scc-j01,
+four OMP slots, failed=0/exit=0, **520 scheduler seconds**, ending **20:28:00 UTC**.
+This is terminal accounting, not pilot acceptance. Its complete execution metadata
+must be reviewed before contextual training, and independent allocated three-pilot
+numerical replay remains mandatory after all arms finish.
+
+Launch: `week5-runtime-baseline-pilot-contrastive/20261106T195057Z/launch.json`, SHA-256
+`99bdf48a3ac1961485ea0cd8f9dee70de2a563fd27643fab40ed986d957c886f`.
+Observation: `week5-status/20261106T205236Z/observation.json`, SHA-256
+`e7c0fc82246e836de7a3fd380476822e88e8471e7d67a8a876290c97169d047b`.
+No resubmission or additional scheduler observation is needed for terminal review.
+
+### Earlier November 6 generation review and validator submission
+
 The researcher restored SCC access and reaffirmed the existing saved-password
 callback procedure. That procedure successfully restored a subsequent disconnected
 session without exposing credentials. The same automation is **ACTIVE**, with
