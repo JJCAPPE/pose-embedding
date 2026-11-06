@@ -13,6 +13,49 @@ govern this work.
 
 ## Current checkpoint: November 6, 2026
 
+The researcher restored SCC access and reaffirmed the existing saved-password
+callback procedure. That procedure successfully restored a subsequent disconnected
+session without exposing credentials. The same automation is **ACTIVE**, with
+its hourly schedule and saved state verified. Its login instructions now match
+the authorized procedure; Duo still requires researcher approval.
+
+Cache job **8469351** finished on scc-j04 at **02:26:57 AM EST**, with four OMP
+slots, one L40S, failed=0 and exit=0 after **5,665 scheduler seconds**.
+Generation metadata review verified 165 retained files, the exact ADR0010 runtime
+before and after execution, five successful commands and four seal records.
+All 103 resource samples passed the current 467,248,364,800-byte storage guard
+and 32 GiB RAM limit. Maximum sampled process-group RSS was 5,987,291,136 bytes.
+The terminal recheck verified 933 launch bindings and 616 frozen source files.
+
+All five sidecar schemas and ordered identities passed: two 95,001-row extractions,
+76,013 development-training rows, 20 gallery rows and 18,929 query rows, each with
+8,704 features. The parity report contains 48 samples and 12 layers reporting
+zero error. These are generation and metadata findings. Full manifest selection,
+archive hashing and numerical comparison still require the allocated validator;
+the local parity review did not reopen its remote manifest paths. Cache admission,
+pilots, measured capacity and Week 5 closure remain pending.
+
+Generation review: `week5-cache-generation-acceptance/20261106T165323Z/verification.json`,
+SHA-256 `4dccde91cf10d00e5b3fc31bd0366906f4fbf468af5fb4b14979727100819e98`.
+The refreshed source-bound forecast retains all 202 GB with zero completed-output
+deduction, the 200 GiB reserve and 25% margin. All 19 source hashes match the
+frozen release. Receipt SHA-256:
+`13cb89df8729d1b2641d5b190ebcbb3337b0904f3ea977ffd0ae963fdd84db61`.
+Selection runs, final training and novel opening remain closed.
+
+After fresh authorization, source, seal, duplicate-job, storage, RAM and calendar
+checks, independent cache validator **8478212** was submitted once at
+**17:25:31 UTC**. Its initial observation at **17:26:21 UTC** was queued, requesting
+four OMP slots, 32 GiB and one hour on scc-h30, with no GPU. Allocation/runtime
+acceptance and numerical results remain pending. The next scheduled observation
+is **18:35 UTC (1:35 PM EST)**, no earlier than 18:26:22 UTC.
+Launch: `week5-runtime-baseline-cache-validation/20261106T172525Z/launch.json`,
+SHA-256 `646fa0d1d927f25c453336cd7a19d214213ac7cc573cd68230d5dec62d40cb59`.
+Observation: `week5-status/20261106T172621Z/observation.json`, SHA-256
+`4e8714df77723049df57f00ee242cf48ca6a20f51f6a79209244a05fad22f5d1`.
+
+### Earlier November 6 access pause
+
 At **05:38 AM EST (10:38 UTC)**, the existing SCC session disconnected before
 the checkpoint read returned. No fresh scheduler status or cache result was
 obtained. Job **8469351** was last observed queued at 05:50:35 UTC; its current
