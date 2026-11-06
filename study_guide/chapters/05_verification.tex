@@ -1,0 +1,223 @@
+\clearpage
+\section{Verification: what each check actually establishes}\label{sec:verification}
+\subsection{A chain of evidence, not a count of passing tests}
+For a final claim to be useful, the implementation must compute the intended
+quantity, use the intended inputs, preserve the comparison, and produce records
+that can be checked independently. A large software test suite supports that
+work, but its size is not a measure of scientific completion.
+
+\begin{longtable}{@{}P{0.24\linewidth}P{0.35\linewidth}P{0.35\linewidth}@{}}
+\toprule Question & Evidence that addresses it & What it does not establish\\\midrule\endhead
+Are the equations implemented correctly? & Independent hand calculations of
+forward values and the declared backward rules, including edge cases & That the
+method works on real movements.\\\addlinespace
+Does the learning path work? & A deliberately learnable synthetic problem with
+healthy gradients and correct self-excluded retrieval & Good generalization or
+real-data superiority.\\\addlinespace
+Are the intended examples used? & Independently regenerated manifests, source
+identity, overlap/exclusion checks & Independence of every observation.\\\addlinespace
+Does the adapter preserve intended encoder behavior? & Local and upstream
+encoder outputs on the same prepared input arrays & Byte-identical upstream
+preprocessing where the local confidence rule intentionally differs.\\\addlinespace
+Does an execution repeat? & Fresh-process initialization, geometry, and full-cache
+repeats under the bound runtime & Correctness merely from repeating the same
+error, or equality across arbitrary hardware.\\\addlinespace
+Was the intervention applied? & Fixed-panel geometry and complete-query damage
+summaries & Better robustness of any learned recipe.\\\addlinespace
+Can results be reconstructed? & Independent projection, ranking, metric, and
+report replay from bound records & Permission to reinterpret the locked claim.\\\addlinespace
+Can the whole study finish? & Measured end-to-end costs, retained storage, job
+windows, queue allowance, and researcher availability & Feasibility inferred
+from fast training alone.\\\bottomrule
+\end{longtable}
+
+\subsection{Independent checks must be capable of disagreeing}
+Calling the same production function twice can establish repeatability, but
+both calls share its possible bug. A mathematical reference should derive a
+small result independently, with enough simplicity to inspect manually.
+For the contextual loss, both the forward formula and prescribed STE backward
+rule need such evidence. A second implementation copied line for line would
+not provide the same independence.
+
+Likewise, a training process writing ``complete'' is not independent proof that
+the checkpoint, inputs, and scores agree. A separate validation process checks
+the retained outputs and their dependencies. A clean process also prevents an
+unrecorded in-memory state from supplying missing information.
+
+Real pilots check finite loss, gradients, and parameters, nonzero projections,
+unit-vector normalization, adequate embedding variation, complete update counts,
+paired initialization/batches, and measured cost. The collapse check asks whether
+every example has become essentially the same vector; it does not certify that
+the remaining variation is useful. There is no real-data accuracy floor that
+forces the experiment to produce a favorable result.
+
+\subsection{The reproducibility problem encountered here}
+Floating-point operations round their results. Reordering sums, choosing a
+different vectorized kernel, or changing the numerical runtime can change bits
+even when the source expression is unchanged. A fixed random seed governs the
+random-number sequence; it does not fix every arithmetic path or transformation
+of those random numbers.
+
+This project encountered both starting-weight reconstruction mismatches and
+small geometry differences across execution environments. In the geometry case,
+clean arrays and sample identities matched, while some derived torso scales
+and jitter arrays differed. Exact repeatability within each environment did not
+establish equality between them. Several diagnostics narrowed possibilities,
+but the complete historical numerical cause was not established.
+
+The authorized response was to select and record one prospective runtime,
+require exact fresh-process repeatability and pairing within it, and preserve
+differences from older outputs. That is an explicit change in the acceptance
+requirement. It is not a claim that the old and new numbers were equal after all.
+
+A later cluster kernel update failed the frozen-runtime startup check before
+scientific training began. Such a startup failure is evidence that the runtime
+binding changed, not evidence that the model produced incorrect numbers on the
+new kernel. The new profile was authorized for verification, but compatibility
+had to be measured rather than assumed.
+
+\subsection{Immutable evidence and the scope of a correction}
+An artifact is retained with its source, input, configuration, and runtime
+bindings. A corrected release writes new artifacts with explicit predecessor
+links instead of overwriting the failed attempt. This preserves the distinction
+between what originally happened and what a later correction established.
+
+The relevant software-engineering idea is dependency-aware invalidation. A
+changed scientific input or implementation invalidates evidence depending on
+it. It need not invalidate an unrelated unchanged manifest, but old numerical
+outputs cannot be relabeled as new-runtime results without the required check.
+The protocol determines which dependencies and acceptance evidence matter.
+
+Changes are recorded with a reason and their effect on scientific settings.
+The runtime amendments arose from observed reproducibility and execution
+problems, with earlier development outputs already in existence. They were not
+claimed to predate all development scores, and final novel outcomes remained
+unavailable. The algorithms, action IDs, corruption definitions, training
+duration, and claim rule stayed fixed.
+
+\subsection{Verification itself has a cost}
+The study discovered that nested validation repeatedly recomputed the same
+expensive numerical checks. Under the measured old execution path, one repeated
+component alone forecast over 122 hours against the old execution plan's shared
+48-hour maximum-job check. That was a forecast from measured component time and call counts, not an
+observed 122-hour run.
+
+The authorized optimization reuses a successful numerical verification only
+inside one guarded command, after rehashing its complete bound contents and
+matching the validator settings and identities. A changed dependency prevents
+reuse. Independent commands begin without inherited proof. Authorization,
+dataset-opening state, resources, and other dynamic checks remain fresh.
+
+This differs from simply skipping expensive checks: the question is whether the
+\emph{identical deterministic proposition} has already been established in the
+current command. The design still requires independent recertification and new
+measurements of total cost.
+
+Storage feasibility also includes retained attempts, checkpoints, feature
+caches, projections, logs, temporary peaks, and a reserve. The declared rule is
+\[
+ \min(\text{filesystem free},\text{quota remaining})
+ \ge 200\cdot2^{30}+1.25\cdot\text{remaining peak bytes}.
+\]
+Free disk space outside the account's quota is not usable capacity. Nor is
+deleting failed scientific evidence an acceptable way to make the forecast fit.
+Time forecasts similarly need the complete workflow, queue/setup allowances,
+and researcher effort, not just the head-training loop.
+
+\source{\src{docs/decisions/0006-v3-execution-completion-amendment.md}{Execution-completion amendment};
+\src{docs/decisions/0007-safe-validation-reuse-and-stage-capacity.md}{Validation reuse and capacity};
+\src{docs/decisions/0008-runtime-baseline.md}{Prospective runtime decision};
+\src{docs/decisions/0009-updated-kernel-baseline.md}{Updated-kernel decision}.}
+
+\section{Decisions and progress through the evidence cutoff}\label{sec:history}
+\subsection{The decisions that explain the current experiment}
+\begin{longtable}{@{}P{0.19\linewidth}P{0.37\linewidth}P{0.38\linewidth}@{}}
+\toprule Decision & Reason & Consequence for the claim or process\\\midrule\endhead
+Choose one-shot motion retrieval & Make movement comparison testable on an
+existing dataset with unfamiliar action labels & Evaluate matching to one clean
+example per novel action; do not claim a rowing-quality system.\\\addlinespace
+Adopt a verified pose input contract & Available HRNet-derived annotations and
+documented missing captures differed from initial assumptions & Bind the actual
+source inventory and regenerate exact manifests.\\\addlinespace
+Freeze MotionBERT and narrow to three recipes (29 Sep) & Bound the December
+question and resource requirements & Compare head-training recipes; preserve
+the broader fine-tuned v2 benchmark as unfinished historical scope.\\\addlinespace
+Use primary and official query sets & Synchronized views can duplicate the
+gallery performance & Primary excludes all such views; official-compatible
+results remain descriptive.\\\addlinespace
+Fix duration, pairing, grid, and claim rule & Limit unequal opportunity and
+outcome-driven choices & Twenty epochs, three paired seeds, 27 selection runs,
+nine final heads, one confirmatory effect.\\\addlinespace
+Omit the extra regularizer control & Keep the December study bounded before
+new selection outcomes & A result supports the full recipe, not the isolated
+neighborhood mechanism.\\\addlinespace
+Complete and rehearse the full path (9 Oct) & Successful pilots did not establish
+that authorization through report generation worked & Successor releases and
+fresh affected evidence before selection.\\\addlinespace
+Permit guarded verification reuse (12 Oct) & Measured repeated validation exceeded
+an execution limit & Preserve checks while avoiding duplicate numerical work
+within an identical guarded command.\\\addlinespace
+Adopt one prospective runtime (19 Oct) & Historical cross-environment equality
+was not established & Keep exact within-runtime repeatability; record historical
+differences honestly.\\\addlinespace
+Revalidate after kernel update (25 Oct) & The observed runtime no longer matched
+the accepted profile & Authorize a new profile, preserve source/settings, require
+fresh affected evidence.\\\bottomrule
+\end{longtable}
+
+\subsection{What has actually been completed}
+The early work established the literature basis, prospectus, dataset/access
+arrangements, verified input inventory, deterministic split manifests, and
+adapter implementation. September extraction established encoder agreement on
+the same prepared arrays and two complete, matching 95,001-row feature passes.
+Those remain historical evidence for their recorded release.
+
+On October 8, Week 4 closed with fresh v3 caches and all three complete
+twenty-epoch engineering pilots. The two full extraction passes matched exactly,
+and independent checks accepted the outputs. Each pilot had 47,520 updates with
+paired initial weights and batches. These are substantial execution milestones,
+but the pilot scores are ineligible for selecting a winner.
+
+October successor work completed execution/report rehearsal and the historical
+full-query damage audit. The audit checked nine corruption conditions across
+18,929 development queries each. Later work accepted a prospective CPU baseline,
+its repeatable initialization and geometry, a synthetic GPU prerequisite, and
+five caches under the then-frozen profile. The subsequent kernel change means
+those records do not automatically satisfy the new-profile requirements.
+
+The project also has a public tracker, research journal, explanatory pose
+visualizations, and report/poster drafts with results explicitly pending.
+Those help communicate and retain the work; they are not additional scientific
+evidence of recipe superiority.
+
+\subsection{What remains incomplete}
+At the October 28 checkpoint, Week 5 remains open and cluster jobs are held
+while adequate usable storage is pending. The local launcher correction and
+conditional remaining-work schedule are prepared. No new-profile acceptance
+or final comparison is inferred from that preparation.
+
+The next scientific prerequisites are accepted new-runtime repeatability,
+affected caches and paired pilots, development corruption/retrieval replay,
+and a measured full-workload capacity decision. Only after admission can the
+27 selection runs proceed, followed by nine final heads, final locks, and the
+novel evaluation campaign. Selection, final training, and novel opening remain
+closed in the latest record.
+
+The original October 18 admission deadline was missed. November 29 final locks,
+December 6 computation, and December 7--18 analysis/delivery remain recorded
+targets; the guide does not claim the remaining schedule has been demonstrated
+feasible. Live capacity was not remeasured while preparing this guide.
+
+\begin{concept}{The accurate status sentence}
+The study design and software have passed substantial engineering checks,
+including historical full pilots and damage audits. The latest runtime still
+needs accepted regeneration, and storage is blocking the next cluster work.
+There is no final evidence yet that contextual training is better, equivalent,
+or worse on the declared novel-action comparison.
+\end{concept}
+
+\source{\src{docs/protocol/week-3-scc-execution.md}{September execution evidence};
+\src{docs/protocol/week-4-execution.md}{Week 4 closure};
+\src{docs/protocol/week-5-execution.md}{October accepted history and kernel/storage blocker};
+\prepsrc{docs/protocol/week-5-execution.md}{October 28 checkpoint};
+\prepsrc{docs/protocol/week-6-handoff.md}{Conditional remaining-work calendar}.}

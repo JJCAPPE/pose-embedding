@@ -1,0 +1,286 @@
+\clearpage
+\section{Prepare to explain and defend the work}\label{sec:explain}
+\subsection{A short explanation you can adapt}
+\begin{concept}{About one minute}
+I am testing whether a particular way of training movement representations
+makes matching human actions less sensitive to damaged pose information.
+At evaluation, the system gets one clean example of each unfamiliar action
+and must match other clips to those examples.
+
+I reuse a pretrained MotionBERT encoder and keep it fixed. I train the same
+linear comparison head with three recipes. The main comparison is the full
+contextual recipe against standard contrastive training. Both use paired
+starting weights, batches, training duration, and tuning opportunities.
+
+I damage only the query poses, using fixed strengths of coordinate noise,
+missing joints, and missing frames. The primary quantity is the difference
+in clean-to-damaged accuracy drops, while absolute accuracy is reported too.
+
+Historical pilots and input checks have passed. Current work is blocked on
+storage and new-runtime verification. The final comparison has not run, so I
+am not claiming that the contextual recipe wins.
+\end{concept}
+
+Say this in your own words. The structure matters more than memorizing it:
+question, input/output, controlled comparison, measurement, current evidence.
+
+\subsection{A five-minute technical explanation}
+\begin{enumerate}
+\item \textbf{Define the task.} A sequence of estimated 2D joint positions enters
+a frozen encoder, then a learned head. The output is a unit vector used for
+nearest-gallery retrieval. One-shot refers to one exemplar per novel action.
+\item \textbf{Define the treatment.} Compare training recipes on the same head.
+The contextual recipe includes neighborhoods, a changed margin, and a regularizer;
+it is not an isolated neighborhood ablation.
+\item \textbf{Explain the split and tuning.} Eighty actions train candidates;
+twenty other auxiliary actions select rates using clean development retrieval.
+Nine fresh final heads use all 100 auxiliary actions. Twenty novel actions
+remain outside selection and training.
+\item \textbf{Explain the intervention.} Three damage families at three fixed
+strengths act after preprocessing and before encoding. Damage is paired across
+methods and nested across severities; gallery examples remain clean.
+\item \textbf{Explain the statistic.} Compare clean-to-corrupt Top-1 drops,
+averaged over three fixed seeds and nine conditions. Resample whole performance
+groups within actions to preserve camera-view dependence. State the interval's
+conditional scope and show absolute accuracy beside the drop.
+\item \textbf{Separate evidence from intent.} Describe completed historical
+pilots and damage checks, then the current runtime/storage prerequisite. End
+with what must happen before a final claim is possible.
+\end{enumerate}
+
+\subsection{Questions someone should be able to ask you}
+\textbf{Why expect contextual learning to help?}
+Relations to neighboring examples may provide useful information beyond a
+pair's direct similarity. That is a plausible mechanism motivating the study.
+Image-domain findings do not establish robustness to noisy pose queries; this
+experiment tests that transfer rather than assuming it.
+
+\textbf{What exactly is original here?}
+The backbone, pose dataset, and published objective ideas are reused. The project
+specifies and implements a controlled pose-retrieval comparison, its local
+adaptations, corruption design, protected evaluation, and verification/reporting
+process. It is not claiming to invent MotionBERT or contextual loss.
+
+\textbf{Why is a linear head enough?}
+The nonlinear encoder already supplies rich motion features. A common affine
+head limits architectural variation while still learning a different geometry.
+This is a deliberate comparison setting, not proof that a nonlinear head could
+not perform better. Its approximately 17.8 million parameters also mean that
+``linear'' should not be confused with negligible capacity.
+
+\textbf{Does fixed training make the comparison perfectly fair?}
+It makes the stated budget and controls comparable. It does not guarantee
+equal computational cost, convergence, optimal hyperparameters, or equal
+compatibility with every representation. The result is conditional on these
+declared recipes and settings.
+
+\textbf{Why not choose the best pilot or early checkpoint?}
+Those outputs are engineering diagnostics. Reusing them for selection or choosing
+an attractive epoch would give an extra, unplanned search opportunity and change
+the fixed-duration procedure. The declared fresh selection runs have one rule.
+
+\textbf{Why keep both official and stricter query sets?}
+The official set enables comparison with the established benchmark convention.
+The primary set removes other cameras' views of the gallery performance,
+reducing a specific shortcut. Their distinct roles are fixed before results.
+
+\textbf{Could the model learn who the person is?}
+Action-disjoint splits do not remove all person or setup dependence. Shared
+people, acquisition conditions, and representation biases remain limitations.
+The study is not a separate test of generalization to unseen people.
+
+\textbf{Why are three seeds not enough for a universal claim?}
+They show three fixed training realizations and allow paired comparisons.
+The primary bootstrap does not resample them and cannot infer performance over
+all possible training randomness. Per-seed results show how consistent this
+small set is without disguising its limited scope.
+
+\textbf{What would count as success if contextual loses?}
+A valid, complete, reproducible comparison with an honest contrary result.
+Scientific success is answering the specified question. Failing to complete
+the comparison because of capacity is a blocked study, not evidence of no effect.
+
+\textbf{Why has verification taken so much work?}
+The experiment needs more than a model that trains. Source/input identity,
+exact pairing, damaged-input validity, runtime repeatability, and independently
+reconstructible results determine whether the final comparison is interpretable.
+The project also learned that those checks must be included in capacity planning.
+
+\textbf{What cannot you claim yet?}
+No final recipe ranking, novel-action robustness effect, or completed empirical
+comparison. Successful pilots establish their execution; report drafts and a
+working tracker do not supply missing final results.
+
+\subsection{Draw these three things without looking}
+\begin{enumerate}
+\item The shape pipeline: $2\times100\times17\times3$ poses to frozen features,
+8,704 pooled values, a learned 2,048-dimensional unit vector, and gallery ranking.
+\item The action split: eighty candidate-training actions, twenty development
+actions, all 100 used only after selection for fresh final training, and twenty
+separate novel actions for final evaluation.
+\item A two-row result table containing clean accuracy, corrupted accuracy,
+and drop. Construct a case where contextual degrades less but has worse
+corrupted accuracy, then explain why both facts belong in the report.
+\end{enumerate}
+
+\subsection{Use the notebooks to test understanding}
+\begin{tabularx}{\linewidth}{@{}P{0.11\linewidth}Y Y@{}}
+\toprule Lab & Concept & What you should explain afterward\\\midrule
+01 & Cosine geometry and a normalized-head gradient & Why direction determines
+ranking; how changing $W$ changes it; what finite differences verify.\\\addlinespace
+02 & Splits, leakage, pairing, and equal selection budgets & Why repeated views
+and unequal tuning opportunities can distort a comparison.\\\addlinespace
+03 & Degradation and paired cluster bootstrap & Why smaller drop can coexist
+with worse accuracy; why the sampled query count is the denominator.\\\bottomrule
+\end{tabularx}
+
+All examples are invented. Do not report their scores as project results.
+Notebook 1 simplifies the training objective to make differentiation visible;
+it does not implement or validate the contextual STE. Notebook 3 implements the
+analysis logic on a tiny synthetic population, not the locked real-data campaign.
+
+\appendix
+\clearpage
+\section{Answers to the study checks}
+\begin{enumerate}[label=\textbf{\arabic*.},leftmargin=2em]
+\item \textbf{Random row splits.} They can put the same action classes in
+training and evaluation, testing new clips of familiar actions rather than
+transfer to unfamiliar actions. They can also separate synchronized views of
+one performance across roles.
+\item \textbf{Gallery exclusion.} A different camera file can still depict the
+same event as the gallery example. The primary set excludes the underlying
+performance group, not only one filename.
+\item \textbf{Learning with a frozen encoder.} The encoder's output stays fixed,
+but the head's $W,b$ change how those features map into comparison directions.
+A novel action does not need a learned output-class coordinate: it supplies a
+gallery exemplar and is recognized by similarity to it.
+\item \textbf{Cache perturbation.} A pose corruption is transformed nonlinearly
+by the encoder. In general $F(T(X))$ is not equivalent to adding noise to $F(X)$.
+The intervention location is therefore part of the hypothesis.
+\item \textbf{Physical batch.} Pairwise similarities, contextual neighbors, and
+SupCon denominators depend on the examples simultaneously present. Summing
+gradients from separate smaller batches omits cross-microbatch relations.
+\item \textbf{Full recipe.} Contextual and standard contrastive differ in the
+neighborhood term, positive margin, and similarity regularizer. A matched
+ablation would be needed to isolate one component's causal contribution.
+\item \textbf{Loss magnitudes.} The formulas, reductions, coefficients, and
+attainable minima differ. Compare retrieval under the common evaluation,
+not which method reports the smallest numerical training loss.
+\item \textbf{Shared severity randomness.} Reuse of the underlying noise field
+or nested mask makes a stronger level a controlled strengthening of the same
+damage. Unrelated draws could obscure the effect of increasing severity.
+\item \textbf{Fallback and realism.} A training-only fallback avoids estimating
+preprocessing parameters from held-out poses. Synthetic zero masks and Gaussian
+noise do not reproduce every output a real pose estimator produces under camera
+occlusion, so they support a narrower robustness claim.
+\item \textbf{Groups versus query weights.} Groups preserve dependence during
+resampling; query weights preserve the chosen statistic. Equal weighting of
+unequal-sized group means would change the quantity being estimated.
+\item \textbf{Interval crossing zero.} The data do not support the prespecified
+smaller-drop claim at that rule. This is neither proof of equality nor an
+estimate that the probability of no effect is 95\%.
+\item \textbf{Bootstrap draws and seeds.} Repeatedly resampling performance
+groups recombines evidence from the same three heads per method. It creates no
+new independent training realizations or uncertainty over unobserved seeds.
+\end{enumerate}
+
+\section{Notation and essential terms}
+\begin{longtable}{@{}P{0.25\linewidth}P{0.68\linewidth}@{}}
+\toprule Symbol or term & Meaning here\\\midrule\endhead
+$X$ & Prepared pose tensor for one capture.\\
+$h\in\R^{8704}$ & Frozen, pooled, unnormalized pre-head feature vector.\\
+$W,b$ & Trainable affine head weights and bias.\\
+$u\in\R^{2048}$; $z$ & Head output before normalization; its unit-length direction.\\
+$s_{ij}$; $d_{ij}$ & Cosine similarity; squared unit-vector distance.\\
+$y_{ij}$ & Indicator that two training examples have the same action label.\\
+$P,K,n$ & Classes per batch, examples per class, and physical batch size.\\
+$k,\epsilon,\alpha$ & Contextual neighbor rank, membership tolerance, and
+surrogate-gradient factor.\\
+$\tau$; $\eta$ & SupCon temperature; optimizer learning rate.\\
+$A_{m,s,c}$; $d_{m,s,c}$ & Top-1 accuracy and clean-to-corrupt drop; this $d$ has
+method/seed/condition indices, unlike pairwise distance $d_{ij}$.\\
+$\Delta$ & Contextual drop minus contrastive drop, averaged over fixed seeds
+and corruptions. Negative favors less contextual degradation.\\
+Gallery; query & Labeled reference examples; the example to be matched.\\
+Embedding & A learned numerical representation used for comparison.\\
+Epoch & The prescribed number of balanced updates, not necessarily one visit
+to each row.\\
+Hyperparameter & A setting chosen outside gradient updates, such as learning
+rate; distinct from learned weights.\\
+Leakage & Information from an evaluation role influences development or makes
+the evaluation easier in a way the claimed design excludes.\\
+Estimand & The exact quantity the experiment intends to estimate.\\
+Bootstrap & Recompute a statistic over repeated resamples of the declared units.\\
+Provenance & The source, input, configuration, and runtime identities connecting
+an output to the execution that produced it.\\
+Gate & An explicit requirement and its acceptance evidence before later work
+is eligible.\\\bottomrule
+\end{longtable}
+
+\section{Source map and evidence boundaries}\label{sec:sources}
+The linked repository sources are pinned to commit
+\code{b32d50f66206b561fa34867c9274fac6ba7c287d}, the main-branch record through
+October 25, unless marked as the October 28 preparation record at
+\code{5d50410b07e19a980fe3b711e63b10417b40b818}. This keeps the account traceable
+even if a live branch later changes. The guide is explanatory documentation;
+the canonical protocol and authorized amendments control execution.
+
+\begin{longtable}{@{}P{0.29\linewidth}P{0.65\linewidth}@{}}
+\toprule Read this for & Primary project source\\\midrule\endhead
+Scientific question and rules & \src{plan/research-plan.v3.md}{Final v3 plan}
+and \src{docs/protocol/protocol-v3.md}{protocol v3}.\\\addlinespace
+Machine-readable settings & \src{configs/protocol.v3.yaml}{Protocol template}
+and \href{https://github.com/JJCAPPE/pose-embedding/tree/b32d50f66206b561fa34867c9274fac6ba7c287d/configs/experiments/v3}{27 candidate configurations}. A template is
+not an executed or resolved design lock.\\\addlinespace
+Method equations and adaptation & \src{docs/protocol/contextual-v3-source-notes.md}{Contextual source notes},
+\src{src/pose_embed/losses/contextual.py}{contextual loss}, and
+\src{src/pose_embed/losses/pairwise.py}{pairwise losses}.\\\addlinespace
+Reuse and preprocessing & \src{third_party/upstreams.toml}{Upstream manifest},
+\src{THIRD_PARTY_NOTICES.md}{notices}, and
+\src{docs/protocol/motionbert-adapter-gate.md}{adapter acceptance}.\\\addlinespace
+Why the scope changed & \src{docs/decisions/0004-frozen-one-shot-v3.md}{Decision 0004};
+\src{docs/decisions/0006-v3-execution-completion-amendment.md}{0006},
+\src{docs/decisions/0007-safe-validation-reuse-and-stage-capacity.md}{0007},
+\src{docs/decisions/0008-runtime-baseline.md}{0008}, and
+\src{docs/decisions/0009-updated-kernel-baseline.md}{0009}.\\\addlinespace
+Accepted history and current state & \src{docs/protocol/week-4-execution.md}{Week 4},
+\src{docs/protocol/week-5-execution.md}{Week 5 through October 25}, and
+\prepsrc{docs/protocol/week-5-execution.md}{October 28 current checkpoint}.\\\bottomrule
+\end{longtable}
+
+The October 28 schedule's opening prose overstates the October 25 filesystem
+failure. The numerical Week 5 record shows quota below the requirement while
+filesystem free space exceeded it; usable space was still insufficient because
+the minimum governs. This guide uses the numerical record and states the
+storage blocker without treating an old observation as live capacity.
+
+The intended prerequisites are general calculus, linear algebra, elementary
+probability/statistics, and strong programming. No transcript, grades, student
+identifier, or private academic record is included. Figures are schematic and
+notebook data are synthetic. No licensed pose array, learned checkpoint,
+participant record, or private operational log is included.
+
+\begin{thebibliography}{9}
+\addcontentsline{toc}{section}{Research origins}
+\bibitem{ntu} J. Liu et al. \emph{NTU RGB+D 120: A Large-Scale Benchmark for
+3D Human Activity Understanding}. IEEE TPAMI, 2020.
+\href{https://arxiv.org/abs/1905.04757}{Authors' paper};
+\href{https://rose1.ntu.edu.sg/dataset/actionRecognition/}{Official dataset}.
+The local input contract separately identifies the adopted HRNet-derived 2D
+annotations; the dataset's title does not make our input coordinates 3D.
+\bibitem{motionbert} W. Zhu et al. \emph{MotionBERT: A Unified Perspective on
+Learning Human Motion Representations}. ICCV, 2023.
+\href{https://openaccess.thecvf.com/content/ICCV2023/html/Zhu_MotionBERT_A_Unified_Perspective_on_Learning_Human_Motion_Representations_ICCV_2023_paper.html}{Official paper and supplement}.
+Read for the encoder's original purpose; our frozen-head comparison is a
+different experiment from its downstream fine-tuning results.
+\bibitem{contextual} C. Liao, T. Tsiligkaridis, and B. Kulis.
+\emph{Supervised Metric Learning to Rank for Retrieval via Contextual Similarity
+Optimization}. ICML, 2023.
+\href{https://proceedings.mlr.press/v202/liao23b.html}{Paper and appendix}.
+Read for the contextual objective's origin. The local source notes resolve
+equation/backward conventions and document pose-study adaptations.
+\bibitem{supcon} P. Khosla et al. \emph{Supervised Contrastive Learning}.
+NeurIPS, 2020.
+\href{https://papers.nips.cc/paper/2020/hash/d89a66c7c80a29b1bdbab0f2a1a94af8-Abstract.html}{Official paper}.
+Read for label-based contrastive learning; this study fixes a single-view variant.
+\end{thebibliography}

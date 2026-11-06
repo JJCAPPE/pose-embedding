@@ -1,0 +1,38 @@
+\section{A study guide for explaining the experiment}
+\entry{30 October}{Connecting theory, decisions and verification}{Documentation and synthetic teaching examples only.}
+
+The researcher requested a study guide following the structure of the rowing
+project's guide, with emphasis on explaining the hypothesis, decisions,
+experimental fairness, code reuse, first-principles theory and verification.
+The resulting guide assumes calculus, linear algebra, introductory statistics
+and strong programming skills. Private academic records were used only to
+calibrate the level; none of their identifying details or grades are included.
+
+The 36-page PDF and editable LaTeX sources at \path{study_guide/} explain the
+action-disjoint one-shot task, the frozen encoder and trained head, all three
+losses, paired selection/training, nested query corruptions, conditional
+cluster bootstrap, provenance and accepted history. Worked examples distinguish
+smaller accuracy degradation from higher absolute corrupted accuracy. The
+guide includes short oral explanations, questions and answers, and three
+standalone NumPy notebooks using invented data only.
+
+The scientific account is pinned to public repository revision
+\texttt{b32d50f} and the October 28 preparation checkpoint \texttt{5d50410}.
+Independent reviews checked objective mathematics, code provenance,
+experimental controls, statistical interpretation and status claims against
+the plan and implementation. All thirteen notebook code cells executed, their
+assertions passed and saved outputs reproduced. The smooth teaching gradient
+also passed an independent finite-difference check; it does not validate the
+contextual loss's prescribed surrogate derivative.
+
+The PDF compiled without TeX warnings after layout corrections. All pages were
+rendered and inspected, and source links and workspace verification passed.
+No experiment code, frozen scientific configuration, dataset or cluster state
+changed. No tracker task or gate was advanced. Historical pilots and damage
+audits remain evidence for their recorded releases; the October 28 storage hold
+and new-runtime prerequisites are still described as unresolved. This guide
+supplies no final novel-action result and changes no scientific authorization.
+
+\evidence{Readable guide: \path{study_guide/main.pdf}. Editable source and
+rebuild instructions: \path{study_guide/README.md}. Synthetic exercises:
+\path{study_guide/notebooks/}.}

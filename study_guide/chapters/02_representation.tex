@@ -1,0 +1,256 @@
+\clearpage
+\section{From joint observations to a comparison vector}\label{sec:representation}
+\subsection{Follow the shapes}
+One deterministically prepared example has shape
+\[
+ X\in\R^{2\times100\times17\times3}.
+\]
+The axes are person slot, sampled frame, joint, and $(x,y,\text{confidence})$.
+A missing second person is represented by a padded slot. Temporal sampling
+selects 100 frame positions; it is not a claim that the original recording
+lasted 100 frames or that all clips had the same physical duration.
+
+The preparation sequence is camera normalization, person tracking, conversion
+from the COCO joint convention to the H36M joint convention, uniform temporal
+sampling, padding, and spatial normalization. Tracking tries to keep person
+slots consistent over time. Conversion produces the joint arrangement expected
+by the pretrained model. Normalization removes some dependence on image position
+and scale; it does not eliminate viewpoint, tracking, or pose-estimation errors.
+
+Some converted joints combine several source joints. Their coordinates can be
+averaged, but the local implementation uses the \emph{minimum} confidence of
+the contributing joints. If one necessary source is absent, its derived joint
+should not acquire high confidence merely because another source is visible.
+This is an explicit departure from upstream confidence handling.
+
+\begin{center}
+\begin{tikzpicture}[node distance=6mm,
+ box/.style={draw=ink,align=center,text width=113mm,minimum height=10mm,font=\small},
+ arrow/.style={-{Latex},thick,ink}]
+\node[box] (x) {Prepared poses: $2\times100\times17\times3$};
+\node[box,below=of x] (f) {Frozen MotionBERT: $2\times100\times17\times512$};
+\node[box,below=of f] (h) {Time mean, joint flattening, person mean: $h\in\R^{8704}$};
+\node[box,below=of h] (u) {Learned affine head: $u=Wh+b\in\R^{2048}$};
+\node[box,below=of u] (z) {Unit-length embedding: $z=u/\lVert u\rVert_2$};
+\draw[arrow] (x)--(f);\draw[arrow] (f)--(h);\draw[arrow] (h)--(u);\draw[arrow] (u)--(z);
+\end{tikzpicture}
+\end{center}
+
+\subsection{What MotionBERT contributes}
+A representation is a numerical description useful for a later task. Raw
+coordinates describe where joints were observed. Learned features can combine
+positions across joints and time so that the next stage need not learn all
+motion structure from scratch.
+
+MotionBERT was pretrained to recover motion structure from partial or noisy 2D
+observations using a 3D reconstruction objective. This study reuses its generic
+pretrained encoder. The adapter requests its internal representation and bypasses
+its 3D output head. There is no newly estimated 3D skeleton that must be evaluated
+between our input poses and retrieval vectors.\cite{motionbert}
+
+The essential transformer operation is attention. Put a set of token features
+in a matrix $H\in\R^{L\times d}$, one token per row. Learned matrices produce
+\[
+ Q=HW_Q,\qquad K=HW_K,\qquad V=HW_V.
+\]
+The query--key dot product measures which tokens should exchange information.
+For each row, softmax turns scores into positive weights that sum to one:
+\[
+ a_{ij}=\frac{\exp(q_i^\top k_j/\sqrt{d_k})}
+ {\sum_\ell\exp(q_i^\top k_\ell/\sqrt{d_k})},
+ \qquad o_i=\sum_j a_{ij}v_j.
+\]
+The square-root factor moderates score scale as the key dimension grows.
+Unlike a fixed temporal average, these weights depend on the input. Multiple
+attention heads provide several learned ways to mix information, while
+position information distinguishes joints and time indices.
+
+MotionBERT's spatial attention exchanges information among joints in a frame;
+temporal attention exchanges information across frames. Its two streams apply
+spatial and temporal operations in opposite orders and fuse their outputs.
+You need to understand this role, not reproduce every transformer layer to
+explain this experiment. The pretrained implementation is imported intact.
+
+\textbf{Frozen} and \textbf{evaluation mode} are different controls. Frozen
+parameters receive no training updates. Evaluation mode selects inference
+behavior for modules with training-dependent behavior, such as dropout. The
+project uses both, so all recipes share a fixed feature extractor.
+
+\subsection{Why averaging features does not discard all motion information}
+Let $F_{p,t,j,:}(X)\in\R^{512}$ denote an encoder output. The pre-head vector is
+\[
+ h(X)=\frac12\sum_{p=1}^{2}
+       \operatorname{vec}_{j}\!\left(\frac1{100}
+       \sum_{t=1}^{100}F_{p,t,j,:}(X)\right)\in\R^{17\cdot512}.
+\]
+Here $\operatorname{vec}_{j}$ concatenates the seventeen joint feature vectors.
+The mean is taken after the encoder has combined information across time. It
+is therefore not equivalent to averaging raw poses before any motion processing.
+It still imposes an information bottleneck: whatever the pooled representation
+does not retain cannot be recovered by the head.
+
+With a frozen encoder, $h(X)$ can be calculated once and stored in a feature
+cache. This saves repeated encoder work across head-training runs. A cache is
+valid only for its exact source data, preprocessing, encoder weights, code,
+and relevant runtime. A damaged query needs a fresh encoder pass on the damaged
+tensor; adding noise to a cached vector would be a different intervention.
+
+\subsection{The trainable head and the geometry of retrieval}
+The trained transformation is
+\[
+ u=Wh+b,\qquad W\in\R^{2048\times8704},\quad b\in\R^{2048},
+ \qquad z=\frac{u}{\lVert u\rVert_2}.
+\]
+There are $2048(8704+1)=17{,}827{,}840$ trainable parameters. The architecture
+is simple, but its parameter count is not tiny. The cached $h$ vectors are
+\emph{not} unit-normalized; the normalization follows the learned projection.
+Zero projections are an invalid numerical state to detect rather than meaningful
+directions for retrieval.
+
+For nonzero vectors $u,v$, cosine similarity is
+\[
+ \cos(u,v)=\frac{u^\top v}{\lVert u\rVert\lVert v\rVert}.
+\]
+It compares direction rather than length. Once both vectors have unit norm,
+$s_{ij}=z_i^\top z_j$. Expanding a squared distance gives
+\[
+ \lVert z_i-z_j\rVert^2
+ =z_i^\top z_i+z_j^\top z_j-2z_i^\top z_j=2-2s_{ij}.
+\]
+Thus sorting by largest cosine is the same as sorting by smallest squared
+Euclidean distance on these unit vectors. This equivalence is why the contextual
+neighborhood can be expressed using $\max(2-2s_{ij},0)$. The maximum only guards
+against a tiny negative distance from floating-point arithmetic.
+
+\begin{concept}{A two-coordinate retrieval example}
+Let a query be $q=(0.8,0.6)$ and the two gallery vectors be $g_1=(1,0)$ and
+$g_2=(0,1)$. All are unit vectors. Their cosine scores are $0.8$ and $0.6$,
+so $g_1$ ranks first. The squared distances are $0.4$ and $0.8$, producing
+the same ranking. Multiplying the unnormalized query by ten changes neither
+its normalized direction nor the ranking.
+\end{concept}
+
+The output has 2,048 coordinates, not 120 class probabilities. Labels influence
+the geometry during learning; an unfamiliar action can still be recognized by
+comparison with its gallery exemplar. Contextual neighborhoods affect training,
+but \textbf{all three recipes use the same cosine retrieval at evaluation}.
+There is no contextual reranking added at query time.
+
+\subsection{From a loss to a weight update}
+A loss $L(\theta)$ assigns a penalty to the current behavior, with
+$\theta=(W,b)$. Minimizing it requires a direction in parameter space.
+For a small perturbation $\delta$,
+\[
+ L(\theta+\delta)\approx L(\theta)+\nabla L(\theta)^\top\delta.
+\]
+Taking $\delta=-\eta\nabla L$ lowers this local approximation when $\eta>0$.
+That is the basic gradient-descent idea. It does not promise global improvement
+for an arbitrarily large step, or a global optimum for this nonconvex objective.
+
+Backpropagation is the chain rule applied through the computation. For
+$z=u/\lVert u\rVert$ away from zero,
+\[
+ \frac{\partial z}{\partial u}
+ =\frac{I-zz^\top}{\lVert u\rVert}.
+\]
+The factor $I-zz^\top$ removes the component parallel to $z$: changing only
+magnitude does not change direction. If $g_u=\partial L/\partial u$, then
+\[
+ \frac{\partial L}{\partial W}=g_u h^\top,
+ \qquad \frac{\partial L}{\partial b}=g_u.
+\]
+Batch gradients add the contributions prescribed by the loss reduction. The
+encoder weights do not enter the update. Notebook 1 works through a small
+normalized-head gradient numerically; its simple loss is explicitly not the
+project's full training objective. This is ordinary backpropagation through
+differentiable operations. The hard contextual neighborhood instead uses a
+prescribed surrogate gradient, explained in the next section.
+
+\subsection{Why AdamW, and what is fixed?}
+The actual optimizer is AdamW. For gradient $g_t$, it keeps exponentially weighted
+first and second moments,
+\[
+ m_t=\beta_1m_{t-1}+(1-\beta_1)g_t,\qquad
+ v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2,
+\]
+and corrects their startup bias: $\widehat m_t=m_t/(1-\beta_1^t)$ and
+$\widehat v_t=v_t/(1-\beta_2^t)$. The essential elementwise update is
+\[
+ \theta_t=(1-\eta\lambda_w)\theta_{t-1}
+       -\eta\frac{\widehat m_t}{\sqrt{\widehat v_t}+\varepsilon_o}.
+\]
+The first term is decoupled weight decay; the second uses recent gradient
+direction and scale. Weight decay is distinct from the contextual recipe's
+mean-similarity regularizer, which acts on embeddings through the loss.
+
+All recipes use $\beta_1=0.9$, $\beta_2=0.999$, $\varepsilon_o=10^{-8}$,
+and $\lambda_w=10^{-4}$ on weight and bias. Learning rate is constant within
+a run. There is no scheduler, dropout, extra augmentation, gradient clipping,
+early stopping, or mixed precision. These are fixed controls, not assertions
+that these choices are universally optimal.
+
+\studycheck{Explain why a frozen encoder still permits learning, why the head
+can recognize an action absent from its training labels, and why perturbing
+cached features would change the experiment. Answers: Questions 3--4.}
+\source{\src{src/pose_embed/data/motionbert.py}{Deterministic preprocessing};
+\src{src/pose_embed/models/motionbert.py}{Encoder adapter};
+\src{src/pose_embed/models/action_head.py}{Pooling and head};
+\src{src/pose_embed/training/runner.py}{Training runner};
+\href{https://github.com/Walter0807/MotionBERT/blob/705d3a95354db8bdb696b3492e47a3b5537174ff/lib/model/DSTformer.py}{Pinned DSTformer source}.}
+
+\section{What is reused, adapted, and written for this study}\label{sec:provenance}
+The research contribution is not a new pose detector or a new transformer
+backbone. It is the specified transfer comparison and the controlled process
+needed to interpret its result.
+
+\begin{longtable}{@{}P{0.21\linewidth}P{0.33\linewidth}P{0.40\linewidth}@{}}
+\toprule Component & Provenance & Role and boundary\\\midrule\endhead
+Pose data & Existing NTU dataset and HRNet-derived pose annotations distributed
+through OpenMMLab/PYSKL & Reuse the available estimates. No new HRNet training,
+video collection, or native 25-joint 3D input.\\\addlinespace
+MotionBERT encoder & Unchanged code imported from a pinned Apache-2.0 checkout;
+verified pretrained checkpoint & Reuse the architecture and learned weights;
+neither source clone nor checkpoint is committed into this repository.\\\addlinespace
+Preprocessing & Minimal licensed port of MotionBERT action-data utilities & Make
+sampling deterministic, preserve confidence through tracking/conversion, and
+apply the declared confidence correction.\\\addlinespace
+Pooling and head & Ported MotionBERT action-head semantics & Reuse time/person
+pooling and projection structure; train fresh head weights for our objectives.\\\addlinespace
+Contextual loss & Independently implemented from published equations, developed
+from the project's teaching implementation & The authors' source repository is
+reference-only because no license was discovered. It is not copied or adapted.\\\addlinespace
+Contrastive and SupCon & Local implementations of the declared formulas & Make
+reduction rules, margins, temperature, and single-view semantics explicit.\\\addlinespace
+Optimization engine & PyTorch tensor operations, autograd, and AdamW & Reuse
+numerical machinery; local code defines which parameters and batches it updates.\\\addlinespace
+Training and evaluation & Local protocol-specific runners & Train on cached
+auxiliary features; keep novel evaluation out of the training loop.\\\addlinespace
+Experimental controls & Local manifests, sampler, corruptions, locks, provenance,
+analysis, and report code & Define a reproducible experiment rather than inherit
+benchmark defaults.\\\bottomrule
+\end{longtable}
+
+\subsection{Why not reuse the upstream one-shot training loop?}
+That loop evaluates novel classes during training. Our study requires those
+outcomes to remain unavailable until training, selection, and the final lock
+are complete. Reusing the encoder is compatible with this requirement; reusing
+that evaluation schedule is not. The local head-training loop is a necessary
+change in scientific procedure, not a claim that upstream code is defective.
+
+\subsection{Two kinds of provenance}
+\textbf{Intellectual provenance} identifies whose method, data, and code are
+being used, along with the permitted reuse and attribution. \textbf{Execution
+provenance} identifies the exact source revision, checkpoint, input IDs,
+configuration, and runtime that produced an artifact. A result needs both.
+
+Historical v2 contains other methods and upstream sources, but those are not all
+used in this v3 comparison. The current study does not need a tour of every
+preserved benchmark implementation. Nor does a source repository being publicly
+viewable establish permission to copy its code; the project's source manifest
+and notices record that boundary.
+
+\source{\src{third_party/upstreams.toml}{Pinned upstream manifest};
+\src{THIRD_PARTY_NOTICES.md}{Third-party notices};
+\src{docs/protocol/ntu-input-source-research.md}{Pose-source investigation};
+\src{docs/protocol/motionbert-adapter-gate.md}{Adapter reuse boundary};
+\src{docs/protocol/contextual-v3-source-notes.md}{Contextual source and equation notes}.}

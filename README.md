@@ -15,6 +15,7 @@ owner editor for tasks, evidence, reflections, and advancement gates.
 ## Repository map
 
 - `plan/` — current v3 schedule and preserved v1/v2 history
+- [`study_guide/`](study_guide/README.md) — theory, experimental design, decisions, and verification, with a PDF and synthetic notebooks
 - `configs/` — validated research and experiment configurations
 - `src/pose_embed/` — data, model, loss, corruption, training, and evaluation code
 - `tests/` — unit, integration, and tiny CPU fixtures

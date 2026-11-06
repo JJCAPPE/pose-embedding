@@ -1,0 +1,180 @@
+\clearpage
+\section{The question and the unit of evidence}\label{sec:question}
+\subsection{Start with a concrete task}
+Suppose a gallery contains one clean motion example for each of twenty actions.
+A query is another motion clip. The system ranks the gallery by similarity and
+returns the action of the closest example. A sitting-down query should retrieve
+the sitting-down example even when some joint observations are unreliable.
+
+This is \textbf{retrieval}: find the matching example. It is not a system that
+estimates joint positions from raw video, predicts rowing force, or judges
+whether an action was performed well. The input already contains estimated
+joint positions. The action label provides the definition of a correct match;
+it does not measure every possible meaning of biomechanical similarity.
+
+\textbf{One-shot} describes the gallery: one labeled example for each new
+action. It does not mean the model learns from one training clip. The comparison
+rule is learned using thousands of clips from other actions, then applied to
+actions excluded from this study's head training and model selection.
+
+Write a motion example as $x$, its action label as $y$, and its learned
+representation as $z=f(x)$. Let $\mathcal A$ be the twenty gallery action labels
+and $g_a$ the reference clip for action $a$. Then
+\[
+ \widehat y(x)=\underset{a\in\mathcal A}{\arg\max}\;s(f(x),f(g_a)).
+\]
+The function $s$ is cosine similarity. Later sections derive both $f$ and $s$.
+No final-test labels are used to update $f$.
+
+\subsection{The hypothesis is deliberately narrower than ``better AI''}
+There are three training recipes: standard contrastive, full contextual, and
+supervised contrastive (SupCon). The one confirmatory comparison is contextual
+versus standard contrastive. SupCon provides a descriptive reference.
+
+Each trained head is evaluated on clean queries and on nine damaged-query
+conditions. For a method $m$, seed $s$, and corruption condition $c$, define
+\[
+ d_{m,s,c}=A_{m,s,0}-A_{m,s,c},
+\]
+where $A$ is top-1 accuracy and $0$ denotes clean input. The main effect is
+\[
+ \Delta=\frac{1}{3\cdot9}\sum_{s,c}
+       \bigl(d_{\mathrm{contextual},s,c}-d_{\mathrm{contrastive},s,c}\bigr).
+\]
+Negative $\Delta$ means the contextual recipe loses fewer accuracy points under
+the declared damage mixture. A later section explains uncertainty and the
+prespecified decision rule.
+
+\begin{concept}{A smaller drop is not necessarily better damaged-input accuracy}
+Invented example: standard contrastive goes from 90\% clean to 75\% damaged,
+a 15-point drop. Contextual goes from 80\% to 70\%, a 10-point drop.
+Then $\Delta=10-15=-5$ percentage points. Contextual degrades less, but its
+damaged-input accuracy is five points worse. Both statements must be reported.
+\end{concept}
+
+The hypothesis concerns a \emph{full recipe}. Its contextual term, positive
+margin, and similarity regularizer differ from the standard recipe. A positive
+finding cannot identify the neighborhood term alone as the cause. The omitted
+extra control limits causal attribution; it does not make the declared
+recipe-to-recipe comparison meaningless.
+
+\subsection{Why use this study design?}
+Freezing an existing motion encoder makes the training comparison narrower and
+less expensive than fine-tuning the whole network. Holding the head architecture,
+data, duration, and tuning budget fixed makes differences easier to attribute to
+the training recipes. Testing unfamiliar action classes asks whether the learned
+comparison transfers beyond the action labels used for training.
+
+Damaging only queries keeps the references unchanged. The experiment can then
+measure sensitivity to the query disturbance. It does not establish performance
+when both gallery and query are damaged, or robustness to arbitrary camera
+failures. Those would be different experiments.
+
+\source{\src{plan/research-plan.v3.md}{Final v3 plan, Sections 1, 3--6};
+\src{docs/decisions/0004-frozen-one-shot-v3.md}{Decision 0004}.}
+
+\section{Data: what one row actually means}\label{sec:data}
+\subsection{Dataset, observations, and dependence}
+The dataset family is NTU RGB+D 120,\cite{ntu} but this pipeline uses its adopted
+\textbf{HRNet-derived 2D pose annotations}. The model channels are $x$ coordinate,
+$y$ coordinate, and confidence. They are not $x,y,z$ ground-truth 3D positions.
+``Clean'' means before this study adds damage; the pose estimates already have
+their own errors.
+
+The adopted inventory has 113,945 usable captures. Together with 535 documented
+missing-skeleton exclusions, these reconcile to 114,480 nominal captures.
+Reconciling the count matters because a changed input inventory could silently
+change the population being compared.
+
+A capture has metadata including setup, performer, repetition, action, and
+camera. Several cameras can observe the \emph{same underlying performance}.
+Thus three rows need not be three independent examples. The performance-group
+key is
+\[
+  (\text{setup},\text{performer},\text{repetition},\text{action}),
+\]
+with camera deliberately omitted. This key matters twice: when excluding
+near-duplicate gallery performances from primary queries, and when estimating
+uncertainty.
+
+\subsection{Split by action before learning the comparison}
+The 120 action classes are partitioned into 100 auxiliary actions and twenty
+novel actions. Within the auxiliary set, eighty actions train candidate heads
+and twenty different actions support development evaluation.
+
+\begin{center}
+\resizebox{0.96\linewidth}{!}{%
+\begin{tikzpicture}[node distance=8mm,
+ box/.style={draw=ink,rounded corners=2pt,align=center,text width=37mm,
+ minimum height=13mm,font=\small},arrow/.style={-{Latex},thick,ink}]
+\node[box] (all) {120 action classes};
+\node[box,below left=10mm and 10mm of all] (aux) {100 auxiliary actions};
+\node[box,below right=10mm and 10mm of all] (novel) {20 novel actions\\final test};
+\node[box,below left=10mm and -2mm of aux] (train) {80 actions\\candidate training};
+\node[box,below right=10mm and -2mm of aux] (dev) {20 actions\\development retrieval};
+\draw[arrow] (all)--(aux);\draw[arrow] (all)--(novel);
+\draw[arrow] (aux)--(train);\draw[arrow] (aux)--(dev);
+\end{tikzpicture}
+}
+\end{center}
+
+\begin{tabularx}{\linewidth}{@{}Y r Y@{}}
+\toprule
+Role & Rows & Permitted use\\\midrule
+Candidate-head training & 76,013 & Learn weights using eighty actions.\\
+Development-validation pool & 18,988 & Twenty held-out auxiliary actions.\\
+Development gallery & 20 & One fixed reference per development action.\\
+Primary development queries & 18,929 & Evaluate candidates without gallery-performance views.\\
+Final-head training & 95,001 & All 100 auxiliary actions, after selecting recipes.\\
+Novel gallery & 20 & Fixed official exemplars.\\
+Primary novel queries & 18,884 & Confirmatory final evaluation.\\
+Exact-official novel queries & 18,924 & Descriptive compatibility evaluation.\\
+\bottomrule
+\end{tabularx}
+
+These rows are \emph{roles}, not disjoint quantities to add together. Final-head
+training is the union of the two auxiliary pools: $76{,}013+18{,}988=95{,}001$.
+Gallery and query roles are selected from their respective validation or novel
+pools. The twenty novel anchors plus 18,924 official queries give 18,944 novel
+rows; $95{,}001+18{,}944=113{,}945$.
+
+After choosing one learning rate for each recipe, nine fresh final heads are
+trained on all 100 auxiliary actions. Reusing the development actions at this
+point is legitimate because recipe selection is finished and the novel actions
+still provide the final evaluation. The final heads are not the candidate or
+pilot checkpoints with new names.
+
+\subsection{Why two query definitions?}
+The exact-official query set removes the gallery exemplar itself. The primary
+set also removes other camera views of that exemplar's performance. Otherwise,
+the system could retrieve a simultaneously recorded version of the same event,
+which is easier than recognizing another performance of the action.
+
+The two definitions answer related but different questions. The official one
+maintains benchmark comparability; the primary one reduces this specific
+cross-camera dependence. Their difference is not selected after seeing scores.
+Exact IDs are locked from metadata. Do not infer counts by assuming every
+performance has three valid camera views.
+
+This is an \textbf{action-disjoint} study, not a claim of performer-disjoint
+generalization. People or setups can recur. ``Novel'' describes the role in
+this study's head training and selection; it does not prove the pretrained
+encoder has never encountered any related action in any source data.
+
+\subsection{A manifest is part of the experimental definition}
+A manifest records which sample IDs belong to a role, their order, exclusions,
+and source bindings. Its hash is a compact fingerprint of those exact bytes.
+Recreating a manifest independently and comparing it checks that the stated
+rules lead to the same population.
+
+This is stronger than checking a row count. Two files can each contain 18,884
+rows but describe different queries. Conversely, equal hashes establish equality
+of content, not that the content is scientifically correct. Both semantic
+validation and identity checks are needed.
+
+\studycheck{Why would a random split of capture rows fail to test the intended
+transfer to new actions? Why is removing only the exact gallery filename
+insufficient? Answers: Questions 1--2 in the answer key.}
+\source{\src{plan/research-plan.v3.md}{Final v3 plan, Section 3};
+\src{docs/protocol/ntu-manifest-audit.v2.md}{Adopted manifest audit};
+\src{docs/protocol/input-contract-amendment.v1.md}{Input contract amendment}.}
