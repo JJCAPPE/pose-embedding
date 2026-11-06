@@ -11,7 +11,57 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
-## Current checkpoint: November 5, 2026
+## Current checkpoint: November 6, 2026
+
+Synthetic GPU prerequisite **8466503** is independently accepted under the exact
+ADR0010 runtime profile. It ran on scc-j01 from **10:51:00 to 10:51:50 PM EST on
+November 5**, with four OMP slots, one L40S, failed=0 and exit=0. Accounting records
+50 scheduler seconds and 26.024 CPU seconds. Acceptance occurred on November 6.
+
+Independent metadata review replayed the existing frozen validators. The complete
+startup profile matches accepted CPU baseline 8457156 with only the previously
+approved exact GPU build-report expansion; before and after profiles are identical.
+The parent remained CUDA-uninitialized. Its owned holder caused the expected busy
+probe rejection, then released the GPU before two successful sequential probes in
+separate processes. All six allocation snapshots and four seal records passed.
+
+Review rehashed 86 metadata files, 58 diagnostic evidence bindings, all 67 runtime
+bindings and 616 frozen source blobs. A terminal recheck verified 846 launch
+bindings. All 13 resource samples independently passed the current
+467,248,364,800-byte storage requirement and 32 GiB RAM limit. Maximum sampled
+process-group RSS was 690,597,888 bytes. The synthetic helper records an older
+84 GB monitoring bound; acceptance recomputed every raw sample against the current
+202 GB forecast without changing the frozen helper.
+
+Acceptance receipt: `week5-runtime-baseline-gpu-acceptance/20261106T054704Z/verification.json`,
+SHA-256 `6adfe659fb73e0f7352cf0f5c85e89989c2e93915016855da2e4ccea1155b109`.
+The source-bound forecast retains 202 GB with zero deductions for completed output,
+the 200 GiB reserve and 25% margin. The next authorized prerequisite is fresh parity
+and all five caches, followed by allocated independent validation. No cache, pilot,
+measured capacity, task, gate or Week 5 closure is accepted by the synthetic check.
+
+The first terminal observer stopped at a metadata-size guard while reading large
+scheduler snapshots. Terminal accounting and retained metadata were recovered
+without another queue poll. This bookkeeping failure did not launch a diagnostic
+or alter the historical libm non-progress count of two.
+
+Fresh parity and five-cache job **8469351** was submitted once after renewed
+identity, source, authorization, seal, duplicate-job, quota, filesystem, RAM,
+GPU queue and calendar guards. Eleven retained attempt paths were reconciled
+against the accepted CPU/GPU evidence and historical failure receipts.
+Launch: `week5-runtime-baseline-caches/20261106T054958Z/launch.json`, SHA-256
+`82eed4393123e74aca88f9ce034c64a5a1b632ed8066db8ef14e133a09c4c313`.
+This submission does not establish cache completion or acceptance. Selection
+runs, final training and novel opening remain closed.
+At **12:50:35 AM EST**, the initial observation found the sole job queued for
+one L40S, four OMP slots and 32 GiB. Actual placement and profile are unverified.
+Observation SHA-256 `5da20af43b2072115be5d1852ccad0d531833b1dd0a55e50891a43e204abdf57`.
+The next eligible scheduled observation is **2:35 AM EST (07:35 UTC)**; no
+routine check before the one-hour boundary at 06:50:36 UTC.
+
+<a id="current-checkpoint-november-5-2026"></a>
+
+## November 5 checkpoint: accepted CPU baseline
 
 CPU baseline **8457156** is independently accepted under ADR0010. It ran on
 scc-h30 from **10:21:15 to 10:25:09 PM EST**, with four OMP slots,
