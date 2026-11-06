@@ -13,6 +13,51 @@ govern this work.
 
 ## Current checkpoint: November 5, 2026
 
+CPU baseline **8457156** is independently accepted under ADR0010. It ran on
+scc-h30 from **10:21:15 to 10:25:09 PM EST**, with four OMP slots,
+failed=0 and exit=0: **234 scheduler seconds** and **237.051 CPU seconds**.
+The complete observed, startup, final and nine child profiles match the exact
+553.182.1 profile, Gold 6426Y, native AVX512 and four numerical threads.
+
+Independent review verified three fresh initializations for each seed 7/17/29,
+two complete byte-identical geometry records with 430 tensor hashes and 387 damage
+rows each, the original 43 panel IDs and fallback 0.6601371765136719. All 18,929
+candidate identities, support fields and scale validity are preserved. All nine
+condition summaries were recomputed from retained damage metadata. The frozen
+allocated validator performed full-array replay; the independent metadata review
+did not access scientific arrays on login or locally.
+
+All three command outcomes, nine resource samples, submission and operation seals,
+782 metadata bindings and 616 frozen source hashes passed. The maximum sampled
+process-group RSS was 2,865,360,896 bytes, below 32 GiB. Minimum observed quota and
+filesystem capacity exceeded the unchanged 467,248,364,800-byte requirement.
+Acceptance receipt: `week5-runtime-baseline-acceptance/20261106T034626Z/verification.json`,
+SHA-256 `7e091117d3f5709939942f83dcb1b043ff4f899fa285c7c151b160ec479fa9f1`.
+
+The external runtime gate now binds this accepted CPU job. Complete profile,
+evidence, resource and before/after checks are unchanged; 73 local fixtures and
+independent review passed. The refreshed source-bound forecast retains all
+202 GB with zero deduction for completed geometry. The existing automation
+returned to hourly checks after terminal acceptance, as requested.
+
+The unchanged synthetic GPU prerequisite **8466503** was submitted at
+**10:49:59 PM EST** after fresh guarded preflight. At **10:50:55 PM EST** it was
+queued for one L40S, four OMP slots and the prescribed Gold-6426Y/Sapphire Rapids
+CPU profile. Actual placement and runtime compatibility remain unverified.
+Launch SHA-256 `22230909f3000441876c75fbb8a427fe5901c0466577de79bdd0476203ab31ff`;
+initial observation SHA-256
+`a9e4cc4f2d61d1e61f54cca20f363309d0113623327956a61a32e67a398f345c`.
+The next observation is no earlier than **11:50:56 PM EST**; the next eligible
+hourly slot is **November 6 at 12:35 AM EST**. Do not resubmit the recorded job.
+
+CPU acceptance does not pass Week 5. Fresh synthetic GPU evidence, parity and five
+caches, the three paired pilots and numerical replay, complete development
+corruption/projection/retrieval evidence, timing, full admission, independent
+recertification and measured schema-2 capacity remain required before selection
+authorization. Selection runs, final training and novel opening remain closed.
+
+### Earlier November 5 checkpoint: CPU placement failure and targeted retry
+
 CPU job **8454319** ran on scc-h32 for 45 seconds (four OMP slots, exit 1).
 The actual CPU identity check failed before the launcher could record a complete
 profile or start initialization. The log does not identify which CPU field failed.
