@@ -38,8 +38,8 @@ The source-bound forecast retains all 202 GB with zero completed-output deductio
 the 200 GiB reserve and 25% margin. Refreshed forecast SHA-256:
 `27f683f3338447972f61beb6041535874866949a6d363a607185b39c0b686cbf`.
 
-The next prerequisite is the contrastive engineering pilot, followed by contextual
-and SupCon pilots with the same initialization, physical P=8/K=4 batches and seed 7,
+The next prerequisite is the contextual engineering pilot, followed by SupCon,
+with the same initialization, physical P=8/K=4 batches and seed 7,
 then independent numerical replay. Development corruption/projection/retrieval,
 resident timing, full admission and recertification, measured schema-2 capacity and
 selection authorization remain required. Selection runs, final training and novel
@@ -50,15 +50,48 @@ GPU and calendar checks passed, including exact reconciliation of 17 retained
 attempt paths. Contrastive pilot **8480921** was submitted once at **19:51:03 UTC**.
 The first observation at **20:52:36 UTC** found it already terminal: scc-j01,
 four OMP slots, failed=0/exit=0, **520 scheduler seconds**, ending **20:28:00 UTC**.
-This is terminal accounting, not pilot acceptance. Its complete execution metadata
-must be reviewed before contextual training, and independent allocated three-pilot
-numerical replay remains mandatory after all arms finish.
+That initial accounting alone did not accept the pilot. The subsequent execution
+review below permits the next arm; independent allocated three-pilot numerical
+replay remains mandatory after all arms finish.
 
 Launch: `week5-runtime-baseline-pilot-contrastive/20261106T195057Z/launch.json`, SHA-256
 `99bdf48a3ac1961485ea0cd8f9dee70de2a563fd27643fab40ed986d957c886f`.
 Observation: `week5-status/20261106T205236Z/observation.json`, SHA-256
 `e7c0fc82246e836de7a3fd380476822e88e8471e7d67a8a876290c97169d047b`.
-No resubmission or additional scheduler observation is needed for terminal review.
+The subsequent independent execution review rehashed 107 metadata files and
+verified 20 epochs, 47,520 physical P=8/K=4 batches, all 20 batch hashes,
+21 diagnostics and five healthy epoch records. Four checkpoint and eight
+projection bindings are retained; their binary content was not read on the login
+node or locally. Retained query identities and rank-summary arithmetic passed at
+all four scored snapshots. The exact approved runtime, five commands, two GPU
+preflights, four seals and all 19 resource records passed. Ten relevant source
+files match the frozen release; the terminal recheck bound 1,153 metadata and
+616 source files. The existing frozen operation metadata checker also passed.
+
+Execution acceptance: `week5-pilot-execution-acceptance/20261107T004153Z/verification.json`,
+SHA-256 `a61a14688f979b699716119968b8775ab0b2df76e8a4bef15ba1f0fdbb005ed6`.
+This accepts execution metadata only, not numerical pilot admission or selection.
+No further scheduler observation or resubmission of 8480921 is needed.
+The evidence-bound forecast at `week5-storage-forecast/20261107T004153Z/forecast.json`,
+SHA-256 `56949acbcb48f7873d5df94e59bdfc9999a690c0e9a95ce75b06c2eb822e1192`,
+retains all 202 GB, zero deductions, the 200 GiB reserve and 25% margin.
+
+After fresh authorization, identity, source, seals, duplicate-job, resource and
+calendar checks, contextual pilot **8488504** was submitted once at
+**00:43:30 UTC November 7 (7:43:30 PM EST November 6)**. The preflight reconciled
+exactly 20 retained attempt paths. Its initial observation at **00:44:03 UTC**
+was queued, requesting four OMP slots, 32 GiB and one L40S on the approved CPU
+architecture. Allocation, runtime and outputs remain unverified. Next scheduled
+observation: **02:35 UTC November 7 (9:35 PM EST November 6)**; never before
+**01:44:04 UTC**. The earlier hourly automation run must skip this job.
+
+Launch: `week5-runtime-baseline-pilot-contextual/20261107T004324Z/launch.json`, SHA-256
+`f127d50a10c0753d67ac1f8cb784e2a7773fe0973248667f3282ebb65faa63e7`.
+Observation: `week5-status/20261107T004402Z/observation.json`, SHA-256
+`d69bba60f0937513ba230897433bf2affb1f265640c00d3946cdf259c3e2ce10`.
+The reviewed launch script SHA-256 is
+`1d2f25deda6f05eb975a41437d1724cb943abb8135543aab0fd7c7015102c7dc`.
+Preserve its submission receipt and invocation markers; do not resubmit blindly.
 
 ### Earlier November 6 generation review and validator submission
 
