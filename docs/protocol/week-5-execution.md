@@ -11,7 +11,73 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
-## Current checkpoint: November 7, 2026, three-pilot execution review
+## November 7: independent three-pilot numerical admission
+
+CPU validator **8499390** independently accepted all three paired engineering
+pilots under ADR0010. It ran on scc-h30 with four OMP slots from **15:23:52 to
+15:39:19 UTC (10:23:52 to 10:39:19 AM EST)**, failed=0/exit=0, after **927
+scheduler seconds**. The due terminal observation reused that accounting for
+review; no second scheduler query was needed.
+
+The frozen allocated validator checked all three 20-epoch pilots, each with
+47,520 physical P=8/K=4 updates, exact shared initialization, the complete batch
+plan and all 20 epoch hashes. All **12 fresh snapshot numerical checks passed
+with zero proof reuse**. Each arm's retained manifests, metrics and wiring
+fixture match its accepted execution record. Scientific arrays and checkpoint
+contents were processed only in allocation, not locally or on the login node.
+
+Independent review rehashed 74 current metadata files and checked the exact
+before/after CPU runtime, ten relevant frozen sources, three commands, four
+seals, 22 operation resource records and the runtime preflight. The terminal
+recheck verified 1,483 metadata and 616 source bindings; the existing frozen
+operation metadata checker passed. Minimum effective free storage was
+3,740,520,000,000 bytes against the unchanged 467,248,364,800-byte requirement.
+The validator recorded 899.490609 seconds and peak process memory of
+4,698,071,040 bytes. These measurements do not establish full campaign capacity.
+
+Acceptance: `week5-pilot-acceptance/20261107T164819Z/verification.json`, SHA-256
+`73741ecf022766505210351b4e2ada8292b6df4570bd6d1a2fc85345bb6b7db3`.
+Allocated validation: `20261107T152403Z-8499390-validate-pilots/validation.json`,
+SHA-256 `956e85fec774793d1b40dc540b72d88fc1c44d20654c2f346694a1a0daf1e26e`.
+Terminal observation: `week5-status/20261107T164152Z/observation.json`, SHA-256
+`6952984f92c851cdc36ca90742a9e2ebf6996fa77b85ca11d4576bff9122689c`.
+Paths are relative to `study-v3/operations`.
+
+The refreshed source-bound forecast, SHA-256
+`c9f19d1c21c5a290333d52c00ce7b77da9d1474f483f6dc0b6f0ac7230c50ddc`,
+binds accepted replay and retains the full 202 GB with zero output deductions,
+the 200 GiB reserve and 25% margin. Its next preflight must reconcile all
+29 retained attempt paths. No evidence was deleted or safeguard lowered.
+
+The next prerequisite is nine development corruption encodings, 27 query
+projections, three galleries and 27 retrieval results. Resident timing, full
+admission, independent recertification, measured schema-2 CPU/GPU/storage/
+researcher capacity and selection authorization remain required. Task 02 stays
+in progress and all scientific gates remain pending. Week 5 remains open;
+selection runs, final training and novel opening remain closed. Actual
+researcher hours remain unreported. November 29 locks, December 6 compute and
+December 7–18 delivery remain binding; the historical libm investigation
+remains stopped at two non-progressing diagnostics.
+
+After fresh identity, source, authorization, seal, duplicate-job, storage,
+RAM, GPU and calendar checks, development corruption job **8501664** was
+submitted once at **16:52:17 UTC (11:52:17 AM EST)**. The existing frozen GPU
+controller receives the accepted cache and three pilot directories in the
+required order. Preflight reconciled all 29 retained attempt paths.
+The initial **16:52:47 UTC** observation was queued, requesting four OMP slots,
+32 GiB, one L40S and 12 hours under the approved architecture/runtime guard.
+Actual allocation, runtime and outputs remain unverified. Submission is not
+acceptance and does not advance a scientific gate.
+
+Launch: `week5-runtime-baseline-corruptions/20261107T165212Z/launch.json`, SHA-256
+`8b28ed95bb2616089ec9234292957c901483ced1555565e51fe679e35134bcd2`.
+Initial observation: `week5-status/20261107T165247Z/observation.json`, SHA-256
+`204f0339de43a5c3a1571c87e944d4af8e23ff4a79dff91bfe173a5b893b16e9`.
+Next scheduled observation: **18:35 UTC (1:35 PM EST)**; never before
+**17:52:48 UTC**. The 17:35 UTC run must skip. Preserve all executed-command
+markers and never resubmit blindly.
+
+## Earlier November 7 three-pilot execution review
 
 SupCon pilot **8498509** is independently accepted for execution metadata.
 It completed on scc-j03 at **13:28:42 UTC (8:28:42 AM EST)** with four OMP
