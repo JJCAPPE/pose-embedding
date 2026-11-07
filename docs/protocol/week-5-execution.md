@@ -11,6 +11,80 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
+## November 7: allocation-local parity recovery
+
+Development job **8501664** failed on scc-j08 at **16:56:56 UTC (11:56:56 AM
+EST)** after **213 scheduler seconds**, with four OMP slots, scheduler failed=0
+and process exit=1. The due observation at 18:50 UTC captured terminal accounting
+once; independent review reused it. Command 010, the first corrupted extraction, rejected
+an inference environment different from its verified parity report.
+
+The accepted cache parity binds scc-j04 and its physical GPU. The new allocation
+used scc-j08 and a different scheduler-assigned L40S. The exact host/GPU comparison
+therefore failed before corruption extraction. This is an input-provenance
+mismatch, not a failed corruption numerical result. All five GPU preflights
+identified the same assigned GPU; the complete approved CPU runtime matched
+before and after the attempt.
+
+Independent failure review checked 109 metadata files, ten relevant frozen
+sources, all eleven command arguments/outcomes, five GPU preflights, 23 resource
+records and four seals. A stat-only output inventory confirms exactly three
+retained gallery archives and their sidecars, with zero corrupted encodings,
+query projections or retrieval results. Terminal recheck verified 1,548 input
+bindings and 616 sources. Scientific binary contents were not read locally or
+on the login node. Failure receipt:
+`week5-corruption-failure-verification/20261107T191759Z/verification.json`, SHA-256
+`7d52180a0763d4367045f243fcb2d61504599600829fe23fcf862e40aee38ae7`.
+
+The reviewed external correction uses the existing parity command on the actual
+allocated GPU, then the unchanged frozen corruption controller. A separate
+`corruption-inputs` directory contains the fresh parity report and two symlinks
+to the original accepted gallery and sidecar. Resolved gallery provenance remains
+original; no cache is copied, rewritten or newly accepted. The exact parity
+comparison, source locks, numerical checks and admission checks remain unchanged.
+The original 135 controller commands and 67 GPU preflights remain required;
+the additional parity prelude retains its own commands, allocation, seals,
+resource records and outcome. Its failures prevent controller execution.
+
+A new immutable external runtime gate adds only the exact hash-bound prelude
+and input packet to its permitted commands and before/after integrity checks.
+Both stages remain inside the full ADR0010 runtime guard. Fifty-three targeted
+controller/prelude checks and 79 runtime checks passed, with independent static
+review. Frozen scientific release f101f0e and r2 locks are untouched. This uses
+ADR0009's reviewed external-correction path; it grants no scientific acceptance.
+
+The corrected source-bound forecast retains the previous 202 GB and adds 1 GiB
+for parity metadata, logs and monitoring, with zero completed-output deductions.
+The 200 GiB reserve and 25 percent margin require **468,590,542,080 bytes** free.
+The next preflight must reconcile all 32 retained attempt paths. The initially
+staged forecast had a stale predecessor reference; it remains immutable and
+unused. A new forecast corrects that link without changing the bound:
+`week5-storage-forecast/20261107T192359Z/forecast.json`, SHA-256
+`d3998a22633f637b5cd5437b6a311eeb42642fe4c259ecf06643b389e6c6117f`.
+
+After fresh identity, source, authorization, seals, duplicate-job, storage,
+RAM, GPU and calendar checks, retry **8504212** was submitted **once at
+19:31:22 UTC (2:31:22 PM EST)**. The initial observation at **19:31:49 UTC**
+found it as the sole queued job, requesting four OMP slots, 32 GiB, one L40S
+and 12 hours on the approved architecture. All 32 retained attempt paths
+reconciled; quota remainder was 3,739,340,000,000 bytes and filesystem free
+space was 4,122,459,766,784 bytes. No actual allocation, parity result or
+scientific output is accepted by this queued observation.
+
+Launch: `week5-runtime-baseline-corruptions/20261107T193116Z/launch.json`, SHA-256
+`0feca23bd23b66ba8b99c1bd9d356e36904355b75bfda92767712024a4912d70`.
+Initial observation: `week5-status/20261107T193149Z/observation.json`, SHA-256
+`9b1bc72e831d66639a4412765218db4133af0d5ce2d0ce24375dd23181d38764`.
+Paths in this section are relative to `study-v3/operations`. The next scheduled
+observation is **20:35 UTC (3:35 PM EST)**, never before **20:31:51 UTC**.
+Terminal review must include the parity prelude and original controller records.
+
+Development acceptance, resident timing, full admission and independent
+recertification, measured schema-2 capacity and selection authorization remain
+required. Week 5 stays open; all later scientific stages remain closed. No new
+allocated diagnostic was run; the historical libm non-progress count remains two.
+Actual researcher hours remain unreported and all delivery safeguards remain fixed.
+
 ## November 7: independent three-pilot numerical admission
 
 CPU validator **8499390** independently accepted all three paired engineering
