@@ -11,6 +11,64 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
+## Current checkpoint: November 7, 2026
+
+Contextual pilot **8488504** is independently accepted for execution metadata.
+It completed on scc-j06 at **00:56:30 UTC November 7 (7:56:30 PM EST November 6)**,
+with four OMP slots, failed=0/exit=0 and **548 scheduler seconds**. The existing
+SCC connection had disconnected; the authorized saved-password callback restored
+the same pane before the terminal observation. No duplicate connection or job
+was created.
+
+Independent review rehashed 108 retained metadata files, checked 12 relevant
+frozen sources and 53 design-source bindings, and verified the exact approved
+runtime before and after execution. Five commands, two GPU preflights, four
+seals and all 20 resource records passed. Minimum effective free storage was
+3,741,830,000,000 bytes; maximum sampled process-group RSS was 3,034,624,000 bytes.
+The terminal controller recheck verified 1,263 metadata and 616 source bindings.
+The existing frozen operation metadata checker also passed.
+
+All 47,520 physical P=8/K=4 batches, 21 diagnostics and five healthy snapshot
+records passed review. Initialization, the complete batch-plan hash and all
+20 epoch batch hashes exactly match accepted Contrastive execution. The wiring
+fixture, four checkpoint and eight projection metadata bindings, query identities
+and retained rank-summary arithmetic passed. Scientific arrays and checkpoint
+contents were not read locally or on the login node; independent allocated
+three-arm numerical replay remains mandatory.
+
+Execution acceptance: `week5-pilot-execution-acceptance/20261107T131548Z/verification.json`,
+SHA-256 `187944574e4ea938d5bdaaf9f5f4c49a45af0988af11b7a5c6d223e127aea619`.
+Terminal observation: `week5-status/20261107T123637Z/observation.json`, SHA-256
+`d3ac84ea494b2d3dc373f362b0ae052ee2c9e9e7ef965efd0d2a66658e1ec856`.
+The refreshed source-bound forecast at
+`week5-storage-forecast/20261107T131548Z/forecast.json`, SHA-256
+`8b551526e4cbd7568ac22ba62200352a8fce95daa26511add88fb518fefdfa0e`,
+retains all 202 GB, zero completed-output deduction, the 200 GiB reserve and
+25% margin. Do not resubmit or poll completed contextual job 8488504.
+
+After fresh authorization, identity, source, seal, duplicate-job, storage,
+RAM, GPU and calendar guards, SupCon pilot **8498509** was submitted once at
+**13:18:36 UTC (8:18:36 AM EST)**. Preflight reconciled exactly 23 retained
+attempt paths. The initial **13:19:11 UTC** observation found it queued,
+requesting four OMP slots, 32 GiB and one L40S under the approved architecture.
+Actual allocation, runtime and outputs remain unverified. Next scheduled check:
+**14:35 UTC (9:35 AM EST)**; never before **14:19:12 UTC**. The 13:35 UTC
+automation run must skip this job.
+
+Launch: `week5-runtime-baseline-pilot-supcon/20261107T131831Z/launch.json`, SHA-256
+`a24c25505bb2fc9f4578852c6dd1ef0fe48b8fe2a66f98c87619d9c8c6de21dd`.
+Observation: `week5-status/20261107T131910Z/observation.json`, SHA-256
+`720d1c068637eb7cfa2b4eef699ca88d282f25de09c1b4fec4fa4d40ff960ecc`.
+The independently reviewed launch script SHA-256 is
+`b734edd2fb5728dbee3a07cc50aa27bdd406c9258502658cac8428e3fa5035ec`.
+Preserve all invocation markers and receipts; never resubmit blindly.
+
+SupCon and independent three-arm replay, development corruption/projection/retrieval,
+resident timing, full admission/recertification, measured schema-2 capacity and
+selection authorization remain required. Selection runs, final training and novel
+opening remain closed. Week 5 remains open; actual researcher hours are unreported.
+The historical libm diagnostic count remains two and stopped.
+
 ## Current checkpoint: November 6, 2026
 
 Cache validator **8478212** is independently accepted under ADR0010. It ran on
