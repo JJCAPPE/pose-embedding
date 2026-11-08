@@ -2,6 +2,30 @@
 
 These rules apply to every automated or human change in this repository.
 
+## SCC completion alerts and continuation
+
+- Every authorized long-running SCC GPU job and dependent CPU validator must
+  have its job ID, launch receipt, sole controller and next eligible check in
+  the existing handoff before control is released. Reuse the existing Week 5
+  automation; do not create a second watcher, connection or monitor.
+- At a permitted scheduled check, retain terminal `qacct` evidence and send a
+  local Mac alert with `scripts/operations/notify_scc_job.py` from the current
+  research worktree. Follow the [notification procedure](docs/protocol/scc-v3-runbook.md#mac-job-alerts-and-continuation).
+  Keep its deduplication receipts outside Git. Notify on completion or failure,
+  never on unchanged queued/running status. Scheduler disappearance alone is
+  not terminal evidence; an alert is not scientific acceptance.
+- The same controller must review the retained evidence and continue the next
+  authorized prerequisite, or record the required researcher action. Preserve
+  all acceptance gates, pause rules and the ban on later scientific stages.
+- These alerts use the existing hourly observation schedule, not instant SCC
+  push. The Mac must be awake with Codex running; notification permission and
+  Focus settings affect banners. Do not claim delivery from an exit-zero
+  notification command alone. Test the visible alert when installing it.
+- Respect explicit pauses. At earned Week 5 closure or a researcher-action
+  blocker with no independent work, pause the same automation and verify its
+  saved state. Do not install email credentials or new notification services
+  for the Mac-only workflow.
+
 ## Canonical intent
 
 - Read `plan/research-plan.v3.md`, `plan/research-plan.v3.json`, and
