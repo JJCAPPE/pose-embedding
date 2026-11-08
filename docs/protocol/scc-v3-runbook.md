@@ -5,6 +5,58 @@ govern these commands. Use a clean committed release, Python 3.11 and the locked
 environment. Perform tensor processing only inside Grid Engine allocations.
 Historical releases, artifacts and run manifests remain immutable.
 
+## Mac job alerts and continuation
+
+The researcher selected native Mac notifications on November 7. Use the existing
+`complete-pose-embed-week-5` automation as the sole scheduled observer and
+continuation mechanism. This is scheduled detection, not an SCC event hook:
+routine checks remain hourly at minute 35, subject to the latest handoff's
+minimum interval and next-check boundary. A job ending just after a check can
+wait roughly an hour; a sleeping Mac or stopped app adds delay. Keep the Mac
+awake and Codex running. No email, SMTP secret, third-party account or additional
+monitor is required.
+
+For every new long-running GPU job and its dependent CPU validators, retain the
+job ID and launch receipt and record the controller, automation state and next
+eligible check in the existing handoff. Never resubmit a job to add alerts.
+Use the current reviewed metadata observer through the existing authenticated
+SCC pane. Do not query the scheduler merely to send a notification.
+
+When the permitted observation has complete terminal accounting, retain the
+exact `qacct -j JOB_ID` output locally with the existing private observation
+packet. The observer's `commands.detail.stdout` contains it when
+`commands.detail.argv` identifies that `qacct` command and its return code is
+zero. Reuse this output rather than polling again. From the research worktree:
+
+```bash
+python3 scripts/operations/notify_scc_job.py \
+  --job-id JOB_ID --accounting /absolute/private/path/accounting.txt
+```
+
+Replace both placeholders with the observed job and retained accounting file.
+The helper validates terminal fields and job identity, shows a native notification
+and retains a locked local receipt under
+`~/.codex/automations/complete-pose-embed-week-5/notifications/`. Repeated successful
+delivery attempts for the same job are suppressed. A failed notification command
+does not mark the alert delivered and may be retried. The notification contains
+only the job ID, exit status and a reminder that evidence review is pending;
+do not include private logs, inputs, identities or results in banner text.
+
+Continue independent terminal review in the same controller turn. Exit zero,
+the alert and the helper's receipt do not establish scientific acceptance.
+Only accepted evidence permits the next authorized prerequisite. Preserve
+single-controller checks, source/input bindings, resource/seal records and all
+researcher-action and completion stopping rules. A notification problem is
+recorded separately from the scientific result.
+
+The helper uses macOS Script Editor notifications through `osascript`. During
+setup, send a clearly labelled test and verify it appears. If not, inspect
+System Settings > Notifications > Script Editor and Focus settings; a successful
+command does not prove a banner was displayed. Do not manufacture a completed
+job for the test. The app's Scheduled inbox remains the durable progress record.
+The existing automation must be ACTIVE for unattended continuation, and an
+explicit user pause must not be silently undone.
+
 On November 5 the researcher adopted [ADR0010](../decisions/0010-kernel-182-baseline.md).
 Use the complete prospective profile with kernel `4.18.0-553.182.1.el8_10.x86_64`
 and apply the full ADR0009 acceptance sequence. Reconcile the latest handoff and
