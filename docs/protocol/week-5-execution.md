@@ -11,6 +11,77 @@ complete.** The [incoming handoff](week-5-handoff.md),
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
+## November 9: development execution accepted
+
+Independent review accepted development job **8504212**, which ran on scc-j02
+from **November 7, 19:33:29 to 21:38:03 UTC**: 7,474 scheduler seconds, four OMP
+slots, failed=0 and exit=0. The November 9 observation retained terminal accounting;
+the configured Mac notification command succeeded. Execution acceptance followed
+the separate evidence review, not the scheduler exit or notification.
+
+The allocation-local parity prelude passed its two commands, one GPU preflight,
+four resource records and both seals. Fresh parity covered all 12 layers and 48
+fixed samples. The prelude and all 67 controller GPU preflights identify the same
+allocated L40S. Both gallery aliases resolve to the original accepted cache.
+Exact before/after runtime matches ADR0010, preserving only the already-reviewed
+Torch build-report handling. The frozen controller completed all 135 commands,
+with 357 resource records and both seals; submission seals also remained intact.
+
+The complete development inventory is accepted for execution and metadata:
+**nine 18,929-row corruption encodings, 27 query projections, three clean gallery
+projections and 27 retrieval results**. Independent reviews checked all 170,361
+geometry metadata rows and 511,083 retrieval rank records, ordered sample pairing,
+seed 7, accepted pilot heads, fixed conditions and source/input provenance.
+The existing frozen operation checker and reviewed metadata validator passed,
+rehashing 2,601 evidence bindings. Terminal checks also retained all 1,653 launch
+bindings and 616 source bindings. Scientific arrays were not opened or hashed on
+login or locally; allocated full admission and numerical recertification remain
+required.
+
+The acceptance receipt is
+`study-v3/operations/week5-development-acceptance/20261109T142747Z/verification.json`,
+SHA-256 `9f0d7db07eecef92afd20f69860ae0a889bc2731a8fd4588b820cb05a8ef6036`.
+It binds the frozen metadata review
+`week5-corruption-verification/20261109T142501Z/verification.json`, SHA-256
+`b421e4f9484ec7b38c0447dd9d75c158d345095fca3d90f683385d8e776cd5c2`.
+The refreshed source-derived forecast at
+`week5-storage-forecast/20261109T142747Z/forecast.json`, SHA-256
+`9ec29252b96518acad68559897edc0ecbda3950ccc73d2af08527d5b932ddbd5`,
+retains **203,073,741,824 bytes** with zero completed-output deductions. The
+200 GiB reserve and 25% margin require **468,590,542,080 free bytes**.
+No evidence was deleted and no scientific check was relaxed.
+
+Resident timing job **8535862** was submitted once at **14:37:02 UTC** after fresh
+identity, source, authorization, seal, duplicate-job, resource and calendar checks.
+All 36 retained attempt/launch/intent paths reconciled. The launch is
+`week5-runtime-baseline-timing/20261109T143656Z/launch.json`, SHA-256
+`7050ec945493b141394d9367c126e4d7ac120873e65f8e8b431e0b0e2b0ddfa2`.
+The initial **14:37:55 UTC** observation found the sole queued job requesting
+four OMP slots, 32 GiB, one L40S and twelve hours on the approved architecture.
+Its observation SHA-256 is
+`0c98423c6b045dc26572df15018a140788d155c7d27a2f351b9a02dd24bd334f`.
+Quota remainder was 3,700,670,000,000 bytes and filesystem free space was
+4,080,785,162,240 bytes. No actual allocation or timing result is accepted yet.
+The next eligible manual observation is **15:37:56 UTC (10:37:56 AM EST)**;
+the paused automation will not perform it automatically. Do not resubmit.
+
+The reused launcher initially stopped before submission because its metadata-path
+guard excluded the exact frozen source paths carried by the new acceptance
+receipt. Independent review verified a one-line correction allowing only those
+already hash-bound release files, alongside artifact-root metadata. Binary
+exclusions and all source/hash/resource checks remain intact. The original failed
+preflight and corrected launcher are retained; no scientific source changed and
+no allocated diagnostic was used.
+
+Full admission, independent
+recertification, measured schema-2 CPU/GPU/storage/researcher capacity and
+selection authorization still govern closure. The researcher explicitly chose
+to keep the hourly automation **paused** on November 9; this manual chat owns
+continuation. No new monitor was created. November 29 final locks, December 6
+compute and December 7–18 delivery safeguards remain binding. Actual researcher
+time remains unreported. Selection runs, final training and novel opening stay
+closed; the historical libm non-progress count remains two and stopped.
+
 ## November 7: allocation-local parity recovery
 
 Development job **8501664** failed on scc-j08 at **16:56:56 UTC (11:56:56 AM
