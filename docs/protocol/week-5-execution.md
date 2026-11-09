@@ -2,14 +2,106 @@
 
 Started October 11, 2026 (America/New_York), before the October 12–18 calendar
 week, at the researcher's direction. **Week 5 remains open. A predecessor runtime
-profile failed a necessary capacity condition. The reviewed validation/capacity
-successor passed installation, rehearsal and preparation; fresh scientific
-regeneration and measured admission remain pending. No scientific admission is
-complete.** The [incoming handoff](week-5-handoff.md),
+profile failed a necessary capacity condition. The reviewed successor now has
+accepted CPU/GPU baselines, five clean caches, three paired pilots and numerical
+replay, development execution and resident timing. Full admission, independent
+recertification, measured campaign capacity and selection authorization remain
+pending. No scientific admission is complete.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 9: resident timing accepted
+
+Independent operational and semantic reviews accepted timing job **8535862**.
+It ran on scc-505 from **14:40:26 to 15:01:58 UTC**, using four OMP slots and
+one L40S: **1,292 scheduler seconds**, 1,254.910 CPU seconds, failed=0 and exit=0.
+The due manual observation retained terminal accounting and the configured Mac
+notification command succeeded. The hourly automation remains paused at the
+researcher's request.
+
+The reviews verified 166 exported metadata records, the exact five commands,
+two GPU preflights, 32 operation resource records, the additional runtime-gate
+resource and four seals. Before/after runtime matches the approved ADR0010
+profile, preserving only the previously authorized CPU/GPU build-report mapping.
+Terminal recheck verified all 2,605 launch bindings and 616 frozen source files.
+The existing frozen operation validator and reviewed resident metadata validator
+passed and rehashed **2,755 evidence bindings**. Its retained receipt is
+`study-v3/operations/week5-timing-verification/20261109T172709Z/verification.json`,
+SHA-256 `ebbae5e873783397a9f56d29248dbfffc4bfd6dd743804cd3d8182c4407d8403`.
+
+The timing experiment held **95,001 rows resident**, with optimization restricted
+to the permitted **76,013 rows and 80 actions**. Each method completed 20 epochs
+and 59,380 updates using seed 7 and the same initialization. Independent review
+checked all **60 paired batch plans**, comprising 178,140 batches and 5,700,480
+index entries, with physical P=8/K=4. All three arms remain ineligible for
+selection or final training and retain no checkpoint.
+
+| Measured component | Seconds |
+| --- | ---: |
+| Resident loading | 15.683600 |
+| Artifact validation | 84.884146 |
+| Contrastive training | 353.846608 |
+| Contextual training | 417.340516 |
+| SupCon training | 329.474566 |
+| Complete timing command | 1,236.449714 |
+| Complete scheduler allocation | 1,292 |
+
+These component times are nested inside the complete command and allocation;
+they must not be added again to whole-job forecasts. The timing record SHA-256
+is `06eb8e09813fc0886d22d78f6e2d04b125bda5393dbf6f42aba5f62882fc1ff8`.
+Peak host memory was 5,092,806,656 bytes; maximum GPU reservation was
+4,078,960,640 bytes against a 47,695,921,152-byte device. Resource checks preserved
+the 32 GiB host limit and the unchanged 468,590,542,080-byte storage guard.
+No scientific array was read or hashed on login or locally.
+
+All nine required pipeline stages now have measured references. Full admission
+and repeated-validation costs still need allocated measurement before the
+schema-2 CPU/GPU calendar can be accepted. Source-derived invocation counts are
+not runtime measurements; historical pilot-cost multipliers cannot certify the
+successor. Full admission, independent recertification, measured capacity and
+selection authorization remain required for closure. The November 29, December 6
+and December 7–18 safeguards remain unchanged; later scientific stages stay closed.
+
+### Allocated admission-cost measurement
+
+The frozen admission assembler requires passed capacity before reaching its full
+admission timer. To measure the missing costs without inventing that capacity,
+the reviewed external correction uses the engineering authority in ADR0009 and
+the timing inventory required by ADR0007. It preserves the frozen scientific
+validator and measures its prefix through the expected rejection of an explicitly
+pending capacity receipt. It cannot write a passed capacity receipt, selection
+candidate or canonical authorization.
+
+The comparison measures a first proof session, reuse within that session and a
+fresh proof session. Required check/hit deltas are 42/24, 0/66 and 42/24; proof
+rehashing remains enabled. This is neither complete admission nor independent
+command recertification, and filesystem-cache state is uncontrolled. A necessary
+calendar bound that fails will require a result-blind researcher decision; a
+passing bound still requires the remaining measurements and full acceptance.
+
+The immutable correction is retained under
+`study-v3/operations/week5-admission-measurement-tools/20261109T175228Z`:
+tools manifest SHA-256
+`488d8b15d8d1f77a5d61cace521b4b8573d47f3ee6e7f97993207c14d9e7101f`,
+input packet `27b688cca27e0d4477f6b807a5c16bf7bf8dedd774b6f801bd30a7ea90ec4446`.
+Independent review passed the source, inputs and launcher. The 166 admission/proof
+tests and corrected 96 runtime tests passed; earlier local fixture/hash failures
+are retained and were corrected before submission.
+
+Job **8539455** was submitted once at **18:06:03 UTC**. Its initial observation
+at **18:07:02 UTC** showed the sole queued job, requesting four OMP slots, 32 GiB,
+12 hours and no GPU on the approved CPU host. Launch SHA-256 is
+`c06b9d9c06211ee81b871197b5fdba46d88c14ce3b98e2e71e0a898a0e23104c`.
+Fresh submission checks bound all 12 prerequisite operations and accountings,
+39 retained paths, source, authorization, seals and resources. The new forecast
+retains 204,147,483,648 bytes, including an additional 1 GiB metadata allowance,
+with zero deductions; required space is 469,932,719,360 bytes after the unchanged
+200 GiB reserve and 25% margin. No measurement result is accepted yet.
+Next eligible manual observation is **19:07:03 UTC / 2:07:03 PM EST**;
+the automation stays paused. This diagnostic line starts at zero non-progress
+attempts; the historical libm line remains stopped at two.
 
 ## November 9: development execution accepted
 
