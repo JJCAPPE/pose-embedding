@@ -12,6 +12,25 @@ pending. No scientific admission is complete.** The [incoming handoff](week-5-ha
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
+## November 9: SCC alerts and scheduled continuation resumed
+
+After the manual run, the researcher requested notification when SCC work ends
+so authorized work can move on. This supersedes the earlier November 9 schedule
+pause. The existing Week 5 automation was resumed and its saved **ACTIVE** state,
+hourly minute-35 schedule and Astra/ultra settings were verified. No second
+monitor or connection was created. The existing native Mac notifier supports
+CPU measurement 8539455; no notification-code change was needed.
+
+The first scheduled observation eligible under the current boundary is
+**19:35 UTC / 2:35 PM EST on November 9**. An earlier scheduled invocation must
+respect the **19:07:03 UTC** minimum boundary and exit without polling.
+Confirmed terminal accounting triggers a deduplicated completion/failure alert,
+followed by independent evidence review and the next authorized prerequisite.
+The Mac must be awake with Codex running; detection is hourly, and notification
+permission or Focus settings can affect banners. The previously confirmed
+visible setup test was not repeated. Scientific acceptance, single-controller
+rules and completion/researcher-action stopping rules remain unchanged.
+
 ## November 9: resident timing accepted
 
 Independent operational and semantic reviews accepted timing job **8535862**.
