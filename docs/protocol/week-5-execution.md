@@ -1,16 +1,84 @@
 # Week 5 execution record
 
 Started October 11, 2026 (America/New_York), before the October 12–18 calendar
-week, at the researcher's direction. **Week 5 remains open. A predecessor runtime
-profile failed a necessary capacity condition. The reviewed successor now has
-accepted CPU/GPU baselines, five clean caches, three paired pilots and numerical
-replay, development execution and resident timing. Full admission, independent
-recertification, measured campaign capacity and selection authorization remain
-pending. No scientific admission is complete.** The [incoming handoff](week-5-handoff.md),
+week, at the researcher's direction. **Week 5 remains open and requires a researcher decision. The current
+profile now fails a measured necessary calendar condition. CPU/GPU baselines,
+five clean caches, three paired pilots and numerical replay, development
+execution, resident timing and the admission-cost measurement are accepted.
+Full admission, independent recertification, feasible campaign capacity and
+selection authorization remain unaccepted. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 9: measured capacity blocker
+
+Independent operational and semantic reviews accepted admission-cost measurement
+**8539455**, which completed on the approved CPU profile from **18:07:25 to
+20:49:17 UTC**. Accounting reports four OMP slots, no GPU, **9,712 wall seconds**,
+failed=0 and exit=0. The permitted 21:41 UTC observation retained terminal
+accounting; the native Mac notification helper returned success. That does not
+prove a visible banner or establish scientific admission.
+
+The reviews checked three exact commands, all **167 operation resource records**,
+the runtime-gate resource, four launch/operation seals and unchanged before/after
+runtime. Terminal source recheck passed **2,815 launch bindings and 616 frozen
+source files**. All 243 exported metadata records passed content verification.
+The measurement command took **9,687.960131 seconds**. Maximum sampled process-group
+RSS was 2,490,146,816 bytes; scheduler maximum RSS was 4,791,463,936 bytes, below
+the 32 GiB limit. Minimum quota and filesystem remainder exceeded the unchanged
+469,932,719,360-byte storage requirement. No scientific arrays were read locally
+or on the login node.
+
+| Proof session | Prefix seconds | Numerical checks / reuse hits |
+| --- | ---: | ---: |
+| First | 3,263.363371 | 42 / 24 |
+| Reused | 3,087.310327 | 0 / 66 |
+| Fresh session | 3,223.895569 | 42 / 24 |
+
+All three reached the exact expected pending-capacity rejection. Full dependency
+rehashing and proof-session verification remained enabled. The reused session
+performed zero numerical replay, so the intended intervention occurred. This
+measures a scientific-validation prefix; it is **not full admission, independent
+command recertification or controlled cold-filesystem timing**. Pending capacity
+stayed unchanged and no passed capacity, candidate or canonical authorization
+was written. Measurement outcome SHA-256:
+`b9401c4bfa00cea684ed0db3c283ab1583b47b0753b4f45ad9cbb4eccbdafbbb`.
+Existing reviewed controller checks, fresh seal checks and **3,034 metadata
+bindings** also passed in the retained acceptance receipt:
+`study-v3/operations/week5-admission-measurement-verification/20261109T215032Z/verification.json`,
+SHA-256 `652046be9c77e11ffd5243902300ad11c450c16bd01d7bc1ddad1f58f943f431`.
+
+Independent frozen-source review counts 392 post-opening commands and 2,054
+nested admission prefixes: 11 encodings (22 prefixes), 10 primary exports (40),
+189 projections (279), 180 evaluations (810), report construction (451) and
+independent report recertification (452). Each command starts with an empty proof
+store. With `C = max(first, fresh session)` and `R = reused`, the necessary
+post-opening prefix forecast is therefore `392C + 1662R`.
+
+At this measured profile, that is **6,410,348.205702 seconds**, or
+**2,225.815349 hours with 25% slack**, compared with the entire **168-hour
+November 30–December 6 interval**. Even hypothetical zero-cost reuse leaves
+**444.180014 hours**. These optimistic necessary forecasts exclude post-proof
+verification, other validation, actual evaluation/report work and queue/setup.
+They fail before a complete schema-2 capacity forecast can pass. This is a
+measured-profile no-go, not a universal hardware or implementation lower bound.
+
+The measurement resolved the missing feasibility evidence; it is not a
+non-progressing diagnostic. Its non-progress count remains zero, while the
+separate historical libm line remains stopped at two. No further confirmation
+job or full-admission allocation is justified under this forecast.
+
+The recommended next step is a **result-blind researcher amendment** for an
+immutable successor that reduces redundant deterministic validation in first
+and reused calls. Preserve complete first checks, full transitive content rehash
+on reuse, fresh dynamic guards, command isolation and independent recertification.
+This is a proposal, not an authorized or tested remedy. The existing automation
+is paused under the required-researcher-action rule; resumption requires direction.
+Task 04 remains blocked. Week 5 cannot close, and selection runs, final training
+and novel opening remain closed. Preserve November 29 final locks, December 6
+compute and December 7–18 delivery. Actual researcher time remains unreported.
 
 ## November 9: SCC alerts and scheduled continuation resumed
 
