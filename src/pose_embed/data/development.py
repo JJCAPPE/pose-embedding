@@ -18,6 +18,11 @@ from pose_embed.provenance import (
     sha256_file,
     write_immutable_json,
 )
+from pose_embed.validation_proofs import (
+    check_numerical_proof,
+    proof_reuse_allowed,
+    proof_source_bindings,
+)
 
 SELECTION_PREFIX = "protocol-v1|dev-anchor-v1|"
 GALLERY_FILENAME = "development-gallery.jsonl"
@@ -172,11 +177,13 @@ def validate_development_episode(
     protocol: ProtocolConfig,
     manifest_path: str | Path | None = None,
     role: Literal["gallery_clean", "query_clean"] | None = None,
+    scientific_use_allowed: bool = True,
 ) -> dict[str, Any]:
-    """Rehash inputs and rederive both partitions before authorizing a cache."""
+    """Rehash inputs; reuse successful reconstruction only within this command."""
     report_file = Path(report_path).resolve()
     try:
-        report = json.loads(report_file.read_text(encoding="utf-8"))
+        content = report_file.read_bytes()
+        report = json.loads(content)
         source = Path(report["source_manifest"]["path"])
         inventory = Path(report["source_inventory"]["path"])
         if (
@@ -184,22 +191,69 @@ def validate_development_episode(
             or inventory != source.parent / "source-inventory.jsonl"
         ):
             raise ValueError("development episode source paths differ from the bundle")
-        records = _complete_validation_records(source, inventory, protocol)
-        expected = _report(report_file.parent, source, inventory, records, protocol)
+
+        def reconstruct() -> None:
+            records = _complete_validation_records(source, inventory, protocol)
+            expected = _report(report_file.parent, source, inventory, records, protocol)
+            if report != expected:
+                raise ValueError(
+                    "development episode report hashes or selection differ"
+                )
+
+        enabled = proof_reuse_allowed(
+            protocol, scientific_use_allowed=scientific_use_allowed
+        )
+        files: dict[str | Path, str] = {}
+        if enabled:
+            files = {
+                Path(report_path).absolute(): hashlib.sha256(content).hexdigest(),
+                source: report["source_manifest"]["sha256"],
+                inventory: report["source_inventory"]["sha256"],
+                report_file.parent / GALLERY_FILENAME: report["gallery"]["sha256"],
+                report_file.parent / QUERY_FILENAME: report["query"]["sha256"],
+            }
+            package = Path(__file__).resolve().parents[1]
+            for name in (
+                "data/development.py",
+                "data/inventory.py",
+                "data/manifest.py",
+                "data/ntu.py",
+                "config.py",
+                "config_v3.py",
+                "protocol.py",
+                "provenance.py",
+            ):
+                files[package / name] = sha256_file(package / name)
+            # Frozen expectations must override observed source hashes.
+            files.update(
+                proof_source_bindings(
+                    protocol, scientific_use_allowed=scientific_use_allowed
+                )
+            )
+        if manifest_path is not None or role is not None:
+            if manifest_path is None or role not in {"gallery_clean", "query_clean"}:
+                raise ValueError(
+                    "development episode validation requires manifest and role"
+                )
+            filename = GALLERY_FILENAME if role == "gallery_clean" else QUERY_FILENAME
+            selected_hash = sha256_file(report_file.parent / filename)
+            if sha256_file(manifest_path) != selected_hash:
+                raise ValueError(
+                    "feature manifest differs from its development episode role"
+                )
+            files[Path(manifest_path).absolute()] = selected_hash
+        check_numerical_proof(
+            "development-episode-reconstruction-v1",
+            enabled=enabled,
+            files=files,
+            metadata={
+                "protocol": protocol.model_dump(mode="json"),
+                "scientific_use_allowed": scientific_use_allowed,
+            },
+            check=reconstruct,
+        )
     except (KeyError, TypeError, OSError, json.JSONDecodeError) as exc:
         raise ValueError(
             "development episode report or its inputs are incomplete"
         ) from exc
-    if report != expected:
-        raise ValueError("development episode report hashes or selection differ")
-    if manifest_path is not None or role is not None:
-        if manifest_path is None or role not in {"gallery_clean", "query_clean"}:
-            raise ValueError(
-                "development episode validation requires manifest and role"
-            )
-        filename = GALLERY_FILENAME if role == "gallery_clean" else QUERY_FILENAME
-        if sha256_file(manifest_path) != sha256_file(report_file.parent / filename):
-            raise ValueError(
-                "feature manifest differs from its development episode role"
-            )
     return report
