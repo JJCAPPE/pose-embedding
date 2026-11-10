@@ -7,11 +7,52 @@ calendar failure. The current frozen profile still fails that condition. CPU/GPU
 five clean caches, three paired pilots and numerical replay, development
 execution, resident timing and the admission-cost measurement are accepted.
 Full admission, independent recertification, feasible campaign capacity and
-selection authorization remain unaccepted. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
+selection authorization remain unaccepted. Diagnostic 8549858 stopped before
+profiling because the allocated host's libc/libm contents differ from the accepted
+runtime. No SCC job remains active; authorized local optimization can continue.
+Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 10: metadata profiling stopped at runtime validation
+
+The permitted 16:27:58–16:28:11 UTC observation found no active jobs. Accounting
+for **8549858** records a 73-minute queue wait followed by five seconds on scc-h30,
+four OMP slots, scheduler failure code zero and process exit one. The runtime gate
+stopped before invoking the diagnostic controller. No operation, profiling child,
+parser comparison or improved capacity measurement was produced.
+
+Independent comparison with the accepted 8457156 baseline found exactly two
+library-content differences: `libc` and `libm`. Their sizes are unchanged; the CPU,
+kernel, interpreter, other libraries and runtime settings match. The baseline
+already contains both NumPy/SciPy BLAS libraries, so an extra import does not
+explain this failure. No replacement baseline or numerical equivalence is claimed.
+The immutable failure receipt is
+`week5-metadata-profile-failure-verification/20261110T163702Z/verification.json`,
+SHA-256 `4393f8e6c7aa69da70b59d1c270bfb0076f51512c229d2ffcc8a86a8ebfdb12e`.
+It verifies 3,079 metadata/source bindings, including the frozen source, fresh
+unopened-data checks and absent operation outputs. Exact terminal accounting is
+retained privately. The Mac notification helper reported success; visible banner
+delivery was not verified.
+
+Do not resubmit the unchanged job. SCC execution needs the accepted environment
+restored or a documented researcher-authorized runtime resolution. The November 10
+engineering authorization still permits local work: the next candidate is reuse
+of successful development-episode reconstruction within an existing command-local
+proof session. Bind every transitive input and the protocol/source/options, rehash
+complete content, keep role and live-authority checks fresh, and return a newly
+parsed report. Prepare mutation/equivalence tests before any scientific use. This
+is a candidate, not a measured speedup or permission to reuse old scientific outputs
+under changed source bindings.
+
+The metadata-cost diagnostic non-progress count is **one** because its intended
+comparison never ran. The historical libm count remains **two and stopped**; this
+failure does not reopen that investigation. Independent local engineering remains
+authorized, with no SCC polling target or new allocation authorized by this
+failure. Follow the latest saved automation state in the private handoff. Preserve the 2,225.815-hour measured no-go and every
+scientific, resource and calendar gate.
 
 ## November 10: reduce redundant validation
 
