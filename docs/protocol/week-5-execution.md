@@ -7,15 +7,54 @@ calendar failure. The current frozen profile still fails that condition. CPU/GPU
 five clean caches, three paired pilots and numerical replay, development
 execution, resident timing and the admission-cost measurement are accepted.
 Full admission, independent recertification, feasible campaign capacity and
-selection authorization remain unaccepted. Diagnostic 8549858 stopped before
-profiling because the allocated host's libc/libm contents differ from the accepted
-runtime. No SCC job remains active. Command-local development reconstruction reuse
-is verified locally; conditional qualification is authorized and SCC capacity remains unresolved.
+selection authorization remain unaccepted. After diagnostic 8549858 exposed the
+changed libc/libm contents, researcher-authorized CPU qualification 8561360 passed
+independent review against the accepted initialization and geometry evidence.
+Command-local development reconstruction reuse is verified locally. The combined
+metadata comparison is the next engineering step; GPU qualification, artifact
+adoption and measured SCC capacity remain unresolved.
 Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 10: conditional CPU compatibility accepted
+
+Under [ADR0011](../decisions/0011-validator-runtime-correction.md), CPU job
+**8561360** completed on the pinned host with four slots, failed=0, exit=0 and
+**205 scheduler seconds**. Independent review accepted the bounded CPU
+qualification: all nine fresh initializations (three per paired seed) match
+8457156 exactly, and the original 43-panel, summary and both repeat-verification
+files are byte-identical to that accepted baseline. Each repeat binds all
+430 tensors and 387 damage rows. The frozen allocated validator independently
+reconstructed the geometry inside the job; no scientific arrays were read on
+login or locally for terminal review.
+
+Receipt
+`study-v3/operations/week5-runtime-conditional-cpu-acceptance/20261110T205722Z/verification.json`,
+SHA-256 `cd54901724d96d57cc100ac5379f71e988bdabfcaad8492feb4528ce1a5c9902`,
+binds the exact candidate profile, accounting, all three command outcomes, nine
+resource records and four sealed-data records. Fresh verification checked
+844 metadata bindings and all 616 frozen source bindings. Peak sampled process
+group memory was 3,432,947,712 bytes within the requested 32 GiB; quota and
+filesystem observations passed the retained reserve and margin. The Mac alert
+helper reported success; a visible banner was not independently observed.
+
+This acceptance permits the next bounded engineering comparison. It does not
+adopt the candidate for the historical caches, pilots, projections or retrievals,
+establish GPU/parity compatibility, or accept full admission or capacity. The
+reviewed external measurement combines the parser cache with development-episode
+reuse while preserving the frozen producer tree. It compares identical component
+outputs, checks one reconstruction followed by one reuse hit, and begins each
+independent child fresh. Its 124 focused tests and independent reviews passed.
+The finite metadata input inventory and all candidate files are separately bound;
+the entire remaining-work forecast still needs allocated measurement.
+
+Historical libm diagnostics remain stopped at two; the metadata-cost line retains
+one non-progress attempt. The same hourly automation continues. Original evidence,
+the November 29 locks, December 6 compute cutoff and December 7–18 delivery
+safeguards remain unchanged. Actual researcher hours are unreported.
 
 ## November 10: development-episode reconstruction reuse verified locally
 
