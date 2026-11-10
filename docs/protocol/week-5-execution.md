@@ -49,9 +49,9 @@ under changed source bindings.
 
 The metadata-cost diagnostic non-progress count is **one** because its intended
 comparison never ran. The historical libm count remains **two and stopped**; this
-failure does not reopen that investigation. The existing automation stays ACTIVE
-for independent local engineering, with no SCC polling target or new allocation
-authorized by this failure. Preserve the 2,225.815-hour measured no-go and every
+failure does not reopen that investigation. Independent local engineering remains
+authorized, with no SCC polling target or new allocation authorized by this
+failure. Follow the latest saved automation state in the private handoff. Preserve the 2,225.815-hour measured no-go and every
 scientific, resource and calendar gate.
 
 ## November 10: reduce redundant validation
