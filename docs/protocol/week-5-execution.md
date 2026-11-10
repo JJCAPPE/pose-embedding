@@ -1,8 +1,9 @@
 # Week 5 execution record
 
 Started October 11, 2026 (America/New_York), before the October 12–18 calendar
-week, at the researcher's direction. **Week 5 remains open and requires a researcher decision. The current
-profile now fails a measured necessary calendar condition. CPU/GPU baselines,
+week, at the researcher's direction. **Week 5 remains open. On November 10 the
+researcher authorized reducing redundant validation to address the measured
+calendar failure. The current frozen profile still fails that condition. CPU/GPU baselines,
 five clean caches, three paired pilots and numerical replay, development
 execution, resident timing and the admission-cost measurement are accepted.
 Full admission, independent recertification, feasible campaign capacity and
@@ -11,6 +12,75 @@ selection authorization remain unaccepted. Later scientific stages stay closed.*
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 10: reduce redundant validation
+
+The researcher requested a way to reduce the required hours using minimal
+redundant checks. This supplies the engineering direction requested at the
+November 9 stop. It authorizes result-blind implementation and bounded measurement,
+not weaker acceptance criteria, a changed deadline, or later scientific stages.
+The measured 2,225.815349-hour no-go remains the baseline until new evidence
+supersedes it. Frozen release `f101f0e`, r2 locks and accepted artifacts remain intact.
+
+Source review found that one admission prefix calls design validation about
+95 times, manifest-bundle validation 91 times and development-episode validation
+87 times. The existing numerical-proof lookup occurs after substantial repeated
+metadata reconstruction. These are source-derived counts, not attributed timings.
+Numerical replay alone took only about 52.5 seconds of the first 3,263-second
+prefix, and zero seconds of the 3,087-second reused prefix.
+
+The first candidate adds a bounded cache to the pure sample-ID parser. Its key
+is the complete input string/path; its result is a frozen value containing only
+identifier fields. This stores no file hashes, scientific arrays, validation
+proofs or authorization. Every file read, content check and scientific predicate
+still executes. The regression test first failed with 19 parses for two distinct
+IDs, then passed with two; changed IDs and invalid inputs remain checked.
+
+Independent local experiments with invented metadata preserved exact outputs:
+19,200 development rows took 1.523 seconds originally and 0.132 seconds with parser
+reuse; split construction/verification on 113,945 invented IDs improved from
+6.986 to 3.110 seconds. These component timings are not SCC evidence or a campaign
+forecast. They do not demonstrate the required 13.25-fold overall reduction.
+An additional grouping change was omitted because it gave no observed benefit
+alongside parser reuse.
+
+A bounded diagnostic reuses the existing four-slot CPU controller, runtime gate,
+locks, seals, input/source checks and resource monitor. It profiles one frozen
+design/bundle/episode triplet, then compares an unprofiled frozen triplet with
+the exact parser candidate in fresh children. The candidate begins with an empty
+parser cache and repeats the triplet once warm. All normalized return digests
+must match; source hashes, installed aliases and hit/miss counts establish the
+intervention. Profiled timings are attribution only; filesystem cache state is
+uncontrolled. This diagnostic creates no admission or capacity receipt.
+
+If parser reuse is insufficient, use the measured profile to target repeated
+deterministic metadata checks within the existing command-local proof mechanism.
+Any extension must bind the complete transitive inputs, retain full-content
+rehashing on reuse and fresh seal, source, time, authorization, resource and
+calendar checks. Independent recertification starts fresh. A reviewed immutable
+correction and impact inventory must precede scientific use; old source hashes
+or artifacts must not be silently relabelled. Only a measured complete forecast
+with 25% slack, queue/setup and remaining work can establish calendar feasibility.
+The historical libm line remains stopped at two non-progress attempts.
+
+The reviewed launcher submitted **8549858** once at **13:41:38 UTC**. The
+13:42:44 UTC initial observation found it queued, requesting four OMP slots,
+32 GiB, 12 hours, no GPU and the approved CPU host. An earlier launcher invocation
+stopped at the manifest-path environment guard before any launch intent or
+scheduler command; restoring the existing reviewed r2 environment export resolved
+that bookkeeping failure. No job was duplicated. All fresh launch checks passed,
+including 42 reconciled prior execution paths. The source-derived remaining
+storage forecast is 205,221,225,472 bytes, requiring 471,274,896,640 free bytes with
+the unchanged reserve and margin; no retained outputs were deducted or deleted.
+
+Local verification passed 1,405 tests, with two existing AVSL source-parity tests
+skipped because their licensed checkout is unavailable. The external diagnostic
+passed 117 focused tests and independent review. The existing automation is
+ACTIVE again, with its saved hourly minute-35/Astra-ultra settings verified.
+The minimum next observation is **14:42:45 UTC**; the next eligible scheduled
+check is **15:35 UTC / 10:35 AM EST**. The 14:35 run must not poll. Initial actual
+allocation review, terminal accounting, Mac notification and independent diagnostic
+acceptance remain pending. This submission is operational progress only.
 
 ## November 9: measured capacity blocker
 

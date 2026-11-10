@@ -9,6 +9,38 @@ from pose_embed.data import ManifestRecord, build_manifest_records, parse_ntu_sa
 from pose_embed.data.manifest import verify_manifests
 
 
+def test_repeated_manifest_checks_parse_each_immutable_id_once(
+    protocol_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from pose_embed.data import ntu
+
+    if hasattr(parse_ntu_sample_id, "cache_clear"):
+        parse_ntu_sample_id.cache_clear()
+    pattern = ntu._NTU_ID
+    calls = []
+
+    class CountingPattern:
+        def fullmatch(self, value):
+            calls.append(value)
+            return pattern.fullmatch(value)
+
+    monkeypatch.setattr(ntu, "_NTU_ID", CountingPattern())
+    sample_id = "S001C001P003R001A003"
+    replacement = "S001C001P004R001A003"
+    row = ManifestRecord(sample_id=sample_id, split="development_train")
+    changed = row.model_copy(update={"sample_id": replacement})
+    protocol = load_protocol(protocol_path)
+    for _ in range(2):
+        verify_manifests([row, changed], protocol)
+    assert row.ntu.performer == 3
+    assert changed.ntu.performer == 4
+    assert calls == [sample_id, replacement]
+    for _ in range(2):
+        with pytest.raises(ValueError, match="canonical NTU"):
+            parse_ntu_sample_id("invalid")
+    assert calls[-2:] == ["invalid", "invalid"]
+
+
 def test_ntu_parser_exposes_synchronized_performance_identity() -> None:
     first = parse_ntu_sample_id("/data/S001C001P002R002A115.skeleton")
     second = parse_ntu_sample_id("S001C003P002R002A115.npy")

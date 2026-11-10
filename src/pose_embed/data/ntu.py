@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 
 _NTU_ID = re.compile(
@@ -29,6 +30,7 @@ class NTUSampleId:
         return (self.setup, self.performer, self.repetition, self.action)
 
 
+@lru_cache(maxsize=131072)
 def parse_ntu_sample_id(value: str | Path) -> NTUSampleId:
     """Extract and validate an NTU identifier from a bare ID or filename."""
     text = str(value)
