@@ -9,12 +9,60 @@ execution, resident timing and the admission-cost measurement are accepted.
 Full admission, independent recertification, feasible campaign capacity and
 selection authorization remain unaccepted. Diagnostic 8549858 stopped before
 profiling because the allocated host's libc/libm contents differ from the accepted
-runtime. No SCC job remains active; authorized local optimization can continue.
+runtime. No SCC job remains active. Command-local development reconstruction reuse
+is verified locally; conditional qualification is authorized and SCC capacity remains unresolved.
 Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 10: development-episode reconstruction reuse verified locally
+
+The authorized local optimization now reuses a successful development-episode
+reconstruction within the existing command-local proof session. It retains the
+complete first reconstruction, freshly parses each report, rehashes all five input
+files and any selected-manifest alias, and binds the complete protocol, eight
+transitive source files, dependency lock and applicable frozen design. Role checks
+remain fresh; independent commands and recertification start cold. Historical
+scientific releases do not acquire successor reuse automatically. No frozen SCC
+source, lock, scientific artifact or numerical tolerance was changed.
+
+Independent source review found no blocking defect. The full local Python suite
+passed **1,435 tests**, with two existing licensed AVSL source-parity skips.
+Workspace and formatting/lint checks passed. Focused tests cover exact
+reports, failed checks, mutable returned reports, changed protocol/roles, all five
+input dependencies (same-size changes, deletion and symlink retargeting), all eight
+source dependencies, report-read races, publication rechecks and command isolation.
+On a **740-row synthetic fixture on the Mac**, 87 repeated validations took
+**0.649315 seconds without a shared session versus 0.181573 seconds with one**:
+one reconstruction and 86 reuse hits, with every report identical. This single
+local comparison is engineering evidence only. It does not scale the accepted
+2,225.815-hour SCC forecast or establish the 168-hour campaign fit.
+
+The researcher then directed continuation beyond local optimization through all
+eligible Week 5 prerequisites. The same hourly minute-35 automation was resumed
+and its saved scope verified. This does not approve a replacement runtime or a
+change to the bound-code correction policy. Retained profiles show that baseline
+8457156 and failed diagnostic 8549858 used the **same scc-h30 host**. A bounded
+metadata inspection of the documented SCC Python/environment installation found
+no retained system-library image; the runtime helper records hashes, not copies.
+This is not a claim that SCC administrators have no backup. No unchanged retry,
+new allocation or historical libm diagnostic was launched.
+
+The implementation is a local candidate, not an adopted scientific release.
+Both the prior parser change and this validator are in the frozen producer source
+bindings. Under the current correction policy, using them scientifically requires
+a dated impact inventory and regeneration of affected comparisons. A separately
+versioned validator that certifies original frozen producer artifacts could avoid
+that regeneration, and the researcher subsequently approved that conditional exception in
+[ADR0011](../decisions/0011-validator-runtime-correction.md). It preserves original
+producer provenance, binds the separate validator, and requires allocated numerical
+compatibility before any artifact adoption. The exact two-library runtime candidate
+is authorized for qualification, not presumed equivalent. Runtime
+compatibility, allocated measurements, full admission, independent recertification,
+complete schema-2 capacity and selection authorization remain required. Week 5
+stays open; selection runs, final training and novel-test opening stay closed.
 
 ## November 10: metadata profiling stopped at runtime validation
 

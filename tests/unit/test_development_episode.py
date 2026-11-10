@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import pose_embed.data.development as development
 from pose_embed.config import ProtocolConfig, load_protocol
 from pose_embed.data.development import (
     GALLERY_FILENAME,
@@ -19,6 +20,7 @@ from pose_embed.data.inventory import NTUInventoryRecord, build_split_manifests
 from pose_embed.data.manifest import ManifestRecord, load_manifest
 from pose_embed.data.ntu import parse_ntu_sample_id
 from pose_embed.evaluation.runner import _validate_identities
+from pose_embed.validation_proofs import validation_session
 
 
 def _validation_records(protocol: ProtocolConfig) -> list[ManifestRecord]:
@@ -254,3 +256,254 @@ def test_development_evaluator_rejects_identity_and_synchronized_view_overlap(
             query_manifest_path=query,
             mode="development",
         )
+
+
+@pytest.mark.parametrize("protocol_path", [Path("configs/protocol.v3.yaml")])
+def test_episode_reconstruction_reuses_success_only_within_one_command(
+    episode_bundle, protocol_path, monkeypatch
+):
+    manifest, output, protocol = episode_bundle
+    expected = generate_development_episode(manifest, output, protocol_path)
+    original = development._complete_validation_records
+    calls = []
+
+    def reconstruct(*args):
+        calls.append(True)
+        return original(*args)
+
+    monkeypatch.setattr(development, "_complete_validation_records", reconstruct)
+    arguments = dict(protocol=protocol, scientific_use_allowed=False)
+    with validation_session():
+        first = validate_development_episode(output / REPORT_FILENAME, **arguments)
+        first["exclusions"].clear()
+        assert (
+            validate_development_episode(output / REPORT_FILENAME, **arguments)
+            == expected
+        )
+        assert len(calls) == 1
+        with validation_session(fresh=True):
+            assert (
+                validate_development_episode(output / REPORT_FILENAME, **arguments)
+                == expected
+            )
+    with validation_session():
+        assert (
+            validate_development_episode(output / REPORT_FILENAME, **arguments)
+            == expected
+        )
+    assert len(calls) == 3
+
+
+@pytest.mark.parametrize("protocol_path", [Path("configs/protocol.v3.yaml")])
+@pytest.mark.parametrize(
+    "dependency", ["report", "source", "inventory", "gallery", "query"]
+)
+@pytest.mark.parametrize("mutation", ["same_size", "missing", "retarget"])
+def test_episode_reuse_rejects_every_changed_input(
+    episode_bundle, protocol_path, dependency, mutation
+):
+    manifest, output, protocol = episode_bundle
+    generate_development_episode(manifest, output, protocol_path)
+    paths = dict(
+        report=output / REPORT_FILENAME,
+        source=manifest,
+        inventory=manifest.parent / "source-inventory.jsonl",
+        gallery=output / GALLERY_FILENAME,
+        query=output / QUERY_FILENAME,
+    )
+    with pytest.raises(ValueError), validation_session():
+        validate_development_episode(
+            output / REPORT_FILENAME, protocol=protocol, scientific_use_allowed=False
+        )
+        path = paths[dependency]
+        content = path.read_bytes()
+        if mutation == "same_size":
+            position = content.index(b"0")
+            path.write_bytes(content[:position] + b"1" + content[position + 1 :])
+        else:
+            path.unlink()
+            if mutation == "retarget":
+                other = path.with_suffix(".replacement")
+                other.write_bytes(content)
+                path.symlink_to(other)
+        validate_development_episode(
+            output / REPORT_FILENAME, protocol=protocol, scientific_use_allowed=False
+        )
+
+
+@pytest.mark.parametrize("protocol_path", [Path("configs/protocol.v3.yaml")])
+@pytest.mark.parametrize(
+    "dependency",
+    [
+        "data/development.py",
+        "data/inventory.py",
+        "data/manifest.py",
+        "data/ntu.py",
+        "config.py",
+        "config_v3.py",
+        "protocol.py",
+        "provenance.py",
+    ],
+)
+def test_episode_reuse_binds_transitive_source(
+    episode_bundle, protocol_path, dependency, monkeypatch, tmp_path
+):
+    manifest, output, protocol = episode_bundle
+    generate_development_episode(manifest, output, protocol_path)
+    package = Path(development.__file__).resolve().parents[1]
+    copied = tmp_path / "source"
+    for name in [
+        "data/development.py",
+        "data/inventory.py",
+        "data/manifest.py",
+        "data/ntu.py",
+        "config.py",
+        "config_v3.py",
+        "protocol.py",
+        "provenance.py",
+    ]:
+        path = copied / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((package / name).read_bytes())
+    monkeypatch.setattr(development, "__file__", str(copied / "data/development.py"))
+    with pytest.raises(ValueError, match="dependency"), validation_session():
+        validate_development_episode(
+            output / REPORT_FILENAME, protocol=protocol, scientific_use_allowed=False
+        )
+        path = copied / dependency
+        content = path.read_bytes()
+        path.write_bytes(b"#" + content[1:])
+        validate_development_episode(
+            output / REPORT_FILENAME, protocol=protocol, scientific_use_allowed=False
+        )
+
+
+@pytest.mark.parametrize("protocol_path", [Path("configs/protocol.v3.yaml")])
+def test_episode_reuse_keeps_roles_and_protocol_fresh(episode_bundle, protocol_path):
+    manifest, output, protocol = episode_bundle
+    generate_development_episode(manifest, output, protocol_path)
+    arguments = dict(protocol=protocol, scientific_use_allowed=False)
+    with validation_session():
+        validate_development_episode(output / REPORT_FILENAME, **arguments)
+        for selected, role in [
+            (QUERY_FILENAME, "gallery_clean"),
+            (GALLERY_FILENAME, None),
+            (None, "query_clean"),
+        ]:
+            with pytest.raises(ValueError, match="role"):
+                validate_development_episode(
+                    output / REPORT_FILENAME,
+                    **arguments,
+                    manifest_path=output / selected if selected else None,
+                    role=role,
+                )
+        for selected, role in [
+            (GALLERY_FILENAME, "gallery_clean"),
+            (QUERY_FILENAME, "query_clean"),
+        ]:
+            validate_development_episode(
+                output / REPORT_FILENAME,
+                **arguments,
+                manifest_path=output / selected,
+                role=role,
+            )
+        changed = protocol.model_copy(update={"protocol_id": "changed"})
+        with pytest.raises(ValueError, match="hashes or selection"):
+            validate_development_episode(
+                output / REPORT_FILENAME, protocol=changed, scientific_use_allowed=False
+            )
+
+
+@pytest.mark.parametrize("protocol_path", [Path("configs/protocol.v3.yaml")])
+def test_episode_failed_reconstruction_is_not_reused(
+    episode_bundle, protocol_path, monkeypatch
+):
+    manifest, output, protocol = episode_bundle
+    expected = generate_development_episode(manifest, output, protocol_path)
+    original = development._complete_validation_records
+    calls = []
+
+    def reconstruct(*args):
+        calls.append(True)
+        if len(calls) == 1:
+            raise ValueError("interrupted reconstruction")
+        return original(*args)
+
+    monkeypatch.setattr(development, "_complete_validation_records", reconstruct)
+    arguments = dict(protocol=protocol, scientific_use_allowed=False)
+    with validation_session():
+        with pytest.raises(ValueError, match="interrupted reconstruction"):
+            validate_development_episode(output / REPORT_FILENAME, **arguments)
+        assert (
+            validate_development_episode(output / REPORT_FILENAME, **arguments)
+            == expected
+        )
+        assert (
+            validate_development_episode(output / REPORT_FILENAME, **arguments)
+            == expected
+        )
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize("protocol_path", [Path("configs/protocol.v3.yaml")])
+def test_episode_binds_the_report_bytes_it_parsed(
+    episode_bundle, protocol_path, monkeypatch
+):
+    manifest, output, protocol = episode_bundle
+    generate_development_episode(manifest, output, protocol_path)
+    path = output / REPORT_FILENAME
+    original = json.loads
+
+    def parse_then_change(content, *args, **kwargs):
+        result = original(content, *args, **kwargs)
+        if isinstance(result, dict) and "source_inventory" in result:
+            path.write_bytes(path.read_bytes() + b" ")
+        return result
+
+    monkeypatch.setattr(development.json, "loads", parse_then_change)
+    with pytest.raises(ValueError, match="dependency"), validation_session():
+        validate_development_episode(
+            path, protocol=protocol, scientific_use_allowed=False
+        )
+
+
+@pytest.mark.parametrize("protocol_path", [Path("configs/protocol.v3.yaml")])
+def test_episode_selected_manifest_is_rechecked_before_publication(
+    episode_bundle, protocol_path
+):
+    manifest, output, protocol = episode_bundle
+    generate_development_episode(manifest, output, protocol_path)
+    selected = output / "selected.jsonl"
+    selected.write_bytes((output / QUERY_FILENAME).read_bytes())
+    with pytest.raises(ValueError, match="dependency"), validation_session():
+        validate_development_episode(
+            output / REPORT_FILENAME,
+            protocol=protocol,
+            scientific_use_allowed=False,
+            manifest_path=selected,
+            role="query_clean",
+        )
+        selected.write_bytes(selected.read_bytes() + b" ")
+
+
+@pytest.mark.parametrize(
+    "protocol_path",
+    [Path("configs/protocol.v1.yaml"), Path("configs/protocol.v3.yaml")],
+)
+def test_historical_episode_validation_remains_cold(
+    episode_bundle, protocol_path, monkeypatch
+):
+    manifest, output, protocol = episode_bundle
+    generate_development_episode(manifest, output, protocol_path)
+    original = development._complete_validation_records
+    calls = []
+
+    def reconstruct(*args):
+        calls.append(True)
+        return original(*args)
+
+    monkeypatch.setattr(development, "_complete_validation_records", reconstruct)
+    with validation_session():
+        for _ in range(2):
+            validate_development_episode(output / REPORT_FILENAME, protocol=protocol)
+    assert len(calls) == 2

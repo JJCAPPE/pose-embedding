@@ -1,13 +1,26 @@
 # Final v3 plan: frozen one-shot pose robustness
 
 Original decision: **2026-09-29**. Execution amendments: **2026-10-09**,
-**2026-10-12**, **2026-10-19**, **2026-10-25** and **2026-11-05**. Delivery: **2026-12-18**. Status: **final planning
+**2026-10-12**, **2026-10-19**, **2026-10-25**, **2026-11-05** and **2026-11-10**. Delivery: **2026-12-18**. Status: **final planning
 decision; implementation and measured campaign gates remain to be completed**.
 This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-frozen-one-shot-v3.md)
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 5 operational status:** the researcher authorized the exact SCC kernel
+**November 10 conditional correction:** the researcher approved
+[ADR0011](../docs/decisions/0011-validator-runtime-correction.md). Qualify the exact
+recorded libc/libm candidate while every other CPU profile field remains fixed.
+A separately frozen validator may certify the finite explicitly bound original
+artifact inventory without regeneration solely for the reviewed parser and
+development-reconstruction changes. Preserve original producer source, r2 locks,
+sidecars, output bytes and runtime labels; record validator identity separately.
+This is an explicit narrow exception to the cross-release adoption rule below.
+Require allocated initialization/geometry/GPU compatibility, retained-artifact
+numerical replay, fresh independent recertification and measured complete capacity
+before acceptance. A mismatch blocks affected evidence. No changed scientific
+choices, selection, final training, novel opening or Week 5 closure is authorized.
+
+**November 5 historical operational status:** the researcher authorized the exact SCC kernel
 `4.18.0-553.182.1.el8_10.x86_64` for Week 5. Job 8435003's retained profile matched
 the previous prospective profile in every other field. [ADR0010](../docs/decisions/0010-kernel-182-baseline.md)
 requires fresh initialization and geometry acceptance on this profile, followed by
@@ -805,7 +818,7 @@ amendment before running, not classification as a path-only change.
 | Documentation, scheduling or report presentation only | Applicable checks and content review; no relabeling or automatic invalidation of scientific artifacts. |
 | This completion release: frozen training/extraction/provenance interfaces | Fresh parity, both full 95,001-row repeat extractions, all five bound clean caches and all three complete pilots; independent validation/accounting under the successor bindings. Retain original evidence separately. |
 | Corruption/evaluation/analysis implementation | Hand-derived fixtures, nine complete development paths, fresh-process geometry checks and actual v3 report dispatch. Recompute affected downstream artifacts; any bound-code change also follows the preceding row. |
-| Later scientific or bound-code correction | New dated release/digest, impact inventory and regeneration of every affected comparison; no mixed-release campaign or silent reuse. |
+| Later scientific or bound-code correction | New dated release/digest, impact inventory and regeneration of every affected comparison; no mixed-release campaign or silent reuse. ADR0011 permits only its explicit finite-artifact validator exception, conditional on separate producer/validator provenance and complete compatibility/independent acceptance. |
 
 Before freezing this release, rehearse its real command path on fixture data:
 selection authorization and ranking, fresh final training, complete final-run
