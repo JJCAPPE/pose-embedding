@@ -59,8 +59,9 @@ the exact runtime before and after, all three command outcomes, 72 operation
 resource records plus one runtime record, and four seals. Every raw resource
 sample passed the 475,301,428,480-byte storage requirement and the 32 GiB RAM
 guard. Fresh terminal checks covered 3,228 launch bindings and 616 frozen source
-files. The existing metadata validator was invoked with fresh full-content
-rehashing and unopened-data checks, but no completion receipt was observed.
+files. The guarded validation command was issued, but validator startup and
+completion were not confirmed. Its full-content rehashing and unopened-data
+checks remain required before final acceptance.
 Scientific arrays were not read locally or on login. The Mac alert helper
 reported success; visible delivery was unverified.
 
