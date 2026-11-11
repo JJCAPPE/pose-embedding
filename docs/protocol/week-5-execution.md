@@ -25,6 +25,24 @@ Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
+## November 11: proposed bounded validation scope
+
+A result-blind source audit traced the 873.911-hour forecast to 2,054 nested
+Week 5 audits in 392 future post-opening commands. It is not remaining Week 5
+time; the measurement job itself took 66.4 minutes. Authorization reads also
+repeat selection-run and final-head validation. Merely caching more numerical
+subchecks leaves the repeated outer audit in place.
+
+[Proposed ADR0012](../decisions/0012-bounded-validation-scope.md) replaces this
+recursion with initial validation plus one independent verification per
+unchanged evidence set, full transitive integrity checks at bounded stage
+boundaries, and fresh direct-input and authority checks for each command.
+All scientific runs, data, numerical comparisons and the complete 180-cell
+study remain required. The 16.8-hour final-campaign validation target is
+unmeasured; no capacity pass, adopted validator or scientific authorization is
+claimed. The proposal explicitly identifies the changed reuse rules and delayed
+detection of changes to unread ancestors. Researcher approval is still required.
+
 ## November 11: whole-prefix review and SCC access blocker
 
 Job **8565319** completed on the prescribed CPU host in **3,982 scheduler
