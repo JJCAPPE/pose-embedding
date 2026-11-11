@@ -17,8 +17,8 @@ independent operational and semantic review. Final receipt publication is unveri
 the SCC session became unresponsive during the guarded acceptance invocation.
 Its reviewed necessary check-cost bound is 873.911 hours versus 168 available.
 Fresh-command costs, GPU qualification, artifact adoption and complete measured
-SCC capacity remain unresolved. The existing automation is paused pending
-researcher restoration of a usable SCC prompt and resume direction.
+SCC capacity remain unresolved. The existing automation remains paused pending
+researcher resume direction and reconciliation of the stopped command and any receipt.
 Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
