@@ -11,13 +11,53 @@ selection authorization remain unaccepted. After diagnostic 8549858 exposed the
 changed libc/libm contents, researcher-authorized CPU qualification 8561360 passed
 independent review against the accepted initialization and geometry evidence.
 Command-local development reconstruction reuse is verified locally. The combined
-metadata comparison is the next engineering step; GPU qualification, artifact
-adoption and measured SCC capacity remain unresolved.
+metadata comparison passed independent review with identical outputs and measured
+component savings. Whole-command costs, GPU qualification, artifact adoption and
+measured SCC capacity remain unresolved.
 Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 10: combined metadata comparison accepted
+
+Engineering job **8563263** completed on the pinned CPU host in **136 scheduler
+seconds**, with four slots, failed=0 and exit=0. Independent review accepted the
+three fresh-process comparison and verified identical design, manifest-bundle and
+development-episode results. The candidate recorded 113,945 cold parser misses,
+one episode reconstruction and one subsequent proof hit. The profiled frozen arm
+identified 3,550,586 parser calls; its instrumented timings are attribution only.
+
+The unprofiled three-component total was **22.893676 seconds**. The candidate took
+**11.779579 seconds cold** and **7.986552 seconds warm**. Episode validation alone
+took 5.557314 seconds originally, 2.725499 seconds cold and 0.052768 seconds on
+reuse. Filesystem cache state was uncontrolled. These are one serial component
+comparison, not a measured whole-command or campaign speedup.
+
+Receipt
+`study-v3/operations/week5-metadata-component-acceptance/20261111T011754Z/verification.json`,
+SHA-256 `f5c8662975c451e7b5e6aff9a4ba16fffc1528ec2d436d1f61990a20eb17da3e`,
+binds 95 evidence files. Review checked 93 exported metadata/source files, the
+exact accepted conditional CPU profile before and after, three operation commands,
+eight operation resource records plus the runtime resource record, and four seals.
+Fresh remote checks covered 3,127 launch bindings and 616 original source files.
+The unchanged reviewed metadata validator independently checked allocation and
+measurement semantics. No scientific arrays were read locally or on login.
+The Mac notification helper reported success; visible delivery was not verified.
+
+The comparison narrows the cost cause, so the metadata non-progress count remains
+one; the historical libm count remains two and stopped. The next prerequisite is
+a separately bound, independently reviewed full scientific-prefix measurement
+using the existing November 9 helper. It measures first, reused and fresh proof
+sessions; the third pass shares the process and parser cache, so it is not a fresh
+command. Separate fresh whole-command measurement and recertification remain
+required before capacity acceptance. Original producer provenance
+and all historical evidence remain unchanged. GPU/parity qualification, retained
+numerical replay, artifact-by-artifact adoption, full admission, independent
+recertification, feasible schema-2 capacity and selection authorization remain
+unaccepted. The 2,225.815-hour forecast is not revised by component timings.
+Week 5 remains open and all later scientific stages remain closed.
 
 ## November 10: conditional CPU compatibility accepted
 
