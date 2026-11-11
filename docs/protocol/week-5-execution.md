@@ -88,9 +88,11 @@ were preserved; no second connection, unchanged allocation retry or downstream
 job was launched. The remote status pointer could not be synchronized.
 
 The existing automation was set to **PAUSED**, and its saved state, unchanged
-hourly minute-35 schedule and prompt were read back. The researcher must restore
-a usable authenticated SCC prompt and provide resume direction. Before rerunning
-anything, reconcile surviving processes and any partial or completed acceptance
+hourly minute-35 schedule and prompt were read back. A later local pane capture
+at 13:39 UTC showed that the prompt had returned and the shell reported the
+acceptance command as stopped. No completion receipt was visible. The automation
+remains paused pending researcher resume direction. Before rerunning anything,
+reconcile the stopped process and any partial or completed acceptance
 receipt with the retained invocation markers; a missing local receipt is not
 proof that the remote writer made no progress. This access blocker is separate
 from the completed measurement and does not authorize weakening its checks.
