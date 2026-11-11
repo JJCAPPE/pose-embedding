@@ -12,13 +12,87 @@ changed libc/libm contents, researcher-authorized CPU qualification 8561360 pass
 independent review against the accepted initialization and geometry evidence.
 Command-local development reconstruction reuse is verified locally. The combined
 metadata comparison passed independent review with identical outputs and measured
-component savings. Whole-command costs, GPU qualification, artifact adoption and
-measured SCC capacity remain unresolved.
+component savings. Whole-prefix measurement 8565319 completed and passed local
+independent operational and semantic review. Final receipt publication is unverified because
+the SCC session became unresponsive during the guarded acceptance invocation.
+Its reviewed necessary check-cost bound is 873.911 hours versus 168 available.
+Fresh-command costs, GPU qualification, artifact adoption and complete measured
+SCC capacity remain unresolved. The existing automation is paused pending
+researcher restoration of a usable SCC prompt and resume direction.
 Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 11: whole-prefix review and SCC access blocker
+
+Job **8565319** completed on the prescribed CPU host in **3,982 scheduler
+seconds**, with four OMP slots, failed=0 and exit=0. Independent operational and
+semantic reviews passed for the bounded engineering measurement. Final guarded
+acceptance and receipt publication remain unverified. The original
+producer release, r2 locks and artifact bytes remain unchanged; the candidate
+validator and exact conditional CPU runtime are bound separately under ADR0011.
+
+The first proof pass took **1,276.968347 seconds**, reuse **1,190.538598 seconds**,
+and the fresh proof-store pass **1,372.929551 seconds**. All timed passes started
+with a warm parser in the same process. The third pass is not independent
+fresh-command measurement or recertification. Proof checks/hits were exactly
+43/110, 0/153 and 43/110; development-episode checks/hits were 1/86, 0/87 and
+1/86, each across 87 calls. All passes reached the unchanged deliberately pending
+capacity rejection. No admission, artifact adoption or authorization was written.
+
+Using the existing frozen-source counts of 392 fresh and 1,662 reused prefixes,
+the necessary check-cost bound is **873.910949 hours with the 25% margin** versus
+**168 hours available**. The earlier measurement's bound was 2,225.815349 hours.
+These separate engineering observations have uncontrolled filesystem-cache
+state; they do not establish a universal speedup or a complete capacity forecast.
+Even zero-cost reuse leaves **186.870967 hours**, so further reductions must also
+address first validation. GPU, setup, queue, other validation and delivery work
+remain outside this necessary bound.
+
+The retained terminal observation is
+`study-v3/operations/week5-status/20261111T110647Z/observation.json`, SHA-256
+`a542fa4b0d62e311f7558762dcf148c725e24799a3fee71df0d8deebe8810c38`.
+Review verified 129 exported metadata/source hashes,
+the exact runtime before and after, all three command outcomes, 72 operation
+resource records plus one runtime record, and four seals. Every raw resource
+sample passed the 475,301,428,480-byte storage requirement and the 32 GiB RAM
+guard. Fresh terminal checks covered 3,228 launch bindings and 616 frozen source
+files. The existing metadata validator was invoked with fresh full-content
+rehashing and unopened-data checks, but no completion receipt was observed.
+Scientific arrays were not read locally or on login. The Mac alert helper
+reported success; visible delivery was unverified.
+
+The metadata-cost non-progress count remains one because this measurement
+establishes the intervention and narrows its cost; historical libm diagnostics
+remain stopped at two. The next authorized prerequisite is the unchanged
+synthetic GPU runtime qualification against the exact conditional candidate
+after final measurement acceptance. Its reviewed submission preparation remains
+local and unexecuted.
+GPU/parity, retained-artifact replay and individual adoption receipts, full
+admission, separate fresh-command measurement and independent recertification,
+feasible schema-2 capacity and selection authorization remain unmet. Week 5
+stays open; selection runs, final training and novel opening remain closed.
+All deadlines and confirmed researcher availability are preserved; actual
+researcher time remains unreported.
+
+The authorized password callback restored the disconnected SCC session. The
+later guarded acceptance invocation then remained silent and did not return an
+idle prompt after interrupt and suspend requests. No traceback, completion
+receipt or confirmed process state was obtained. Local source inspection found
+no nested blocking lock or scientific replay; Git checks and full metadata reads
+can be slow, but the actual cause remains unknown. The connection and evidence
+were preserved; no second connection, unchanged allocation retry or downstream
+job was launched. The remote status pointer could not be synchronized.
+
+The existing automation was set to **PAUSED**, and its saved state, unchanged
+hourly minute-35 schedule and prompt were read back. The researcher must restore
+a usable authenticated SCC prompt and provide resume direction. Before rerunning
+anything, reconcile surviving processes and any partial or completed acceptance
+receipt with the retained invocation markers; a missing local receipt is not
+proof that the remote writer made no progress. This access blocker is separate
+from the completed measurement and does not authorize weakening its checks.
 
 ## November 10: combined metadata comparison accepted
 
