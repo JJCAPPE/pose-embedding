@@ -672,3 +672,15 @@ prompt and researcher resume direction are required. The remote status pointer
 remains unsynchronized, and any surviving process or partial receipt must be
 reconciled before another invocation. No scientific failure is inferred from
 this access problem.
+
+The reviewed record and guarded tracker update were merged in PR 64 with all
+required CI checks passing. Live public export verification confirmed the four
+updated records and unchanged open/pending states. A final wording review
+clarified that sending the validation command does not establish validator
+startup; final acceptance remains unverified.
+
+A local pane capture at 13:39 UTC subsequently showed the authenticated prompt
+and a stopped acceptance command. No completion receipt was visible. This
+narrows the process state but does not establish the validator's internal
+progress. The automation remains paused pending researcher resume direction;
+the stopped process and possible receipts must be reconciled before a retry.

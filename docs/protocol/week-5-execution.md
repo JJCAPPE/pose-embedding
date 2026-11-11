@@ -17,8 +17,8 @@ independent operational and semantic review. Final receipt publication is unveri
 the SCC session became unresponsive during the guarded acceptance invocation.
 Its reviewed necessary check-cost bound is 873.911 hours versus 168 available.
 Fresh-command costs, GPU qualification, artifact adoption and complete measured
-SCC capacity remain unresolved. The existing automation is paused pending
-researcher restoration of a usable SCC prompt and resume direction.
+SCC capacity remain unresolved. The existing automation remains paused pending
+researcher resume direction and reconciliation of the stopped command and any receipt.
 Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
@@ -59,8 +59,9 @@ the exact runtime before and after, all three command outcomes, 72 operation
 resource records plus one runtime record, and four seals. Every raw resource
 sample passed the 475,301,428,480-byte storage requirement and the 32 GiB RAM
 guard. Fresh terminal checks covered 3,228 launch bindings and 616 frozen source
-files. The existing metadata validator was invoked with fresh full-content
-rehashing and unopened-data checks, but no completion receipt was observed.
+files. The guarded validation command was issued, but validator startup and
+completion were not confirmed. Its full-content rehashing and unopened-data
+checks remain required before final acceptance.
 Scientific arrays were not read locally or on login. The Mac alert helper
 reported success; visible delivery was unverified.
 
@@ -87,9 +88,11 @@ were preserved; no second connection, unchanged allocation retry or downstream
 job was launched. The remote status pointer could not be synchronized.
 
 The existing automation was set to **PAUSED**, and its saved state, unchanged
-hourly minute-35 schedule and prompt were read back. The researcher must restore
-a usable authenticated SCC prompt and provide resume direction. Before rerunning
-anything, reconcile surviving processes and any partial or completed acceptance
+hourly minute-35 schedule and prompt were read back. A later local pane capture
+at 13:39 UTC showed that the prompt had returned and the shell reported the
+acceptance command as stopped. No completion receipt was visible. The automation
+remains paused pending researcher resume direction. Before rerunning anything,
+reconcile the stopped process and any partial or completed acceptance
 receipt with the retained invocation markers; a missing local receipt is not
 proof that the remote writer made no progress. This access blocker is separate
 from the completed measurement and does not authorize weakening its checks.
