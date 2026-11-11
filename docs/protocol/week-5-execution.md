@@ -9,18 +9,62 @@ original provenance. The current correction removes recursive historical
 consumer audits; one full issuer check, initial opening safeguards and one
 independent final 180-cell/report verification remain. The former mandatory
 whole-history adoption campaign and second Week 5 recertification are superseded.
-CPU qualification 8561360 is accepted; the remaining candidate GPU parity and
-corrected-path timing are pending. Measurement 8565319 now has its verified
+CPU qualification 8561360 and bounded GPU parity 8580442 are independently
+accepted. CPU job 8581145 was submitted once for one corrected admission-prefix
+measurement; no result is accepted. Corrected-path timing and complete capacity
+remain pending.
+Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
 metadata-only receipt writer succeeded after a reviewed lock-scope correction.
 No new capacity pass or downstream scientific-stage authorization is claimed.
-The legacy automation remains paused; the single completion watcher is idle
-until an eligible job is submitted. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
+The legacy automation remains paused; the single completion watcher is
+armed for job 8581145, with its next eligible check at 23:52:31 UTC (6:52:31 PM EST). Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 11: bounded GPU parity accepted
+
+Job **8580442** completed on an L40S with four OMP slots, failed=0 and exit=0,
+in **78 scheduler seconds**. Independent review accepted its bounded parity
+qualification at 22:43:37 UTC. Scheduler completion alone did not establish
+acceptance. The review checked the exact accepted CPU 8561360 runtime before
+and after, with only the previously approved GPU build-report expansion;
+allocation and GPU identity; both command outcomes; five resource records;
+four seal observations; and 749 unique launch/runtime bindings before and after
+the metadata review. All 43 exported metadata files passed their content hashes.
+
+The frozen parity validator reconstructed the same ordered 48-sample auxiliary
+panel as the retained accepted report, with eight samples in each of six
+strata. All 12 layers passed their unchanged tolerances with zero recorded
+maximum absolute error. The job ran parity only: it created no gallery links,
+launched no development corruptions and granted no new cache acceptance.
+Scientific binary data was processed only in the allocation; terminal review
+used retained metadata and the frozen validation functions.
+
+Acceptance receipt:
+`study-v3/operations/week5-runtime-conditional-gpu-acceptance/20261111T224337Z/verification.json`,
+SHA-256 `04658fe428167b26cb0f5f79d862dad510965e8bcd9c9076c5927518086975f5`.
+The frozen producer release `f101f0e9d9bd64275d2088deab1b0bdcfcc53620`,
+execution-r2 locks and historical evidence retain their original provenance.
+
+CPU job **8581145** was submitted once for **one changed admission-prefix
+measurement**, using the existing admission controller/assembler and the
+separately bound ADR0012 validator. It must retain the expected pending-capacity
+rejection. Launch receipt:
+`study-v3/operations/week5-runtime-minimal-admission/20261111T225147Z/launch.json`,
+SHA-256 `e694ca5d9323f13e70b95fdfb6d30bdc187d12e13b4e9615f7676633e6a7f59c`.
+No measurement outcome is accepted from this submission.
+The old three-pass timing sequence will not be repeated, and downstream
+authorization or final-lock records will not be invented for timing. Complete
+CPU/GPU/storage/calendar/researcher capacity and actual admission remain pending.
+The old 873.911-hour estimate still describes only the old call graph; no
+replacement runtime total, capacity pass or Week 5 closure is claimed.
+Selection runs, final training and novel opening remain closed. The legacy
+automation stays paused; the single completion watcher will be armed for the
+submitted job at handoff.
 
 ## November 11: minimum validation scope authorized
 
