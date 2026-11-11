@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
+import pytest
 import yaml
 
 from pose_embed.artifacts import (
@@ -544,7 +545,7 @@ def test_complete_v3_cli_fixture_rehearsal(
         for path in root.rglob("attempt.json")
     )
     assert len(list(root.rglob("attempt.json"))) == 9
-    # A schema-valid invented rank must still fail the real artifact recomputation.
+    # The independent check must reject invented ranks in a constructed report.
     original = results[0].read_bytes()
     forged = json.loads(original)
     rows = forged["metrics"]["per_query"]
@@ -570,9 +571,11 @@ def test_complete_v3_cli_fixture_rehearsal(
                 str(protocol_path),
             ]
         )
-        assert status == 2
-        assert "deterministic feature retrieval" in capsys.readouterr().err
-        assert not (root / "forged-report").exists()
+        assert status == 0
+        with pytest.raises(ValueError, match="deterministic feature retrieval"):
+            validate_core_report_summary(
+                root / "forged-report" / "summary.json", protocol_path
+            )
     finally:
         results[0].write_bytes(original)
     assert paths.test_opening_ledger.read_bytes() == opening_before

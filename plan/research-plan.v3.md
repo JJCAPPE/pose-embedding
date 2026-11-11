@@ -1,11 +1,38 @@
 # Final v3 plan: frozen one-shot pose robustness
 
 Original decision: **2026-09-29**. Execution amendments: **2026-10-09**,
-**2026-10-12**, **2026-10-19**, **2026-10-25**, **2026-11-05** and **2026-11-10**. Delivery: **2026-12-18**. Status: **final planning
+**2026-10-12**, **2026-10-19**, **2026-10-25**, **2026-11-05**, **2026-11-10** and **2026-11-11**. Delivery: **2026-12-18**. Status: **final planning
 decision; implementation and measured campaign gates remain to be completed**.
 This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-frozen-one-shot-v3.md)
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
+
+**November 11 current validation policy:** the researcher authorized the minimum
+validation scope in [ADR0012](../docs/decisions/0012-bounded-validation-scope.md).
+It takes precedence over earlier validation and regeneration requirements below.
+Preserve accepted outputs with their original producer, source and runtime
+provenance; validator or runtime changes alone do not require regenerating,
+re-adopting or independently recertifying the entire historical inventory.
+Qualify the new runtime's GPU computation once using the fixed 48-sample,
+12-layer parity comparison, adding a compact development projection/retrieval
+check only if needed to cover changed computation.
+
+Keep the existing complete validation when issuing selection authorization,
+creating selected configurations and first authorizing novel opening. Those
+immutable records are the trust anchors; later reads check their fresh direct
+bindings without repeating historical numerical validation. Producers retain
+input/output identity, order, role, finiteness and full-content hash checks.
+Current authority, seals, source/runtime, locks and capacity guards remain fresh.
+Require one independent final verification of all 180 retrieval cells and the
+report/bootstrap. No new persistent proof cache, certificate framework, complete
+stage-inventory audit or second full independent Week 5 recertification is added.
+
+The three methods, three paired seeds, 20 epochs, 27 selection slots, nine final
+heads, all corruption conditions and 180 cells remain fixed. The changed source
+and runtime path still need allocated qualification and timing; no speedup,
+capacity pass or task completion is claimed. Selection runs, final training and
+novel opening remain outside the current Week 5 authorization. Earlier dated
+records below remain historical evidence under this precedence rule.
 
 **November 10 conditional correction:** the researcher approved
 [ADR0011](../docs/decisions/0011-validator-runtime-correction.md). Qualify the exact

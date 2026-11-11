@@ -446,13 +446,11 @@ def require_v3_selection_authorization(
 def require_v3_final_authorization(
     protocol: ProtocolV3Config, *, now: datetime | None = None
 ) -> V3FinalLock:
-    """Require every final head and the complete canonical cross-binding."""
+    """Verify the complete canonical final records without replaying prior evidence."""
     from pose_embed.protocol import (
         load_evaluation_plan,
         load_final_run_set,
         load_protocol_lock,
-        validate_evaluation_manifests,
-        validate_final_run_artifacts,
         verify_protocol_lock,
     )
     from pose_embed.protocol_v3_campaign import (
@@ -502,7 +500,4 @@ def require_v3_final_authorization(
         raise ValueError("v3 final lock authorization bindings or chronology differ")
     _bound_file(paths.root, runs.selection_evidence)
     verify_protocol_lock(protocol, lock, plan, runs, now=now)
-    validate_evaluation_manifests(protocol, plan, paths.root, check_source_files=False)
-    for run in runs.runs:
-        validate_final_run_artifacts(runs, run, paths.root, protocol=protocol)
     return lock

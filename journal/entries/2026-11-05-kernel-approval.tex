@@ -684,3 +684,62 @@ and a stopped acceptance command. No completion receipt was visible. This
 narrows the process state but does not establish the validator's internal
 progress. The automation remains paused pending researcher resume direction;
 the stopped process and possible receipts must be reconciled before a retry.
+
+\subsection*{November 11: reducing the validation scope}
+
+A local source audit explains the 873.911-hour figure as projected serial
+validation in the future final-evaluation window, not remaining Week 5 work.
+The measurement itself lasted 66.4 scheduler minutes. The call graph repeats
+the Week 5 evidence 2,054 times across 392 commands, and also revisits selection
+runs and final heads. This is implementation overhead, not 2,054 new experiments.
+
+Proposed decision \path{docs/decisions/0012-bounded-validation-scope.md} keeps
+the complete scientific study while replacing recursive historical validation
+with an initial audit and one independent verification per unchanged evidence
+set. It specifies full dependency hashes at bounded stage entry/acceptance and
+fresh consumed-input, role and permission checks per command. The proposal
+explicitly changes the current reuse restrictions and records the tradeoff:
+changes to unread ancestors are detected at boundaries, with no guarantee for
+changes restored between those checks. Provisional outputs cannot pass gates.
+
+The engineering target is 16.8 hours of total post-opening validation including
+margin; this is not a measured result. Complete allocated measurement and
+capacity acceptance remain required. The proposal is awaiting researcher
+approval. No SCC command, scientific output or protocol adoption followed from
+this local audit, and the legacy automation remains paused.
+
+\subsection*{November 11: minimum scope authorized}
+
+The researcher subsequently authorized the smallest defensible validation scope
+and delegated its implementation. ADR0012 now records that authorization and
+supersedes the earlier proposal. The implementation reuses issued acceptance
+records with fresh direct-content and permission checks. Full issuer validation
+and initial opening checks remain. The final independent checker still recomputes
+all 180 retrieval cells and the report; construction no longer performs another
+retrieval replay first. Historical evidence retains its original provenance,
+without a new whole-history adoption campaign or second complete recertification.
+
+The existing parity helper now supports qualification without launching all
+nine development corruptions. The previously stopped metadata acceptance command
+was reconciled and resumed; its pending interrupt terminated it at dataset-lock
+acquisition before validation or receipt publication. This identifies a
+bookkeeping access problem, not a failed scientific comparison. A metadata-only
+acceptance correction retains before/after seal observations and exact source
+bindings while leaving scientific dataset locking unchanged. Allocated timing
+and new qualification outcomes are not yet claimed.
+
+The corrected metadata-only writer subsequently completed at 21:18:24 UTC.
+It verified 3,352 metadata/source bindings and before/after unopened-seal
+observations, producing the immutable measurement receipt linked in the
+execution record. The historical cost estimate is accepted for its original
+call graph only; it is not a forecast for the corrected consumer path. The
+original measurement was not repeated and no new scientific result is inferred.
+
+Independent local review found no blocking implementation issue. Focused tests
+passed for issuer/consumer separation, changed bindings, selection attempts,
+opening guards, independent rank-forgery rejection and parity-only dispatch.
+The complete local Python suite exposed one obsolete rehearsal expectation:
+report construction was still expected to reject invented ranks before the
+independent check. The corrected rehearsal now demonstrates rejection by that
+independent check and passes. Workspace, lint and formatting checks passed;
+required remote CI remains part of merging the change.

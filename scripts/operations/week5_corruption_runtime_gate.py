@@ -21,9 +21,9 @@ GPU_BUILD_SHA = "8ef1be76262a97c1101484cef940d6dbb63cf1582bda8fd9d5104e1f54ff6b0
 PARITY_ENTRYPOINT = str(
     Path(__file__).with_name("week5_corruption_parity.py").resolve()
 )
-PARITY_SHA256 = "d07bd168d06513678cacf9a182416fef64b90487a623b5ff87fba4fa32caaaf7"
+PARITY_SHA256 = "5835f21b91e632014268e9d53d4ffc56b8f770941d85fe64d01c4bb8b7062d61"
 TARGETS = {
-    PARITY_ENTRYPOINT: ("corruptions",),
+    PARITY_ENTRYPOINT: ("corruptions", "parity-only"),
     "scripts/operations/week5_gpu_context_diagnostic.py": (),
     "scripts/operations/week5_gpu_controller.py": (
         "caches",

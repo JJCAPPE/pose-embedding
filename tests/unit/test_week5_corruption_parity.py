@@ -85,9 +85,12 @@ def test_input_links_reject_escape_overwrite_and_unbound_gallery(inputs, fault):
         helper.prepare_inputs(cache, destination, revision)
 
 
-@pytest.mark.parametrize("fault", [None, "lock", "parity", "seal"])
+@pytest.mark.parametrize(
+    "fault", [None, "lock", "parity", "seal", "escape", "existing"]
+)
+@pytest.mark.parametrize("mode", ["corruptions", "parity-only"])
 def test_prelude_retains_failures_and_only_executes_controller_after_success(
-    inputs, monkeypatch, fault
+    inputs, monkeypatch, fault, mode
 ):
     helper, revision, cache, destination = inputs
     root = revision.parent
@@ -96,6 +99,10 @@ def test_prelude_retains_failures_and_only_executes_controller_after_success(
     revision.parent.mkdir(parents=True)
     (root / "old").rename(revision)
     cache, destination = revision / cache.name, revision / "corruption-inputs/fresh"
+    if fault == "escape":
+        destination = root / "outside"
+    elif fault == "existing":
+        destination.mkdir(parents=True)
     child = [
         ".venv/bin/python",
         "scripts/operations/week5_gpu_controller.py",
@@ -106,27 +113,27 @@ def test_prelude_retains_failures_and_only_executes_controller_after_success(
         "202000000000",
     ]
     packet = root / "packet.json"
-    packet.write_text(
-        json.dumps(
-            {
-                "bindings": {},
-                "remaining_peak_bytes": 202000000000,
-                "runtime_gate": "fixture-gate.py",
-                "controller_command": child,
-                "input_dir": str(destination),
-                "cache_dir": str(cache),
-                "cache_acceptance": "fixture-acceptance",
-                "diagnostic_receipt": "fixture-diagnostic",
-                "diagnostic_sha256": "a" * 64,
-            }
+    payload = {
+        "bindings": {},
+        "remaining_peak_bytes": 202000000000,
+        "input_dir": str(destination),
+        "diagnostic_receipt": "fixture-diagnostic",
+        "diagnostic_sha256": "a" * 64,
+    }
+    if mode == "corruptions":
+        payload.update(
+            runtime_gate="fixture-gate.py",
+            controller_command=child,
+            cache_dir=str(cache),
+            cache_acceptance="fixture-acceptance",
         )
-    )
+    packet.write_text(json.dumps(payload))
     monkeypatch.setattr(
         sys,
         "argv",
         [
             "prelude",
-            "corruptions",
+            mode,
             "--inputs",
             str(packet),
             "--inputs-sha256",
@@ -145,7 +152,7 @@ def test_prelude_retains_failures_and_only_executes_controller_after_success(
     monkeypatch.setattr(helper, "dataset_access", nullcontext)
     monkeypatch.setattr(helper, "load_protocol", lambda _: None)
     monkeypatch.setattr(helper, "require_v3_design", lambda _: None)
-    calls, executed = [], []
+    calls, executed, commands, cuda_guards = [], [], [], []
 
     def seal(**_):
         calls.append("seal")
@@ -153,6 +160,7 @@ def test_prelude_retains_failures_and_only_executes_controller_after_success(
             raise ValueError("synthetic seal failure")
 
     def run(command, attempt, index, *args):
+        commands.append(command)
         if index == 1:
             if fault == "parity":
                 raise RuntimeError("synthetic parity failure")
@@ -163,7 +171,7 @@ def test_prelude_retains_failures_and_only_executes_controller_after_success(
             interrupted=lambda *_: None, require_dataset_unopened=seal, run_command=run
         ),
         "controller": SimpleNamespace(
-            require_cuda_free_parent=lambda: None,
+            require_cuda_free_parent=lambda: cuda_guards.append(True),
             execution_binding=lambda *_: {},
             validate_allocation=lambda **_: None,
             validate_diagnostic=lambda *_, **__: None,
@@ -192,14 +200,46 @@ def test_prelude_retains_failures_and_only_executes_controller_after_success(
 
         monkeypatch.setattr(helper.fcntl, "flock", locked)
     if fault:
-        with pytest.raises((RuntimeError, ValueError, BlockingIOError)):
+        with pytest.raises(
+            (RuntimeError, ValueError, BlockingIOError, FileExistsError)
+        ):
             helper.main()
     else:
         helper.main()
-    attempt = root / "study-v3/operations/fresh-123-corruption-parity"
+    suffix = "corruption-parity" if mode == "corruptions" else "runtime-parity"
+    attempt = root / f"study-v3/operations/{destination.name}-123-{suffix}"
     outcome = json.loads((attempt / "outcome.json").read_text())
     assert outcome["status"] == ("failed" if fault else "passed")
-    assert executed == ([] if fault else [(child[0], child)])
+    assert executed == (
+        [(child[0], child)] if not fault and mode == "corruptions" else []
+    )
+    if mode == "parity-only":
+        assert outcome["parity_only"] is True
+        assert outcome["corruptions_launched"] is False
+    if not fault:
+        assert len(commands) == 2
+        assert commands[0][2] == "--gpu-preflight-output"
+        assert commands[1][1:3] == ["features", "parity"]
+        assert len(cuda_guards) == 4
+        assert json.loads((attempt / "seal-before.json").read_text())["status"] == (
+            "sealed"
+        )
+        assert json.loads((attempt / "seal-after.json").read_text())["status"] == (
+            "sealed"
+        )
+        record = json.loads((attempt / "attempt.json").read_text())
+        if mode == "parity-only":
+            assert record["kind"] == "allocation_local_runtime_parity"
+            assert record["parity_only"] is True
+            assert record["corruptions_launched"] is False
+            assert "cache_acceptance" not in record
+            assert "original_gallery_links" not in record
+            assert sorted(path.name for path in destination.iterdir()) == [
+                "parity.json"
+            ]
+        else:
+            assert record["kind"] == "allocation_local_corruption_parity"
+            assert "parity_only" not in record
     if fault == "seal":
         assert (
             json.loads((attempt / "seal-after.json").read_text())["error_message"]
@@ -207,7 +247,8 @@ def test_prelude_retains_failures_and_only_executes_controller_after_success(
         )
 
 
-def test_runtime_gate_adds_only_the_bound_parity_target():
+@pytest.mark.parametrize("mode", ["corruptions", "parity-only"])
+def test_runtime_gate_adds_only_the_bound_parity_target(mode):
     gate = load("scripts/operations/week5_corruption_runtime_gate.py")
     assert (
         hashlib.sha256(Path(gate.PARITY_ENTRYPOINT).read_bytes()).hexdigest()
@@ -216,7 +257,7 @@ def test_runtime_gate_adds_only_the_bound_parity_target():
     command = [
         ".venv/bin/python",
         gate.PARITY_ENTRYPOINT,
-        "corruptions",
+        mode,
         "--inputs",
         "/fixture/packet.json",
         "--inputs-sha256",
