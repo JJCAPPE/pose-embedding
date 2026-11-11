@@ -348,7 +348,7 @@ def _campaign_binding(root, protocol, binding):
     return path
 
 
-def _receipt(root, binding, model, protocol, authorization):
+def _receipt(root, binding, model, protocol, authorization, *, rehash_evidence=True):
     from pose_embed.protocol import current_code_hashes
 
     _campaign_binding(root, protocol, binding)
@@ -361,8 +361,9 @@ def _receipt(root, binding, model, protocol, authorization):
         or receipt.code_sha256 != current_code_hashes().model_dump()
     ):
         raise ValueError("admission evidence has wrong protocol/design or chronology")
-    for evidence in receipt.evidence:
-        _bound_file(root, evidence)
+    if rehash_evidence:
+        for evidence in receipt.evidence:
+            _bound_file(root, evidence)
     return receipt
 
 
@@ -436,15 +437,7 @@ def _validate_capacity_availability(root, capacity, *, as_of=None):
         raise ValueError("confirmed planned hours do not fit remaining work and slack")
 
 
-def _validate_authorization(protocol, authorization):
-    from pose_embed.artifacts import sample_order_digest, validate_feature_artifact
-    from pose_embed.data.manifest import load_manifest
-    from pose_embed.evaluation.analysis import metadata_dependence_table_v3
-    from pose_embed.evaluation.result import EvaluationResult
-    from pose_embed.geometry_v3 import validate_geometry_panel
-    from pose_embed.report import _feature_path_for_hash, _validate_retrieval_metrics
-    from pose_embed.training.runner import validate_engineering_pilot
-
+def _authorization_context(protocol, authorization):
     root = resolve_scientific_paths(protocol).root
     design = require_v3_design(protocol)
     if (
@@ -454,6 +447,56 @@ def _validate_authorization(protocol, authorization):
         or authorization.recorded_at < design.recorded_at
     ):
         raise ValueError("selection authorization differs from the admitted design")
+    return root, design
+
+
+def _validate_selection_matrix(root, protocol, authorization):
+    from pose_embed.config import validate_experiment_against_protocol
+
+    matrix = _read(root, authorization.run_matrix, SelectionMatrix)
+    _campaign_binding(root, protocol, authorization.run_matrix)
+    if matrix.protocol_sha256 != authorization.protocol_sha256:
+        raise ValueError("selection matrix differs from the protocol")
+    for slot in matrix.slots:
+        config = load_experiment(_campaign_binding(root, protocol, slot.config))
+        validate_experiment_against_protocol(config, protocol)
+        if (config.objective, config.learning_rate, config.seed) != _slot_key(slot):
+            raise ValueError("selection matrix configuration differs from its slot")
+    return matrix
+
+
+def _validate_authorization_bindings(protocol, authorization):
+    """Read the issued admission and its direct bindings without replaying it."""
+    root, design = _authorization_context(protocol, authorization)
+    for binding in authorization.pilot_records.values():
+        _campaign_binding(root, protocol, binding)
+    for binding, model in (
+        (authorization.corruption_verification, CorruptionReceipt),
+        (authorization.analysis_verification, AnalysisReceipt),
+        (authorization.capacity_report, CapacityReceipt),
+        (authorization.seal_audit, SealReceipt),
+    ):
+        receipt = _receipt(
+            root, binding, model, protocol, authorization, rehash_evidence=False
+        )
+        if isinstance(receipt, SealReceipt) and (
+            receipt.artifact_root_registry_sha256
+            != design.artifact_root_registry_sha256
+        ):
+            raise ValueError("selection seal audit differs from the shared registry")
+    return _validate_selection_matrix(root, protocol, authorization)
+
+
+def _validate_authorization(protocol, authorization):
+    from pose_embed.artifacts import sample_order_digest, validate_feature_artifact
+    from pose_embed.data.manifest import load_manifest
+    from pose_embed.evaluation.analysis import metadata_dependence_table_v3
+    from pose_embed.evaluation.result import EvaluationResult
+    from pose_embed.geometry_v3 import validate_geometry_panel
+    from pose_embed.report import _feature_path_for_hash, _validate_retrieval_metrics
+    from pose_embed.training.runner import validate_engineering_pilot
+
+    root, design = _authorization_context(protocol, authorization)
     pilots = {}
     pairing = set()
     for method, binding in authorization.pilot_records.items():
@@ -595,18 +638,7 @@ def _validate_authorization(protocol, authorization):
     )
     if seal.artifact_root_registry_sha256 != design.artifact_root_registry_sha256:
         raise ValueError("selection seal audit differs from the shared registry")
-    matrix = _read(root, authorization.run_matrix, SelectionMatrix)
-    _campaign_binding(root, protocol, authorization.run_matrix)
-    if matrix.protocol_sha256 != authorization.protocol_sha256:
-        raise ValueError("selection matrix differs from the protocol")
-    from pose_embed.config import validate_experiment_against_protocol
-
-    for slot in matrix.slots:
-        config = load_experiment(_campaign_binding(root, protocol, slot.config))
-        validate_experiment_against_protocol(config, protocol)
-        if (config.objective, config.learning_rate, config.seed) != _slot_key(slot):
-            raise ValueError("selection matrix configuration differs from its slot")
-    return matrix
+    return _validate_selection_matrix(root, protocol, authorization)
 
 
 def require_selection_authorization(
@@ -617,7 +649,7 @@ def require_selection_authorization(
     if not path.is_file():
         raise ValueError("v3 selection requires measured campaign authorization")
     authorization = V3SelectionAuthorization.model_validate_json(path.read_text())
-    _validate_authorization(protocol, authorization)
+    _validate_authorization_bindings(protocol, authorization)
     return authorization
 
 
@@ -644,7 +676,58 @@ def selected_configs_path(protocol: ProtocolV3Config) -> Path:
     ).with_name("selected-configs.v3.json")
 
 
-def _selection_table(protocol, authorization, ledger, *, not_after=None):
+def _selection_metadata(root, slot, attempt, outcome, config):
+    from pose_embed.training.runner import _stage_identity
+
+    manifest_path = root / "run-manifest.json"
+    metrics_path = root / "metrics.json"
+    for path, key in (
+        (manifest_path, "run_manifest_sha256"),
+        (metrics_path, "metrics_sha256"),
+    ):
+        if sha256_file(path) != outcome.get(key):
+            raise ValueError("selection outcome metadata hash mismatch")
+    manifest = json.loads(manifest_path.read_text())
+    metrics = json.loads(metrics_path.read_text())
+    epoch_path = root / "epoch-020.json"
+    if (
+        set(manifest["epoch_records"]) != {epoch_path.name}
+        or manifest["epoch_records"] != metrics["epoch_records"]
+        or sha256_file(epoch_path) != manifest["epoch_records"][epoch_path.name]
+        or manifest["outputs"]["metrics"] != outcome["metrics_sha256"]
+        or manifest["configuration"]["attempt_sha256"]
+        != sha256_file(root / "attempt.json")
+        or manifest["protocol_sha256"] != attempt["protocol_sha256"]
+    ):
+        raise ValueError("selection metadata provenance changed")
+    epoch = json.loads(epoch_path.read_text())
+    identity = _stage_identity("development_selection")
+    if (
+        any(
+            value.get(key) != expected
+            for value in (manifest, metrics, epoch)
+            for key, expected in identity.items()
+        )
+        or epoch.get("epoch") != 20
+    ):
+        raise ValueError("selection metadata stage/eligibility changed")
+    if (
+        manifest["configuration"]["experiment"] != config.model_dump(mode="json")
+        or (config.objective, config.learning_rate, config.seed) != _slot_key(slot)
+        or (metrics["objective"], metrics["seed"], metrics["epochs"])
+        != (config.objective, config.seed, config.epochs)
+        or metrics["initialization_sha256"] != manifest["initialization_sha256"]
+        or metrics["batch_plan_sha256"] != manifest["batch_plan_sha256"]
+        or manifest["outputs"]["batch_plan"] != outcome["batch_plan_sha256"]
+        or manifest["outputs"]["checkpoint"] != outcome["checkpoint_sha256"]
+    ):
+        raise ValueError("selection metadata configuration or pairing changed")
+    return metrics, epoch
+
+
+def _selection_table(
+    protocol, authorization, ledger, *, not_after=None, validate_training=True
+):
     from pose_embed.training.runner import validate_v3_training_run
 
     root = resolve_scientific_paths(protocol).root
@@ -761,10 +844,23 @@ def _selection_table(protocol, authorization, ledger, *, not_after=None):
                     raise ValueError(
                         "successful attempt requires its own completed outcome"
                     )
-                metrics = validate_v3_training_run(
-                    path.parent, stage="development_selection"
-                )
-                epoch = json.loads((path.parent / "epoch-020.json").read_text())
+                if validate_training:
+                    metrics = validate_v3_training_run(
+                        path.parent, stage="development_selection"
+                    )
+                    epoch = json.loads((path.parent / "epoch-020.json").read_text())
+                else:
+                    metrics, epoch = _selection_metadata(
+                        path.parent,
+                        slot,
+                        attempt,
+                        outcome,
+                        load_experiment(
+                            _campaign_binding(
+                                root, protocol, slots[_slot_key(slot)].config
+                            )
+                        ),
+                    )
                 hashes = (
                     metrics["initialization_sha256"],
                     metrics["batch_plan_sha256"],
@@ -890,6 +986,7 @@ def require_selected_configurations(protocol) -> SelectedConfigurations:
         authorization,
         _read(root, selected.ledger, SelectionLedger),
         not_after=selected.recorded_at,
+        validate_training=False,
     )
     if selected.candidates != candidates or selected.selected_rates != rates:
         raise ValueError(

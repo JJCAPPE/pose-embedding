@@ -683,6 +683,7 @@ def _validate_final_provenance(
     results: list[EvaluationResult],
     *,
     protocol_path: str | Path,
+    recompute_metrics: bool = True,
 ) -> tuple[int, set[tuple[str, int, str, str]]]:
     protocol = load_protocol(protocol_path)
     paths = resolve_scientific_paths(protocol)
@@ -908,7 +909,8 @@ def _validate_final_provenance(
         )
         if len(query_lineages) != 1:
             raise ValueError("final matrix changes a paired query corruption cache")
-        _validate_retrieval_metrics(result, gallery_path, query_path)
+        if recompute_metrics:
+            _validate_retrieval_metrics(result, gallery_path, query_path)
         key = (
             result.method,
             result.seed,
@@ -1196,7 +1198,13 @@ def build_report(
             if modes == {"final"}
             else _validate_exploratory_provenance
         )
-        expected_rows, authorized_keys = validator(results, protocol_path=protocol_path)
+        validation_options = {}
+        if modes == {"final"} and load_protocol(protocol_path).schema_version == 3:
+            # ADR0012: the independent report check owns the retrieval replay.
+            validation_options["recompute_metrics"] = False
+        expected_rows, authorized_keys = validator(
+            results, protocol_path=protocol_path, **validation_options
+        )
         complete = matrix_keys == authorized_keys and len(matrix_keys) == expected_rows
         if load_protocol(protocol_path).schema_version == 3 and (
             modes != {"final"} or expected_rows != 180 or not complete
@@ -1540,6 +1548,7 @@ def validate_core_report_summary(
     validated_rows, validated_keys = _validate_final_provenance(
         results,
         protocol_path=protocol_path,
+        recompute_metrics=True,
     )
     if validated_rows != plan.expected_rows:
         raise ValueError("core report failed full final provenance validation")

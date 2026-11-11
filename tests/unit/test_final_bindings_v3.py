@@ -324,7 +324,7 @@ def test_v3_final_metadata_rejects_incomplete_or_unpaired_heads(
 def test_v3_final_stage_dispatch_keeps_binding_checks_real(
     full_metadata_bundle, tmp_path, monkeypatch, mutation
 ):
-    """Only prior admission and heavy source/head inspection are test seams."""
+    """Consumer reads preserve binding checks without reconstructing prior evidence."""
     bundle = full_metadata_bundle
     monkeypatch.setenv("POSE_EMBED_ARTIFACT_ROOT", str(bundle.root))
     monkeypatch.setenv("POSE_EMBED_DATA_ROOT", str(tmp_path))
@@ -340,13 +340,15 @@ def test_v3_final_stage_dispatch_keeps_binding_checks_real(
     monkeypatch.setattr(
         "pose_embed.protocol_v3._registry_path", lambda: bundle.registry
     )
+
+    def unexpected_replay(*args, **kwargs):
+        pytest.fail("final record consumption must not replay source or head evidence")
+
     monkeypatch.setattr(
-        "pose_embed.protocol.validate_evaluation_manifests", lambda *a, **k: None
+        "pose_embed.protocol.validate_evaluation_manifests", unexpected_replay
     )
-    visited = []
     monkeypatch.setattr(
-        "pose_embed.protocol.validate_final_run_artifacts",
-        lambda _, run, *a, **k: visited.append((run.method, run.seed)),
+        "pose_embed.protocol.validate_final_run_artifacts", unexpected_replay
     )
     lock_path = bundle.root / bundle.protocol.test_access.protocol_lock_relative_path
     original = lock_path.read_bytes()
@@ -383,16 +385,9 @@ def test_v3_final_stage_dispatch_keeps_binding_checks_real(
         lock_path.write_text(json.dumps(payload))
         if mutation is None:
             assert require_v3_final_authorization(bundle.protocol) == bundle.lock
-            assert set(visited) == {
-                (method, seed)
-                for method in bundle.plan.methods
-                for seed in bundle.plan.seeds
-            }
-            assert len(visited) == 9
         else:
             with pytest.raises(ValueError, match="bindings or chronology"):
                 require_v3_final_authorization(bundle.protocol)
-            assert not visited
     finally:
         lock_path.write_bytes(original)
         selection_path.write_bytes(original_selection)

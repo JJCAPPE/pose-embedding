@@ -1,47 +1,64 @@
 # Week 5 execution record
 
 Started October 11, 2026 (America/New_York), before the October 12–18 calendar
-week, at the researcher's direction. **Week 5 remains open. On November 10 the
-researcher authorized reducing redundant validation to address the measured
-calendar failure. The current frozen profile still fails that condition. CPU/GPU baselines,
-five clean caches, three paired pilots and numerical replay, development
-execution, resident timing and the admission-cost measurement are accepted.
-Full admission, independent recertification, feasible campaign capacity and
-selection authorization remain unaccepted. After diagnostic 8549858 exposed the
-changed libc/libm contents, researcher-authorized CPU qualification 8561360 passed
-independent review against the accepted initialization and geometry evidence.
-Command-local development reconstruction reuse is verified locally. The combined
-metadata comparison passed independent review with identical outputs and measured
-component savings. Whole-prefix measurement 8565319 completed and passed local
-independent operational and semantic review. Final receipt publication is unverified because
-the SCC session became unresponsive during the guarded acceptance invocation.
-Its reviewed necessary check-cost bound is 873.911 hours versus 168 available.
-Fresh-command costs, GPU qualification, artifact adoption and complete measured
-SCC capacity remain unresolved. The existing automation remains paused pending
-researcher resume direction and reconciliation of the stopped command and any receipt.
-Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
+week, at the researcher's direction. **Week 5 remains open. On November 11 the
+researcher authorized minimum validation under ADR0012. Accepted CPU/GPU
+baselines, five caches, three paired pilots/replay, development execution,
+resident timing and historical admission measurements remain preserved with
+original provenance. The current correction removes recursive historical
+consumer audits; one full issuer check, initial opening safeguards and one
+independent final 180-cell/report verification remain. The former mandatory
+whole-history adoption campaign and second Week 5 recertification are superseded.
+CPU qualification 8561360 is accepted; the remaining candidate GPU parity and
+corrected-path timing are pending. Measurement 8565319 now has its verified
+metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
+to the old call graph. The stopped process was reconciled and terminated; the
+metadata-only receipt writer succeeded after a reviewed lock-scope correction.
+No new capacity pass or downstream scientific-stage authorization is claimed.
+The legacy automation remains paused; the single completion watcher is idle
+until an eligible job is submitted. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
 
-## November 11: proposed bounded validation scope
+## November 11: minimum validation scope authorized
 
-A result-blind source audit traced the 873.911-hour forecast to 2,054 nested
-Week 5 audits in 392 future post-opening commands. It is not remaining Week 5
-time; the measurement job itself took 66.4 minutes. Authorization reads also
-repeat selection-run and final-head validation. Merely caching more numerical
-subchecks leaves the repeated outer audit in place.
+The researcher authorized the smallest defensible scope in
+[ADR0012](../decisions/0012-bounded-validation-scope.md). It replaces the earlier
+unadopted two-audit proposal. The complete scientific study remains unchanged.
+Accepted historical outputs retain their original provenance; no separate
+artifact-adoption campaign or second complete Week 5 recertification is required.
 
-[Proposed ADR0012](../decisions/0012-bounded-validation-scope.md) replaces this
-recursion with initial validation plus one independent verification per
-unchanged evidence set, full transitive integrity checks at bounded stage
-boundaries, and fresh direct-input and authority checks for each command.
-All scientific runs, data, numerical comparisons and the complete 180-cell
-study remain required. The 16.8-hour final-campaign validation target is
-unmeasured; no capacity pass, adopted validator or scientific authorization is
-claimed. The proposal explicitly identifies the changed reuse rules and delayed
-detection of changes to unread ancestors. Researcher approval is still required.
+The corrected consumer paths check issued records, direct content bindings and
+current permissions without repeating the historical admission audit, selection
+numerical replay or full source/nine-head reconstruction. Full validators remain
+at issuance and initial opening. Report construction omits the extra retrieval
+replay; the independent final checker still recomputes every cell and report.
+Qualification uses the existing parity-only route rather than launching the
+full development-corruption pipeline. These are implementation changes, not an
+SCC runtime result. The old 873.911-hour forecast describes the old call graph;
+new capacity remains to be measured. No scientific gate is marked complete.
+
+The historical measurement receipt was written at 21:18:24 UTC on November 11:
+`study-v3/operations/week5-admission-measurement-verification/20261111T211824Z/verification.json`,
+SHA-256 `764f7bafa00a82355bb8c055b071053115a5f690773ff02f60d404003d05a0e7`.
+All 3,352 metadata/source bindings and before/after unopened-seal observations
+passed. The writer read no scientific binary data and granted no admission,
+artifact adoption or capacity. The earlier stopped process had not entered its
+validation body or created an output directory. Its completed traceback located
+the interruption at dataset-lock acquisition. Only this terminal metadata writer
+was changed; scientific dataset locks remain mandatory. This receipt accepts the
+old measurement without repeating the job or applying its obsolete call counts
+to the corrected consumer path.
+
+Independent local implementation review found no blocking issue. Focused tests
+cover issuer/consumer dispatch, altered direct bindings and selection metadata,
+complete attempt accounting, opening guards, independent numerical forgery
+rejection and parity-only execution. The full local suite found one old report
+rehearsal assertion; the corrected rehearsal passes and now checks rejection at
+independent verification. Workspace, Ruff lint and formatting checks passed.
+Required CI checks govern merge; these fixture results do not establish runtime.
 
 ## November 11: whole-prefix review and SCC access blocker
 

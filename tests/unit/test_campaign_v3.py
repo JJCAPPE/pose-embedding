@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import pytest
 import torch
 
-from pose_embed.config import load_protocol
+from pose_embed.config import load_experiment, load_protocol
 from pose_embed.config_v3 import ArtifactBinding
 from pose_embed.protocol import _validate_head_checkpoint, protocol_digest
 from pose_embed.protocol_v3 import V3SelectionAuthorization
@@ -59,6 +59,14 @@ def campaign(tmp_path, monkeypatch):
 
     protocol = load_protocol("configs/protocol.v3.yaml")
     matrix = _matrix(protocol)
+    configs = {}
+    for slot in matrix["slots"]:
+        rate = {1e-4: "1e-4", 3e-4: "3e-4", 1e-3: "1e-3"}[slot["learning_rate"]]
+        config = load_experiment(
+            f"configs/experiments/v3/{slot['method']}-lr{rate}-seed{slot['seed']}.yaml"
+        ).model_dump(mode="json")
+        configs[slot["config"]["relative_path"]] = config
+        slot["config"] = _binding(tmp_path, slot["config"]["relative_path"], config)
     matrix_binding = _binding(tmp_path, "matrix.json", matrix)
     timestamp = datetime.now(UTC) - timedelta(days=1)
     authorization = SimpleNamespace(
@@ -74,7 +82,7 @@ def campaign(tmp_path, monkeypatch):
             "scientific_use_allowed": True,
             "objective": slot["method"],
             "seed": slot["seed"],
-            "config_sha256": "a" * 64,
+            "config_sha256": slot["config"]["sha256"],
             "started_at": (timestamp + timedelta(hours=1)).isoformat(),
         }
         outcome = {
@@ -87,9 +95,48 @@ def campaign(tmp_path, monkeypatch):
             "outcome": _binding(tmp_path, f"{name}/outcome.json", outcome),
             "failure": None,
         }
-        _binding(
-            tmp_path, f"{name}/epoch-020.json", {"scores": {"top1": 0.5, "mrr": 0.6}}
+        identity = {
+            "stage": "development_selection",
+            "selection_eligible": True,
+            "final_eligible": False,
+        }
+        epoch = _binding(
+            tmp_path,
+            f"{name}/epoch-020.json",
+            identity | {"epoch": 20, "scores": {"top1": 0.5, "mrr": 0.6}},
         )
+        metrics = identity | {
+            "objective": slot["method"],
+            "seed": slot["seed"],
+            "epochs": 20,
+            "initialization_sha256": str(slot["seed"]),
+            "batch_plan_sha256": str(slot["seed"]),
+            "epoch_records": {"epoch-020.json": epoch["sha256"]},
+        }
+        metrics_binding = _binding(tmp_path, f"{name}/metrics.json", metrics)
+        manifest = identity | {
+            "protocol_sha256": protocol_digest(protocol),
+            "initialization_sha256": metrics["initialization_sha256"],
+            "batch_plan_sha256": metrics["batch_plan_sha256"],
+            "epoch_records": metrics["epoch_records"],
+            "configuration": {
+                "attempt_sha256": record["attempt"]["sha256"],
+                "experiment": configs[slot["config"]["relative_path"]],
+            },
+            "outputs": {
+                "metrics": metrics_binding["sha256"],
+                "batch_plan": metrics["batch_plan_sha256"],
+                "checkpoint": "b" * 64,
+            },
+        }
+        manifest_binding = _binding(tmp_path, f"{name}/run-manifest.json", manifest)
+        outcome.update(
+            metrics_sha256=metrics_binding["sha256"],
+            run_manifest_sha256=manifest_binding["sha256"],
+            batch_plan_sha256=metrics["batch_plan_sha256"],
+            checkpoint_sha256="b" * 64,
+        )
+        record["outcome"] = _binding(tmp_path, f"{name}/outcome.json", outcome)
         slots.append(
             {key: slot[key] for key in ("method", "learning_rate", "seed")}
             | {"attempts": [record]}
@@ -180,7 +227,10 @@ def test_all_three_seeds_and_exact_clean_tie_breaks(campaign):
     assert candidates[-1]["mean_top1"] is None
 
 
-def test_ledger_hash_tampering_and_precompletion_lock_are_rejected(campaign):
+@pytest.mark.parametrize("validate_training", [True, False])
+def test_ledger_hash_tampering_and_precompletion_lock_are_rejected(
+    campaign, validate_training
+):
     protocol, authorization, ledger, root = campaign
     with pytest.raises(ValueError, match="chronology"):
         _selection_table(
@@ -188,12 +238,16 @@ def test_ledger_hash_tampering_and_precompletion_lock_are_rejected(campaign):
             authorization,
             SelectionLedger.model_validate(ledger),
             not_after=authorization.recorded_at,
+            validate_training=validate_training,
         )
     path = root / ledger["slots"][0]["attempts"][0]["attempt"]["relative_path"]
     path.write_text("{}")
     with pytest.raises(ValueError, match="hash mismatch"):
         _selection_table(
-            protocol, authorization, SelectionLedger.model_validate(ledger)
+            protocol,
+            authorization,
+            SelectionLedger.model_validate(ledger),
+            validate_training=validate_training,
         )
 
 
@@ -251,7 +305,8 @@ def test_retry_cannot_follow_a_numerical_failure(campaign):
         )
 
 
-def test_ledger_cannot_omit_preserved_selection_attempt(campaign):
+@pytest.mark.parametrize("validate_training", [True, False])
+def test_ledger_cannot_omit_preserved_selection_attempt(campaign, validate_training):
     protocol, authorization, ledger, root = campaign
     original = root / ledger["slots"][0]["attempts"][0]["attempt"]["relative_path"]
     attempt = json.loads(original.read_text())
@@ -259,8 +314,175 @@ def test_ledger_cannot_omit_preserved_selection_attempt(campaign):
     _binding(root, "omitted-failure/attempt.json", attempt)
     with pytest.raises(ValueError, match="omits a preserved"):
         _selection_table(
+            protocol,
+            authorization,
+            SelectionLedger.model_validate(ledger),
+            validate_training=validate_training,
+        )
+
+
+def test_selected_receipt_reads_bound_metadata_without_numerical_replay(
+    campaign, monkeypatch
+):
+    from pose_embed import protocol_v3_campaign as module
+
+    protocol, authorization, ledger, root = campaign
+    candidates, rates = _selection_table(
+        protocol, authorization, SelectionLedger.model_validate(ledger)
+    )
+    auth_path = root / protocol.test_access.selection_authorization_relative_path
+    auth_path.parent.mkdir(parents=True, exist_ok=True)
+    auth_path.write_text("{}")
+    selected = module.SelectedConfigurations(
+        schema_version=1,
+        kind="v3_selected_configurations",
+        protocol_sha256=protocol_digest(protocol),
+        selection_authorization_sha256=sha256_file(auth_path),
+        recorded_at=datetime.now(UTC),
+        recorded_by="fixture",
+        ledger=_binding(root, "selection-ledger.json", ledger),
+        candidates=candidates,
+        selected_rates=rates,
+    )
+    module.selected_configs_path(protocol).write_text(selected.model_dump_json())
+    monkeypatch.setattr(
+        module, "require_selection_authorization", lambda _: authorization
+    )
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("historical numerical replay")
+
+    monkeypatch.setattr(
+        "pose_embed.training.runner.validate_v3_training_run", forbidden
+    )
+    assert module.require_selected_configurations(protocol) == selected
+    assert module.require_selected_configurations(protocol) == selected
+    path = root / ledger["slots"][0]["attempts"][0]["attempt"]["relative_path"]
+    path.with_name("epoch-020.json").write_text("{}")
+    with pytest.raises(ValueError, match="metadata provenance"):
+        module.require_selected_configurations(protocol)
+    with pytest.raises(AssertionError, match="historical numerical replay"):
+        _selection_table(
             protocol, authorization, SelectionLedger.model_validate(ledger)
         )
+
+
+@pytest.mark.parametrize("filename", ["metrics.json", "run-manifest.json"])
+def test_selection_metadata_rejects_changed_bound_training_summaries(
+    campaign, filename
+):
+    protocol, authorization, ledger, root = campaign
+    path = root / ledger["slots"][0]["attempts"][0]["attempt"]["relative_path"]
+    path.with_name(filename).write_text("{}")
+    with pytest.raises(ValueError, match="metadata hash mismatch"):
+        _selection_table(
+            protocol,
+            authorization,
+            SelectionLedger.model_validate(ledger),
+            validate_training=False,
+        )
+
+
+def test_admission_read_binds_receipt_without_rehashing_its_historical_evidence(
+    tmp_path, monkeypatch
+):
+    from pose_embed import protocol_v3_campaign as module
+
+    protocol = load_protocol("configs/protocol.v3.yaml")
+    now = datetime.now(UTC)
+    evidence = _binding(tmp_path, "historical.json", {"accepted": True})
+    payload = {
+        "schema_version": 1,
+        "protocol_sha256": protocol_digest(protocol),
+        "design_lock_sha256": "a" * 64,
+        "recorded_at": now.isoformat(),
+        "recorded_by": "fixture",
+        "scientific_use_allowed": True,
+        "status": "passed",
+        "evidence": [evidence],
+        "code_sha256": {},
+    }
+    binding = ArtifactBinding.model_validate(
+        _binding(tmp_path, "study-v3/receipt.json", payload)
+    )
+    authorization = SimpleNamespace(design_lock_sha256="a" * 64, recorded_at=now)
+    monkeypatch.setattr(
+        "pose_embed.protocol.current_code_hashes",
+        lambda: SimpleNamespace(model_dump=lambda: {}),
+    )
+    (tmp_path / "historical.json").write_text("changed after acceptance")
+    assert (
+        module._receipt(
+            tmp_path,
+            binding,
+            module.AdmissionReceipt,
+            protocol,
+            authorization,
+            rehash_evidence=False,
+        ).status
+        == "passed"
+    )
+    with pytest.raises(ValueError, match="hash mismatch"):
+        module._receipt(
+            tmp_path, binding, module.AdmissionReceipt, protocol, authorization
+        )
+    (tmp_path / binding.relative_path).write_text("{}")
+    with pytest.raises(ValueError, match="hash mismatch"):
+        module._receipt(
+            tmp_path,
+            binding,
+            module.AdmissionReceipt,
+            protocol,
+            authorization,
+            rehash_evidence=False,
+        )
+
+
+def test_authorization_read_uses_bindings_but_issuance_requires_complete_validation(
+    tmp_path, monkeypatch
+):
+    from contextlib import nullcontext
+
+    from pose_embed import protocol_v3_campaign as module
+
+    protocol = load_protocol("configs/protocol.v3.yaml")
+    binding = _binding(tmp_path, "receipt.json", {})
+    authorization = V3SelectionAuthorization(
+        schema_version=3,
+        kind="v3_selection_authorization",
+        protocol_sha256=protocol_digest(protocol),
+        design_lock_sha256="a" * 64,
+        recorded_at=datetime.now(UTC),
+        recorded_by="fixture",
+        pilot_records={method: binding for method in protocol.objectives.core},
+        corruption_verification=binding,
+        analysis_verification=binding,
+        capacity_report=binding,
+        seal_audit=binding,
+        run_matrix=binding,
+        capacity_passed=True,
+        novel_access_authorized=False,
+    )
+    path = tmp_path / protocol.test_access.selection_authorization_relative_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(authorization.model_dump_json())
+    monkeypatch.setattr(
+        module, "resolve_scientific_paths", lambda _: SimpleNamespace(root=tmp_path)
+    )
+    reads = []
+    monkeypatch.setattr(
+        module, "_validate_authorization_bindings", lambda _, value: reads.append(value)
+    )
+
+    def full_validation(*args):
+        raise ValueError("complete numerical admission required")
+
+    monkeypatch.setattr(module, "_validate_authorization", full_validation)
+    monkeypatch.setattr("pose_embed.dataset_seal.dataset_access", nullcontext)
+    assert module.require_selection_authorization(protocol) == authorization
+    assert reads == [authorization]
+    with pytest.raises(ValueError, match="complete numerical admission"):
+        module.record_selection_authorization(protocol, authorization)
 
 
 def _capacity():

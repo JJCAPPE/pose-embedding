@@ -295,6 +295,7 @@ def test_core_report_recertification_requires_full_provenance_validator(
 
     def require_full_validator(results: list, **kwargs: object) -> tuple[int, set]:
         observed["result_count"] = len(results)
+        assert kwargs["recompute_metrics"] is True
         raise RuntimeError("full-validator-called")
 
     monkeypatch.setattr(
@@ -455,10 +456,13 @@ def test_exact_final_report_writes_analysis_and_source_bound_curve(
         "derive_core_failure_status",
         lambda protocol: failure_payload,
     )
+
+    def validate_report_inputs(results, **kwargs):
+        assert kwargs.get("recompute_metrics", True) is (protocol_version != 3)
+        return 180, expected_keys
+
     monkeypatch.setattr(
-        report_module,
-        "_validate_final_provenance",
-        lambda results, **kwargs: (180, expected_keys),
+        report_module, "_validate_final_provenance", validate_report_inputs
     )
 
     destination = tmp_path / "report"
