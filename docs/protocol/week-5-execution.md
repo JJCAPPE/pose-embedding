@@ -15,20 +15,50 @@ accepted under their recorded profiles. CPU job 8616892 restored the missing
 before the admission controller because the allocated kernel changed from
 `4.18.0-553.182.1.el8_10.x86_64` to `4.18.0-553.184.2.el8_10.x86_64`.
 Independent review found no other startup-profile difference. No operation or
-admission timing was produced. The existing amendments do not authorize this
-kernel change; continuation requires a researcher decision. Qualification of
-the changed profile, corrected-path timing and complete capacity remain pending.
+admission timing was produced. The researcher subsequently approved ADR0013
+for the exact kernel-only candidate and bounded qualification. Fresh CPU
+qualification and independent acceptance are the next prerequisite; GPU coverage,
+corrected-path timing and complete capacity remain pending.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
 metadata-only receipt writer succeeded after a reviewed lock-scope correction.
 No new capacity pass or downstream scientific-stage authorization is claimed.
-The completion watcher is disarmed at this researcher-action blocker; the legacy
+CPU qualification job **8621649** was submitted through the reviewed bounded
+launcher; its results and independent acceptance are pending. The legacy
 automation remains paused. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 14: kernel-only qualification authorized
+
+The researcher approved [ADR0013](../decisions/0013-kernel-184-qualification.md)
+before new qualification results. The candidate changes only the kernel in
+accepted CPU 8561360's complete profile from 553.182.1 to 553.184.2; every other
+field remains exact. The next prerequisite is fresh allocated CPU qualification:
+three initializations per seed 7/17/29 and two complete original 43-panel geometry
+processes retaining all 430 comparisons, followed by independent acceptance.
+Retain required GPU qualification and repeat the existing bounded 48-sample,
+12-layer parity check only if the actual changed runtime/path needs fresh
+coverage. ADR0012 still preserves historical evidence without a new adoption
+campaign or second full recertification. Runtime acceptance, corrected-prefix
+timing, full capacity and admission remain pending; selection runs, final
+training and novel opening stay closed. The earlier failed attempts and blocker
+record remain historical evidence.
+
+The independently reviewed external package passed 311 focused synthetic tests;
+its launcher, wrapper, candidate, amendment and storage forecast were frozen
+before use. CPU job **8621649** was submitted once with four OMP slots, 32 GiB
+requested memory, the fixed Gold-6426Y/Sapphire Rapids target and a two-hour
+limit. The retained launch receipt,
+`study-v3/operations/week5-r2-launches/20261114T234754Z/launch.json`, has SHA-256
+`85c8faade20d4bcd5e792aaa9a2a4fc44fb2156f70b6ee976c7fab261198fe65`.
+Fresh source, identity, seals, storage and duplicate-job checks passed before
+submission. This is qualification work only; local tests and submission do not
+establish runtime or scientific acceptance.
+
 
 ## November 14: changed kernel blocks the replacement measurement
 

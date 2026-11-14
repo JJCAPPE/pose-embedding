@@ -1,11 +1,24 @@
 # Final v3 plan: frozen one-shot pose robustness
 
 Original decision: **2026-09-29**. Execution amendments: **2026-10-09**,
-**2026-10-12**, **2026-10-19**, **2026-10-25**, **2026-11-05**, **2026-11-10** and **2026-11-11**. Delivery: **2026-12-18**. Status: **final planning
+**2026-10-12**, **2026-10-19**, **2026-10-25**, **2026-11-05**, **2026-11-10**, **2026-11-11** and **2026-11-14**. Delivery: **2026-12-18**. Status: **final planning
 decision; implementation and measured campaign gates remain to be completed**.
 This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-frozen-one-shot-v3.md)
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
+
+**November 14 current runtime authorization:** the researcher approved
+[ADR0013](../docs/decisions/0013-kernel-184-qualification.md) for the exact
+553.184.2 kernel substitution in accepted CPU 8561360's complete profile;
+every other field remains fixed. Fresh CPU initialization and original 43-panel,
+430-comparison geometry qualification require independent acceptance. Retain
+required GPU qualification, repeating bounded 48-sample/12-layer parity only if
+the actual changed runtime or path needs fresh coverage. ADR0012 continues to
+preserve accepted historical evidence and minimum validation scope; no new
+adoption campaign or second full recertification is required. This is
+qualification authorization, not runtime acceptance, measured capacity or
+permission for selection runs, final training or novel opening. Earlier dated
+runtime notices remain historical.
 
 **November 11 current validation policy:** the researcher authorized the minimum
 validation scope in [ADR0012](../docs/decisions/0012-bounded-validation-scope.md).
