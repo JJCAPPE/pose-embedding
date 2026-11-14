@@ -10,20 +10,52 @@ consumer audits; one full issuer check, initial opening safeguards and one
 independent final 180-cell/report verification remain. The former mandatory
 whole-history adoption campaign and second Week 5 recertification are superseded.
 CPU qualification 8561360 and bounded GPU parity 8580442 are independently
-accepted. CPU job 8581145 was submitted once for one corrected admission-prefix
-measurement; no result is accepted. Corrected-path timing and complete capacity
-remain pending.
+accepted. CPU job 8581145 failed its startup runtime check before the corrected
+admission-prefix measurement began. November 14 review identified one missing
+environment setting: `CUBLAS_WORKSPACE_CONFIG=:4096:8`. Replacement CPU job
+8616892 was submitted with that setting and observed queued at 12:50:09 UTC.
+Startup qualification, corrected-path timing and complete capacity remain pending.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
 metadata-only receipt writer succeeded after a reviewed lock-scope correction.
 No new capacity pass or downstream scientific-stage authorization is claimed.
-The legacy automation remains paused; the single completion watcher is
-armed for job 8581145, with its next eligible check at 23:52:31 UTC (6:52:31 PM EST). Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
+The legacy automation remains paused; handoff follows the existing single
+completion-watcher workflow. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 14: admission measurement startup failure
+
+Retained terminal accounting for CPU job **8581145** records failed=0,
+exit=1 and **four scheduler seconds** on November 11. The runtime gate rejected
+startup before invoking the admission controller; no measurement operation
+directory was created. Comparing the complete recorded startup profile with the
+accepted CPU 8561360 profile found one difference: `CUBLAS_WORKSPACE_CONFIG`
+was absent, while the accepted profile requires `:4096:8`. The other profile
+fields, including CPU, kernel, interpreter and library hashes, match.
+
+The retained runtime record is
+`study-v3/operations/week5-runtime-minimal-admission/20261111T225147Z/runtime.json`,
+SHA-256 `060f3b10e3c30874b1363d9ae960d7eeb85eb60907efc2636e917311bdb7104e`.
+This is a launch-environment failure, with no admission timing or scientific
+result accepted. The corrected submission explicitly passes the existing
+accepted setting, retaining the complete runtime comparison and fresh
+launch/resource checks. The failed attempt and frozen source remain unchanged.
+
+Replacement CPU job **8616892** was submitted once at **12:49:48 UTC** and
+observed queued with four CPU slots at **12:50:09 UTC**. The scheduler's recorded
+environment includes the required setting and all three input/artifact/manifest
+roots; actual startup qualification and the measurement outcome remain pending.
+Launch receipt:
+`study-v3/operations/week5-runtime-minimal-admission/20261114T124944Z/launch.json`,
+SHA-256 `c7ad6871909abd3730b25143f30cb07699abf27f504875dd977d688ee5700e0f`.
+The next eligible scheduler check is **13:50:11 UTC (8:50:11 AM EST)**; handoff
+uses the existing single completion-watcher workflow. Full capacity and
+admission remain pending; selection runs, final training and novel opening
+stay closed.
 
 ## November 11: bounded GPU parity accepted
 
