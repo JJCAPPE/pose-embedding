@@ -7,55 +7,86 @@ Historical releases, artifacts and run manifests remain immutable.
 
 ## Mac job alerts and continuation
 
-The researcher selected native Mac notifications on November 7. Use the existing
-`complete-pose-embed-week-5` automation as the sole scheduled observer and
-continuation mechanism. This is scheduled detection, not an SCC event hook:
-routine checks remain hourly at minute 35, subject to the latest handoff's
-minimum interval and next-check boundary. A job ending just after a check can
-wait roughly an hour; a sleeping Mac or stopped app adds delay. Keep the Mac
-awake and Codex running. No email, SMTP secret, third-party account or additional
-monitor is required.
+Keep the legacy `complete-pose-embed-week-5` Codex automation paused. Use a
+single local completion watcher with the existing authenticated SCC tmux pane.
+One shell command in that pane observes scheduler metadata at most once an
+hour, starting at the handoff's earliest eligible check. The Mac watcher
+reads the last 200 lines of the pane each minute without typing into it.
+Queued or running jobs use no Codex runs. The first verified terminal accounting
+starts one new GPT-6 Astra chat with ultra reasoning in the Pose Embed Codex
+project. A job can finish between scheduler checks. This uses SCC's documented
+[`qacct` command](https://www.bu.edu/tech/support/research/system-usage/running-jobs/tracking-jobs/).
+SCC support for native job-end events has not been verified.
 
-For every new long-running GPU job and its dependent CPU validators, retain the
-job ID and launch receipt and record the controller, automation state and next
-eligible check in the existing handoff. Never resubmit a job to add alerts.
-Use the current reviewed metadata observer through the existing authenticated
-SCC pane. Do not query the scheduler merely to send a notification.
-
-When the permitted observation has complete terminal accounting, retain the
-exact `qacct -j JOB_ID` output locally with the existing private observation
-packet. The observer's `commands.detail.stdout` contains it when
-`commands.detail.argv` identifies that `qacct` command and its return code is
-zero. Reuse this output rather than polling again. From the research worktree:
+Install once on the Mac from the checkout containing the watcher:
 
 ```bash
-python3 scripts/operations/notify_scc_job.py \
-  --job-id JOB_ID --accounting /absolute/private/path/accounting.txt
+python3 scripts/operations/watch_scc_job.py install
+launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/org.pose-embed.scc-completion.plist"
+launchctl print "gui/$(id -u)/org.pose-embed.scc-completion"
+python3 scripts/operations/watch_scc_job.py status
 ```
 
-Replace both placeholders with the observed job and retained accounting file.
-The helper validates terminal fields and job identity, shows a native notification
-and retains a locked local receipt under
-`~/.codex/automations/complete-pose-embed-week-5/notifications/`. Repeated successful
-delivery attempts for the same job are suppressed. A failed notification command
-does not mark the alert delivered and may be retried. The notification contains
-only the job ID, exit status and a reminder that evidence review is pending;
-do not include private logs, inputs, identities or results in banner text.
+The installer copies the helper to a stable local path:
 
-Continue independent terminal review in the same controller turn. Exit zero,
-the alert and the helper's receipt do not establish scientific acceptance.
-Only accepted evidence permits the next authorized prerequisite. Preserve
-single-controller checks, source/input bindings, resource/seal records and all
-researcher-action and completion stopping rules. A notification problem is
-recorded separately from the scientific result.
+```bash
+watch="$HOME/.config/pose-embed/scc-completion/bin/watch_scc_job.py"
+python3 "$watch" status
+```
 
-The helper uses macOS Script Editor notifications through `osascript`. During
-setup, send a clearly labelled test and verify it appears. If not, inspect
-System Settings > Notifications > Script Editor and Focus settings; a successful
-command does not prove a banner was displayed. Do not manufacture a completed
-job for the test. The app's Scheduled inbox remains the durable progress record.
-The existing automation must be ACTIVE for unattended continuation, and an
-explicit user pause must not be silently undone.
+Use that copy from any research worktree. Disarm before reinstalling. An idle
+installation leaves paused research paused. The sole controller
+records each authorized long-running GPU job and dependent CPU validator in
+the existing private handoff. Record the verified job ID and launch receipt,
+current research worktree and release, earliest eligible check, active
+controller, acceptance evidence, blocker and next authorized prerequisite.
+Confirm there is no other SCC controller or watcher. Use the stable tmux pane ID for the existing SSH session and the native Pose
+Embed UUID from the desktop-bundled [Codex app server](https://learn.chatgpt.com/docs/app-server)
+(`project/list`; match the saved project root). The `local-...` ID shown by some
+project tools is a different identifier.
+
+```bash
+python3 "$watch" arm \
+  --job-id JOB_ID --launch-receipt 'VERIFIED_LAUNCH_RECEIPT' \
+  --handoff /absolute/path/to/private/current-state.md \
+  --not-before 'YYYY-MM-DDTHH:MM:SS-05:00' \
+  --cwd /absolute/path/to/current/research/worktree \
+  --project-id 'NATIVE_CODEX_PROJECT_ID' --pane '%PANE_ID'
+```
+
+Use the actual offset from the handoff. Inspect the pane and confirm an
+authenticated, idle SCC prompt. The sole controller pastes the printed
+foreground wait command there once, records that it is armed and hands over
+the pane. Never resubmit a job to install a watcher. Keep the Mac and SSH
+session available, and keep the completion output within the pane's last
+200 lines until the watcher has retained it.
+
+The watcher validates the job ID and terminal fields, saves the exact
+`qacct -j JOB_ID` output and sends the Mac alert through
+`scripts/operations/notify_scc_job.py`. The private dispatch state and errors
+are under `~/.config/pose-embed/scc-completion/`. Retain the accounting,
+notification receipts and chat dispatch receipts outside Git. A queued or
+running job, missing accounting, or incomplete accounting cannot start a chat.
+The new chat opens in the Pose Embed project with a reference to the private
+handoff and accounting. Reconcile the saved handoff, current controller,
+launch receipt, terminal accounting and actual SCC state before doing any
+research work. Continue independent terminal review, preserving source/input
+bindings, resource and seal checks, and all protocol gates. Only accepted
+evidence permits the next authorized prerequisite.
+
+When explicitly paused, at earned closure, or when further progress requires
+the researcher, run `python3 "$watch" disarm` and
+verify with `status`. If the foreground command is still running and is
+confirmed to be the metadata wait, the sole controller can stop it with
+Ctrl-C. Leave the pane alone if there is any doubt about the foreground
+process. If SSH disconnects, the pane history is lost or dispatch is uncertain,
+reconcile the retained state and any existing project chat before re-arming.
+An uncertain dispatch is held for review to prevent a duplicate chat.
+
+The helper uses macOS Script Editor notifications through `osascript`.
+During setup, send a clearly labelled test and verify it appears. If it does
+not, check System Settings > Notifications > Script Editor and Focus settings.
+The notification result is separate from scientific acceptance.
 
 On November 5 the researcher adopted [ADR0010](../decisions/0010-kernel-182-baseline.md).
 Use the complete prospective profile with kernel `4.18.0-553.182.1.el8_10.x86_64`
