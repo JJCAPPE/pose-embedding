@@ -10,22 +10,65 @@ consumer audits; one full issuer check, initial opening safeguards and one
 independent final 180-cell/report verification remain. The former mandatory
 whole-history adoption campaign and second Week 5 recertification are superseded.
 CPU qualification 8561360 and bounded GPU parity 8580442 are independently
-accepted. CPU job 8581145 failed its startup runtime check before the corrected
-admission-prefix measurement began. November 14 review identified one missing
-environment setting: `CUBLAS_WORKSPACE_CONFIG=:4096:8`. Replacement CPU job
-8616892 was submitted with that setting and observed queued at 12:50:09 UTC.
-Startup qualification, corrected-path timing and complete capacity remain pending.
+accepted under their recorded profiles. CPU job 8616892 restored the missing
+`CUBLAS_WORKSPACE_CONFIG=:4096:8` setting from failed job 8581145, but stopped
+before the admission controller because the allocated kernel changed from
+`4.18.0-553.182.1.el8_10.x86_64` to `4.18.0-553.184.2.el8_10.x86_64`.
+Independent review found no other startup-profile difference. No operation or
+admission timing was produced. The existing amendments do not authorize this
+kernel change; continuation requires a researcher decision. Qualification of
+the changed profile, corrected-path timing and complete capacity remain pending.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
 metadata-only receipt writer succeeded after a reviewed lock-scope correction.
 No new capacity pass or downstream scientific-stage authorization is claimed.
-The legacy automation remains paused; handoff follows the existing single
-completion-watcher workflow. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
+The completion watcher is disarmed at this researcher-action blocker; the legacy
+automation remains paused. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 14: changed kernel blocks the replacement measurement
+
+CPU job **8616892** ended with failed=0, exit=1 and **13 scheduler seconds**.
+Independent review found that the full startup runtime gate rejected the job
+before invoking the admission controller; no measurement operation was created.
+The required `CUBLAS_WORKSPACE_CONFIG=:4096:8` setting is now present. The sole
+recorded profile difference from accepted CPU 8561360 is `runtime.platform`:
+`Linux-4.18.0-553.184.2.el8_10.x86_64-x86_64-with-glibc2.28`, instead of
+`Linux-4.18.0-553.182.1.el8_10.x86_64-x86_64-with-glibc2.28`. All other recorded
+profile fields match. This establishes the failure's cause, not numerical
+equivalence, an accepted runtime or admission timing.
+
+The retained runtime record is
+`study-v3/operations/week5-runtime-minimal-admission/20261114T124944Z/runtime.json`,
+SHA-256 `4dd9e9ed3610b83db35f674af8b15f4bff7ab8cf59ce19a3bbde726d97149302`.
+Terminal accounting SHA-256 is
+`a23371ecb20b79d290c6704938811c49165d5af041bf5f3b3994700309606ce4`.
+The failed attempt, frozen source, prior runtime records and accepted historical
+evidence remain unchanged.
+
+[ADR0010](../decisions/0010-kernel-182-baseline.md) authorizes the exact
+553.182.1 kernel; [ADR0011](../decisions/0011-validator-runtime-correction.md)
+and [ADR0012](../decisions/0012-bounded-validation-scope.md) do not authorize this
+new kernel. No replacement job is submitted under those decisions. The
+recommended next step is an explicit, result-blind, kernel-only amendment,
+followed by three fresh CPU initializations per seed 7/17/29 and two complete
+processes on the original 43-panel geometry, retaining all 430 comparisons and
+existing exact checks and tolerances. After independent CPU acceptance, retain
+the required GPU qualification; repeat only the existing bounded 48-sample,
+all-12-layer parity check if the changed runtime or path requires it. This is a
+proposal, not an authorization or accepted result. Preserve ADR0012's historical
+evidence and minimum validation scope: no new whole-history adoption campaign or
+second full recertification. Only accepted qualification could permit the changed-prefix
+measurement to resume, followed by the existing complete capacity assessment.
+
+Week 5 remains open with a researcher-action blocker. Corrected-path timing,
+capacity and admission remain unaccepted; selection runs, final training and
+novel opening stay closed. The completion watcher is disarmed and the legacy
+automation remains paused. No runtime forecast or researcher hours are inferred.
 
 ## November 14: admission measurement startup failure
 

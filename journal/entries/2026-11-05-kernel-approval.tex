@@ -809,3 +809,42 @@ existing single completion-watcher workflow. Corrected-path timing, complete
 capacity and admission remain pending. Week 5 remains open; later scientific
 stages remain closed. No replacement forecast or actual researcher hours are
 inferred.
+
+\subsection*{November 14: replacement measurement stopped by kernel drift}
+
+CPU job 8616892 ended with failed=0, exit=1 and 13 scheduler seconds.
+Independent review located the failure in the complete startup runtime gate,
+before the admission controller was invoked. No measurement operation or
+admission timing was produced. The previously missing
+\path{CUBLAS_WORKSPACE_CONFIG} setting is restored to \texttt{:4096:8}.
+The sole recorded difference from accepted CPU 8561360 is the kernel component
+of \path{runtime.platform}: \path{4.18.0-553.184.2.el8_10.x86_64} was allocated,
+while the accepted profile specifies \path{4.18.0-553.182.1.el8_10.x86_64}.
+All other recorded profile fields match; this does not establish numerical
+equivalence or qualify the changed runtime.
+
+The retained runtime record is
+\path{study-v3/operations/week5-runtime-minimal-admission/20261114T124944Z/runtime.json},
+with SHA-256
+\path{4dd9e9ed3610b83db35f674af8b15f4bff7ab8cf59ce19a3bbde726d97149302}.
+Terminal accounting has SHA-256
+\path{a23371ecb20b79d290c6704938811c49165d5af041bf5f3b3994700309606ce4}.
+The failure and all prior evidence remain retained with their original provenance.
+
+The existing amendments do not authorize the new kernel. Continuation therefore
+requires a researcher decision; no replacement job is submitted. The proposed
+next step is an explicit result-blind, kernel-only amendment followed by three
+fresh CPU initializations per seed 7/17/29 and two complete processes on the
+original 43-panel geometry, preserving all 430 comparisons, exact checks and
+numerical tolerances. After independent CPU acceptance, retain the required GPU
+qualification; repeat only the existing bounded 48-sample, all-12-layer parity
+check if the changed runtime or path requires it.
+This proposal preserves ADR0012's accepted historical evidence and minimum
+validation scope, without a new whole-history adoption campaign or a second full
+recertification. It is not an authorization or accepted result.
+
+Week 5 remains open with a researcher-action blocker. Corrected-prefix timing,
+complete capacity and admission remain pending. Selection, final training and
+novel opening remain closed. The completion watcher is disarmed and the legacy
+automation remains paused. No replacement forecast or actual researcher hours
+are inferred.
