@@ -776,3 +776,36 @@ still pending. Week 5 remains open; selection, final training and novel access
 remain closed. The legacy automation stays paused and the single completion
 watcher will be armed for the submitted job at handoff. No
 replacement runtime forecast or researcher hours are inferred.
+
+\subsection*{November 14: admission measurement stopped at startup}
+
+Retained accounting shows that CPU job 8581145 ended on November 11 with
+failed=0, exit=1 and four scheduler seconds. The November 14 review located
+the failure in the startup runtime comparison, before the admission controller
+was invoked. No measurement operation directory was created. The recorded
+profile differed from accepted CPU 8561360 in one field:
+\path{CUBLAS_WORKSPACE_CONFIG} was absent instead of the required
+\texttt{:4096:8}. CPU, kernel, interpreter, library hashes and the remaining
+profile fields match the accepted baseline.
+
+The retained runtime record is linked in
+\path{docs/protocol/week-5-execution.md}; its SHA-256 is
+\path{060f3b10e3c30874b1363d9ae960d7eeb85eb60907efc2636e917311bdb7104e}.
+This failure provides no admission measurement or scientific result. The
+corrected submission explicitly passes the already accepted setting,
+preserving the full runtime comparison, frozen source, failed attempt and
+fresh resource checks.
+
+Replacement CPU job 8616892 was submitted once at 12:49:48 UTC and observed
+queued with four CPU slots at 12:50:09 UTC. The scheduler environment includes
+the required setting and all three input, artifact and manifest roots.
+Actual startup qualification and the measurement outcome remain pending.
+The launch receipt is
+\path{study-v3/operations/week5-runtime-minimal-admission/20261114T124944Z/launch.json},
+with SHA-256
+\path{c7ad6871909abd3730b25143f30cb07699abf27f504875dd977d688ee5700e0f}.
+The next eligible check is 13:50:11 UTC (8:50:11 AM EST); handoff follows the
+existing single completion-watcher workflow. Corrected-path timing, complete
+capacity and admission remain pending. Week 5 remains open; later scientific
+stages remain closed. No replacement forecast or actual researcher hours are
+inferred.
