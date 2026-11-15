@@ -7,17 +7,19 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 14 current runtime authorization:** the researcher approved
-[ADR0013](../docs/decisions/0013-kernel-184-qualification.md) for the exact
-553.184.2 kernel substitution in accepted CPU 8561360's complete profile;
-every other field remains fixed. Fresh CPU initialization and original 43-panel,
-430-comparison geometry qualification require independent acceptance. Retain
-required GPU qualification, repeating bounded 48-sample/12-layer parity only if
-the actual changed runtime or path needs fresh coverage. ADR0012 continues to
-preserve accepted historical evidence and minimum validation scope; no new
-adoption campaign or second full recertification is required. This is
-qualification authorization, not runtime acceptance, measured capacity or
-permission for selection runs, final training or novel opening. Earlier dated
+**November 14 current runtime status:** CPU job 8621649 passed independent
+qualification under [ADR0013](../docs/decisions/0013-kernel-184-qualification.md).
+Its complete profile changes only CPU 8561360's kernel from 553.182.1 to
+553.184.2. Nine fresh initializations and both original 43-panel geometry
+processes, with all 430 tensor comparisons, match the accepted historical
+outputs exactly; runtime/source/input bindings, accounting, resources and seals
+passed review. The [acceptance receipt and remaining prerequisites](../docs/protocol/week-5-execution.md#november-14-kernel-only-cpu-qualification-accepted)
+record the evidence. GPU 8580442 used kernel 553.182.1, so the existing bounded
+48-sample, all-12-layer parity check is the next required qualification on
+553.184.2. ADR0012 preserves accepted historical evidence and minimum validation
+scope without a new adoption campaign or second full recertification.
+Corrected-prefix timing, complete capacity and admission remain pending;
+selection runs, final training and novel opening remain closed. Earlier dated
 runtime notices remain historical.
 
 **November 11 current validation policy:** the researcher authorized the minimum

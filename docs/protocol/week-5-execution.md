@@ -16,21 +16,62 @@ before the admission controller because the allocated kernel changed from
 `4.18.0-553.182.1.el8_10.x86_64` to `4.18.0-553.184.2.el8_10.x86_64`.
 Independent review found no other startup-profile difference. No operation or
 admission timing was produced. The researcher subsequently approved ADR0013
-for the exact kernel-only candidate and bounded qualification. Fresh CPU
-qualification and independent acceptance are the next prerequisite; GPU coverage,
+for the exact kernel-only candidate and bounded qualification. CPU job 8621649
+has now passed independent qualification on that candidate. Fresh bounded GPU
+parity is the next prerequisite because accepted GPU 8580442 used kernel 553.182.1;
 corrected-path timing and complete capacity remain pending.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
 metadata-only receipt writer succeeded after a reviewed lock-scope correction.
 No new capacity pass or downstream scientific-stage authorization is claimed.
-CPU qualification job **8621649** was submitted through the reviewed bounded
-launcher; its results and independent acceptance are pending. The legacy
+CPU qualification job **8621649** passed exact historical initialization and
+geometry comparisons, complete runtime/source/input checks, resources and seals. The legacy
 automation remains paused. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 14: kernel-only CPU qualification accepted
+
+Independent terminal review accepted CPU job **8621649** under ADR0013. The job
+ended with failed=0, exit=0 and **189 scheduler seconds**. All nine fresh
+initializations, three each for seeds 7/17/29, match accepted CPU 8561360 exactly.
+Both complete geometry processes retain the original 43 panel IDs and all 430
+tensor comparisons; the panel, summary and both repeat-verification records are
+byte-identical to their accepted CPU 8561360 counterparts. Original fallback,
+ordering, algorithms, historical equality checks and numerical tolerances remain
+unchanged. The allocated frozen validator performed the geometry replay.
+
+Review also verified all three command outcomes, complete before/after and child
+runtime profiles, 616 frozen source bindings, 910 metadata bindings, resource
+records and unopened seals. The exact accepted profile differs from CPU 8561360
+only by the authorized 553.182.1 to 553.184.2 kernel substitution. The immutable
+acceptance receipt is
+`study-v3/operations/week5-runtime-conditional-cpu-acceptance/20261115T005843Z/verification.json`,
+SHA-256 `181232d38f4bdf85eb549a2ec592a2fbd0dbe61e4e4ffc97dead32c0ff7197ee`.
+The UTC receipt date is November 15; acceptance occurred November 14 EST.
+
+GPU job 8580442 retains its accepted kernel-553.182.1 provenance and therefore
+does not establish GPU coverage for 553.184.2. The next authorized prerequisite
+is the existing bounded **48-sample, all-12-layer parity check** on the new
+profile, followed by independent acceptance. It does not require historical
+cache/pilot regeneration or another full recertification under ADR0012. Only
+accepted qualification permits the single corrected admission-prefix measurement;
+its independently accepted timing must feed the complete capacity model before
+genuine admission. Selection runs, final training, novel opening and Week 5
+closure remain closed. No new timing forecast or actual researcher hours are
+inferred.
+
+GPU parity job **8622248** was subsequently submitted once after the launcher's
+fresh source, identity, resource and unopened-seal checks passed. It requests
+one L40S, four OMP slots, 32 GiB host memory and the existing 12-hour scheduler
+cap. The immutable launch receipt is
+`study-v3/operations/week5-runtime-conditional-gpu/20261115T010607Z/launch.json`,
+SHA-256 `6e19ad25469b8fcb12f4abb8cf56cfd8fd03e6f10d50708ed3651e8ed49ce666`.
+This records submission only; the allocated runtime, parity result and
+independent GPU acceptance remain pending.
 
 ## November 14: kernel-only qualification authorized
 
