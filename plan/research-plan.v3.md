@@ -7,16 +7,20 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 15 current runtime status:** CPU qualification 8621649 and bounded
+**November 15 current execution status:** CPU qualification 8621649 and bounded
 GPU parity 8622248 are independently accepted under
 [ADR0013](../docs/decisions/0013-kernel-184-qualification.md) on the authorized
 kernel-553.184.2 profile. CPU initialization/geometry retain exact historical
 equality; the fixed 48-sample, all-12-layer GPU comparison passes unchanged
 tolerances and complete runtime/source/input/resource/seal checks. The
-[acceptance receipt and remaining prerequisites](../docs/protocol/week-5-execution.md#november-15-kernel-184-gpu-parity-accepted)
-record the evidence. The existing single corrected admission-prefix measurement
-is the next prerequisite. Independently accepted timing must feed the complete
-capacity model before genuine admission. ADR0012 preserves historical evidence
+[acceptance receipts and remaining prerequisites](../docs/protocol/week-5-execution.md#november-15-corrected-admission-prefix-measurement-accepted)
+record the evidence. Single corrected admission-prefix measurement 8639284 is
+independently accepted at 1,289.522811 seconds, with the exact pending-capacity
+rejection and required source/runtime/resource/seal checks. This parser-warmed
+issuer-prefix timing is not complete campaign throughput. The next prerequisite
+is the complete CPU/GPU/storage/calendar/researcher capacity assessment using
+accepted timings and the corrected call graph, before genuine admission only if
+feasible. ADR0012 preserves historical evidence
 with its original provenance, without another adoption campaign or second full
 recertification. Week 5 remains open; selection runs, final training and novel
 opening remain gated. Earlier dated runtime notices remain historical.
