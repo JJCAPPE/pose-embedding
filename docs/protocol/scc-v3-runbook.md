@@ -5,6 +5,21 @@ govern these commands. Use a clean committed release, Python 3.11 and the locked
 environment. Perform tensor processing only inside Grid Engine allocations.
 Historical releases, artifacts and run manifests remain immutable.
 
+**November 14 current runtime authorization:**
+[ADR0013](../decisions/0013-kernel-184-qualification.md) authorizes only the exact
+553.184.2 kernel substitution in accepted CPU 8561360's full profile, with every
+other field fixed. Fresh CPU initialization/43-panel geometry qualification and
+independent acceptance precede further use. Retain required GPU qualification;
+repeat bounded 48-sample/12-layer parity only if the actual changed runtime/path
+needs fresh coverage. ADR0012 preserves historical evidence without a new adoption
+campaign or second full recertification. All scientific, capacity and access gates
+remain. Earlier dated runtime instructions below are historical.
+
+Use one SCC controller and the existing completion watcher for authorized jobs;
+keep the legacy Week 5 automation paused. Reconcile the current private handoff
+and actual pane state before acting. This current instruction supersedes the
+historical hourly-automation wording below.
+
 ## Mac job alerts and continuation
 
 The researcher selected native Mac notifications on November 7. Use the existing

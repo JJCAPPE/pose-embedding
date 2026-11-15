@@ -6,6 +6,16 @@ study. The original prospectus and v1/v2 protocols, code and evidence remain
 historical records. They are not permission to execute the new study. Independent
 research governance applies; no advisor sign-off is required.
 
+**November 14 current runtime authorization:**
+[ADR0013](../decisions/0013-kernel-184-qualification.md) authorizes only the exact
+553.184.2 kernel substitution in accepted CPU 8561360's full profile, with every
+other field fixed. Fresh CPU initialization/43-panel geometry qualification and
+independent acceptance precede further use. Retain required GPU qualification;
+repeat bounded 48-sample/12-layer parity only if the actual changed runtime/path
+needs fresh coverage. ADR0012 preserves historical evidence without a new adoption
+campaign or second full recertification. All scientific, capacity and access gates
+remain. Earlier dated runtime instructions below are historical.
+
 On November 5 the researcher adopted [ADR0010](../decisions/0010-kernel-182-baseline.md).
 Use the complete prospective profile with kernel `4.18.0-553.182.1.el8_10.x86_64`
 and apply the full ADR0009 acceptance sequence. Reconcile the latest handoff and
