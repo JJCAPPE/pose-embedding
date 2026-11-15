@@ -7,20 +7,19 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 14 current runtime status:** CPU job 8621649 passed independent
-qualification under [ADR0013](../docs/decisions/0013-kernel-184-qualification.md).
-Its complete profile changes only CPU 8561360's kernel from 553.182.1 to
-553.184.2. Nine fresh initializations and both original 43-panel geometry
-processes, with all 430 tensor comparisons, match the accepted historical
-outputs exactly; runtime/source/input bindings, accounting, resources and seals
-passed review. The [acceptance receipt and remaining prerequisites](../docs/protocol/week-5-execution.md#november-14-kernel-only-cpu-qualification-accepted)
-record the evidence. GPU 8580442 used kernel 553.182.1, so the existing bounded
-48-sample, all-12-layer parity check is the next required qualification on
-553.184.2. ADR0012 preserves accepted historical evidence and minimum validation
-scope without a new adoption campaign or second full recertification.
-Corrected-prefix timing, complete capacity and admission remain pending;
-selection runs, final training and novel opening remain closed. Earlier dated
-runtime notices remain historical.
+**November 15 current runtime status:** CPU qualification 8621649 and bounded
+GPU parity 8622248 are independently accepted under
+[ADR0013](../docs/decisions/0013-kernel-184-qualification.md) on the authorized
+kernel-553.184.2 profile. CPU initialization/geometry retain exact historical
+equality; the fixed 48-sample, all-12-layer GPU comparison passes unchanged
+tolerances and complete runtime/source/input/resource/seal checks. The
+[acceptance receipt and remaining prerequisites](../docs/protocol/week-5-execution.md#november-15-kernel-184-gpu-parity-accepted)
+record the evidence. The existing single corrected admission-prefix measurement
+is the next prerequisite. Independently accepted timing must feed the complete
+capacity model before genuine admission. ADR0012 preserves historical evidence
+with its original provenance, without another adoption campaign or second full
+recertification. Week 5 remains open; selection runs, final training and novel
+opening remain gated. Earlier dated runtime notices remain historical.
 
 **November 11 current validation policy:** the researcher authorized the minimum
 validation scope in [ADR0012](../docs/decisions/0012-bounded-validation-scope.md).

@@ -16,22 +16,47 @@ before the admission controller because the allocated kernel changed from
 `4.18.0-553.182.1.el8_10.x86_64` to `4.18.0-553.184.2.el8_10.x86_64`.
 Independent review found no other startup-profile difference. No operation or
 admission timing was produced. The researcher subsequently approved ADR0013
-for the exact kernel-only candidate and bounded qualification. CPU job 8621649
-has now passed independent qualification on that candidate. Fresh bounded GPU
-parity is the next prerequisite because accepted GPU 8580442 used kernel 553.182.1;
-corrected-path timing and complete capacity remain pending.
+for the exact kernel-only candidate and bounded qualification. CPU qualification
+8621649 and bounded GPU parity 8622248 are independently accepted on that
+candidate. The next prerequisite is the existing single corrected admission-prefix
+measurement. Its independently accepted timing must feed the complete capacity
+model before genuine admission; Week 5 remains open.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
 metadata-only receipt writer succeeded after a reviewed lock-scope correction.
 No new capacity pass or downstream scientific-stage authorization is claimed.
 CPU qualification job **8621649** passed exact historical initialization and
-geometry comparisons, complete runtime/source/input checks, resources and seals. The legacy
+geometry comparisons; GPU job **8622248** passed fixed 48-sample, all-12-layer
+parity. Both passed complete runtime/source/input checks, resources and seals. The legacy
 automation remains paused. Later scientific stages stay closed.** The [incoming handoff](week-5-handoff.md),
 [Week 4 record](week-4-execution.md), [current protocol](protocol-v3.md) and
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 15: kernel-184 GPU parity accepted
+
+Independent terminal review accepted GPU job **8622248** after successful
+90-second scheduler execution. The existing bounded comparison covers the fixed
+48 auxiliary samples and all 12 MotionBERT layers at unchanged tolerances;
+observed errors and tolerance ratios are zero. Review verified the complete
+before/after runtime against accepted CPU 8621649, with only the previously
+approved exact GPU build-report expansion, together with 770 source/input
+bindings, both child commands, allocation, five resource records and four
+unopened seals. The operation was parity-only: it produced no corruption
+campaign, new cache admission or novel-test result.
+
+The immutable acceptance receipt is
+`study-v3/operations/week5-runtime-conditional-gpu-acceptance/20261115T213659Z/verification.json`,
+SHA-256 `f402d96b4c0a6da9773f0785ae3721ccaf3c298be0e0e6aed7195c2b65c65f23`.
+This completes the required bounded CPU/GPU qualification for the authorized
+kernel-553.184.2 path. Historical evidence keeps its original source and runtime
+provenance under ADR0012. The next prerequisite is the single corrected
+admission-prefix measurement, followed by independent timing acceptance and the
+complete capacity/admission checks. No new runtime forecast, capacity pass,
+Week 5 closure or researcher hours are claimed. Selection runs, final training
+and novel opening remain gated.
 
 ## November 14: kernel-only CPU qualification accepted
 
