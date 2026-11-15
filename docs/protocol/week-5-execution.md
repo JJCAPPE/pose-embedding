@@ -18,9 +18,9 @@ Independent review found no other startup-profile difference. No operation or
 admission timing was produced. The researcher subsequently approved ADR0013
 for the exact kernel-only candidate and bounded qualification. CPU qualification
 8621649 and bounded GPU parity 8622248 are independently accepted on that
-candidate. The next prerequisite is the existing single corrected admission-prefix
-measurement. Its independently accepted timing must feed the complete capacity
-model before genuine admission; Week 5 remains open.
+candidate. Single corrected admission-prefix measurement 8639284 is independently
+accepted at 1,289.522811 seconds. This parser-warmed issuer-prefix timing must
+feed the complete capacity model before genuine admission; Week 5 remains open.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
@@ -34,6 +34,40 @@ automation remains paused. Later scientific stages stay closed.** The [incoming 
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 15: corrected admission-prefix measurement accepted
+
+Independent terminal review accepted CPU job **8639284** after **1,447 scheduler
+seconds**, with four OMP slots and successful accounting. The separately bound
+ADR0012 issuer completed its single scientific-prefix pass in **1,289.522811
+seconds** and reached the exact expected rejection of deliberately pending
+capacity. Proof checks/hits were **43/110**; development-episode calls/checks/hits
+were **87/1/86**. The post-pass proof verification took **10.480662 seconds**;
+the complete assembler command took **1,403.011175 seconds**. The parser was
+warmed by assembly and filesystem-cache state was uncontrolled. This measures
+the issuer prefix, not complete campaign throughput.
+
+Independent local review verified 85 exported metadata hashes, the installed
+issuer and candidate source bindings, all three child commands, 30 operation
+resource samples plus one runtime sample, and four launch/operation seals.
+Terminal metadata validation rehashed the 1,128 combined source/input/metadata
+bindings, ran the existing allocation and measurement validators, confirmed the
+complete before/after runtime exactly matches accepted CPU 8621649, and observed
+fresh unopened seals before and after. Raw quota and memory records passed the
+unchanged guards; the storage requirement was **484,696,669,440 bytes**. No passed
+capacity, authorization candidate or canonical selection authorization was
+written.
+
+The immutable acceptance receipt is
+`study-v3/operations/week5-minimal-measurement-acceptance/20261115T225218Z/verification.json`,
+SHA-256 `4e13bcc0d8e1f2018d2551fe336b1060c3a78d1307cf14354f765fabb4f3e936`.
+The next prerequisite is the existing complete CPU/GPU/storage/calendar/researcher
+capacity assessment using accepted timings and the corrected call graph, followed
+by genuine admission only if feasible. No full capacity pass, Week 5 closure or
+actual researcher hours are claimed. Selection runs, final training and novel
+opening remain closed. Historical evidence retains its original provenance;
+ADR0012 requires neither another adoption campaign nor a second full Week 5
+recertification.
 
 ## November 15: kernel-184 GPU parity accepted
 
