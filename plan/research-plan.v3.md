@@ -19,6 +19,12 @@ issuer replay or novel-array access. Integrity reads preceded timed reads and
 filesystem-cache state was uncontrolled; these are measured components, not
 future consumer records or complete campaign throughput.
 
+The conservative conditional forecast puts the longest CPU report job at
+22.773 hours including the required 25% margin, above the observed qualified
+public queue's 12-hour limit. Compatible 24-hour queue options restrict access
+to other projects. This is a forecast/access gap, not a measured report duration
+or proof that the study is infeasible; no complete capacity pass is claimed.
+
 Complete CPU/GPU/storage/calendar/researcher capacity and dated researcher
 availability remain unresolved before genuine admission. Preserve larger
 applicable accepted timings, the 200 GiB reserve, 25% margin and fixed deadlines.

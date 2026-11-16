@@ -23,7 +23,9 @@ accepted at 1,289.522811 seconds. This parser-warmed issuer-prefix timing must
 feed the complete capacity model before genuine admission. Retained-input component
 measurement 8640396 is independently accepted: 23 components, 218 scheduler seconds,
 complete source/input/runtime/resource/seal checks and no capacity or authorization.
-Complete capacity and dated researcher availability remain unresolved; Week 5 stays open.
+The conditional CPU report forecast exceeds the observed qualified public queue
+limit; complete capacity and dated researcher availability remain unresolved.
+Week 5 stays open.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
@@ -73,6 +75,19 @@ availability remains unresolved. The required 200 GiB reserve, 25% margin and
 November 29/December 6/December 7–18 deadlines remain fixed. Week 5 stays open;
 selection runs, final training and novel opening remain closed. No capacity pass,
 Week 5 closure or actual researcher hours are claimed.
+
+A subsequent source-derived **conditional forecast** puts the longest CPU report
+job at **22.773 hours including the required 25% margin**. The observed qualified
+public queue permits **12 hours**; compatible 24-hour queue options restrict
+access to other projects. This is an unresolved forecast/access gap, not a
+measured report duration or proof that the study is infeasible. The forecast
+remains conditional on its input/attempt bounds and is not accepted capacity.
+Complete capacity requires a supported workload bound that fits qualified,
+authorized access and the fixed calendar, plus confirmed researcher availability.
+No dependent job was submitted from this unaccepted forecast. The retained
+conditional review and queue evidence are bound by
+`study-v3/operations/week5-conditional-capacity-review/20261116T004258Z/review.json`,
+SHA-256 `0b72d84a93e020daaffd28a64a8070fc4b2a84d5daa46e85fbae324f37632fca`.
 
 ## November 15: corrected admission-prefix measurement accepted
 
