@@ -24,7 +24,9 @@ feed the complete capacity model before genuine admission. Retained-input compon
 measurement 8640396 is independently accepted: 23 components, 218 scheduler seconds,
 complete source/input/runtime/resource/seal checks and no capacity or authorization.
 The conditional CPU report forecast exceeds the observed qualified public queue
-limit; complete capacity and dated researcher availability remain unresolved.
+limit. Researcher planning availability was confirmed November 16; a possible
+fixed two-part construction and two-part independent verification path is under
+review. Implementation, qualification and complete capacity remain pending.
 Week 5 stays open.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
@@ -39,6 +41,36 @@ automation remains paused. Later scientific stages stay closed.** The [incoming 
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 16: availability confirmed; CPU report path under review
+
+The researcher confirmed planning budgets of **4 hours before the November 29
+locks**, **1 hour for compute review** and **8 hours for December 7–18 delivery**.
+The corresponding allowances including the required 25% margin are **5, 1.25
+and 10 hours**. Actual time remains unreported. This resolves the previously
+unconfirmed availability input; it does not establish complete capacity.
+
+Source review identified a possible fixed two-part construction and two-part
+independent verification path. Implementation, qualification and complete
+capacity remain pending. All 180 retrieval cells, the final report/bootstrap
+checks and the existing scientific gates remain required. No split has been
+implemented or qualified, and no new job has been submitted. The existing
+22.773-hour conservative conditional forecast and its evidence remain unchanged;
+it is not a measured report duration or proof of scientific infeasibility.
+
+The fallback is an authorized access request through Research Computing Services
+at `help@scc.bu.edu`. BU's [buy-in management guidance](https://www.bu.edu/tech/support/research/account-management/buy-in-management/)
+states that buy-in authorizers can request project-access and queue-time-limit
+changes; its [support instructions](https://www.bu.edu/tech/support/research/system-usage/support-request/)
+give the request route. A draft is prepared but has not been sent. No access
+approval or new runtime qualification is claimed.
+
+The next prerequisite is to implement and qualify a bounded report path, or
+establish compatible authorized CPU access, then complete the
+CPU/GPU/storage/calendar/researcher capacity assessment. The 200 GiB reserve,
+25% margin and November 29/December 6/December 7–18 deadlines remain fixed.
+Week 5 stays open; genuine admission, selection, final training and novel opening
+remain gated. The November 15 entries below retain the state at those events.
 
 ## November 15: retained-input component measurement accepted
 
