@@ -20,7 +20,12 @@ for the exact kernel-only candidate and bounded qualification. CPU qualification
 8621649 and bounded GPU parity 8622248 are independently accepted on that
 candidate. Single corrected admission-prefix measurement 8639284 is independently
 accepted at 1,289.522811 seconds. This parser-warmed issuer-prefix timing must
-feed the complete capacity model before genuine admission; Week 5 remains open.
+feed the complete capacity model before genuine admission. Retained-input component
+measurement 8640396 is independently accepted: 23 components, 218 scheduler seconds,
+complete source/input/runtime/resource/seal checks and no capacity or authorization.
+The conditional CPU report forecast exceeds the observed qualified public queue
+limit; complete capacity and dated researcher availability remain unresolved.
+Week 5 stays open.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
@@ -34,6 +39,55 @@ automation remains paused. Later scientific stages stay closed.** The [incoming 
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 15: retained-input component measurement accepted
+
+Independent terminal review accepted CPU job **8640396** after **218 scheduler
+seconds** on the qualified four-slot CPU profile. The successful assembler
+command took **188.447290 seconds** and measured all **23 retained-input
+components**: pilot metadata and checkpoints, the full 95,001-row auxiliary
+cache, exact physical P=8/K=4 sampler reconstruction for seeds 7/17/29, and
+report/bootstrap computation using retained development records. It performed
+zero optimization updates, no issuer replay and no novel-array access.
+
+Review verified all three commands, 63 exported metadata hashes, all 69 component
+input bindings, ten operation resource samples plus one runtime sample, and four
+launch/operation seals. The allocated controller rehashed the consumed inputs
+after the child completed; all seven scientific binary identities match original
+producer provenance. The terminal metadata review checked **1,165 live source
+and metadata bindings**, exact before/after agreement with accepted CPU 8621649,
+and fresh unopened seals. It read no scientific binaries on the login node.
+Memory and storage guards passed, including the **486,038,846,720-byte** available
+storage requirement. No capacity or selection authorization was written.
+
+The immutable acceptance receipt is
+`study-v3/operations/week5-component-measurement-acceptance/20261116T003453Z/verification.json`,
+SHA-256 `b814e81139e2866cce16f8fdbe4e07ae38bbdd25131c213d7196e5d72648171d`.
+Acceptance occurred November 15 EST; the receipt uses November 16 UTC.
+Integrity reads preceded timed reads, and filesystem-cache state was uncontrolled.
+These are measured components for a source-derived forecast, not measured future
+consumer records or complete campaign throughput. Retain larger applicable
+accepted timings when computing conservative bounds.
+
+The next prerequisite remains the complete CPU/GPU/storage/calendar/researcher
+capacity assessment, then genuine admission only if feasible. Dated researcher
+availability remains unresolved. The required 200 GiB reserve, 25% margin and
+November 29/December 6/December 7–18 deadlines remain fixed. Week 5 stays open;
+selection runs, final training and novel opening remain closed. No capacity pass,
+Week 5 closure or actual researcher hours are claimed.
+
+A subsequent source-derived **conditional forecast** puts the longest CPU report
+job at **22.773 hours including the required 25% margin**. The observed qualified
+public queue permits **12 hours**; compatible 24-hour queue options restrict
+access to other projects. This is an unresolved forecast/access gap, not a
+measured report duration or proof that the study is infeasible. The forecast
+remains conditional on its input/attempt bounds and is not accepted capacity.
+Complete capacity requires a supported workload bound that fits qualified,
+authorized access and the fixed calendar, plus confirmed researcher availability.
+No dependent job was submitted from this unaccepted forecast. The retained
+conditional review and queue evidence are bound by
+`study-v3/operations/week5-conditional-capacity-review/20261116T004258Z/review.json`,
+SHA-256 `0b72d84a93e020daaffd28a64a8070fc4b2a84d5daa46e85fbae324f37632fca`.
 
 ## November 15: corrected admission-prefix measurement accepted
 

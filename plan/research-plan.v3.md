@@ -10,20 +10,28 @@ lock, a completed experiment, or a change to the deployed tracker.
 **November 15 current execution status:** CPU qualification 8621649 and bounded
 GPU parity 8622248 are independently accepted under
 [ADR0013](../docs/decisions/0013-kernel-184-qualification.md) on the authorized
-kernel-553.184.2 profile. CPU initialization/geometry retain exact historical
-equality; the fixed 48-sample, all-12-layer GPU comparison passes unchanged
-tolerances and complete runtime/source/input/resource/seal checks. The
-[acceptance receipts and remaining prerequisites](../docs/protocol/week-5-execution.md#november-15-corrected-admission-prefix-measurement-accepted)
-record the evidence. Single corrected admission-prefix measurement 8639284 is
-independently accepted at 1,289.522811 seconds, with the exact pending-capacity
-rejection and required source/runtime/resource/seal checks. This parser-warmed
-issuer-prefix timing is not complete campaign throughput. The next prerequisite
-is the complete CPU/GPU/storage/calendar/researcher capacity assessment using
-accepted timings and the corrected call graph, before genuine admission only if
-feasible. ADR0012 preserves historical evidence
-with its original provenance, without another adoption campaign or second full
-recertification. Week 5 remains open; selection runs, final training and novel
-opening remain gated. Earlier dated runtime notices remain historical.
+kernel-553.184.2 profile. The accepted single admission-prefix measurement
+8639284 took 1,289.522811 seconds. [Retained-input component measurement
+8640396](../docs/protocol/week-5-execution.md#november-15-retained-input-component-measurement-accepted)
+is independently accepted: all 23 components, 218 scheduler seconds and complete
+source/input/runtime/resource/seal checks. It performed no optimization updates,
+issuer replay or novel-array access. Integrity reads preceded timed reads and
+filesystem-cache state was uncontrolled; these are measured components, not
+future consumer records or complete campaign throughput.
+
+The conservative conditional forecast puts the longest CPU report job at
+22.773 hours including the required 25% margin, above the observed qualified
+public queue's 12-hour limit. Compatible 24-hour queue options restrict access
+to other projects. This is a forecast/access gap, not a measured report duration
+or proof that the study is infeasible; no complete capacity pass is claimed.
+
+Complete CPU/GPU/storage/calendar/researcher capacity and dated researcher
+availability remain unresolved before genuine admission. Preserve larger
+applicable accepted timings, the 200 GiB reserve, 25% margin and fixed deadlines.
+ADR0012 preserves historical evidence with original provenance, without another
+adoption campaign or second full recertification. Week 5 remains open; selection
+runs, final training and novel opening remain gated. Earlier dated runtime notices
+remain historical.
 
 **November 11 current validation policy:** the researcher authorized the minimum
 validation scope in [ADR0012](../docs/decisions/0012-bounded-validation-scope.md).
