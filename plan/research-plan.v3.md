@@ -7,7 +7,7 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 15 current execution status:** CPU qualification 8621649 and bounded
+**November 16 current execution status:** CPU qualification 8621649 and bounded
 GPU parity 8622248 are independently accepted under
 [ADR0013](../docs/decisions/0013-kernel-184-qualification.md) on the authorized
 kernel-553.184.2 profile. The accepted single admission-prefix measurement
@@ -25,9 +25,19 @@ public queue's 12-hour limit. Compatible 24-hour queue options restrict access
 to other projects. This is a forecast/access gap, not a measured report duration
 or proof that the study is infeasible; no complete capacity pass is claimed.
 
-Complete CPU/GPU/storage/calendar/researcher capacity and dated researcher
-availability remain unresolved before genuine admission. Preserve larger
-applicable accepted timings, the 200 GiB reserve, 25% margin and fixed deadlines.
+On November 16 the researcher confirmed planning budgets of 4 hours before the
+November 29 locks, 1 hour for compute review and 8 hours for December 7–18
+delivery, corresponding to 5, 1.25 and 10 hours with the required 25% margin.
+Actual time remains unreported. [Source review](../docs/protocol/week-5-execution.md#november-16-availability-confirmed-cpu-report-path-under-review)
+identified a possible fixed two-part construction and two-part independent
+verification path; implementation, qualification and complete capacity remain
+pending. No split has been implemented or qualified, and no new job has been
+submitted. An RCS access-request fallback is documented; no request has been sent
+or access approval obtained.
+
+Complete CPU/GPU/storage/calendar/researcher capacity remains unresolved before
+genuine admission. Preserve larger applicable accepted timings, the 200 GiB
+reserve, 25% margin and fixed deadlines.
 ADR0012 preserves historical evidence with original provenance, without another
 adoption campaign or second full recertification. Week 5 remains open; selection
 runs, final training and novel opening remain gated. Earlier dated runtime notices
