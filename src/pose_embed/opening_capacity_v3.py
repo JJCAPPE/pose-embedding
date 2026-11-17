@@ -64,7 +64,7 @@ def _capacity(protocol, lock_sha256):
     return capacity, authorization.capacity_report
 
 
-def _calendar_capacity(root, capacity, recorded_at):
+def _calendar_capacity(root, capacity, recorded_at, *, allocation=None):
     """Count only still-usable evaluation windows; completed training is excluded."""
     calendar = _read(root, capacity.allocation_calendar, AllocationCalendar)
     availability = _read(root, capacity.researcher_availability, ResearcherAvailability)
@@ -77,6 +77,16 @@ def _calendar_capacity(root, capacity, recorded_at):
         or recorded_at.astimezone(timezone).date() > capacity.novel_completion_date
     ):
         raise ValueError("opening capacity chronology or novel deadline differs")
+    if allocation is not None:
+        started = datetime.fromisoformat(allocation["job_started_at"])
+        measured = datetime.fromisoformat(allocation["measured_at"])
+        if (
+            allocation["resource_class"] != "gpu"
+            or started.tzinfo is None
+            or measured.tzinfo is None
+            or not started <= measured <= recorded_at
+        ):
+            raise ValueError("opening allocation chronology differs")
     usable_seconds = dict.fromkeys(RESOURCE_CLASSES, 0.0)
     for window in calendar.windows:
         if (
@@ -89,6 +99,19 @@ def _calendar_capacity(root, capacity, recorded_at):
             window.ends_at - max(recorded_at, window.starts_at)
         ).total_seconds() - window.queue_allowance_seconds
         resource = window.resource_class
+        if (
+            allocation is not None
+            and resource == "gpu"
+            and window.starts_at <= started <= recorded_at < window.ends_at
+        ):
+            # This validated allocation has already queued. Future allocations
+            # keep their allowance; count only this job's proven remaining time.
+            seconds = min(
+                (window.ends_at - recorded_at).total_seconds(),
+                allocation["remaining_job_wall_seconds"]
+                - (recorded_at - measured).total_seconds(),
+                window.job_wall_limit_seconds - (recorded_at - started).total_seconds(),
+            )
         if capacity.maximum_job_seconds_by_resource[
             resource
         ] * capacity.compute_slack <= min(seconds, window.job_wall_limit_seconds):
@@ -235,6 +258,8 @@ def _validate_resources(root, resources, capacity):
         raise ValueError("opening capacity storage reserve is insufficient")
     return {
         "resource_class": "gpu",
+        "job_started_at": started.astimezone(UTC).isoformat(),
+        "measured_at": measured.astimezone(UTC).isoformat(),
         "required_job_wall_seconds": required_wall_seconds,
         "remaining_job_wall_seconds": remaining_wall_seconds,
         "host_memory_limit_bytes": int(allocated_memory),
@@ -271,7 +296,9 @@ def record_opening_capacity(protocol, protocol_lock_sha256) -> ArtifactBinding:
         )
         recorded_at = datetime.now(UTC)
         receipt["recorded_at"] = recorded_at.isoformat()
-        receipt["calendar_summary"] = _calendar_capacity(root, capacity, recorded_at)
+        receipt["calendar_summary"] = _calendar_capacity(
+            root, capacity, recorded_at, allocation=receipt["resource_summary"]
+        )
         verify_validation_proofs()
         receipt["status"] = "passed"
     except BaseException as error:
@@ -315,8 +342,9 @@ def validate_opening_capacity(protocol, binding, protocol_lock_sha256) -> dateti
         or not started_at <= measured_at <= recorded_at
     ):
         raise ValueError("opening capacity measurement chronology differs")
-    if receipt["resource_summary"] != _validate_resources(
-        root, receipt["resources"], capacity
-    ) or receipt["calendar_summary"] != _calendar_capacity(root, capacity, recorded_at):
+    resource_summary = _validate_resources(root, receipt["resources"], capacity)
+    if receipt["resource_summary"] != resource_summary or receipt[
+        "calendar_summary"
+    ] != _calendar_capacity(root, capacity, recorded_at, allocation=resource_summary):
         raise ValueError("opening capacity recorded summary differs from evidence")
     return recorded_at

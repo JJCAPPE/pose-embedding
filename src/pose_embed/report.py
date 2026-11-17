@@ -14,6 +14,7 @@ import torch
 from pydantic import ValidationError
 
 from pose_embed.artifacts import (
+    load_feature_sidecar,
     sample_order_digest,
     sidecar_path_for,
     validate_feature_artifact,
@@ -45,7 +46,12 @@ from pose_embed.protocol import (
 )
 from pose_embed.provenance import RuntimeTelemetry, sha256_file, write_immutable_json
 from pose_embed.test_access import TestOpeningLedger
-from pose_embed.validation_proofs import validation_command, verify_validation_proofs
+from pose_embed.validation_proofs import (
+    numerical_runtime,
+    proof_source_bindings,
+    validation_command,
+    verify_validation_proofs,
+)
 
 
 def _load_result(path: Path) -> EvaluationResult:
@@ -684,6 +690,7 @@ def _validate_final_provenance(
     *,
     protocol_path: str | Path,
     recompute_metrics: bool = True,
+    _lineages: dict[str, Any] | None = None,
 ) -> tuple[int, set[tuple[str, int, str, str]]]:
     protocol = load_protocol(protocol_path)
     paths = resolve_scientific_paths(protocol)
@@ -919,6 +926,15 @@ def _validate_final_provenance(
         )
         if key not in expected_keys:
             raise ValueError(f"unexpected final result matrix cell: {key}")
+    if _lineages is not None:
+        _lineages.update(
+            encoder=list(next(iter(encoder_lineages))),
+            gallery=list(next(iter(gallery_base_lineages))),
+            queries=[
+                [*key, *next(iter(values))]
+                for key, values in sorted(query_base_lineages.items())
+            ],
+        )
     return plan.expected_rows, expected_keys
 
 
@@ -1143,14 +1159,284 @@ def _validate_exploratory_provenance(
     return len(expected_keys), expected_keys
 
 
+def _report_split_source_paths() -> list[Path]:
+    repository = Path(__file__).resolve().parents[2]
+    return sorted((repository / "src/pose_embed").rglob("*.py")) + [
+        repository / "uv.lock"
+    ]
+
+
+def _report_split_partition(results, protocol_path):
+    protocol = load_protocol(protocol_path)
+    paths = resolve_scientific_paths(protocol)
+    plan = load_evaluation_plan(paths.evaluation_plan)
+    keys = {
+        (method, seed, condition, definition)
+        for method in plan.methods
+        for seed in plan.seeds
+        for condition in plan.conditions
+        for definition in plan.query_definitions
+    }
+    observed = [
+        (row.method, row.seed, row.condition, row.query_definition) for row in results
+    ]
+    if (
+        protocol.schema_version != 3
+        or plan.expected_rows != 180
+        or len(plan.conditions) != 10
+        or len(results) != 180
+        or set(observed) != keys
+        or len(set(observed)) != 180
+        or any(row.mode != "final" for row in results)
+    ):
+        raise ValueError("split report requires exactly 180 authorized v3 final cells")
+    first = [row for row in results if row.condition in plan.conditions[:6]]
+    second = [row for row in results if row.condition in plan.conditions[6:]]
+    if (len(first), len(second)) != (108, 72):
+        raise ValueError("split report requires the fixed 108/72 condition partition")
+    return paths, first, second
+
+
+def _report_split_context(paths, results, protocol_path, role, summary_path=None):
+    scientific_paths, first, _ = _report_split_partition(results, protocol_path)
+    protocol = load_protocol(protocol_path)
+    bindings: dict[str, dict[str, Any]] = {}
+
+    def bind(raw, expected=None):
+        path = Path(raw).absolute()
+        name = str(path)
+        if name not in bindings:
+            bindings[name] = {
+                "resolved": str(path.resolve(strict=True)),
+                "sha256": sha256_file(path),
+                "bytes": path.stat().st_size,
+            }
+        if expected is not None and bindings[name]["sha256"] != expected:
+            raise ValueError(f"split report input hash mismatch: {path}")
+
+    visited: set[Path] = set()
+    source_flags: set[bool] = set()
+
+    def bind_feature(path):
+        if path in visited:
+            return
+        visited.add(path)
+        sidecar = load_feature_sidecar(path)
+        bind(path, sidecar.artifact_sha256)
+        bind(sidecar_path_for(path))
+        inputs = sidecar.provenance.get("inputs", {})
+        by_hash: dict[str, list[Path]] = {}
+        for raw, digest in inputs.items():
+            bind(raw, digest)
+            by_hash.setdefault(digest, []).append(Path(raw))
+        if sidecar.scientific_use_allowed not in source_flags:
+            for raw, digest in proof_source_bindings(
+                protocol, scientific_use_allowed=sidecar.scientific_use_allowed
+            ).items():
+                bind(raw, digest)
+            source_flags.add(sidecar.scientific_use_allowed)
+        if sidecar.base_artifact_sha256 is not None:
+            bind_feature(
+                _feature_path_for_hash(
+                    by_hash, sidecar.base_artifact_sha256, label="base"
+                )
+            )
+
+    for path, result in zip(paths, results, strict=True):
+        bind(path)
+        if _load_result(path) != result:
+            raise ValueError(f"split report result changed while loading: {path}")
+    for path in (
+        protocol_path,
+        scientific_paths.protocol_lock,
+        scientific_paths.evaluation_plan,
+        scientific_paths.final_run_set,
+        scientific_paths.test_opening_ledger,
+        *_report_split_source_paths(),
+    ):
+        bind(path)
+    if summary_path is not None:
+        bind(summary_path)
+    for result in first:
+        by_hash: dict[str, list[Path]] = {}
+        for raw, digest in result.provenance.inputs.items():
+            bind(raw, digest)
+            by_hash.setdefault(digest, []).append(Path(raw))
+        for digest in (result.gallery_artifact_sha256, result.query_artifact_sha256):
+            bind_feature(_feature_path_for_hash(by_hash, digest, label="report"))
+    return {
+        "role": role,
+        "protocol_file": str(Path(protocol_path).resolve()),
+        "summary_file": str(Path(summary_path).resolve()) if summary_path else None,
+        "result_index": [
+            {"file": str(path), "sha256": bindings[str(path)]["sha256"]}
+            for path in paths
+        ],
+        "completed_keys": sorted(
+            [row.method, row.seed, row.condition, row.query_definition] for row in first
+        ),
+        "source_files": [str(path) for path in _report_split_source_paths()],
+        "runtime": json.loads(json.dumps(numerical_runtime())),
+        "bindings": bindings,
+        "bound_file_count": len(bindings),
+        "bound_bytes_per_recheck": sum(item["bytes"] for item in bindings.values()),
+    }
+
+
+def _recheck_report_split(context):
+    if context["source_files"] != [str(path) for path in _report_split_source_paths()]:
+        raise ValueError("split report validator source inventory changed")
+    if context["runtime"] != json.loads(json.dumps(numerical_runtime())):
+        raise ValueError("split report numerical runtime changed")
+    for raw, binding in context["bindings"].items():
+        path = Path(raw)
+        if (
+            str(path.resolve(strict=True)) != binding["resolved"]
+            or sha256_file(path) != binding["sha256"]
+            or path.stat().st_size != binding["bytes"]
+        ):
+            raise ValueError(f"split report bound input changed: {raw}")
+    verify_validation_proofs()
+
+
+def _write_report_continuation(
+    paths, results, output, protocol_path, role, summary=None
+):
+    context = _report_split_context(paths, results, protocol_path, role, summary)
+    _, first, _ = _report_split_partition(results, protocol_path)
+    lineages: dict[str, Any] = {}
+    _validate_final_provenance(
+        first,
+        protocol_path=protocol_path,
+        recompute_metrics=role == "independent_validation",
+        _lineages=lineages,
+    )
+    payload = {
+        "schema_version": 1,
+        "artifact_type": "report_continuation",
+        "context": context,
+        "lineages": lineages,
+    }
+    _recheck_report_split(context)
+    path = Path(output).resolve()
+    write_immutable_json(path, payload)
+    digest = sha256_file(path)
+    if digest != _payload_sha256(payload):
+        raise ValueError("written report continuation hash changed")
+    return {
+        "continuation_file": str(path),
+        "continuation_sha256": digest,
+        "role": role,
+        "completed_rows": 108,
+        "expected_rows": 180,
+        "complete": False,
+        "bound_file_count": context["bound_file_count"],
+        "bound_bytes_per_recheck": context["bound_bytes_per_recheck"],
+    }
+
+
+def _validate_report_continuation(
+    paths,
+    results,
+    protocol_path,
+    role,
+    continuation_path,
+    continuation_sha256,
+    summary_path=None,
+):
+    path = Path(continuation_path).resolve()
+    if sha256_file(path) != continuation_sha256:
+        raise ValueError("report continuation differs from its external SHA256")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    context = _report_split_context(paths, results, protocol_path, role, summary_path)
+    if (
+        not isinstance(payload, dict)
+        or set(payload) != {"schema_version", "artifact_type", "context", "lineages"}
+        or payload["schema_version"] != 1
+        or payload["artifact_type"] != "report_continuation"
+        or payload["context"] != context
+    ):
+        raise ValueError("report continuation role, inputs, source or runtime differ")
+    first_lineages = payload["lineages"]
+    if (
+        not isinstance(first_lineages, dict)
+        or set(first_lineages) != {"encoder", "gallery", "queries"}
+        or not isinstance(first_lineages["encoder"], list)
+        or len(first_lineages["encoder"]) != 3
+        or not isinstance(first_lineages["gallery"], list)
+        or len(first_lineages["gallery"]) != 2
+        or not isinstance(first_lineages["queries"], list)
+        or len(first_lineages["queries"]) != 12
+        or any(
+            not isinstance(row, list) or len(row) != 4
+            for row in first_lineages["queries"]
+        )
+    ):
+        raise ValueError("report continuation lineage record is incomplete")
+    _, _, second = _report_split_partition(results, protocol_path)
+    lineages: dict[str, Any] = {}
+    validated = _validate_final_provenance(
+        second,
+        protocol_path=protocol_path,
+        recompute_metrics=role == "independent_validation",
+        _lineages=lineages,
+    )
+    if (
+        first_lineages["encoder"] != lineages["encoder"]
+        or first_lineages["gallery"] != lineages["gallery"]
+    ):
+        raise ValueError("split report changes encoder or clean-gallery lineage")
+    queries = first_lineages["queries"] + lineages["queries"]
+    expected = {(row.condition, row.query_definition) for row in results}
+    if len(queries) != 20 or {tuple(row[:2]) for row in queries} != expected:
+        raise ValueError("split report query lineages have gaps or overlaps")
+    # Retain the externally supplied receipt binding through the final write.
+    context["bindings"][str(path)] = {
+        "resolved": str(path),
+        "sha256": continuation_sha256,
+        "bytes": path.stat().st_size,
+    }
+    context["bound_file_count"] = len(context["bindings"])
+    context["bound_bytes_per_recheck"] = sum(
+        item["bytes"] for item in context["bindings"].values()
+    )
+    return validated, context
+
+
+def _require_continuation_pair(path, digest):
+    if (path is None) != (digest is None):
+        raise ValueError(
+            "report continuation path and SHA256 must be supplied together"
+        )
+
+
+@validation_command()
+def build_report_part_one(
+    result_paths: Iterable[str | Path],
+    continuation_path: str | Path,
+    *,
+    protocol_path: str | Path,
+) -> dict[str, Any]:
+    """Validate the first six frozen conditions; write no report or acceptance."""
+    paths = sorted((Path(path).resolve() for path in result_paths), key=str)
+    results = [_load_result(path) for path in paths]
+    return _write_report_continuation(
+        paths, results, continuation_path, protocol_path, "construction"
+    )
+
+
 @validation_command()
 def build_report(
     result_paths: Iterable[str | Path],
     output_dir: str | Path,
     *,
     protocol_path: str | Path | None = None,
+    continuation_path: str | Path | None = None,
+    continuation_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Build validated result tables and analyze only an exact final matrix."""
+    _require_continuation_pair(continuation_path, continuation_sha256)
+    continuation_context = None
     paths = sorted((Path(path).resolve() for path in result_paths), key=str)
     if not paths:
         raise ValueError("at least one result file is required")
@@ -1202,9 +1488,21 @@ def build_report(
         if modes == {"final"} and load_protocol(protocol_path).schema_version == 3:
             # ADR0012: the independent report check owns the retrieval replay.
             validation_options["recompute_metrics"] = False
-        expected_rows, authorized_keys = validator(
-            results, protocol_path=protocol_path, **validation_options
-        )
+        if continuation_path is None:
+            expected_rows, authorized_keys = validator(
+                results, protocol_path=protocol_path, **validation_options
+            )
+        else:
+            (expected_rows, authorized_keys), continuation_context = (
+                _validate_report_continuation(
+                    paths,
+                    results,
+                    protocol_path,
+                    "construction",
+                    continuation_path,
+                    continuation_sha256,
+                )
+            )
         complete = matrix_keys == authorized_keys and len(matrix_keys) == expected_rows
         if load_protocol(protocol_path).schema_version == 3 and (
             modes != {"final"} or expected_rows != 180 or not complete
@@ -1218,6 +1516,8 @@ def build_report(
             )
             primary_analysis = core_artifacts["json"]["primary-analysis.json"]
 
+    if continuation_path is not None and continuation_context is None:
+        raise ValueError("report continuation requires a locked v3 final report")
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
     report_path = destination / "summary.md"
@@ -1234,6 +1534,8 @@ def build_report(
     for output_path in output_paths:
         if output_path.exists():
             raise ValueError(f"refusing to overwrite report: {output_path}")
+    if continuation_context is not None:
+        _recheck_report_split(continuation_context)
     verify_validation_proofs()
     references = core_artifacts["references"] if core_artifacts is not None else {}
     if core_artifacts is not None:
@@ -1475,13 +1777,8 @@ def build_report(
     return summary
 
 
-@validation_command(fresh=True)
-def validate_core_report_summary(
-    summary_path: str | Path,
-    protocol_path: str | Path,
-) -> dict[str, Any]:
-    """Recertify every immutable core analysis artifact without writing."""
-    path = Path(summary_path)
+def _load_core_report_inputs(summary_path, protocol_path):
+    path = Path(summary_path).resolve()
     try:
         summary = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -1545,11 +1842,62 @@ def validate_core_report_summary(
         raise ValueError("core report result paths must be unique and sorted")
 
     results = [_load_result(result_path) for result_path in result_paths]
-    validated_rows, validated_keys = _validate_final_provenance(
-        results,
-        protocol_path=protocol_path,
-        recompute_metrics=True,
+    return path, summary, plan, expected_matrix, result_paths, results
+
+
+@validation_command(fresh=True)
+def validate_core_report_summary_part_one(
+    summary_path: str | Path,
+    continuation_path: str | Path,
+    *,
+    protocol_path: str | Path,
+) -> dict[str, Any]:
+    """Independently replay the first 108 cells in a fresh proof session."""
+    path, summary, _, _, paths, results = _load_core_report_inputs(
+        summary_path, protocol_path
     )
+    if summary["results"] != [
+        _result_row(item, result) for item, result in zip(paths, results, strict=True)
+    ]:
+        raise ValueError("core report result rows differ from their immutable files")
+    return _write_report_continuation(
+        paths, results, continuation_path, protocol_path, "independent_validation", path
+    )
+
+
+@validation_command(fresh=True)
+def validate_core_report_summary(
+    summary_path: str | Path,
+    protocol_path: str | Path,
+    *,
+    continuation_path: str | Path | None = None,
+    continuation_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Recertify every immutable core analysis artifact without writing."""
+    _require_continuation_pair(continuation_path, continuation_sha256)
+    path, summary, plan, expected_matrix, result_paths, results = (
+        _load_core_report_inputs(summary_path, protocol_path)
+    )
+    rows = summary["results"]
+    continuation_context = None
+    if continuation_path is None:
+        validated_rows, validated_keys = _validate_final_provenance(
+            results,
+            protocol_path=protocol_path,
+            recompute_metrics=True,
+        )
+    else:
+        (validated_rows, validated_keys), continuation_context = (
+            _validate_report_continuation(
+                result_paths,
+                results,
+                protocol_path,
+                "independent_validation",
+                continuation_path,
+                continuation_sha256,
+                path,
+            )
+        )
     if validated_rows != plan.expected_rows:
         raise ValueError("core report failed full final provenance validation")
     recomputed_rows = [
@@ -1618,6 +1966,8 @@ def validate_core_report_summary(
             raise ValueError(
                 f"core report figure differs from recomputed data: {filename}"
             )
+    if continuation_context is not None:
+        _recheck_report_split(continuation_context)
     primary = expected_artifacts["json"]["primary-analysis.json"]
     failures = expected_artifacts["json"]["core-failures.json"]
     figure_hashes = {

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 
 import pytest
@@ -126,7 +126,7 @@ def test_fresh_capacity_passes_and_archival_validation_never_measures(
     assert receipt["schema_version"] == 2
     assert receipt["calendar_summary"]["usable_evaluation_seconds_by_resource"] == {
         "cpu": 10800,
-        "gpu": 7200,
+        "gpu": 3600,
     }
     assert receipt["calendar_summary"]["confirmed_delivery_hours"] == 10
 
@@ -237,6 +237,146 @@ def test_remaining_allocated_wall_time_uses_actual_start_and_slack(tmp_path, cap
         ]
         == 75
     )
+
+
+def _delayed_running_capacity(root, capacity):
+    payload = capacity.model_dump(mode="json")
+    payload["maximum_job_seconds_by_resource"]["gpu"] = 7200
+    payload["remaining_evaluation_seconds_by_resource"]["gpu"] = 7200
+    calendar = json.loads((root / "calendar.json").read_text())
+    calendar["windows"][-2]["job_wall_limit_seconds"] = 10800
+    payload["allocation_calendar"] = _bind(root, "calendar.json", calendar)
+    resources = _resources(root)
+    resources["qstat_xml"] = resources["qstat_xml"].replace(
+        "2026-11-30T07:00:00", "2026-11-30T08:00:00"
+    )
+    resources["qstat_job"] = resources["qstat_job"].replace("12:00:00", "03:00:00")
+    return CapacityReceipt.model_validate(payload), resources
+
+
+def test_running_allocation_does_not_pay_its_elapsed_queue_twice(tmp_path, capacity):
+    capacity, resources = _delayed_running_capacity(tmp_path, capacity)
+    now = datetime(2026, 11, 30, 13, tzinfo=UTC)
+    with pytest.raises(ValueError, match="calendar"):
+        opening._calendar_capacity(tmp_path, capacity, now)
+    allocation = opening._validate_resources(tmp_path, resources, capacity)
+    summary = opening._calendar_capacity(tmp_path, capacity, now, allocation=allocation)
+    assert summary["usable_evaluation_seconds_by_resource"]["gpu"] == 10800
+    assert summary["required_evaluation_seconds_by_resource"]["gpu"] == 9000
+
+
+@pytest.mark.parametrize("recording_delay", [1801, 3601])
+def test_running_calendar_still_requires_the_complete_job(
+    tmp_path, capacity, recording_delay
+):
+    capacity, resources = _delayed_running_capacity(tmp_path, capacity)
+    allocation = opening._validate_resources(tmp_path, resources, capacity)
+    now = datetime(2026, 11, 30, 13, tzinfo=UTC) + timedelta(seconds=recording_delay)
+    with pytest.raises(ValueError, match="calendar"):
+        opening._calendar_capacity(tmp_path, capacity, now, allocation=allocation)
+
+
+def test_running_credit_is_capped_by_remaining_wall_time(tmp_path, capacity):
+    capacity, resources = _delayed_running_capacity(tmp_path, capacity)
+    resources["qstat_xml"] = resources["qstat_xml"].replace(
+        "2026-11-30T08:00:00", "2026-11-30T07:30:00"
+    )
+    allocation = opening._validate_resources(tmp_path, resources, capacity)
+    assert allocation["remaining_job_wall_seconds"] == 9000
+    with pytest.raises(ValueError, match="calendar"):
+        opening._calendar_capacity(
+            tmp_path,
+            capacity,
+            datetime(2026, 11, 30, 13, 0, 1, tzinfo=UTC),
+            allocation=allocation,
+        )
+
+
+def test_running_credit_does_not_extend_the_declared_job_limit(tmp_path, capacity):
+    allocation = opening._validate_resources(tmp_path, _resources(tmp_path), capacity)
+    assert allocation["remaining_job_wall_seconds"] == 11 * 3600
+    summary = opening._calendar_capacity(
+        tmp_path,
+        capacity,
+        datetime(2026, 11, 30, 13, tzinfo=UTC),
+        allocation=allocation,
+    )
+    # The calendar allows two hours; one has elapsed despite the 12h request.
+    assert summary["usable_evaluation_seconds_by_resource"]["gpu"] == 3600
+
+
+def test_running_credit_requires_start_inside_the_same_window(tmp_path, capacity):
+    capacity, resources = _delayed_running_capacity(tmp_path, capacity)
+    resources["qstat_xml"] = resources["qstat_xml"].replace(
+        "2026-11-30T08:00:00", "2026-11-30T06:59:00"
+    )
+    resources["qstat_job"] = resources["qstat_job"].replace("03:00:00", "12:00:00")
+    allocation = opening._validate_resources(tmp_path, resources, capacity)
+    with pytest.raises(ValueError, match="calendar"):
+        opening._calendar_capacity(
+            tmp_path,
+            capacity,
+            datetime(2026, 11, 30, 13, tzinfo=UTC),
+            allocation=allocation,
+        )
+
+
+def test_running_credit_preserves_future_queue_allowances(tmp_path, capacity):
+    capacity, resources = _delayed_running_capacity(tmp_path, capacity)
+    calendar = json.loads((tmp_path / "calendar.json").read_text())
+    future = calendar["windows"][-2] | {
+        "starts_at": "2026-12-01T12:00:00Z",
+        "ends_at": "2026-12-01T16:00:00Z",
+    }
+    calendar["windows"].append(future)
+    capacity = capacity.model_copy(
+        update={
+            "allocation_calendar": ArtifactBinding.model_validate(
+                _bind(tmp_path, "calendar.json", calendar)
+            )
+        }
+    )
+    allocation = opening._validate_resources(tmp_path, resources, capacity)
+    summary = opening._calendar_capacity(
+        tmp_path,
+        capacity,
+        datetime(2026, 11, 30, 13, tzinfo=UTC),
+        allocation=allocation,
+    )
+    assert summary["usable_evaluation_seconds_by_resource"]["gpu"] == 2 * 10800
+
+
+def test_archival_replay_recomputes_running_credit_from_retained_resources(
+    configured, capacity, monkeypatch
+):
+    protocol, root = configured
+    capacity, resources = _delayed_running_capacity(root, capacity)
+    capacity_binding = ArtifactBinding.model_validate(
+        _bind(root, "capacity.json", capacity.model_dump(mode="json"))
+    )
+    monkeypatch.setattr(opening, "_capacity", lambda *_: (capacity, capacity_binding))
+    monkeypatch.setattr(
+        opening, "_capture_resources", lambda _, target: target.update(resources)
+    )
+    binding = opening.record_opening_capacity(protocol, "a" * 64)
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("archival replay must not read live resources")
+
+    monkeypatch.setattr(opening, "_capture_resources", forbidden)
+    monkeypatch.setattr(opening.subprocess, "check_output", forbidden)
+    assert opening.validate_opening_capacity(protocol, binding, "a" * 64) == datetime(
+        2026, 11, 30, 13, tzinfo=UTC
+    )
+    path = root / binding.relative_path
+    receipt = json.loads(path.read_text())
+    receipt["resource_summary"]["remaining_job_wall_seconds"] += 1
+    path.write_text(json.dumps(receipt))
+    changed = ArtifactBinding(
+        relative_path=binding.relative_path, sha256=sha256_file(path)
+    )
+    with pytest.raises(ValueError, match="summary differs"):
+        opening.validate_opening_capacity(protocol, changed, "a" * 64)
 
 
 def _long_cpu_report(tmp_path, capacity):
