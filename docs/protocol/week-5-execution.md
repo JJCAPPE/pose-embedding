@@ -25,8 +25,8 @@ measurement 8640396 is independently accepted: 23 components, 218 scheduler seco
 complete source/input/runtime/resource/seal checks and no capacity or authorization.
 The conditional CPU report forecast exceeds the observed qualified public queue
 limit. Researcher planning availability was confirmed November 16; a possible
-fixed two-part construction and two-part independent verification path is under
-review. Implementation, qualification and complete capacity remain pending.
+fixed two-part construction and two-part independent verification path is now
+implemented and locally tested. SCC qualification and complete capacity remain pending.
 Week 5 stays open.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
@@ -41,6 +41,51 @@ automation remains paused. Later scientific stages stay closed.** The [incoming 
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 17: fixed report split implemented; qualification pending
+
+The researcher authorized implementation and continued Week 5 work. Report
+construction and independent verification can each run in two fixed parts:
+the first six frozen conditions (108 cells), then the remaining four (72 cells).
+Both parts contain all three methods, three seeds and both query definitions.
+The existing unsplit calls retain their behavior.
+
+`report build --write-continuation PATH` validates the first part and writes
+an immutable continuation. Finishing requires `--continuation PATH` and its
+externally retained `--continuation-sha256`, along with the complete result
+index and output directory. `report validate --summary PATH` uses the same
+two-part options for fresh independent numerical verification. Construction
+and independent records have distinct roles and cannot substitute for each other.
+Neither first part produces report acceptance.
+
+Each continuation binds the complete 180-cell index, actual source and runtime,
+protocol and locks, and the directly consumed first-part inputs. The second
+part checks these bindings afresh, validates its remaining cells, checks the
+combined matrix and lineages, and retains the complete report/bootstrap checks.
+Local fixture tests produce byte-identical split and unsplit report artifacts,
+recompute exactly 108 then 72 independent retrieval cells, reject forged metrics
+in either part, and preserve the unopened scientific ledger. Dependency changes,
+wrong roles, incomplete partitions and overwritten continuations are rejected.
+
+A calendar regression also exposed double-counted queue time for an allocation
+that scheduler evidence already shows running. The correction credits only that
+allocation's proven remaining time, capped by the dated window and remaining
+declared wall limit. Future allocations retain their queue allowances; the full
+job, 25% margin and deadline checks remain. Archival verification recomputes the
+same result from retained scheduler evidence. No scientific opening occurred.
+
+These are implementation checks, not SCC throughput or accepted capacity.
+The next prerequisite is bounded allocated qualification of the changed report
+path, followed by a complete forecast that includes continuation reads, attempt
+growth and every queue/detection/review handoff. Retained fixture attempts also
+increase the inventory; the bounded qualification will measure that expanded
+metadata workload using the accepted inventory primitive. Fresh scheduler configuration
+permits 48-hour L40S jobs; this is ordinary queued access, not a reservation.
+The preserved prior GPU job waited 10 hours 22 minutes 51 seconds, while the
+three recent accepted CPU jobs waited 90--123 seconds. These observations do not
+guarantee future waits. No new capacity pass or scientific-stage permission is
+inferred. Week 5 remains open; selection runs, final training and novel opening
+stay closed.
 
 ## November 16: availability confirmed; CPU report path under review
 

@@ -14,7 +14,12 @@ from pose_embed.evaluation.runner import evaluate_files
 from pose_embed.features import apply_trained_head, extract_fixture_features
 from pose_embed.gpu_profile import profile_motionbert_gpu
 from pose_embed.protocol import current_code_hashes, verify_protocol
-from pose_embed.report import build_report
+from pose_embed.report import (
+    build_report,
+    build_report_part_one,
+    validate_core_report_summary,
+    validate_core_report_summary_part_one,
+)
 from pose_embed.training import train_head
 from pose_embed.validation_proofs import validation_command
 
@@ -275,8 +280,22 @@ def _parser() -> argparse.ArgumentParser:
         ),
     )
     report_build.add_argument("--results", nargs="+", required=True)
-    report_build.add_argument("--output-dir", required=True)
-    report_build.add_argument("--protocol-config", default=DEFAULT_PROTOCOL)
+    report_build.add_argument("--output-dir")
+    report_validate = report_commands.add_parser(
+        "validate", help="independently recompute the complete core report"
+    )
+    report_validate.add_argument("--summary", required=True)
+    for operation in (report_build, report_validate):
+        operation.add_argument("--protocol-config", default=DEFAULT_PROTOCOL)
+        continuation = operation.add_mutually_exclusive_group()
+        continuation.add_argument(
+            "--write-continuation",
+            help="validate the first fixed partition and write its continuation",
+        )
+        continuation.add_argument(
+            "--continuation", help="finish using this immutable part-one continuation"
+        )
+        operation.add_argument("--continuation-sha256")
     return parser
 
 
@@ -485,13 +504,45 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             return 0
         if args.area == "report":
-            _print(
-                build_report(
-                    args.results,
-                    args.output_dir,
+            if (args.continuation is None) != (args.continuation_sha256 is None):
+                raise ValueError(
+                    "--continuation and --continuation-sha256 are required together"
+                )
+            if args.operation == "build":
+                if args.write_continuation:
+                    if args.output_dir is not None:
+                        raise ValueError(
+                            "--output-dir cannot be used with --write-continuation"
+                        )
+                    result = build_report_part_one(
+                        args.results,
+                        args.write_continuation,
+                        protocol_path=args.protocol_config,
+                    )
+                else:
+                    if args.output_dir is None:
+                        raise ValueError("report build requires --output-dir")
+                    result = build_report(
+                        args.results,
+                        args.output_dir,
+                        protocol_path=args.protocol_config,
+                        continuation_path=args.continuation,
+                        continuation_sha256=args.continuation_sha256,
+                    )
+            elif args.write_continuation:
+                result = validate_core_report_summary_part_one(
+                    args.summary,
+                    args.write_continuation,
                     protocol_path=args.protocol_config,
                 )
-            )
+            else:
+                result = validate_core_report_summary(
+                    args.summary,
+                    protocol_path=args.protocol_config,
+                    continuation_path=args.continuation,
+                    continuation_sha256=args.continuation_sha256,
+                )
+            _print(result)
             return 0
     except (OSError, RuntimeError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)

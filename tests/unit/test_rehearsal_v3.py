@@ -17,6 +17,7 @@ import numpy as np
 import pytest
 import yaml
 
+from pose_embed import report as report_module
 from pose_embed.artifacts import (
     load_feature_sidecar,
     validate_feature_artifact,
@@ -536,6 +537,76 @@ def test_complete_v3_cli_fixture_rehearsal(
     assert analysis["schema_version"] == 3
     assert analysis["bootstrap"]["replicates"] == 10000
     assert len(analysis["leave_one_action_out"]["rows"]) == 20
+    split_report = root / "fixture-split-report"
+    construction_part = root / "construction-part-one.json"
+    independent_part = root / "independent-part-one.json"
+    replayed = []
+    original_retrieval = report_module._validate_retrieval_metrics
+
+    def track_retrieval(result, *arguments):
+        replayed.append(
+            (result.method, result.seed, result.condition, result.query_definition)
+        )
+        return original_retrieval(result, *arguments)
+
+    with monkeypatch.context() as split_checks:
+        split_checks.setattr(
+            report_module, "_validate_retrieval_metrics", track_retrieval
+        )
+        command(
+            "report",
+            "build",
+            "--results",
+            *results,
+            "--write-continuation",
+            construction_part,
+            "--protocol-config",
+            protocol_path,
+        )
+        assert not split_report.exists()
+        command(
+            "report",
+            "build",
+            "--results",
+            *results,
+            "--output-dir",
+            split_report,
+            "--continuation",
+            construction_part,
+            "--continuation-sha256",
+            sha256_file(construction_part),
+            "--protocol-config",
+            protocol_path,
+        )
+        assert replayed == []
+        command(
+            "report",
+            "validate",
+            "--summary",
+            split_report / "summary.json",
+            "--write-continuation",
+            independent_part,
+            "--protocol-config",
+            protocol_path,
+        )
+        assert len(replayed) == len(set(replayed)) == 108
+        command(
+            "report",
+            "validate",
+            "--summary",
+            split_report / "summary.json",
+            "--continuation",
+            independent_part,
+            "--continuation-sha256",
+            sha256_file(independent_part),
+            "--protocol-config",
+            protocol_path,
+        )
+    assert len(replayed) == len(set(replayed)) == 180
+    assert {path.name: path.read_bytes() for path in split_report.iterdir()} == {
+        path.name: path.read_bytes() for path in report_dir.iterdir()
+    }
+    assert paths.test_opening_ledger.read_bytes() == opening_before
     assert all(
         load_feature_sidecar(path).scientific_use_allowed is False
         for path in root.rglob("*.npz")
@@ -546,38 +617,64 @@ def test_complete_v3_cli_fixture_rehearsal(
     )
     assert len(list(root.rglob("attempt.json"))) == 9
     # The independent check must reject invented ranks in a constructed report.
-    original = results[0].read_bytes()
-    forged = json.loads(original)
-    rows = forged["metrics"]["per_query"]
-    rows[0]["rank"] = 2 if rows[0]["rank"] == 1 else 1
-    rows[0]["top1_correct"] = rows[0]["rank"] == 1
-    for key, value in (
-        ("top1", sum(row["rank"] == 1 for row in rows) / len(rows)),
-        ("mrr", sum(1 / row["rank"] for row in rows) / len(rows)),
-        ("r_at_5", sum(row["rank"] <= 5 for row in rows) / len(rows)),
-    ):
-        forged["metrics"][key] = value
-    try:
-        results[0].write_text(json.dumps(forged))
-        status = main(
-            [
+    for part, condition in enumerate((plan.conditions[0], plan.conditions[6]), 1):
+        changed = next(
+            path
+            for path in results
+            if json.loads(path.read_text())["condition"] == condition
+        )
+        original = changed.read_bytes()
+        forged = json.loads(original)
+        rows = forged["metrics"]["per_query"]
+        rows[0]["rank"] = 2 if rows[0]["rank"] == 1 else 1
+        rows[0]["top1_correct"] = rows[0]["rank"] == 1
+        for key, value in (
+            ("top1", sum(row["rank"] == 1 for row in rows) / len(rows)),
+            ("mrr", sum(1 / row["rank"] for row in rows) / len(rows)),
+            ("r_at_5", sum(row["rank"] <= 5 for row in rows) / len(rows)),
+        ):
+            forged["metrics"][key] = value
+        forged_report = root / f"forged-report-{part}"
+        forged_part = root / f"forged-part-one-{part}.json"
+        try:
+            changed.write_text(json.dumps(forged))
+            command(
                 "report",
                 "build",
                 "--results",
-                *map(str, results),
+                *results,
                 "--output-dir",
-                str(root / "forged-report"),
+                forged_report,
+                "--protocol-config",
+                protocol_path,
+            )
+            with pytest.raises(ValueError, match="deterministic feature retrieval"):
+                validate_core_report_summary(
+                    forged_report / "summary.json", protocol_path
+                )
+            arguments = [
+                "report",
+                "validate",
+                "--summary",
+                str(forged_report / "summary.json"),
                 "--protocol-config",
                 str(protocol_path),
             ]
-        )
-        assert status == 0
-        with pytest.raises(ValueError, match="deterministic feature retrieval"):
-            validate_core_report_summary(
-                root / "forged-report" / "summary.json", protocol_path
-            )
-    finally:
-        results[0].write_bytes(original)
+            first = [*arguments, "--write-continuation", str(forged_part)]
+            if part == 2:
+                command(*first)
+                first = [
+                    *arguments,
+                    "--continuation",
+                    str(forged_part),
+                    "--continuation-sha256",
+                    sha256_file(forged_part),
+                ]
+            assert main(first) == 2
+            assert "deterministic feature retrieval" in capsys.readouterr().err
+            assert forged_part.exists() is (part == 2)
+        finally:
+            changed.write_bytes(original)
     assert paths.test_opening_ledger.read_bytes() == opening_before
     # No raw fixture values or simulated admissions are emitted outside tmp_path.
     write_immutable_json(

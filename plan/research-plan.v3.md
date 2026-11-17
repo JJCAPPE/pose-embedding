@@ -7,7 +7,7 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 16 current execution status:** CPU qualification 8621649 and bounded
+**November 17 current execution status:** CPU qualification 8621649 and bounded
 GPU parity 8622248 are independently accepted under
 [ADR0013](../docs/decisions/0013-kernel-184-qualification.md) on the authorized
 kernel-553.184.2 profile. The accepted single admission-prefix measurement
@@ -28,12 +28,14 @@ or proof that the study is infeasible; no complete capacity pass is claimed.
 On November 16 the researcher confirmed planning budgets of 4 hours before the
 November 29 locks, 1 hour for compute review and 8 hours for December 7–18
 delivery, corresponding to 5, 1.25 and 10 hours with the required 25% margin.
-Actual time remains unreported. [Source review](../docs/protocol/week-5-execution.md#november-16-availability-confirmed-cpu-report-path-under-review)
-identified a possible fixed two-part construction and two-part independent
-verification path; implementation, qualification and complete capacity remain
-pending. No split has been implemented or qualified, and no new job has been
-submitted. An RCS access-request fallback is documented; no request has been sent
-or access approval obtained.
+Actual time remains unreported. The authorized [fixed report split](../docs/protocol/week-5-execution.md#november-17-fixed-report-split-implemented-qualification-pending)
+is implemented and locally tested: construction and independent verification each
+process 108 cells, then 72, preserving all 180 cells and complete report/bootstrap
+checks. SCC qualification and complete capacity remain pending. The forecast must
+include continuation reads, attempt growth and queue, completion-detection and
+review time. Ordinary 48-hour L40S access is available without a reservation.
+An RCS access-request fallback remains documented; no request has been sent or
+special access approval obtained.
 
 Complete CPU/GPU/storage/calendar/researcher capacity remains unresolved before
 genuine admission. Preserve larger applicable accepted timings, the 200 GiB
