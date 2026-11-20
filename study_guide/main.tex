@@ -1,0 +1,120 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,mathtools}
+\usepackage{graphicx,booktabs,longtable,tabularx,array,enumitem}
+\usepackage{xcolor,hyperref,fancyhdr,needspace}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\definecolor{ink}{HTML}{223B53}
+\definecolor{pale}{HTML}{F0F4F7}
+\definecolor{warm}{HTML}{805A26}
+\hypersetup{colorlinks=true,linkcolor=ink,urlcolor=ink,citecolor=ink,
+ pdftitle={Pose Embed: Understanding and Defending the Experiment},
+ pdfauthor={Pose Embed project},pdfsubject={Study guide; evidence through October 28, 2026}}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small Pose Embed / Study guide}
+\fancyhead[R]{\small Evidence through 28 October 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{15pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\setlength{\emergencystretch}{2em}
+\clubpenalty=10000
+\widowpenalty=10000
+\setlist{nosep,leftmargin=1.4em,topsep=0.4em}
+\setcounter{tocdepth}{2}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\ind}{\mathbf{1}}
+\newcommand{\relu}[1]{\left[#1\right]_+}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\src}[2]{\href{https://github.com/JJCAPPE/pose-embedding/blob/b32d50f66206b561fa34867c9274fac6ba7c287d/#1}{#2}}
+\newcommand{\prepsrc}[2]{\href{https://github.com/JJCAPPE/pose-embedding/blob/5d50410b07e19a980fe3b711e63b10417b40b818/#1}{#2}}
+\newcommand{\source}[1]{\par\smallskip{\small\textit{Source trail:} #1}\par}
+\newtcolorbox{concept}[1]{colback=pale,colframe=ink,boxrule=0.5pt,
+ arc=1pt,title=#1,fonttitle=\bfseries,left=8pt,right=8pt,top=6pt,bottom=6pt}
+\newtcolorbox{caution}[1]{colback=warm!4,colframe=warm,boxrule=0.5pt,
+ arc=1pt,title=#1,fonttitle=\bfseries,left=8pt,right=8pt,top=6pt,bottom=6pt}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\studycheck}[1]{\begin{concept}{Check your understanding}#1\end{concept}}
+\begin{document}
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\vspace*{1.3cm}
+{\large POSE EMBED\par}
+\vspace{0.8cm}
+{\Huge\bfseries Understanding\\and defending\\the experiment\par}
+\vspace{0.65cm}
+{\Large A study guide from movement data to a fair scientific claim\par}
+\vspace{1.1cm}
+{\large Theory, design decisions, code provenance, and verification\par}
+\vspace{0.8cm}
+\begin{concept}{The question}
+Does the full contextual training recipe lose less one-shot retrieval accuracy
+than standard contrastive training when the query's pose information is
+deliberately damaged?
+\end{concept}
+\vfill
+This guide assumes comfortable programming, matrix algebra, multivariable
+calculus, and introductory probability and statistics. It develops the
+machine-learning ideas needed for this study rather than reviewing basic coding.
+
+Prepared 30 October 2026. Scientific status is based on records through
+28 October 2026. All numerical teaching examples are synthetic unless explicitly
+identified as recorded project evidence. No final novel-action result exists in
+the records used here.
+\end{titlepage}
+\pagenumbering{roman}
+\hypersetup{pageanchor=true}
+\begingroup
+\small
+\setlength{\parskip}{0pt}
+\tableofcontents
+\endgroup
+\clearpage
+\pagenumbering{arabic}
+\section*{How to study this guide}
+\addcontentsline{toc}{section}{How to study this guide}
+The goal is to explain \emph{what is being measured, why the comparison is fair,
+and what evidence permits a conclusion}. You do not need to memorize test names,
+cluster job numbers, hashes, or every historical implementation detail.
+
+Read Sections~\ref{sec:question}--\ref{sec:analysis} for the scientific account.
+Section~\ref{sec:verification} explains why working software is not enough and
+what has actually passed. Section~\ref{sec:explain} prepares you for questions.
+The appendices contain short answers, a notation reference, and source links.
+
+At each equation, identify the objects, their shapes, and what changes during
+training. At each experimental decision, ask: \emph{what alternative explanation
+does this control remove, and what uncertainty remains?}
+
+The three companion notebooks use invented, small arrays. They illustrate
+geometry and gradients, fair comparisons, and paired cluster resampling. They
+are learning exercises, not an alternate research pipeline or evidence that
+the real study has passed a gate.
+
+\begin{caution}{Three different kinds of statement}
+\textbf{Design:} what the locked study requires.\quad
+\textbf{Evidence:} what a dated run and its verification established.\quad
+\textbf{Interpretation:} what may reasonably be concluded from that evidence.
+
+For example, three complete engineering pilots are evidence that those runs
+worked under their recorded conditions. They are not the planned final
+comparison, and they do not automatically validate a changed runtime.
+\end{caution}
+
+The guide uses the current frozen v3 study. The earlier 26-method, fine-tuned
+v2 benchmark is preserved history, not completed work or a requirement of this
+December comparison. The October 28 operational checkpoint is on a preparation
+branch; its local launcher changes are not claimed to have run on the cluster.
+
+\input{chapters/01_question_data.tex}
+\input{chapters/02_representation.tex}
+\input{chapters/03_objectives.tex}
+\input{chapters/04_design_analysis.tex}
+\input{chapters/05_verification.tex}
+\input{chapters/06_explain.tex}
+\end{document}

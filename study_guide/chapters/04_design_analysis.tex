@@ -1,0 +1,362 @@
+\clearpage
+\section{How the comparison is made fair}\label{sec:design}
+\subsection{Specify the experiment before looking for a winner}
+A machine-learning result combines choices about data, representation, objective,
+optimization, model selection, and evaluation. If those choices are changed
+after seeing a preferred method's outcomes, apparent improvement can reflect
+the selection process rather than a reliable advantage.
+
+The v3 protocol fixes the hypothesis, action splits, gallery, recipes, duration,
+tuning grid, corruption conditions, analysis, and reporting rules before
+selection and final-test access. This is a \emph{prespecified} comparison. A
+hash-bound configuration makes the exact specification checkable; it does not
+replace a scientific explanation of why the choices are appropriate.
+
+\begin{longtable}{@{}P{0.28\linewidth}P{0.32\linewidth}P{0.34\linewidth}@{}}
+\toprule Controlled choice & What stays the same & Alternative explanation reduced\\\midrule\endhead
+Representation & Encoder, checkpoint, preprocessing, head structure & A different
+backbone or input pipeline caused the difference.\\\addlinespace
+Optimization exposure & Twenty epochs, physical $8\times4$ batches & One recipe
+received more updates or different within-batch information.\\\addlinespace
+Initialization and order & Exact initial weights and ordered batches within seed
+& A favorable starting state or example order caused the difference.\\\addlinespace
+Tuning budget & Three rates, three seeds per rate, same ranking rule & More search
+opportunities gave one method an advantage.\\\addlinespace
+Evaluation input & Same gallery, queries, and per-example damage & Methods were
+evaluated on different problems.\\\addlinespace
+Claim rule & One primary effect and fixed interval construction & A favorable
+metric, subset, or threshold was chosen afterward.\\\bottomrule
+\end{longtable}
+
+These controls improve \textbf{internal validity}: whether the observed
+difference answers the declared comparison. \textbf{External validity} asks
+whether it transfers to other datasets, people, actions, cameras, or damage
+mechanisms. Internal controls alone cannot establish that broader claim.
+
+\subsection{Pairing is more than using the same seed}
+Let $A_s$ and $B_s$ denote outcomes from two methods under a paired condition.
+For their difference,
+\[
+ \operatorname{Var}(A_s-B_s)
+ =\operatorname{Var}(A_s)+\operatorname{Var}(B_s)
+  -2\operatorname{Cov}(A_s,B_s).
+\]
+Shared difficulty can induce positive covariance, making the difference less
+variable than an unpaired comparison. Pairing is useful even when that variance
+reduction is not guaranteed: it prevents known input differences from becoming
+uncontrolled method differences.
+
+A seed initializes a pseudorandom generator. It does not prove two execution
+paths consumed random values in the same order or used the same arithmetic.
+The project therefore stores and verifies exact starting-state and batch-plan
+identities. Seeds 7, 17, and 29 give three paired training realizations.
+They produce three separate heads per method, \emph{not an ensemble}.
+
+An epoch is defined as $\lceil N/32\rceil$ balanced batches. For candidate
+training, $\lceil76{,}013/32\rceil=2{,}376$ updates per epoch and 47,520 over
+twenty epochs. Class and example queues are shuffled at the epoch start and
+cycled within it. This is a balanced update budget, not a guarantee that every
+row is visited exactly once per epoch.
+
+Gradient accumulation cannot replace the physical batch: relationships between
+examples in different microbatches never exist in either microbatch's similarity
+matrix. Adding their gradients cannot retroactively construct the missing
+neighbors, positives, or softmax alternatives.
+
+\subsection{Pilots, model selection, and final training are separate}
+\textbf{Engineering pilots} answer whether the implementation can complete the
+specified training and produce valid numerical artifacts. There is one pilot
+per recipe, at seed 7 and learning rate $3\times10^{-4}$, for twenty epochs.
+Checkpoints at epochs 5, 10, 15, and 20 plus epoch-zero diagnostics expose the
+training behavior. Their accuracy does not select a learning rate or a winning
+method. A pilot that happens to share a candidate's settings is still ineligible
+for selection.
+
+\textbf{Model selection} chooses the learning rate separately for each recipe:
+\[
+ 3\text{ recipes}\times3\text{ rates}\times3\text{ seeds}=27\text{ fresh runs},
+ \qquad\eta\in\{10^{-4},3\times10^{-4},10^{-3}\}.
+\]
+Rank candidates using unrounded mean epoch-20 clean development top-1 accuracy
+over all three seeds. Resolve exact ties with mean MRR, then lower learning rate.
+The best checkpoint is not selected across epochs. Corrupted development scores
+are not tuning criteria. If an endpoint learning rate wins, the grid is not
+expanded after the fact.
+
+\textbf{Final training} starts nine fresh heads: three recipes at their selected
+rates, each with three paired seeds, using all 95,001 auxiliary examples. All nine
+must finish and be locked before novel evaluation. A final run is not a pilot
+continued for longer, a selected checkpoint reused unchanged, or a seed chosen
+because it looked favorable.
+
+\begin{concept}{What a failed run means}
+A candidate needs all three valid seeds; averaging only its two successful
+seeds changes the comparison. Preserve failures and their causes. An allowed
+infrastructure retry repeats identical inputs in a new attempt; it is not a
+chance to draw a better seed. Numerical failure and poor accuracy are different:
+poor but valid accuracy is a scientific outcome, while nonfinite computation
+invalidates the affected evidence.
+\end{concept}
+
+The fixed twenty-epoch duration avoids choosing a favorable stopping point.
+It does not claim that every method has converged or received its ideal budget.
+The fair statement is equal declared training and selection opportunities,
+with cost and limitations reported.
+
+\subsection{Why keep the final test closed?}
+Repeatedly looking at test results can influence human choices even if no
+test gradient is computed. Picking margins, a split, a corruption, or a headline
+after observing novel outcomes would use the test for development.
+
+The study therefore progresses through separate authorizations: auxiliary
+engineering, selection, final-head locking, and only then the single novel
+evaluation campaign. A dataset-level opening record spans historical and current
+versions so a new output folder cannot silently reset the holdout's history.
+After opening, scientific training and selection for this study/source remain
+closed. An error discovered afterward must be preserved and reported; a corrected
+analysis cannot silently replace the confirmatory result.
+
+There is a historical packaging nuance. The original aggregate loader
+deserialized all annotations before selecting auxiliary records. The evidence
+supports no novel retrieval preprocessing, embedding, visualization, scoring,
+or tuning access; it does not support the stronger claim that no novel bytes
+were ever deserialized. The newer auxiliary package separates authorized inputs
+from novel processing. State the actual access boundary, not a cleaner-sounding
+history.
+
+\source{\src{plan/research-plan.v3.md}{Plan, Sections 4 and 9};
+\src{src/pose_embed/training/sampler.py}{Balanced sampler};
+\src{docs/protocol/protocol-v3.md}{Fixed recipes, selection, and staged authorization}.}
+
+\section{Designing a controlled disturbance}\label{sec:corruption}
+\subsection{Where the intervention occurs}
+Write preprocessing as $P$, frozen encoding and pooling as $F$, and the learned
+head as $H_m$. Clean retrieval uses $H_m(F(P(x)))$. A damaged query uses
+\[
+ z_{m,c}=H_m\bigl(F(T_c(P(x)))\bigr),
+\]
+where $T_c$ changes the prepared pose tensor. The gallery remains clean.
+This location is part of the scientific question: the study perturbs pose
+observations, not rendered pixels, model weights, training labels, or cached
+embedding coordinates.
+
+Each family starts from its own clean tensor. Damage families are not combined.
+After damage, there is no clipping, recentering, normalization, interpolation,
+or frame deletion that could alter the declared intervention.
+
+\begin{tabularx}{\linewidth}{@{}P{0.20\linewidth}P{0.24\linewidth}Y@{}}
+\toprule Family & Three strengths & What changes and what stays fixed\\\midrule
+Coordinate jitter & 1\%, 2.5\%, 5\% of torso scale & Gaussian offsets to observed
+$x,y$ coordinates; confidence and missing observations unchanged.\\\addlinespace
+Joint masking & 3, 6, 8 joints & Zero complete trajectories, including confidence,
+using nested prefixes of one anatomically grouped ordering.\\\addlinespace
+Frame masking & 10, 25, 40 of 100 frames & Zero a contiguous nested interval across
+people, joints, and channels; retain all 100 time slots.\\\bottomrule
+\end{tabularx}
+
+\subsection{Scale jitter to the body, not arbitrary pixels}
+For observed joint coordinates, the intervention has the form
+\[
+ x'_{p,t,j,:2}=x_{p,t,j,:2}+\sigma\,r(x)\,\eta_{p,t,j},
+ \qquad\eta_{p,t,j}\sim\mathcal N(0,I_2).
+\]
+$\sigma$ is a fixed severity and $r(x)$ is the clean sample's lower-median
+positive finite torso scale. Thus the noise standard deviation is expressed
+relative to body size. A sample without usable torso geometry uses one fixed
+fallback: the lower median of valid sample-level scales from the eighty-action
+training set. It is measured and frozen before the relevant runs, not estimated
+from final-test poses or tuned to produce convenient damage.
+
+The same Gaussian field is reused at all three severities, multiplied by the
+corresponding scale. That keeps the disturbance direction fixed while changing
+its magnitude. Missing or padded observations remain missing rather than being
+turned into plausible new joints.
+
+\subsection{Nested severity and shared randomness}
+Per-example randomness is determined by the sample identity and corruption
+family, not by method, training seed, or severity. Joint masks use nested
+prefixes; frame intervals are coupled so larger intervals contain smaller ones.
+Therefore, when severity increases, it strengthens the same intervention.
+It does not accidentally replace it with an unrelated easier random pattern.
+
+The same damaged tensor is evaluated for every recipe and seed. A comparison
+then measures different responses to the same disturbance. It does not compare
+one model's fortunate noise draw with another model's unfortunate draw.
+
+\subsection{Validate the intervention before interpreting performance}
+A declared ``40-frame mask'' should zero the intended forty slots without
+shortening the sequence. Jitter should preserve confidence and scale with the
+declared body measure. The geometry panel checks interpretable examples and edge
+cases; full-query damage summaries establish what happened across the evaluation
+population, including fallback use and zero-damage cases.
+
+That evidence is a manipulation check: did $T_c$ do what the experiment says?
+It does not establish that contextual training handles the damage better.
+The October development damage audit passed its recorded execution/damage
+checks, but later runtime-dependent evidence still requires regeneration.
+
+These are controlled tensor stress tests. Real occlusion may cause a pose
+estimator to hallucinate confident joints rather than set them to zero; real
+frame loss may have another temporal pattern. MotionBERT was already pretrained
+with masking/noise. The present experiment studies the incremental effect of
+head-training recipes on that shared encoder.
+
+\studycheck{Why exclude severity from the random seed? Why measure fallback
+scale only from training poses? Why is masking input coordinates not equivalent
+to simulating a camera occlusion? Answers: Questions 8--9.}
+\source{\src{docs/protocol/protocol-v3.md}{Corruption conventions};
+\src{src/pose_embed/corruptions/pose.py}{Corruption operators};
+\src{src/pose_embed/corruptions/fallback.py}{Training-only fallback};
+\src{docs/protocol/week-5-execution.md}{Recorded development damage audit}.}
+
+\section{From retrieval ranks to a defensible conclusion}\label{sec:analysis}
+\subsection{Compute ranks first, then metrics}
+Let $r_q$ be the rank of the one correct gallery exemplar for query $q$.
+With a fixed gallery order to break exact cosine ties,
+\[
+ \mathrm{Top1}=\frac1Q\sum_q\ind[r_q=1],\qquad
+ \mathrm{R@5}=\frac1Q\sum_q\ind[r_q\le5],\qquad
+ \mathrm{MRR}=\frac1Q\sum_q\frac1{r_q}.
+\]
+For invented ranks $(1,2,7,1)$, Top-1 is $2/4=0.5$, R@5 is $3/4=0.75$, and
+MRR is $(1+1/2+1/7+1)/4\approx0.661$. Top-1 asks whether the immediate answer
+is correct. R@5 asks whether the correct answer is in a short list. MRR rewards
+moving the correct answer closer to the top even when it is not first.
+
+With exactly one relevant gallery item, average precision per query is $1/r_q$,
+so mAP equals MRR. Reporting both would not add independent evidence.
+
+The complete final report has
+\[
+ 3\text{ recipes}\times3\text{ seeds}\times10\text{ conditions}
+ \times2\text{ query definitions}=180\text{ cells}.
+\]
+The ten conditions are clean plus nine corruptions. These are 180 reporting
+cells, not 180 independent experiments: the same heads, examples, and damage
+draws recur across them. The two query sets also overlap heavily.
+
+\subsection{Derive the primary effect at the query level}
+Let $a_{m,s,c,q}\in\{0,1\}$ indicate a correct top-1 prediction. For each
+primary query, compute
+\[
+ e_q=\frac1{27}\sum_{s,c}
+ \left[(a_{C,s,0,q}-a_{C,s,c,q})
+       -(a_{B,s,0,q}-a_{B,s,c,q})\right],
+\]
+where $C$ is contextual and $B$ is standard contrastive. Then
+\[
+ \Delta=\frac1Q\sum_q e_q.
+\]
+This equals the earlier difference of mean accuracy drops because sums can be
+reordered. A query that becomes correct after corruption contributes a negative
+drop; the definition does not clip improvements to zero.
+
+Queries have equal weight within each cell. The three seeds and nine corruption
+conditions have equal weight in the declared mixture. This does not imply the
+nine conditions are equally common in the world. It defines the specific stress
+mixture whose average effect is being tested.
+
+An algebraic check connects the headline to absolute performance:
+\[
+ \Delta=(A_{C,\mathrm{clean}}-A_{B,\mathrm{clean}})
+        -(\overline A_{C,\mathrm{corrupt}}-\overline A_{B,\mathrm{corrupt}}).
+\]
+Always report all three quantities. An accuracy difference of $0.03$ is
+\emph{three percentage points}, not a three-percent relative increase. It
+corresponds descriptively to thirty additional correct matches per thousand
+queries under the specified mixture.
+
+\subsection{Why ordinary row resampling would be misleading}
+The observed $\Delta$ is a number for this fixed collection of trained heads
+and examples. To characterize sampling variation within that setting, the
+protocol uses a bootstrap: repeatedly resample the observed units with
+replacement and recompute the statistic.
+
+The resampling unit must reflect dependence. If several cameras recorded the
+same performance, resampling each view independently treats correlated evidence
+as if it came from separate events. The project instead samples entire
+performance groups, preserving all available camera views together.
+
+The declared procedure is:
+\begin{enumerate}
+\item Within each of the twenty fixed actions, identify the performance groups.
+\item Sample that action's original number of groups with replacement. A group
+selected twice contributes all its queries twice.
+\item Use the same sampled groups across all methods, seeds, and conditions.
+\item Sum their per-query effects and divide by the total sampled query count.
+\item Repeat 10,000 times with the fixed generator seed, then take the 2.5th and
+97.5th percentiles using the prescribed linear quantile convention.
+\end{enumerate}
+Actions and training seeds are \emph{not} resampled. This is not a bootstrap
+over all possible tasks or all possible training runs.
+
+\subsection{Unequal camera counts change the denominator}
+Suppose one sampled performance group contains one query with effect $+1$ and
+another contains three queries each with effect $-1$. The query-weighted mean is
+\[
+ \frac{1-1-1-1}{4}=-0.5.
+\]
+The mean of the two group means would be $(1+(-1))/2=0$, which answers a
+different question. Groups are resampled together to respect dependence, but
+queries retain their declared weighting. Resampling is not permission to change
+the estimand, meaning the exact quantity we intend to estimate.
+
+Because groups can have different numbers of views, each bootstrap draw can
+contain a different query count. The denominator must be recomputed. Actions
+remain fixed strata, but their queries are not forced to have equal action
+weights. Notebook 3 demonstrates this with small arrays.
+
+\subsection{What the interval means and the rule for the claim}
+The 95\% percentile interval describes uncertainty under the chosen resampling
+scheme. The 95\% is a nominal repeated-sampling coverage target under its
+assumptions, not a 95\% probability that the contextual recipe is superior.
+The single confirmatory statement is supported only if its \emph{upper}
+bound is below zero. An interval spanning zero is inconclusive for that claim;
+it does not prove equivalence or that the true effect is exactly zero.
+
+\begin{tabularx}{\linewidth}{@{}Y Y@{}}
+\toprule Observed pattern & Permitted interpretation\\\midrule
+Upper bound below zero & Evidence of less contextual degradation under the
+declared mixture. Check absolute corrupted accuracy separately.\\\addlinespace
+Interval includes zero & Insufficient evidence for the declared smaller-drop
+claim; no equivalence conclusion.\\\addlinespace
+Lower bound above zero & Evidence points toward more contextual degradation
+under the declared mixture.\\\bottomrule
+\end{tabularx}
+
+\begin{caution}{The interval's scope is conditional}
+It conditions on the trained heads, the three fixed seeds, fixed actions,
+gallery anchors, query definitions, and realized synthetic corruptions. It
+assumes performance groups are exchangeable within an action for this resampling
+purpose. Repeated performances from one person can still be dependent.
+
+It does not quantify uncertainty over arbitrary people, new action classes,
+different reference clips, unrestricted training seeds, or real camera failures.
+Ten thousand bootstrap draws do not create ten thousand independent models.
+\end{caution}
+
+Three seeds expose some training variation but do not justify broad population
+claims about random initializations. Every seed and condition is reported.
+SupCon, exact-official results, and per-cell comparisons remain descriptive;
+there are no additional unplanned superiority tests selected from favorable
+rows of the 180-cell table.
+
+\subsection{Sensitivity without changing the retrieval problem}
+Leave-one-action-out analysis asks whether one action strongly determines the
+reported effect. Remove that action's \emph{queries}, retaining the original
+gallery and original ranks. If the gallery item were also removed, the remaining
+queries would face fewer alternatives, changing the retrieval problem itself.
+The ranges and sign changes are descriptive checks, not new confirmatory tests.
+
+Report effect size, clean accuracy, absolute corrupted accuracy, per-seed and
+per-condition results, cost, and failures together. A null or adverse contextual
+result is successful research if the valid declared experiment is completed.
+A blocked experiment with no final comparison is an honest operational outcome,
+but it is not a null scientific result.
+
+\studycheck{Why resample whole performance groups but still weight individual
+queries? What does an interval crossing zero establish? Why do the three seeds
+not become 10,000 seeds through bootstrapping? Answers: Questions 10--12.}
+\source{\src{plan/research-plan.v3.md}{Locked analysis, Section 6};
+\src{docs/protocol/protocol-v3.md}{Analysis conventions};
+\src{docs/results/README.md}{Reproducible result/report contract}.}
