@@ -5,26 +5,27 @@ These rules apply to every automated or human change in this repository.
 ## SCC completion alerts and continuation
 
 - Every authorized long-running SCC GPU job and dependent CPU validator must
-  have its job ID, launch receipt, sole controller and next eligible check in
-  the existing handoff before control is released. Reuse the existing Week 5
-  automation; do not create a second watcher, connection or monitor.
-- At a permitted scheduled check, retain terminal `qacct` evidence and send a
-  local Mac alert with `scripts/operations/notify_scc_job.py` from the current
-  research worktree. Follow the [notification procedure](docs/protocol/scc-v3-runbook.md#mac-job-alerts-and-continuation).
-  Keep its deduplication receipts outside Git. Notify on completion or failure,
-  never on unchanged queued/running status. Scheduler disappearance alone is
-  not terminal evidence; an alert is not scientific acceptance.
-- The same controller must review the retained evidence and continue the next
-  authorized prerequisite, or record the required researcher action. Preserve
-  all acceptance gates, pause rules and the ban on later scientific stages.
-- These alerts use the existing hourly observation schedule, not instant SCC
-  push. The Mac must be awake with Codex running; notification permission and
-  Focus settings affect banners. Do not claim delivery from an exit-zero
-  notification command alone. Test the visible alert when installing it.
-- Respect explicit pauses. At earned Week 5 closure or a researcher-action
-  blocker with no independent work, pause the same automation and verify its
-  saved state. Do not install email credentials or new notification services
-  for the Mac-only workflow.
+  have its job ID, launch receipt, research worktree, sole controller and
+  earliest eligible check in the existing handoff before control is released.
+  Arm one [completion watcher](docs/protocol/scc-v3-runbook.md#mac-job-alerts-and-continuation)
+  using the existing authenticated SCC tmux pane. Keep the legacy Week 5 Codex
+  automation paused. The SCC wait checks scheduler metadata without a model.
+- The watcher retains validated terminal `qacct` output outside Git, sends a
+  deduplicated native Mac alert and starts one new GPT-6 Astra chat with ultra
+  reasoning in the Pose Embed Codex project. It stays quiet while the job is
+  queued or running. Scheduler disappearance alone cannot start a chat.
+- The new chat takes sole control after reconciling the private handoff, launch
+  receipt, terminal accounting and actual SCC state. It reviews the required
+  independent evidence before the next authorized prerequisite or records the
+  researcher action needed. Preserve the scientific acceptance gates and the
+  ban on later stages. An alert or successful scheduler exit does not accept
+  scientific evidence.
+- At an explicit pause, earned closure or researcher-action blocker with no
+  independent work, disarm the watcher and verify its state. Stop only a
+  confirmed foreground metadata wait in the SCC pane. Never interrupt the
+  experiment, restart a working SSH session or resume paused work without
+  researcher direction. Keep the Mac and its existing SCC session available
+  while waiting, and verify visible notifications during setup.
 
 ## Canonical intent
 

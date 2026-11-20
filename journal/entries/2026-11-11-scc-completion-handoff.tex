@@ -1,0 +1,20 @@
+\section{SCC completion handoff}
+\entry{11 November}{Replace hourly Codex runs with terminal accounting handoff}{The Week 5 pause is preserved. No scientific result or gate changes.}
+
+The researcher requested that Codex run only when an SCC job finishes.
+The local desktop scheduler has no SCC event trigger, so the new
+\path{scripts/operations/watch_scc_job.py} leaves the scheduler queries in a
+plain shell on the existing authenticated SCC connection. The Mac starts
+one GPT-6 Astra chat with ultra reasoning in the project after retaining and
+validating the job's terminal accounting. The new chat receives the existing
+handoff and must independently review the evidence before proceeding.
+
+Local fixtures exercised the metadata wait, exact accounting transfer,
+rejection of wrong or incomplete records, duplicate prevention, and chat
+dispatch ordering. A no-model smoke chat verified project membership and was
+archived. The installed Mac watcher was checked in its idle state. A labelled
+test notification was requested; visible delivery was not established.
+The old hourly automation remains paused. No SCC command or continuation
+model turn was run for this change. The next eligible live test is the first
+newly authorized job after the pause. The
+\path{docs/protocol/scc-v3-runbook.md} records the setup and stop procedure.
