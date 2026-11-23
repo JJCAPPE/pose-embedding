@@ -7,7 +7,7 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 17 current execution status:** CPU qualification 8621649 and bounded
+**November 23 current execution status:** CPU qualification 8621649 and bounded
 GPU parity 8622248 are independently accepted under
 [ADR0013](../docs/decisions/0013-kernel-184-qualification.md) on the authorized
 kernel-553.184.2 profile. The accepted single admission-prefix measurement
@@ -19,23 +19,26 @@ issuer replay or novel-array access. Integrity reads preceded timed reads and
 filesystem-cache state was uncontrolled; these are measured components, not
 future consumer records or complete campaign throughput.
 
-The conservative conditional forecast puts the longest CPU report job at
-22.773 hours including the required 25% margin, above the observed qualified
-public queue's 12-hour limit. Compatible 24-hour queue options restrict access
-to other projects. This is a forecast/access gap, not a measured report duration
-or proof that the study is infeasible; no complete capacity pass is claimed.
+The earlier unsplit CPU report forecast was 22.773 hours with margin against a
+12-hour queue limit. On November 17, CPU job 8724028 passed 123 synthetic
+tests of the fixed report split, including independent retrieval verification
+for 108 then 72 cells and complete report/bootstrap equivalence. Direct review
+of the retained fixture outcomes and continuation bindings on SCC is pending.
 
-On November 16 the researcher confirmed planning budgets of 4 hours before the
-November 29 locks, 1 hour for compute review and 8 hours for December 7–18
-delivery, corresponding to 5, 1.25 and 10 hours with the required 25% margin.
-Actual time remains unreported. The authorized [fixed report split](../docs/protocol/week-5-execution.md#november-17-fixed-report-split-implemented-qualification-pending)
-is implemented and locally tested: construction and independent verification each
-process 108 cells, then 72, preserving all 180 cells and complete report/bootstrap
-checks. SCC qualification and complete capacity remain pending. The forecast must
-include continuation reads, attempt growth and queue, completion-detection and
-review time. Ordinary 48-hour L40S access is available without a reservation.
-An RCS access-request fallback remains documented; no request has been sent or
-special access approval obtained.
+Using 298 retained attempt records, the updated conditional forecast puts the
+longest of four CPU report parts at 11h 22m 24s with the required 25% margin.
+The two proposed GPU jobs need 49h 28m 54s and 48h 47m 46s against the ordinary
+48-hour L40S limit. The schedule misses the December 6 compute deadline by
+6h 45m 16s with the stated queue and review allowances. This grouping requires
+at least 49h 28m 54s per GPU window and at most 14h 14m 44s of GPU queue time
+in total. See the [November 23 capacity review](../docs/protocol/week-5-execution.md#november-23-report-qualification-and-capacity-review).
+
+The November 16 researcher budgets were 4 hours before the November 29 locks,
+1 hour for compute review and 8 hours for December 7–18 delivery, or 5, 1.25
+and 10 hours including margin. The November 18–21 pre-lock allocation windows
+have elapsed. The week of November 23 has zero guaranteed researcher hours.
+The remaining pre-lock work needs new dated allocations and confirmed hours.
+Actual time remains unreported.
 
 Complete CPU/GPU/storage/calendar/researcher capacity remains unresolved before
 genuine admission. Preserve larger applicable accepted timings, the 200 GiB

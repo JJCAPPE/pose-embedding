@@ -23,11 +23,10 @@ accepted at 1,289.522811 seconds. This parser-warmed issuer-prefix timing must
 feed the complete capacity model before genuine admission. Retained-input component
 measurement 8640396 is independently accepted: 23 components, 218 scheduler seconds,
 complete source/input/runtime/resource/seal checks and no capacity or authorization.
-The conditional CPU report forecast exceeds the observed qualified public queue
-limit. Researcher planning availability was confirmed November 16; a possible
-fixed two-part construction and two-part independent verification path is now
-implemented and locally tested. SCC qualification and complete capacity remain pending.
-Week 5 stays open.
+Job 8724028 passed the fixed report split tests on synthetic inputs. Direct
+inspection of the retained fixture outputs is pending. With the expanded attempt
+inventory, both proposed GPU jobs exceed the ordinary 48-hour limit. The
+conditional schedule also misses the December 6 deadline. Week 5 stays open.
 Measurement 8565319 now has its verified
 metadata acceptance receipt, with its 873.911-hour forecast explicitly limited
 to the old call graph. The stopped process was reconciled and terminated; the
@@ -41,6 +40,51 @@ automation remains paused. Later scientific stages stay closed.** The [incoming 
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 23: report qualification and capacity review
+
+CPU job 8724028 ran on November 17 for 280 seconds after waiting 15 minutes
+28 seconds. All three monitored commands succeeded. The 123 tests passed with
+zero skips or failures. On synthetic inputs, the complete report test checked
+byte equality between the split and unsplit reports, including the
+10,000-replicate bootstrap. Construction performed zero retrieval replays.
+Independent verification recomputed 108 distinct cells and then the remaining
+72. It rejected forged ranks in both parts.
+
+Review of the 49 retained records confirmed the imported candidate code,
+runtime profile, resource checks and sealed dataset before and after execution.
+The local fixture index contains filenames and sizes. Independent qualification
+still requires inspecting the retained continuations and their source bindings,
+the fixture outcome and the report and bootstrap contents on SCC.
+
+The inventory measured 298 attempt records totalling 982,790 bytes in
+32.496375 seconds, including the new operation and its 23 fixture records.
+Integrity hashing preceded the timed reads. Cache state was uncontrolled.
+The conditional forecast uses the larger observed inventory and individual-read
+timings and allows for 36 future training records, 13 remaining operation
+records and zero retries. Including the required 25% margin gives:
+
+| Work | Forecast walltime | Ordinary queue limit |
+| --- | ---: | ---: |
+| First GPU group (70 cells and preparation) | 49h 28m 54s | 48h |
+| Second GPU group (110 cells) | 48h 47m 46s | 48h |
+| Longest of four CPU report parts | 11h 22m 24s | 12h |
+
+The calendar reserves the largest job of each resource class in every window
+of that class. With 10h 30m of queue time per GPU job, 15m 28s per CPU job,
+six detection and review intervals, and the final researcher review, completion
+falls at **06:44:16 Eastern on December 7**. That misses the December 6 23:59
+cutoff by **6h 45m 16s**. For this grouping and the other stated allowances,
+each GPU window would need at least 49h 28m 54s of usable walltime and the
+two GPU queue waits together could consume at most 14h 14m 44s.
+Neither bound has confirmed access.
+
+The proposed November 18–21 pre-lock windows have elapsed. The week of
+November 23 has zero guaranteed researcher hours. The November 16 plan allowed
+five hours including margin before the November 29 locks. Remaining work needs
+fresh dated researcher availability and allocation windows. Complete capacity
+and genuine admission remain pending. Selection, final training and novel
+opening remain closed.
 
 ## November 17: fixed report split implemented; qualification pending
 
