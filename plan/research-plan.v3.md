@@ -7,7 +7,7 @@ This document replaces the v3 draft. [Decision 0004](../docs/decisions/0004-froz
 records the change of direction from v2. It does not constitute a final-test
 lock, a completed experiment, or a change to the deployed tracker.
 
-**November 23 current execution status:** CPU qualification 8621649 and bounded
+**November 25 current execution status:** CPU qualification 8621649 and bounded
 GPU parity 8622248 are independently accepted under
 [ADR0013](../docs/decisions/0013-kernel-184-qualification.md) on the authorized
 kernel-553.184.2 profile. The accepted single admission-prefix measurement
@@ -22,8 +22,9 @@ future consumer records or complete campaign throughput.
 The earlier unsplit CPU report forecast was 22.773 hours with margin against a
 12-hour queue limit. On November 17, CPU job 8724028 passed 123 synthetic
 tests of the fixed report split, including independent retrieval verification
-for 108 then 72 cells and complete report/bootstrap equivalence. Direct review
-of the retained fixture outcomes and continuation bindings on SCC is pending.
+for 108 then 72 cells and complete report/bootstrap equivalence. Independent
+inspection of both continuations and all 13 retained report files completed
+[synthetic qualification on November 25](../docs/protocol/week-5-execution.md#november-25-retained-report-qualification).
 
 Using 298 retained attempt records, the updated conditional forecast puts the
 longest of four CPU report parts at 11h 22m 24s with the required 25% margin.
@@ -31,7 +32,9 @@ The two proposed GPU jobs need 49h 28m 54s and 48h 47m 46s against the ordinary
 48-hour L40S limit. The schedule misses the December 6 compute deadline by
 6h 45m 16s with the stated queue and review allowances. This grouping requires
 at least 49h 28m 54s per GPU window and at most 14h 14m 44s of GPU queue time
-in total. See the [November 23 capacity review](../docs/protocol/week-5-execution.md#november-23-report-qualification-and-capacity-review).
+in total. The November 25 queue check found no eligible instance at 49h 29m.
+Research Computing Services has been asked about compatible access and scheduled
+starts. See the [November 23 capacity review](../docs/protocol/week-5-execution.md#november-23-report-qualification-and-capacity-review).
 
 The November 16 researcher budgets were 4 hours before the November 29 locks,
 1 hour for compute review and 8 hours for December 7–18 delivery, or 5, 1.25

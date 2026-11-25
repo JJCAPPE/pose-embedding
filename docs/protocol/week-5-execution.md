@@ -23,8 +23,8 @@ accepted at 1,289.522811 seconds. This parser-warmed issuer-prefix timing must
 feed the complete capacity model before genuine admission. Retained-input component
 measurement 8640396 is independently accepted: 23 components, 218 scheduler seconds,
 complete source/input/runtime/resource/seal checks and no capacity or authorization.
-Job 8724028 passed the fixed report split tests on synthetic inputs. Direct
-inspection of the retained fixture outputs is pending. With the expanded attempt
+Job 8724028 qualified the fixed report split on synthetic inputs. Independent
+review of the retained fixture was completed November 25. With the expanded attempt
 inventory, both proposed GPU jobs exceed the ordinary 48-hour limit. The
 conditional schedule also misses the December 6 deadline. Week 5 stays open.
 Measurement 8565319 now has its verified
@@ -40,6 +40,28 @@ automation remains paused. Later scientific stages stay closed.** The [incoming 
 [adopted October 9 amendment](../decisions/0006-v3-execution-completion-amendment.md)
 and [October 12 engineering amendment](../decisions/0007-safe-validation-reuse-and-stage-capacity.md)
 govern this work.
+
+## November 25: retained report qualification
+
+Independent inspection of job 8724028's retained synthetic fixture on SCC
+completed qualification of the fixed report split. The construction continuation
+bound 595 files and the independent verification continuation bound 596. Both
+identified the candidate's 80 source files, the full 180-cell index and the 108
+cells completed in the first part. Every bound file matched its recorded hash.
+The nine-head fixture produced all 180 cells. All 13 split report files matched
+the unsplit outputs byte for byte, including the analysis with 10,000 bootstrap
+replicates. This completes the [November 23 terminal review](#november-23-report-qualification-and-capacity-review)
+of the 123 passing tests, runtime, resources and dataset seals. The independent
+qualification receipt has SHA-256
+`2bd4f9dd6a18c0d2fa58b309a7b6ae4f9dcb672e244b6069734dd2aae2e8839d`.
+
+The November 25 queue check returned ten L40S queue instances for a 48-hour
+request and none for 49 hours 29 minutes. Both proposed GPU jobs exceed the
+48-hour limit. The [capacity forecast](#november-23-report-qualification-and-capacity-review)
+requires two compatible windows and at most 14h 14m 44s of combined GPU queue
+time. Research Computing Services has been asked about longer allocations and
+scheduled starts. Access approval and dated pre-lock researcher availability
+are outstanding. Week 5 remains open with genuine admission pending.
 
 ## November 23: report qualification and capacity review
 
